@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>CoderBot</title>
+	<link rel="shortcut icon" href="favicon.ico">
+	<link rel="stylesheet"  href="../css/jquery.mobile-1.4.0.min.css">
+	<script src="../js/jquery-2.1.0.min.js"></script>
+	<script src="../js/jquery.mobile-1.4.0.min.js"></script>
+	<script src="../js/coderbot.js"></script>
+</head>
+<body>
+<div data-role="page" class="">
+<div data-role="header"><h1>CoderBot</h1></div>
+<div role="main" class="ui-content">
+<fieldset class="ui-grid-solo">
+    <div class="ui-block-a"><button id="b_forward" class="ui-btn ui-icon-arrow-u ui-btn-icon-top" type="button">Forward</button></div>
+</fieldset>
+<fieldset class="ui-grid-a">
+	<div class="ui-block-a"><button id="b_left" class="ui-btn ui-icon-arrow-l ui-btn-icon-top" type="button">Left</button></div>
+	<div class="ui-block-b"><button id="b_right" class="ui-btn ui-icon-arrow-r ui-btn-icon-top" type="button">Right</button></div>
+</fieldset>
+<fieldset class="ui-grid-solo">
+	<div class="ui-block-a"><button id="b_backward" class="ui-btn ui-icon-arrow-d ui-btn-icon-top" type="button">Backward</button></div>
+</fieldset>
+<div class="ui-grid-solo">
+<div class="ui-block-a"><iframe src="http://10.1.1.1:8080" width="320" height="240" style="display:block;margin: 0 auto;"></iframe></div>
+</div>
+</div>
+</div>
+</body>
+</html>
