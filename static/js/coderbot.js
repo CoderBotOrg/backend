@@ -1,14 +1,43 @@
+function CoderBot() {
+	this.url = "/bot";
+}
+
+CoderBot.prototype.command = function(cmd, param) {
+	data =  {'cmd': cmd,
+			 'param': param};
+	$.ajax({url: this.url, data: data, type: "GET"});
+}
+
+CoderBot.prototype.forward = function(t) {
+	this.command('forward', t);
+}
+
+CoderBot.prototype.left = function(t) {
+	this.command('left', t);
+}
+
+CoderBot.prototype.right = function(t) {
+	this.command('right', t);
+}
+
+CoderBot.prototype.backward = function(t) {
+	this.command('backward', t);
+}
+
+var bot = new CoderBot();
+
 $(document).ready(function() {
+	
 	$('#b_forward').on("click", function (){
-		alert("Forward");
+		bot.forward(1);
 	});
 	$('#b_left').on("click", function (){
-		alert("Left");
+		bot.left(1);
 	});
 	$('#b_right').on("click", function (){
-		alert("Right");
+		bot.right(1);
 	});
 	$('#b_backward').on("click", function (){
-		alert("Backward");
+		bot.backward(1);
 	});
 });
