@@ -1,8 +1,12 @@
+import signal_reader
+import coderbot
+
 from flask import Flask, render_template, request
 
-import coderbot
-app = Flask(__name__,static_url_path="")
+signal = signal_reader.SignalReader()
 bot = coderbot.CoderBot()
+
+app = Flask(__name__,static_url_path="")
 
 @app.route("/")
 def home():
@@ -20,7 +24,11 @@ def handle_bot():
         bot.right(float(param))
     elif cmd == "backward":
         bot.backward(float(param))
+    elif cmd == "signal_on":
+        signal.start()
+    elif cmd == "signal_off":
+        signal.stop()    
     return "ok"
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)

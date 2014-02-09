@@ -24,6 +24,14 @@ CoderBot.prototype.backward = function(t) {
 	this.command('backward', t);
 }
 
+CoderBot.prototype.signalOn = function() {
+	this.command('signal_on', 0);
+}
+
+CoderBot.prototype.signalOff = function() {
+	this.command('signal_off',0);
+}
+
 var bot = new CoderBot();
 
 $(document).ready(function() {
@@ -39,5 +47,11 @@ $(document).ready(function() {
 	});
 	$('#b_backward').on("click", function (){
 		bot.backward(1);
+	});
+	$('#b_signal_on').on("click", function (){
+		bot.signalOn();
+	});
+	$('#b_signal_off').on("click", function (){
+		bot.signalOff();
 	});
 });
