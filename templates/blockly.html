@@ -9,6 +9,7 @@
   <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/javascript_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/en.js"></script>
   <script src="js/jquery-2.1.0.min.js"></script>
   <script src="js/jquery.mobile-1.4.0.min.js"></script>
   <script src="js/coderbot.js"></script>
@@ -18,12 +19,12 @@
 <div data-role="page" class="">
 <div data-role="header"><h1>CoderBot - Blockly</h1></div>
 <div role="main" class="ui-content">
-  <p>
-    <button onclick="showCode()">Show Code</button>
-    <button onclick="runCode()">Run Code</button>
-  </p>
+  <fieldset class="ui-grid-a">
+    <div class="ui-block-a"><button onclick="showCode()" class="ui-btn" type="button">Show Code</button></div>
+    <div class="ui-block-b"><button onclick="runCode()" class="ui-btn" type="button">Run Code</button></div>
+  </fieldset>
 
-  <div id="blocklyDiv" style="height: 480px; width: 100%"></div>
+  <div id="blocklyDiv" style="height: 480px; width:100%;"></div>
 
   <xml id="toolbox" style="display: none">
     <category name="Control">
@@ -62,8 +63,10 @@
   </xml>
 
   <script>
+    $(document).ready(function() {
     Blockly.inject(document.getElementById('blocklyDiv'),
         {path: '../../', toolbox: document.getElementById('toolbox')});
+    });
 
     function showCode() {
       // Generate JavaScript code and display it.
