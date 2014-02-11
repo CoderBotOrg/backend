@@ -3,13 +3,12 @@
 <head>
   <meta charset="utf-8">
   <title>Blockly Demo: Fixed Blockly</title>
-  <script type="text/javascript" src="../../blockly_compressed.js"></script>
-  <script type="text/javascript" src="../../blocks_compressed.js"></script>
-  <script type="text/javascript" src="../../javascript_compressed.js"></script>
-  <script type="text/javascript" src="../../msg/js/en.js"></script>
-  <script type="text/javascript" src="jquery-2.1.0.min.js"></script>
-  <script type="text/javascript" src="coderbot.js"></script>
-  <script type="text/javascript" src="blocks.js"></script>  <style>
+  <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/javascript_compressed.js"></script>
+  <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
+  <script type="text/javascript" src="js/coderbot.js"></script>
+  <script type="text/javascript" src="js/blockly/blocks.js"></script>  <style>
     body {
       background-color: #fff;
       font-family: sans-serif;
@@ -78,6 +77,7 @@
     }
 
     function runCode() {
+      var bot = new CoderBot();
       // Generate JavaScript code and run it.
       window.LoopTrap = 1000;
       Blockly.JavaScript.INFINITE_LOOP_TRAP =

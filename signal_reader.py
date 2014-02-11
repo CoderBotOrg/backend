@@ -8,7 +8,7 @@ class SignalReader(Thread):
   def __init__(self):
     self.cam = Camera()
     time.sleep(2)
-    self.streamer = JpegStreamer("0.0.0.0:8080")
+    self.streamer = JpegStreamer("0.0.0.0:8090")
     self.bot = coderbot.CoderBot()
     Thread.__init__(self)
 

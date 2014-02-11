@@ -40,7 +40,7 @@ Blockly.Blocks['coderbot_moveForward'] = {
 
 Blockly.JavaScript['coderbot_moveForward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return 'CoderBot.forward(2);\n';
+  return 'bot.forward(2);\n';
 };
 
 Blockly.Blocks['coderbot_moveBackward'] = {
@@ -58,7 +58,7 @@ Blockly.Blocks['coderbot_moveBackward'] = {
 
 Blockly.JavaScript['coderbot_moveBackward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return 'CoderBot.backward(2);\n';
+  return 'bot.backward(2);\n';
 };
 
 Blockly.Blocks['coderbot_turnLeft'] = {
@@ -74,10 +74,10 @@ Blockly.Blocks['coderbot_turnLeft'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_turnRight'] = function(block) {
+Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
   // Generate JavaScript for turning left or right.
   var dir = block.getFieldValue('DIR');
-  return 'CoderBot.right(2);\n';
+  return 'bot.left(1.8);\n';
 };
 
 Blockly.Blocks['coderbot_turnRight'] = {
@@ -96,7 +96,7 @@ Blockly.Blocks['coderbot_turnRight'] = {
 Blockly.JavaScript['coderbot_turnRight'] = function(block) {
   // Generate JavaScript for turning left or right.
   var dir = block.getFieldValue('DIR');
-  return 'CoderBot.right(2);\n';
+  return 'bot.right(1.8);\n';
 };
 
 

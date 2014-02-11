@@ -3,7 +3,7 @@ import coderbot
 
 from flask import Flask, render_template, request
 
-signal = signal_reader.SignalReader()
+#signal = signal_reader.SignalReader()
 bot = coderbot.CoderBot()
 
 app = Flask(__name__,static_url_path="")
@@ -11,6 +11,10 @@ app = Flask(__name__,static_url_path="")
 @app.route("/")
 def home():
     return render_template('control.html')
+
+@app.route("/blockly")
+def blockly():
+    return render_template('blockly.html')
 
 @app.route("/bot")
 def handle_bot():
@@ -25,9 +29,11 @@ def handle_bot():
     elif cmd == "backward":
         bot.backward(float(param))
     elif cmd == "signal_on":
-        signal.start()
+        #signal.start()
+        pass
     elif cmd == "signal_off":
-        signal.stop()    
+        #signal.stop()
+        pass    
     return "ok"
 
 if __name__ == "__main__":
