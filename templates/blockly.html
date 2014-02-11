@@ -1,33 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet"  href="../css/jquery.mobile-1.4.0.min.css">
   <meta charset="utf-8">
-  <title>Blockly Demo: Fixed Blockly</title>
+  <title>CoderBot - Blockly</title>
   <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/javascript_compressed.js"></script>
-  <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
-  <script type="text/javascript" src="js/coderbot.js"></script>
-  <script type="text/javascript" src="js/blockly/blocks.js"></script>  <style>
-    body {
-      background-color: #fff;
-      font-family: sans-serif;
-    }
-    h1 {
-      font-weight: normal;
-      font-size: 140%;
-    }
-  </style>
+  <script src="js/jquery-2.1.0.min.js"></script>
+  <script src="js/jquery.mobile-1.4.0.min.js"></script>
+  <script src="js/coderbot.js"></script>
+  <script type="text/javascript" src="js/blockly/blocks.js"></script>
 </head>
 <body>
-  <h1>CoderBot</h1>
-  <p>CoderBot blockly programming</p>
+<div data-role="page" class="">
+<div data-role="header"><h1>CoderBot - Blockly</h1></div>
+<div role="main" class="ui-content">
   <p>
     <button onclick="showCode()">Show Code</button>
     <button onclick="runCode()">Run Code</button>
   </p>
 
-  <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+  <div id="blocklyDiv" style="height: 480px; width: 100%"></div>
 
   <xml id="toolbox" style="display: none">
     <category name="Control">
@@ -91,6 +87,7 @@
       }
     }
   </script>
-
+</div>
+</div>
 </body>
 </html>
