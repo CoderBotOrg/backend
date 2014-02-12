@@ -7,13 +7,20 @@ class SignalReader(Thread):
 
   def __init__(self):
     self.cam = Camera()
-    time.sleep(2)
     self.streamer = JpegStreamer("0.0.0.0:8090")
-    self.bot = coderbot.CoderBot()
+    self.bot = coderbot.get_instance()
     Thread.__init__(self)
 
   corners = [(160, 0), (480, 0), (460, 480), (180, 480)]
-
+  the_reader = None
+  
+  @classmethod
+  def get_instance(cls) {
+    if not cls.the_reader:
+      cls.the_reader = SignalReader()
+    return cls.the_reader 
+  }
+  
   def start(self):
     self.finish = False
     print "SignalReader starting"
@@ -21,6 +28,7 @@ class SignalReader(Thread):
 
   def stop(self):
     self.finish = True
+    self.join()
 
   def run(self):
     print "run"
@@ -57,13 +65,13 @@ class SignalReader(Thread):
       if lineAngle:
         if lineAngle > -30 and lineAngle < 30:
           print "turn right"
-          self.bot.right(2)
+          self.bot.right(1.8)
         elif lineAngle < -60 and lineAngle > -120:
           print "go forward"
           self.bot.forward(2)
         elif lineAngle > 150 or lineAngle < -150:
           print "turn left"
-          self.bot.left(2)
+          self.bot.left(1.8)
         elif lineAngle > 60 and lineAngle < 110:
           print "go backward"
           self.bot.backward(2)

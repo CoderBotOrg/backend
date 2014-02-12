@@ -3,8 +3,8 @@ import coderbot
 
 from flask import Flask, render_template, request
 
-#signal = signal_reader.SignalReader()
-bot = coderbot.CoderBot()
+signal = signal_reader.SignalReader.get_instance()
+bot = coderbot.CoderBot.get_instance()
 
 app = Flask(__name__,static_url_path="")
 
