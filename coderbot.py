@@ -16,6 +16,14 @@ class CoderBot:
     pigpio.write(PIN_LEFT_BACKWARD, 0)
     pigpio.write(PIN_RIGHT_BACKWARD, 0)
 
+  the_bot = None
+
+  @classmethod
+  def get_instance(cls):
+	if not cls.the_bot:
+	  cls.the_bot = CoderBot()
+    return cls.the_bot
+    
   def forward(self, seconds):
     pigpio.write(PIN_MOTOR_ENABLE, 1)
     pigpio.write(PIN_LEFT_FORWARD, 1)
