@@ -1,15 +1,17 @@
+var bot = new CoderBot()
+
 $(document).ready(function() {
 	
 	$('#b_forward').on("click", function (){
-		CoderBot.forward(1);
+		bot.forward(1);
 	});
 	$('#b_left').on("click", function (){
-		CoderBot.left(1);
+		bot.left(1);
 	});
 	$('#b_right').on("click", function (){
-		CoderBot.right(1);
+		bot.right(1);
 	});
 	$('#b_backward').on("click", function (){
-		CoderBot.backward(1);
+		bot.backward(1);
 	});
 });
