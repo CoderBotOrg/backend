@@ -20,8 +20,8 @@ class CoderBot:
 
   @classmethod
   def get_instance(cls):
-	if not cls.the_bot:
-	  cls.the_bot = CoderBot()
+    if not cls.the_bot:
+      cls.the_bot = CoderBot()
     return cls.the_bot
     
   def forward(self, seconds):

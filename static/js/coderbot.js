@@ -4,7 +4,7 @@ CoderBot.prototype.command = function(cmd, param) {
 	this.url = "/bot";
 	var data =  {'cmd': cmd,
 			 'param': param};
-	$.ajax({url: this.url, data: data, type: "GET"});
+	$.ajax({url: this.url, data: data, async: false, type: "GET"});
 }
 
 CoderBot.prototype.forward = function(t) {

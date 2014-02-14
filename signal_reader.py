@@ -6,20 +6,19 @@ import coderbot
 class SignalReader(Thread):
 
   def __init__(self):
-    self.cam = Camera()
+    self.cam = Camera(prop_set={'width':640,'heigth':480})
     self.streamer = JpegStreamer("0.0.0.0:8090")
-    self.bot = coderbot.get_instance()
+    self.bot = coderbot.CoderBot.get_instance()
     Thread.__init__(self)
 
   corners = [(160, 0), (480, 0), (460, 480), (180, 480)]
   the_reader = None
   
   @classmethod
-  def get_instance(cls) {
+  def get_instance(cls):
     if not cls.the_reader:
       cls.the_reader = SignalReader()
     return cls.the_reader 
-  }
   
   def start(self):
     self.finish = False

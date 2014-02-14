@@ -1,16 +1,16 @@
-import signal_reader
 import coderbot
+import signal_reader
 
 from flask import Flask, render_template, request
 
-signal = signal_reader.SignalReader.get_instance()
 bot = coderbot.CoderBot.get_instance()
+reader = signal_reader.SignalReader.get_instance()
 
 app = Flask(__name__,static_url_path="")
 
 @app.route("/")
 def home():
-    return render_template('control.html')
+    return render_template('control.html', host=request.host[:request.host.find(':')])
 
 @app.route("/blockly")
 def blockly():
@@ -29,12 +29,12 @@ def handle_bot():
     elif cmd == "backward":
         bot.backward(float(param))
     elif cmd == "signal_on":
-        #signal.start()
+        reder.start()
         pass
     elif cmd == "signal_off":
-        #signal.stop()
+        reader.stop()
         pass    
     return "ok"
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, debug=True)
+def run_server():
+    app.run(host='0.0.0.0', port=8080, debug=False, use_reloader=False)
