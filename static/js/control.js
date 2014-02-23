@@ -14,4 +14,8 @@ $(document).ready(function() {
 	$('#b_backward').on("click", function (){
 		bot.backward(1);
 	});
+	$('.b_camera').on("click", function (){
+		var param = $(this).attr('data-param');
+		bot.set_handler(param);
+	});
 });

@@ -1,14 +1,14 @@
-import camera_handler
+from handler import camera, signal, logo
+import coderbot
 import main
 
-camera_handler = camera_handler.CameraReader.get_instance()
-camera_handler.add_handler(camera_handler.SignalReader())
-camera_handler.add_handler(camera_handler.LogoReader())
-camera_handler.set_active_handler(None)
+cam_h = camera.CameraHandler.get_instance()
+cam_h.add_handler(camera.SimpleHandler())
+cam_h.add_handler(signal.SignalHandler(coderbot.CoderBot.get_instance()))
+cam_h.add_handler(logo.LogoHandler("coderdojo-logo.png", coderbot.CoderBot.get_instance()))
+cam_h.set_active_handler(None)
 
 if __name__=="__main__":
-  camera_handler.start()
+  cam_h.start()
   main.run_server()
   reader.join()
-
-

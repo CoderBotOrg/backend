@@ -25,12 +25,14 @@
   <fieldset class="ui-grid-solo">
    <div class="ui-block-a"><button id="b_backward" class="ui-btn ui-icon-arrow-d ui-btn-icon-top" type="button">Backward</button></div>
   </fieldset>
-  <fieldset class="ui-grid-a">
-   <div class="ui-block-a"><button id="b_signal_on" class="ui-btn ui-icon- ui-btn-icon-top" type="button">Signal On</button></div>
-   <div class="ui-block-b"><button id="b_signal_off" class="ui-btn ui-icon- ui-btn-icon-top" type="button">Signal Off</button></div>
+  <fieldset class="ui-grid-c center">
+   <div class="ui-block-a"><button class="ui-btn ui-icon- ui-btn-icon-top b_camera" data-param="-1" type="button">Off</button></div>
+   <div class="ui-block-b"><button class="ui-btn ui-icon- ui-btn-icon-top b_camera" data-param="0" type="button">Camera</button></div>
+   <div class="ui-block-c"><button class="ui-btn ui-icon- ui-btn-icon-top b_camera" data-param="1" type="button">Signal</button></div>
+   <div class="ui-block-d"><button class="ui-btn ui-icon- ui-btn-icon-top b_camera" data-param="2" type="button">Logo</button></div>
   </fieldset>
   <div class="ui-grid-solo">
-   <div class="ui-block-a"><iframe src="http://{{host}}:8090" style="display:block;margin: 0 auto;"></iframe></div>
+   <div class="ui-block-a"><iframe src="http://{{host}}:8090" width="640" height="480" style="display:block;margin: 0 auto;"></iframe></div>
   </div>
   </div>
   <div data-role="navbar">

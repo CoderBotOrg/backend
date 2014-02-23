@@ -1,10 +1,10 @@
 import coderbot
-import camera_handler
+from handler import camera
 
 from flask import Flask, render_template, request
 
 bot = coderbot.CoderBot.get_instance()
-camera_handler = camera_handler.CameraReader.get_instance()
+cam_h = camera.CameraHandler.get_instance()
 
 app = Flask(__name__,static_url_path="")
 
@@ -28,12 +28,13 @@ def handle_bot():
         bot.right(float(param))
     elif cmd == "backward":
         bot.backward(float(param))
-    elif cmd == "signal_on":
-        camera_handler.set_active_handler(1)
-        pass
-    elif cmd == "signal_off":
-        camera_handler.set_active_handler(None)
-        pass    
+    elif cmd == "set_handler":
+        print "param: " + str(param)
+        try:
+          handler = int(param) if int(param) >= 0 else None
+          cam_h.set_active_handler(handler)
+        except e:
+          print e 
     return "ok"
 
 def run_server():

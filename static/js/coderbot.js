@@ -22,3 +22,7 @@ CoderBot.prototype.right = function(t) {
 CoderBot.prototype.backward = function(t) {
 	this.command('backward', t);
 }
+
+CoderBot.prototype.set_handler = function(h) {
+	this.command('set_handler', h);
+}
