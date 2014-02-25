@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from handler import camera, signal, logo
 import coderbot
 import main
