@@ -17,5 +17,6 @@ $(document).ready(function() {
 	$('.b_camera').on("click", function (){
 		var param = $(this).attr('data-param');
 		bot.set_handler(param);
+                $('#f_stream').attr('src', $('#f_stream').attr('src'));
 	});
 });
