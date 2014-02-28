@@ -4,7 +4,7 @@ import coderbot
 
 class SignalHandler():
 
-  corners = [(160, 0), (480, 0), (460, 480), (180, 480)]
+  corners = [(160, 0), (480, 0), (380, 480), (260, 480)]
 
   @classmethod
   def get_name(cls):
