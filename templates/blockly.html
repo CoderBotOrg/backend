@@ -20,6 +20,7 @@
           {path: '../../', toolbox: document.getElementById('toolbox')});
       $("#b_show_code").on("click", showCode).on("touchend",showCode);
       $("#b_run_code").on("click", runCode).on("touchend",runCode);
+      $("#b_control").on("click", goControl).on("touchend",goControl);
     });
 
     function showCode() {
@@ -42,6 +43,9 @@
       } catch (e) {
         alert(e);
       }
+    }
+    function goControl() {
+      $.mobile.changePage("/");
     }
   </script>
 </head>
@@ -92,7 +96,7 @@
  </div>
  <div data-role="navbar">
   <ul>
-   <li><a href="/" data-ajax="false">Controllo</a></li>
+   <li><button id="b_control" type="button">Control</button></li>
    <li><a href="#" class="ui-btn-active">Blockly</a></li>
   </ul>
  </div><!-- /navbar -->
