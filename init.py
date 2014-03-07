@@ -13,4 +13,3 @@ cam_h.set_active_handler(None)
 if __name__=="__main__":
   cam_h.start()
   main.run_server()
-  reader.join()

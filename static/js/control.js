@@ -14,6 +14,10 @@ $(document).ready(function() {
 	$('#b_backward').on("click", function (){
 		bot.backward(1);
 	});
+	$('#b_say').on("click", function (){
+		var text = $('#i_say').val();
+                bot.say(text);
+	});
 	$('.b_camera').on("click", function (){
 		var param = $(this).attr('data-param');
 		bot.set_handler(param);

@@ -1,26 +1,19 @@
 /**
- * Blockly Apps: CoderBot Blocks
- *
- * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+  * Copyright (C) 2014 Roberto Previtera
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 3 of the License.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
 
-/**
- * @fileoverview Blocks for Blockly's CoderBot application.
- * @author fraser@google.com (Neil Fraser)
- */
 'use strict';
 
 // Extensions to Blockly's language and JavaScript generator.
@@ -97,6 +90,27 @@ Blockly.JavaScript['coderbot_turnRight'] = function(block) {
   // Generate JavaScript for turning left or right.
   var dir = block.getFieldValue('DIR');
   return 'bot.right(1.8);\n';
+};
+
+Blockly.Blocks['coderbot_say'] = {
+  // Block for text to speech.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Say');
+    this.setColour(290);
+    this.appendValueInput('TEXT')
+        .setCheck(["String", "Number", "Date"])
+        .appendField('text');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(('CoderBot_sayTooltip'));
+  }
+};
+
+Blockly.JavaScript['coderbot_say'] = function(block) {
+  // Generate JavaScript for turning left or right.
+  var text = Blockly.JavaScript.valueToCode(block, 'TEXT',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'';
+  return 'bot.say(' + text + ');\n';
 };
 
 

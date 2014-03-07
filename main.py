@@ -1,3 +1,4 @@
+import os
 import coderbot
 from handler import camera
 
@@ -33,9 +34,15 @@ def handle_bot():
         try:
           handler = int(param) if int(param) >= 0 else None
           cam_h.set_active_handler(handler)
+      
         except e:
           print e 
-    return "ok"
 
+    elif cmd == "say":
+        print "say: " + str(param)
+        os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + repr(param) + '" 2>>/dev/null')
+        
+    return "ok"
+    
 def run_server():
     app.run(host='0.0.0.0', port=8080, debug=False, use_reloader=False)

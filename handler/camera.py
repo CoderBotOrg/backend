@@ -9,9 +9,11 @@ class CameraHandler(Thread):
     print "starting camera"
     self.cam = Camera()
     self.streamer = JpegStreamer("0.0.0.0:8090")
+    self._cam_off_img.save(self.streamer)
     Thread.__init__(self)
 
   _cam_handler = None
+  _cam_off_img = Image("coderdojo-logo.png")
   
   @classmethod
   def get_instance(cls): 
@@ -26,11 +28,13 @@ class CameraHandler(Thread):
     Thread.start(self)
 
   def stop(self):
+    print "CameraHandler stopping"
     self.finish = True
     self.join()
+    self._cam_off_img.save(self.streamer)
+    print "stopped"
 
   def run(self):
-    print "run"
     while not self.finish:
       print "getting image"
       img = self.cam.getImage()
@@ -38,7 +42,8 @@ class CameraHandler(Thread):
       	handler = self._handlers[self._active_handler_idx]
       	handler.handle(img, self.streamer)
       else:
-        time.sleep(0.5)
+        self._cam_off_img.save(self.streamer)
+        time.sleep(1)
   
   _handlers = []
   _active_handler_idx = None

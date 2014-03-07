@@ -3,7 +3,7 @@ function CoderBot() {};
 CoderBot.prototype.command = function(cmd, param) {
 	this.url = "/bot";
 	var data =  {'cmd': cmd,
-			 'param': param};
+                     'param': param};
 	$.ajax({url: this.url, data: data, async: false, type: "GET"});
 }
 
@@ -25,4 +25,8 @@ CoderBot.prototype.backward = function(t) {
 
 CoderBot.prototype.set_handler = function(h) {
 	this.command('set_handler', h);
+}
+
+CoderBot.prototype.say = function(h) {
+	this.command('say', h);
 }
