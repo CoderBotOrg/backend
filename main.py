@@ -40,7 +40,7 @@ def handle_bot():
 
     elif cmd == "say":
         print "say: " + str(param)
-        os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + repr(param) + '" 2>>/dev/null')
+	bot.say(param)
         
     return "ok"
     

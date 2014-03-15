@@ -70,7 +70,7 @@ Blockly.Blocks['coderbot_turnLeft'] = {
 Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
   // Generate JavaScript for turning left or right.
   var dir = block.getFieldValue('DIR');
-  return 'bot.left(1.8);\n';
+  return 'bot.left(1.6);\n';
 };
 
 Blockly.Blocks['coderbot_turnRight'] = {
@@ -89,7 +89,7 @@ Blockly.Blocks['coderbot_turnRight'] = {
 Blockly.JavaScript['coderbot_turnRight'] = function(block) {
   // Generate JavaScript for turning left or right.
   var dir = block.getFieldValue('DIR');
-  return 'bot.right(1.8);\n';
+  return 'bot.right(1.6);\n';
 };
 
 Blockly.Blocks['coderbot_say'] = {

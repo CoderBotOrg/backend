@@ -1,3 +1,4 @@
+import os
 import time
 import pigpio
 
@@ -59,3 +60,6 @@ class CoderBot:
     pigpio.write(PIN_MOTOR_ENABLE, 0)
     pigpio.write(PIN_LEFT_FORWARD, 0)
     pigpio.write(PIN_RIGHT_BACKWARD, 0) 
+
+  def say(self, what):
+    os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + repr(what) + '" 2>>/dev/null')
