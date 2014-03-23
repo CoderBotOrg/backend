@@ -8,7 +8,7 @@ class CameraHandler(Thread):
   def __init__(self):
     print "starting camera"
     self.cam = Camera()
-    self.streamer = JpegStreamer("0.0.0.0:8090")
+    self.streamer = JpegStreamer("0.0.0.0:8090", st=0.5)
     self._cam_off_img.save(self.streamer)
     Thread.__init__(self)
 

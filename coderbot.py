@@ -10,12 +10,8 @@ PIN_RIGHT_BACKWARD = 17
 
 class CoderBot:
   def __init__(self):
-    pigpio.start()
-    pigpio.write(PIN_MOTOR_ENABLE, 0)
-    pigpio.write(PIN_LEFT_FORWARD, 0)
-    pigpio.write(PIN_RIGHT_FORWARD, 0)
-    pigpio.write(PIN_LEFT_BACKWARD, 0)
-    pigpio.write(PIN_RIGHT_BACKWARD, 0)
+    pigpio.start('localhost')
+    self.stop()
 
   the_bot = None
 
@@ -25,41 +21,47 @@ class CoderBot:
       cls.the_bot = CoderBot()
     return cls.the_bot
     
-  def forward(self, seconds):
+  def forward(self, seconds=-1):
     pigpio.write(PIN_MOTOR_ENABLE, 1)
     pigpio.write(PIN_LEFT_FORWARD, 1)
     pigpio.write(PIN_RIGHT_FORWARD, 1)
-    time.sleep(seconds)
-    pigpio.write(PIN_MOTOR_ENABLE, 0)
-    pigpio.write(PIN_LEFT_FORWARD, 0)
-    pigpio.write(PIN_RIGHT_FORWARD, 0)
+    print "forward"
+    if seconds > 0:
+      time.sleep(seconds)
+      self.stop()
+      print "stop"
 
-  def backward(self, seconds):
+  def backward(self, seconds=-1):
     pigpio.write(PIN_MOTOR_ENABLE, 1)
     pigpio.write(PIN_LEFT_BACKWARD, 1)
     pigpio.write(PIN_RIGHT_BACKWARD, 1)
-    time.sleep(seconds)
-    pigpio.write(PIN_MOTOR_ENABLE, 0)
-    pigpio.write(PIN_LEFT_BACKWARD, 0)
-    pigpio.write(PIN_RIGHT_BACKWARD, 0)
+    if seconds > 0:
+      time.sleep(seconds)
+      self.stop()     
     
-  def left(self, seconds):
+  def left(self, seconds=-1):
     pigpio.write(PIN_MOTOR_ENABLE, 1)
     pigpio.write(PIN_LEFT_BACKWARD, 1)
     pigpio.write(PIN_RIGHT_FORWARD, 1)
-    time.sleep(seconds)
-    pigpio.write(PIN_MOTOR_ENABLE, 0)
-    pigpio.write(PIN_LEFT_BACKWARD, 0)
-    pigpio.write(PIN_RIGHT_FORWARD, 0)
+    if seconds > 0:
+      time.sleep(seconds)
+      self.stop()    
 
-  def right(self, seconds):
+  def right(self, seconds=-1):
     pigpio.write(PIN_MOTOR_ENABLE, 1)
     pigpio.write(PIN_LEFT_FORWARD, 1)
     pigpio.write(PIN_RIGHT_BACKWARD, 1)
-    time.sleep(seconds)
+    if seconds > 0:
+      time.sleep(seconds)
+      self.stop()
+
+  def stop(self):
     pigpio.write(PIN_MOTOR_ENABLE, 0)
     pigpio.write(PIN_LEFT_FORWARD, 0)
-    pigpio.write(PIN_RIGHT_BACKWARD, 0) 
+    pigpio.write(PIN_LEFT_BACKWARD, 0)
+    pigpio.write(PIN_RIGHT_FORWARD, 0)
+    pigpio.write(PIN_RIGHT_BACKWARD, 0)
+    print "stop"
 
   def say(self, what):
     os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + repr(what) + '" 2>>/dev/null')
