@@ -9,6 +9,7 @@
   <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/javascript_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/python_compressed.js"></script>
   <script type="text/javascript" src="js/blockly/en.js"></script>
   <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
   <script type="text/javascript" src="js/jquery.mobile-1.4.0.min.js"></script>
@@ -20,13 +21,14 @@
           {path: '../../', toolbox: document.getElementById('toolbox')});
       $("#b_show_code").on("click", showCode).on("touchend",showCode);
       $("#b_run_code").on("click", runCode).on("touchend",runCode);
+      $("#b_end_code").on("click", endCode).on("touchend",endCode);
       $("#b_control").on("click", goControl).on("touchend",goControl);
     });
 
     function showCode() {
       // Generate JavaScript code and display it.
       Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-      var code = Blockly.JavaScript.workspaceToCode();
+      var code = Blockly.Python.workspaceToCode();
       alert(code);
     }
 
@@ -34,15 +36,19 @@
       var bot = new CoderBot();
       // Generate JavaScript code and run it.
       window.LoopTrap = 1000;
-      Blockly.JavaScript.INFINITE_LOOP_TRAP =
-          'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
-      var code = Blockly.JavaScript.workspaceToCode();
-      Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+      Blockly.Python.INFINITE_LOOP_TRAP = '  program.check_end()\n';
+      var code = Blockly.Python.workspaceToCode();
+      Blockly.Python.INFINITE_LOOP_TRAP = null;
       try {
-        eval(code);
+        var data =  {'name': 'one',
+                     'code': code};
+        $.ajax({url: '/program/exec', data: data, type: "POST"});
       } catch (e) {
         alert(e);
       }
+    }
+    function endCode() {
+        $.ajax({url: '/program/end', type: "POST"});
     }
     function goControl() {
       $.mobile.changePage("/");
@@ -53,9 +59,10 @@
 <div data-role="page" class="">
  <div data-role="header"><h1>CoderBot - Blockly</h1></div>
  <div role="main" class="ui-content">
-  <fieldset class="ui-grid-a">
+  <fieldset class="ui-grid-b">
     <div class="ui-block-a"><button id="b_show_code" class="ui-btn" type="button">Show Code</button></div>
     <div class="ui-block-b"><button id="b_run_code" class="ui-btn" type="button">Run Code</button></div>
+    <div class="ui-block-c"><button id="b_end_code" class="ui-btn" type="button">Stop Code</button></div>
   </fieldset>
   <div id="blocklyDiv" style="height: 480px; width:100%;"></div>
   <xml id="toolbox" style="display: none">
@@ -92,6 +99,7 @@
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
       <block type="coderbot_say"></block>
+      <block type="coderbot_pathAhead"></block>
     </category>      
   </xml>
  </div>

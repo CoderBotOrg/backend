@@ -1,16 +1,22 @@
 import os
-import coderbot
+import json
+
+from coderbot import CoderBot
+from camera import Camera
+from program import ProgramEngine, Program
 from handler import camera, signal, logo
-from threading import Thread
 
 from flask import Flask, render_template, request
 #from flask_sockets import Sockets
 
-bot = coderbot.CoderBot.get_instance()
-cam_h = camera.CameraHandler.get_instance()
+bot = CoderBot.get_instance()
+cam = Camera.get_instance()
 
 app = Flask(__name__,static_url_path="")
+app.debug = True
 #sockets = Sockets(app)
+
+app.prog_engine = ProgramEngine.get_instance()
 
 @app.route("/")
 def home():
@@ -20,10 +26,11 @@ def home():
 def blockly():
     return render_template('blockly.html')
 
-@app.route("/bot")
+@app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
     param = request.args.get('param')
+
     if cmd == "forward":
         bot.forward(float(param))
     elif cmd == "left":
@@ -38,15 +45,47 @@ def handle_bot():
         print "param: " + str(param)
         try:
           handler = int(param) if int(param) >= 0 else None
-          cam_h.set_active_handler(handler)
-      
+          cam_h.set_active_handler(handler)      
         except e:
           print e 
 
     elif cmd == "say":
         print "say: " + str(param)
 	bot.say(param)
-        
+   
+@app.route("/program/list", methods=["GET"])
+def handle_program_list():
+    print "program_list"
+    return json.dumps(app.prog_eng.list().keys())
+
+@app.route("/program/load", methods=["GET"])
+def handle_program_load():
+    print "program_load"
+    name = request.args.get('name')
+    return json.dumps(app.prog_eng.load(name))
+
+@app.route("/program/save", methods=["POST"])
+def handle_program_save():
+    print "program_save"
+    name = request.form.get('name')
+    code = request.form.get('code')
+    prog = Program(name, code)
+    return json.dumps(app.prog_eng.save(prog))
+
+@app.route("/program/exec", methods=["POST"])
+def handle_program_exec():
+    print "program_exec"
+    name = request.form.get('name')
+    code = request.form.get('code')
+    app.prog = Program(name, code)
+    return json.dumps(app.prog.execute())
+
+@app.route("/program/end", methods=["POST"])
+def handle_program_end():
+    print "program_end"
+    app.prog.end()
+    app.prog = None
+  
     return "ok"
 
 """
@@ -79,4 +118,4 @@ init()
 """
 
 def run_server():
-  app.run(host="0.0.0.0", port=8080, use_reloader=False)
+  app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)

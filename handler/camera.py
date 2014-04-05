@@ -36,7 +36,6 @@ class CameraHandler(Thread):
 
   def run(self):
     while not self.finish:
-      print "getting image"
       img = self.cam.getImage()
       if self._active_handler_idx is not None:
       	handler = self._handlers[self._active_handler_idx]

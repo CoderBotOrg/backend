@@ -1,3 +1,7 @@
+# backup source #
+###################
+*.save*
+
 # Compiled source #
 ###################
 *.com
