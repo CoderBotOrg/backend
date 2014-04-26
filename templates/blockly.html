@@ -22,7 +22,18 @@
       $("#b_show_code").on("click", showCode).on("touchend",showCode);
       $("#b_run_code").on("click", runCode).on("touchend",runCode);
       $("#b_end_code").on("click", endCode).on("touchend",endCode);
+      $("#b_save_code").on("click", saveCode).on("touchend",saveCode);
       $("#b_control").on("click", goControl).on("touchend",goControl);
+      try {
+        var data =  {'name': 'one'};
+        $.ajax({url: '/program/load', data: data, type: "GET", success:function(data) {
+	  Blockly.mainWorkspace.clear();
+          var xml = Blockly.Xml.textToDom(data);
+          Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+	}});
+      } catch (e) {
+        alert(e);
+      }
     });
 
     function showCode() {
@@ -30,6 +41,17 @@
       Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
       var code = Blockly.Python.workspaceToCode();
       alert(code);
+    }
+
+    function saveCode() {
+      // Generate Dom code and display it.
+      Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+      var xml_code = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+      var code = Blockly.Xml.domToText(xml_code);
+      var data =  {'name': 'one', 'dom_code': code};
+      $.ajax({url: '/program/save', data: data, type: "POST", success:function() {
+	  alert('saved ok');
+	}});
     }
 
     function runCode() {
@@ -59,10 +81,11 @@
 <div data-role="page" class="">
  <div data-role="header"><h1>CoderBot - Blockly</h1></div>
  <div role="main" class="ui-content">
-  <fieldset class="ui-grid-b">
+  <fieldset class="ui-grid-c">
     <div class="ui-block-a"><button id="b_show_code" class="ui-btn" type="button">Show Code</button></div>
     <div class="ui-block-b"><button id="b_run_code" class="ui-btn" type="button">Run Code</button></div>
     <div class="ui-block-c"><button id="b_end_code" class="ui-btn" type="button">Stop Code</button></div>
+    <div class="ui-block-d"><button id="b_save_code" class="ui-btn" type="button">Save Code</button></div>
   </fieldset>
   <div id="blocklyDiv" style="height: 480px; width:100%;"></div>
   <xml id="toolbox" style="display: none">
@@ -99,7 +122,11 @@
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
       <block type="coderbot_say"></block>
-      <block type="coderbot_pathAhead"></block>
+    </category>      
+    <category name="CoderBot Advanced">
+      <block type="coderbot_adv_move"></block>
+      <block type="coderbot_adv_stop"></block>
+      <block type="coderbot_adv_pathAhead"></block>
     </category>      
   </xml>
  </div>

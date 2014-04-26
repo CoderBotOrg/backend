@@ -20,35 +20,83 @@ class CoderBot:
     if not cls.the_bot:
       cls.the_bot = CoderBot()
     return cls.the_bot
-    
-  def forward(self, seconds=-1):
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
+
+  def forward(self, speed=100, elapse=-1):
+    speed = (255 * speed) / 100
+    pigpio.write(PIN_RIGHT_FORWARD, 1)
+    pigpio.write(PIN_LEFT_FORWARD, 1)
+    pigpio.write(PIN_RIGHT_BACKWARD, 0)
+    pigpio.write(PIN_LEFT_BACKWARD, 0)
+    pigpio.set_PWM_frequency(PIN_MOTOR_ENABLE, 100)
+    pigpio.set_PWM_dutycycle(PIN_MOTOR_ENABLE, speed)
+    if elapse > 0:
+      time.sleep(elapse)
+      self.stop()
+
+  def backward(self, speed=100, elapse=-1):
+    speed = (255 * speed) / 100
+    pigpio.write(PIN_RIGHT_FORWARD, 0)
+    pigpio.write(PIN_LEFT_FORWARD, 0)
+    pigpio.write(PIN_RIGHT_BACKWARD, 1)
+    pigpio.write(PIN_LEFT_BACKWARD, 1)
+    pigpio.set_PWM_frequency(PIN_MOTOR_ENABLE, 100)
+    pigpio.set_PWM_dutycycle(PIN_MOTOR_ENABLE, speed)
+    if elapse > 0:
+      time.sleep(elapse)
+      self.stop()
+
+  def left(self, speed=100, elapse=-1):
+    speed = (255 * speed) / 100
+    pigpio.write(PIN_RIGHT_FORWARD, 1)
+    pigpio.write(PIN_LEFT_FORWARD, 0)
+    pigpio.write(PIN_RIGHT_BACKWARD, 0)
+    pigpio.write(PIN_LEFT_BACKWARD, 1)
+    pigpio.set_PWM_frequency(PIN_MOTOR_ENABLE, 100)
+    pigpio.set_PWM_dutycycle(PIN_MOTOR_ENABLE, speed)
+    if elapse > 0:
+      time.sleep(elapse)
+      self.stop()
+
+  def right(self, speed=100, elapse=-1):
+    speed = (255 * speed) / 100
+    pigpio.write(PIN_RIGHT_FORWARD, 0)
+    pigpio.write(PIN_LEFT_FORWARD, 1)
+    pigpio.write(PIN_RIGHT_BACKWARD, 1)
+    pigpio.write(PIN_LEFT_BACKWARD, 0)
+    pigpio.set_PWM_frequency(PIN_MOTOR_ENABLE, 100)
+    pigpio.set_PWM_dutycycle(PIN_MOTOR_ENABLE, speed)
+    if elapse > 0:
+      time.sleep(elapse)
+      self.stop()
+
+  def forward_old(self, seconds=-1):
     pigpio.write(PIN_LEFT_FORWARD, 1)
     pigpio.write(PIN_RIGHT_FORWARD, 1)
+    pigpio.write(PIN_MOTOR_ENABLE, 1)
     if seconds > 0:
       time.sleep(seconds)
       self.stop()
 
-  def backward(self, seconds=-1):
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
+  def backward_old(self, seconds=-1):
     pigpio.write(PIN_LEFT_BACKWARD, 1)
     pigpio.write(PIN_RIGHT_BACKWARD, 1)
+    pigpio.write(PIN_MOTOR_ENABLE, 1)
     if seconds > 0:
       time.sleep(seconds)
       self.stop()     
     
-  def left(self, seconds=-1):
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
+  def left_old(self, seconds=-1):
     pigpio.write(PIN_LEFT_BACKWARD, 1)
     pigpio.write(PIN_RIGHT_FORWARD, 1)
+    pigpio.write(PIN_MOTOR_ENABLE, 1)
     if seconds > 0:
       time.sleep(seconds)
       self.stop()    
 
-  def right(self, seconds=-1):
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
+  def right_old(self, seconds=-1):
     pigpio.write(PIN_LEFT_FORWARD, 1)
     pigpio.write(PIN_RIGHT_BACKWARD, 1)
+    pigpio.write(PIN_MOTOR_ENABLE, 1)
     if seconds > 0:
       time.sleep(seconds)
       self.stop()
@@ -61,7 +109,7 @@ class CoderBot:
     pigpio.write(PIN_RIGHT_BACKWARD, 0)
 
   def say(self, what):
-    os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + repr(what) + '" 2>>/dev/null')
+    os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
 
 
   

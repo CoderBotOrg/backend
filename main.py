@@ -32,13 +32,13 @@ def handle_bot():
     param = request.args.get('param')
 
     if cmd == "forward":
-        bot.forward(float(param))
+        bot.forward(elapse=float(param))
     elif cmd == "left":
-        bot.left(float(param))
+        bot.left(elapse=float(param))
     elif cmd == "right":
-        bot.right(float(param))
+        bot.right(elapse=float(param))
     elif cmd == "backward":
-        bot.backward(float(param))
+        bot.backward(elapse=float(param))
     elif cmd == "stop":
         bot.stop()
     elif cmd == "set_handler":
@@ -52,25 +52,29 @@ def handle_bot():
     elif cmd == "say":
         print "say: " + str(param)
 	bot.say(param)
+
+    return "ok"
+
    
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
     print "program_list"
-    return json.dumps(app.prog_eng.list().keys())
+    return json.dumps(app.prog_engine.list().keys())
 
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
     print "program_load"
     name = request.args.get('name')
-    return json.dumps(app.prog_eng.load(name))
+    return app.prog_engine.load(name).dom_code
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
     print "program_save"
     name = request.form.get('name')
-    code = request.form.get('code')
-    prog = Program(name, code)
-    return json.dumps(app.prog_eng.save(prog))
+    dom_code = request.form.get('dom_code')
+    prog = Program(name, dom_code = dom_code)
+    app.prog_engine.save(prog)
+    return "ok"
 
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():

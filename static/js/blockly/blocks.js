@@ -33,12 +33,12 @@ Blockly.Blocks['coderbot_moveForward'] = {
 
 Blockly.JavaScript['coderbot_moveForward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return 'bot.forward(2);\n';
+  return 'bot.forward(elapse=0.25);\n';
 };
 
 Blockly.Python['coderbot_moveForward'] = function(block) {
   // Generate Python for moving forward.
-  return 'bot.forward(2)\n';
+  return 'bot.forward(elapse=0.25)\n';
 };
 
 Blockly.Blocks['coderbot_moveBackward'] = {
@@ -56,16 +56,16 @@ Blockly.Blocks['coderbot_moveBackward'] = {
 
 Blockly.JavaScript['coderbot_moveBackward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return 'bot.backward(2);\n';
+  return 'bot.backward(elapse=0.25);\n';
 };
 
 Blockly.Python['coderbot_moveBackward'] = function(block) {
   // Generate Python for moving forward.
-  return 'bot.backward(2)\n';
+  return 'bot.backward(elapse=0.25)\n';
 };
 
 Blockly.Blocks['coderbot_turnLeft'] = {
-  // Block for turning left or right.
+  // Block for turning left.
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(290);
@@ -78,19 +78,17 @@ Blockly.Blocks['coderbot_turnLeft'] = {
 };
 
 Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  var dir = block.getFieldValue('DIR');
-  return 'bot.left(1.6);\n';
+  // Generate JavaScript for turning left.
+  return 'bot.left(elapse=0.15);\n';
 };
 
 Blockly.Python['coderbot_turnLeft'] = function(block) {
-  // Generate Python for turning left or right.
-  var dir = block.getFieldValue('DIR');
-  return 'bot.left(1.6)\n';
+  // Generate Python for turning left.
+  return 'bot.left(elapse=0.15)\n';
 };
 
 Blockly.Blocks['coderbot_turnRight'] = {
-  // Block for turning left or right.
+  // Block for turning right.
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(290);
@@ -104,14 +102,12 @@ Blockly.Blocks['coderbot_turnRight'] = {
 
 Blockly.JavaScript['coderbot_turnRight'] = function(block) {
   // Generate JavaScript for turning left or right.
-  var dir = block.getFieldValue('DIR');
-  return 'bot.right(1.6);\n';
+  return 'bot.right(elapse=0.15);\n';
 };
 
 Blockly.Python['coderbot_turnRight'] = function(block) {
   // Generate Python for turning left or right.
-  var dir = block.getFieldValue('DIR');
-  return 'bot.right(1.6)\n';
+  return 'bot.right(elapse=0.15)\n';
 };
 
 Blockly.Blocks['coderbot_say'] = {
@@ -121,7 +117,7 @@ Blockly.Blocks['coderbot_say'] = {
     this.setColour(290);
     this.appendValueInput('TEXT')
         .setCheck(["String", "Number", "Date"])
-        .appendField('text');
+        .appendField('say');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_sayTooltip'));
@@ -142,7 +138,92 @@ Blockly.Python['coderbot_say'] = function(block) {
   return 'bot.say(' + text + ')\n';
 };
 
-Blockly.Blocks['coderbot_pathAhead'] = {
+Blockly.Blocks['coderbot_adv_move'] = {
+  // Block for moving forward.
+  init: function() {
+    var ACTIONS =
+        [['forward', 'FORWARD'],
+        ['backward', 'BACKWARD'],
+        ['left', 'LEFT'],
+        ['right', 'RIGHT']]
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
+    this.setColour(290);
+    this.interpolateMsg("move bot ",
+                        ['TEXT', null, Blockly.ALIGN_RIGHT],
+                        Blockly.ALIGN_RIGHT);
+    
+    this.appendDummyInput("ACTION")
+       .appendField(new Blockly.FieldDropdown(ACTIONS), 'ACTION');
+    this.appendValueInput('SPEED')
+        .setCheck('Number')
+        .appendField(" at speed: ");
+    this.appendValueInput('ELAPSE')
+        .setCheck('Number')
+        .appendField(" for: ");
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+    var thisBlock = this;
+    this.setTooltip(function() {
+      var mode = thisBlock.getFieldValue('ACTION');
+      var TOOLTIPS = {
+        FORWARD: "Move forward",
+        BACKWARD: "Move backward",
+        LEFT: "Turn left",
+        RIGHT: "Turn right",
+      };
+      return TOOLTIPS[mode] + " at speed (0-100%) for time (seconds)";
+    });
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_move'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'bot.forward();\n';
+};
+
+Blockly.Python['coderbot_adv_move'] = function(block) {
+  // Generate Python for moving forward.
+  var OPERATORS = {
+    FORWARD: ['forward'],
+    BACKWARD: ['backward'],
+    LEFT: ['left'],
+    RIGHT: ['right']
+  };
+  var tuple = OPERATORS[block.getFieldValue('ACTION')];
+  var action = tuple[0];
+  var speed = Blockly.Python.valueToCode(block, 'SPEED', Blockly.Python.ORDER_NONE);
+  var elapse = Blockly.Python.valueToCode(block, 'ELAPSE', Blockly.Python.ORDER_NONE);
+  var code = "bot." + action + "(speed=" + speed + ", elapse="+elapse+")\n";
+  return code;
+};
+
+Blockly.Blocks['coderbot_adv_stop'] = {
+  // Block to stop the bot.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Stop');
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField("stop");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(('CoderBot_stopTooltip'));
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_stop'] = function(block) {
+  // Generate JavaScript to stop the bot.
+  return 'bot.stop();\n';
+};
+
+Blockly.Python['coderbot_adv_stop'] = function(block) {
+  // Generate Python to stop the bot.
+  return 'bot.stop()\n';
+};
+
+
+Blockly.Blocks['coderbot_adv_pathAhead'] = {
   /**
    * Block for pathAhead function.
    * @this Blockly.Block
@@ -157,13 +238,13 @@ Blockly.Blocks['coderbot_pathAhead'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_pathAhead'] = function(block) {
+Blockly.JavaScript['coderbot_adv_pathAhead'] = function(block) {
   // Boolean values true and false.
-  var code = 'cam.path_ahead();';
+  var code = 'cam.path_ahead()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Python['coderbot_pathAhead'] = function(block) {
+Blockly.Python['coderbot_adv_pathAhead'] = function(block) {
   // Boolean values true and false.
   var code = 'cam.path_ahead()';
   return [code, Blockly.Python.ORDER_ATOMIC];

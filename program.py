@@ -22,19 +22,28 @@ class ProgramEngine:
     return self._repository.values()
     
   def save(self, program):
-    program = self._repository[program.name] = program
+    #program = self._repository[program.name] = program
+    f = open('program_' + program.name + '.data', 'w')
+    f.write(program.dom_code)
     
   def load(self, name):
-    return self._repository[name]
-
+    #return self._repository[name]
+    f = open('program_' + name + '.data', 'r')
+    dom_code = f.read()
+    return Program(name=name, dom_code=dom_code)
 
 class Program(threading.Thread):
 
   _running = False
 
-  def __init__(self, name, code):
+  @property
+  def dom_code(self):
+    return self._dom_code
+
+  def __init__(self, name, code=None, dom_code=None):
     super(Program, self).__init__()
     self.name = name
+    self._dom_code = dom_code
     self._code = code 
 
   def execute(self):
