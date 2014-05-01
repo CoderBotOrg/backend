@@ -19,12 +19,12 @@ app.debug = True
 app.prog_engine = ProgramEngine.get_instance()
 
 @app.route("/")
-def home():
+def handle_home():
     return render_template('control.html', host=request.host[:request.host.find(':')])
 
-@app.route("/blockly")
-def blockly():
-    return render_template('blockly.html')
+@app.route("/program")
+def handle_program():
+    return render_template('program.html', host=request.host[:request.host.find(':')])
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():

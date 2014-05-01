@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet"  href="../css/jquery.mobile-1.4.0.min.css">
+  <meta charset="utf-8">
+  <title>CoderBot - Program</title>
+  <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/javascript_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/python_compressed.js"></script>
+  <script type="text/javascript" src="js/blockly/en.js"></script>
+  <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
+  <script type="text/javascript" src="js/jquery.mobile-1.4.0.min.js"></script>
+  <script type="text/javascript" src="js/coderbot.js"></script>
+  <script type="text/javascript" src="js/blockly/blocks.js"></script>
+  <script type="text/javascript" src="js/program.js"></script>
+</head>
+<body>
+<div data-role="page" class="">
+ <div data-role="header"><h1>CoderBot</h1></div>
+ <div role="main" class="ui-content">
+  <fieldset class="ui-grid-b">
+    <div class="ui-block-a"><button id="b_new_prog" class="ui-btn" type="button">New</button></div>
+    <div class="ui-block-b"><button id="b_load_prog" class="ui-btn" type="button">Load</button></div>
+    <div class="ui-block-c"><button id="b_save_prog" class="ui-btn" type="button">Save</button></div>
+  </fieldset>
+  <fieldset class="ui-grid-b">
+    <div class="ui-block-a"><button id="b_show_prog" class="ui-btn" type="button">Show</button></div>
+    <div class="ui-block-b"><button id="b_run_prog" class="ui-btn" type="button">Run</button></div>
+    <div class="ui-block-c"><button id="b_end_prog" class="ui-btn" type="button">Stop</button></div>
+  </fieldset>
+  <div id="blocklyDiv" style="height: 480px; width:100%;"></div>
+  {%include "blocks.xml"%}
+ </div>
+ <div data-role="navbar">
+  <ul>
+   <li><button id="b_control" type="button">Control</button></li>
+   <li><a href="#" class="ui-btn-active">Program</a></li>
+  </ul>
+ </div><!-- /navbar -->
+<a href="#dialogRunning" id="dialogRunningLnk" data-rel="popup" data-position-to="window" class="ui-btn" style="display:none;">Run Program</a>
+ <div data-role="popup" id="dialogRunning" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:680px;">
+  <div data-role="header" data-theme="a">
+   <h1>CoderBot is running</h1>
+  </div>
+  <div role="main" class="ui-content">
+   <button href="#" id="b_end_prog" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">End program</button>
+   <iframe id="f_stream" src="http://{{host}}:8090" width="640" height="480" style="display:block;margin: 0 auto;"></iframe>
+  </div>
+ </div>
+<a href="#dialogNewProg" id="dialogNewProgLnk" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display:none;">New Program</a>
+<div data-role="popup" id="dialogNewProg" data-theme="a" class="ui-corner-all">
+  <div style="padding:10px 20px;">
+   <h3>New Program</h3>
+   <label for="un" class="ui-hidden-accessible">Program name:</label>
+   <input type="text" name="name" id="i_new_prog_name" value="" placeholder="program name" data-theme="a">
+   <button type="button" id="b_new_prog_post" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Create</button>
+  </div>
+</div>
+<a href="#dialogLoadProg" id="dialogLoadProgLnk" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="display:none;">Load Program</a>
+<div data-role="popup" id="dialogLoadProg" data-theme="a" class="ui-corner-all">
+  <div style="padding:10px 20px;">
+   <h3>Load Program</h3>
+   <label for="un" class="ui-hidden-accessible">Program name:</label>
+   <input type="text" name="name" id="i_load_prog_name" value="" placeholder="program name" data-theme="a">
+   <button type="button" id="b_load_prog_post" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Load</button>
+  </div>
+</div>
+</div> 
+</body>
+</html>

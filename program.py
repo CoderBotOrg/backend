@@ -1,8 +1,13 @@
+import os
 import sys
 import threading
 
 import coderbot
 import camera
+
+PROGRAM_PATH = "./data/"
+PROGRAM_PREFIX = "program_"
+PROGRAM_SUFFIX = ".data"
 
 class ProgramEngine:
 
@@ -11,7 +16,12 @@ class ProgramEngine:
   def __init__(self):
     self._program = None
     self._repository = {}
-  
+    for dirname, dirnames, filenames,  in os.walk(PROGRAM_PATH):
+      for filename in filenames:
+        if PROGRAM_PREFIX in filename:
+          program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]    
+      self._repository[program_name] = filename
+    
   @classmethod
   def get_instance(cls):
     if not cls._instance:
@@ -19,16 +29,16 @@ class ProgramEngine:
     return cls._instance
 
   def list(self):
-    return self._repository.values()
+    return self._repository.keys()
     
   def save(self, program):
     #program = self._repository[program.name] = program
-    f = open('program_' + program.name + '.data', 'w')
+    f = open(PROGRAM_PATH + PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX, 'w')
     f.write(program.dom_code)
     
   def load(self, name):
     #return self._repository[name]
-    f = open('program_' + name + '.data', 'r')
+    f = open(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX, 'r')
     dom_code = f.read()
     return Program(name=name, dom_code=dom_code)
 

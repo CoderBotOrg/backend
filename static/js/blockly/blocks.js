@@ -250,6 +250,32 @@ Blockly.Python['coderbot_adv_pathAhead'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
+Blockly.Blocks['coderbot_adv_findLine'] = {
+  /**
+   * Block for pathAhead function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(210);
+    this.appendDummyInput()
+        .appendField('findLine');
+    this.setOutput(true, 'Boolean');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_findLine'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_line()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['coderbot_adv_findLine'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_line()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
 
 Blockly.Blocks['coderbot_if'] = {
   // Block for 'if' conditional if there is a path.
