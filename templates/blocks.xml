@@ -16,6 +16,20 @@
       <block type="logic_negate"></block>
       <block type="logic_boolean"></block>
     </category>
+    <category name="Variables">
+      <block type="variables_get"></block>
+      <block type="variables_set"></block>
+      <block type="variables_set"></block>
+    </category>
+    <category name="Procedures">
+      <block type="procedures_defnoreturn"></block>
+      <block type="procedures_defreturn"></block>
+      <block type="procedures_mutatorcontainer"></block>
+      <block type="procedures_mutatorarg"></block>
+      <block type="procedures_callnoreturn"></block>
+      <block type="procedures_callreturn"></block>
+      <block type="procedures_ifreturn"></block>
+    </category>
     <category name="Math">
       <block type="math_number"></block>
       <block type="math_arithmetic"></block>
@@ -32,9 +46,18 @@
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
       <block type="coderbot_say"></block>
-    </category>      
-    <category name="CoderBot Advanced">
-      <block type="coderbot_adv_move"></block>
+      <block type="coderbot_adv_move">
+        <value name="SPEED">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+        <value name="ELAPSE">
+          <block type="math_number">
+            <field name="NUM">0.2</field>
+          </block>
+        </value>
+      </block>
       <block type="coderbot_adv_stop"></block>
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>

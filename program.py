@@ -16,11 +16,11 @@ class ProgramEngine:
   def __init__(self):
     self._program = None
     self._repository = {}
-    for dirname, dirnames, filenames,  in os.walk(PROGRAM_PATH):
+    for dirname, dirnames, filenames,  in os.walk("./data"):
       for filename in filenames:
         if PROGRAM_PREFIX in filename:
           program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]    
-      self._repository[program_name] = filename
+          self._repository[program_name] = filename
     
   @classmethod
   def get_instance(cls):
@@ -32,7 +32,7 @@ class ProgramEngine:
     return self._repository.keys()
     
   def save(self, program):
-    #program = self._repository[program.name] = program
+    program = self._repository[program.name] = program
     f = open(PROGRAM_PATH + PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX, 'w')
     f.write(program.dom_code)
     
@@ -41,6 +41,14 @@ class ProgramEngine:
     f = open(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX, 'r')
     dom_code = f.read()
     return Program(name=name, dom_code=dom_code)
+
+  def delete(self, name):
+    del self._repository[name]
+    os.remove(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX)
+    return "ok"
+
+  def is_running(self, name):
+    return self._repository[name].is_running()
 
 class Program(threading.Thread):
 
@@ -77,6 +85,9 @@ class Program(threading.Thread):
   def check_end(self):
     if self._running == False:
       raise RuntimeError('end requested')
+
+  def is_running(self):
+    return self._running
 
   def run(self):
     try:

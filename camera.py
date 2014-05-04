@@ -1,6 +1,6 @@
 import time
 import copy
-from threading import Thread
+from threading import Thread, Lock
 
 import SimpleCV
 
@@ -30,23 +30,28 @@ class Camera(Thread):
     self._cam_off_img.save(self._streamer)
     self._run = True
     self._image_time = 0
+    self._image_lock = Lock()
     super(Camera, self).__init__()
 
   def run(self):
     while self._run:
-      self.get_image(maxage=CAMERA_REFRESH_INTERVAL).save(self._streamer)
+      ts = time.time()
+      print "run.1"
+      self._image_lock.acquire()
+      self._image = self._camera.getImage()
+      print "run.2: " + str(time.time()-ts)
+      if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
+        self.save_image(self._image)
+        print "run.3: " + str(time.time()-ts)
+      self._image_lock.release()
       time.sleep(CAMERA_REFRESH_INTERVAL)
     
   def get_image(self, maxage = MAX_IMAGE_AGE):
-    if time.time() - self._image_time > maxage:
-      print "get_image: " + str(time.time() - self._image_time)
-      self._image = self._camera.getImage()
-      self._image_time = time.time()
     return self._image
 
-  def save_image(self, image, expire=2.0):
-    self._image = image
-    self._image_time=time.time()+expire
+  def save_image(self, image):
+    image.save(self._streamer)
+    self._image_time=time.time()
 
   def exit(self):
     self._run = False
@@ -80,8 +85,8 @@ class Camera(Thread):
   def path_ahead(self):
     print "path ahead"
     ts = time.time()
-    img = copy.deepcopy(self.get_image())
-    #img = self._camera.getImage()
+    self._image_lock.acquire()
+    img = self.get_image()
     print "path_ahead.get_image: " + str(time.time() - ts)
     warped = img.resize(160).warp(self._warp_corners_4).resize(640)
     print "path_ahead.warp: " + str(time.time() - ts)
@@ -101,6 +106,7 @@ class Camera(Thread):
     if blobs and len(blobs):
       print blobs
       obstacle = blobs.sortDistance(point=(60,320))[0]
+      print "path_ahead.sortdistnace: " + str(time.time() - ts)
       #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
       #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
       #img.drawRectangle(dw_x, dw_y, obstacle.width(), obstacle.height(), color=(255,0,0))
@@ -112,7 +118,10 @@ class Camera(Thread):
       #self.save_image(warped.warp(self._unwarp_corners), expire=10)
 
     img.drawText("path ahead clear for " + str(coordY) + " cm", 0, 0, fontsize=32 )
+    print "path_ahead.drawtext: " + str(time.time() - ts)
     self.save_image(img)
+    print "path_ahead.save_image: " + str(time.time() - ts)
+    self._image_lock.release()
     print "path_ahead: " + str(time.time() - ts)
     return coordY
     

@@ -4,7 +4,6 @@ import json
 from coderbot import CoderBot
 from camera import Camera
 from program import ProgramEngine, Program
-from handler import camera, signal, logo
 
 from flask import Flask, render_template, request
 #from flask_sockets import Sockets
@@ -59,7 +58,7 @@ def handle_bot():
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
     print "program_list"
-    return json.dumps(app.prog_engine.list().keys())
+    return json.dumps(app.prog_engine.list())
 
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
@@ -76,6 +75,13 @@ def handle_program_save():
     app.prog_engine.save(prog)
     return "ok"
 
+@app.route("/program/delete", methods=["POST"])
+def handle_program_delete():
+    print "program_delete"
+    name = request.form.get('name')
+    app.prog_engine.delete(name)
+    return "ok"
+
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
     print "program_exec"
@@ -88,9 +94,16 @@ def handle_program_exec():
 def handle_program_end():
     print "program_end"
     app.prog.end()
-    app.prog = None
-  
+    app.prog = None  
     return "ok"
+
+@app.route("/program/status", methods=["GET"])
+def handle_program_status():
+    print "program_status"
+    prog = Program("")
+    if app.prog:
+      prog = app.prog
+    return json.dumps({'name': prog.name, "running": prog.is_running()}) 
 
 """
 @sockets.route('/bot_ws')

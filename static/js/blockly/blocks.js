@@ -156,10 +156,10 @@ Blockly.Blocks['coderbot_adv_move'] = {
        .appendField(new Blockly.FieldDropdown(ACTIONS), 'ACTION');
     this.appendValueInput('SPEED')
         .setCheck('Number')
-        .appendField(" at speed: ");
+        .appendField("at speed");
     this.appendValueInput('ELAPSE')
         .setCheck('Number')
-        .appendField(" for: ");
+        .appendField("for");
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -230,7 +230,7 @@ Blockly.Blocks['coderbot_adv_pathAhead'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(210);
+    this.setColour(290);
     this.appendDummyInput()
         .appendField('pathAhead');
     this.setOutput(true, 'Boolean');
@@ -257,7 +257,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(210);
+    this.setColour(290);
     this.appendDummyInput()
         .appendField('findLine');
     this.setOutput(true, 'Boolean');
@@ -277,86 +277,3 @@ Blockly.Python['coderbot_adv_findLine'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_if'] = {
-  // Block for 'if' conditional if there is a path.
-  init: function() {
-    var DIRECTIONS =
-        [['CoderBot_pathAhead', 'isPathForward'],
-         ['CoderBot_pathLeft', 'isPathLeft'],
-         ['CoderBot_pathRight', 'isPathRight']];
-    this.setColour(210);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
-    this.appendStatementInput('DO')
-        .appendField('CoderBot_doCode');
-    this.setTooltip('CoderBot_ifTooltip');
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-  }
-};
-
-
-Blockly.JavaScript['coderbot_if'] = function(block) {
-  // Generate JavaScript for 'if' conditional if there is a path.
-  var argument = 'CoderBot.' + block.getFieldValue('DIR') +
-      '(\'block_id_' + block.id + '\')';
-  var branch = Blockly.JavaScript.statementToCode(block, 'DO');
-  var code = 'if (' + argument + ') {\n' + branch + '}\n';
-  return code;
-};
-
-Blockly.Blocks['coderbot_ifElse'] = {
-  // Block for 'if/else' conditional if there is a path.
-  init: function() {
-    var DIRECTIONS =
-        [[('CoderBot_pathAhead'), 'isPathForward'],
-         [('CoderBot_pathLeft'), 'isPathLeft'],
-         [('CoderBot_pathRight'), 'isPathRight']];
-    this.setColour(210);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
-    this.appendStatementInput('DO')
-        .appendField(('CoderBot_doCode'));
-    this.appendStatementInput('ELSE')
-        .appendField(('CoderBot_elseCode'));
-    this.setTooltip(('CoderBot_ifelseTooltip'));
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-  }
-};
-
-Blockly.JavaScript['coderbot_ifElse'] = function(block) {
-  // Generate JavaScript for 'if/else' conditional if there is a path.
-  var argument = 'CoderBot.' + block.getFieldValue('DIR') +
-      '(\'block_id_' + block.id + '\')';
-  var branch0 = Blockly.JavaScript.statementToCode(block, 'DO');
-  var branch1 = Blockly.JavaScript.statementToCode(block, 'ELSE');
-  var code = 'if (' + argument + ') {\n' + branch0 +
-             '} else {\n' + branch1 + '}\n';
-  return code;
-};
-
-Blockly.Blocks['coderbot_forever'] = {
-  // Do forever loop.
-  init: function() {
-    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Repeat');
-    this.setColour(120);
-    this.appendDummyInput()
-        .appendField(('CoderBot_repeatUntil'))
-        .appendField(new Blockly.FieldImage(CoderBot.SKIN.marker, 12, 16));
-    this.appendStatementInput('DO')
-        .appendField(('CoderBot_doCode'));
-    this.setPreviousStatement(true);
-    this.setTooltip(('CoderBot_whileTooltip'));
-  }
-};
-
-Blockly.JavaScript['coderbot_forever'] = function(block) {
-  // Generate JavaScript for do forever loop.
-  var branch = Blockly.JavaScript.statementToCode(block, 'DO');
-  if (Blockly.JavaScript.INFINITE_LOOP_TRAP) {
-    branch = Blockly.JavaScript.INFINITE_LOOP_TRAP.replace(/%1/g,
-        '\'block_id_' + block.id + '\'') + branch;
-  }
-  return 'while (true) {\n' + branch + '}\n';
-};
