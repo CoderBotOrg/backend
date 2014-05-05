@@ -1,4 +1,4 @@
-coderbot
+CoderBot
 ========
 
 A RaspberryPI-based bot controller
