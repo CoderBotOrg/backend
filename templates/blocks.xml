@@ -46,6 +46,13 @@
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
       <block type="coderbot_say"></block>
+      <block type="coderbot_sleep">
+        <value name="ELAPSE">
+          <block type="math_number">
+            <field name="NUM">1.0</field>
+          </block>
+        </value>
+      </block>
       <block type="coderbot_adv_move">
         <value name="SPEED">
           <block type="math_number">

@@ -138,6 +138,34 @@ Blockly.Python['coderbot_say'] = function(block) {
   return 'bot.say(' + text + ')\n';
 };
 
+Blockly.Blocks['coderbot_sleep'] = {
+  // Block for text to sleep.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Sleep');
+    this.setColour(290);
+    this.appendValueInput('ELAPSE')
+        .setCheck(["Number"])
+        .appendField('sleep');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(('CoderBot_sleepTooltip'));
+  }
+};
+
+Blockly.JavaScript['coderbot_sleep'] = function(block) {
+  // Generate JavaScript for sleeping.
+  var elapse = Blockly.JavaScript.valueToCode(block, 'ELAPSE',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'';
+  return 'cam.sleep(' + elapse + ');\n';
+};
+
+Blockly.Python['coderbot_sleep'] = function(block) {
+  // Generate Python for sleeping.
+  var elapse = Blockly.Python.valueToCode(block, 'ELAPSE',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  return 'cam.sleep(' + elapse + ')\n';
+};
+
 Blockly.Blocks['coderbot_adv_move'] = {
   // Block for moving forward.
   init: function() {

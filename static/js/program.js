@@ -26,6 +26,7 @@
     }
 
     function loadProg() {
+      $.mobile.loading("show");
       try {
         $.ajax({url: '/program/list', dataType: "json", type: "GET", success:function(data) {
           $('#i_prog_list').empty();
@@ -37,22 +38,24 @@
           $('.c_load_prog').on('click', loadProgPost);
           $('.c_delete_prog').on('click', deleteProg);
           $("#dialogLoadProg").popup("open", {transition: "pop"});
+          $.mobile.loading("hide");
 	}});
       } catch (e) {
         alert(e);
-      }      
+      }
     }
 
     function loadProgPost() {
+      $("#dialogLoadProg").popup("close");
+      $.mobile.loading("show");
       Blockly.mainWorkspace.clear();
       prog.name=$(this).parent('li').attr('data-prog-name');
       try {
         var data =  {'name': prog.name};
         $.ajax({url: '/program/load', data: data, type: "GET", success:function(data) {
-	  Blockly.mainWorkspace.clear();
           var xml = Blockly.Xml.textToDom(data);
           Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
-          $("#dialogLoadProg").popup("close");
+          $.mobile.loading("hide");
 	}});
       } catch (e) {
         alert(e);

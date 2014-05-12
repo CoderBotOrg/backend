@@ -5,6 +5,7 @@ from threading import Thread, Lock
 import SimpleCV
 
 CAMERA_REFRESH_INTERVAL=0.3
+CAMERA_DELAY_INTERVAL=0.3
 MAX_IMAGE_AGE = 0.0
 
 class Camera(Thread):
@@ -25,7 +26,7 @@ class Camera(Thread):
 
   def __init__(self):
     print "starting camera"
-    self._camera = SimpleCV.Camera(prop_set=self._cam_props, threaded=True)
+    self._camera = SimpleCV.Camera(prop_set=self._cam_props)
     self._streamer = SimpleCV.JpegStreamer("0.0.0.0:8090", st=0.1)
     self._cam_off_img.save(self._streamer)
     self._run = True
@@ -47,7 +48,7 @@ class Camera(Thread):
       time.sleep(CAMERA_REFRESH_INTERVAL)
     
   def get_image(self, maxage = MAX_IMAGE_AGE):
-    return self._image
+    return self._camera.getImage()
 
   def save_image(self, image):
     image.save(self._streamer)
@@ -82,11 +83,15 @@ class Camera(Thread):
     if signal:
       return signal[-1]
 
+  def sleep(self, elapse):
+    print "sleep"
+    time.sleep(elapse)
+
   def path_ahead(self):
     print "path ahead"
     ts = time.time()
     self._image_lock.acquire()
-    img = self.get_image()
+    img = self.get_image(0)
     print "path_ahead.get_image: " + str(time.time() - ts)
     warped = img.resize(160).warp(self._warp_corners_4).resize(640)
     print "path_ahead.warp: " + str(time.time() - ts)
@@ -94,11 +99,19 @@ class Camera(Thread):
     #ar_layer.rectangle((260,120),(120,320), color=(0,255,0))
     cropped = warped.crop(260, 160, 120, 320)
     control = cropped.crop(0, 280, 160, 40)
-    #control_color = control.meanColor()
+
+    control_color = control.meanColor()
+    color_distance = cropped.dilate().colorDistance(control_color)
+
     control_hue = control.getNumpy().mean()
+    hue_distance = cropped.dilate().hueDistance(control_hue)
+
     print "path_ahead.crop: " + str(time.time() - ts)
-    control_hue = control_hue - 20 if control_hue > 127 else control_hue + 20
-    binarized = cropped.dilate().binarize(control_hue)
+    #control_hue = control_hue - 20 if control_hue > 127 else control_hue + 20
+    #binarized = cropped.dilate().binarize(control_hue)
+    #binarized = cropped.dilate().binarize().invert()
+    control_hue = control_hue - 10
+    binarized = color_distance.binarize(control_hue).invert()
     print "path_ahead.binarize: " + str(time.time() - ts)
     blobs = binarized.findBlobs(minsize=1000, maxsize=(cropped.width*cropped.height)-2000)
     print "path_ahead.blobs: " + str(time.time() - ts)
