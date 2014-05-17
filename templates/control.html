@@ -12,7 +12,7 @@
 	<script src="js/control.js"></script>
 </head>
 <body>
-<div data-role="page" class="">
+<div data-role="page" class="" id="pagecontrol">
  <div data-role="header"><h1>CoderBot</h1></div>
  <div role="main" class="ui-content">
   <fieldset class="ui-grid-solo">
@@ -32,6 +32,9 @@
   <div class="ui-grid-solo">
    <div class="ui-block-a"><iframe id="f_stream" src="http://{{host}}:8090" width="640" height="480" style="display:block;margin: 0 auto;"></iframe></div>
   </div>
+  <fieldset class="ui-grid-solo">
+   <div class="ui-block-a"><button id="b_halt" class="ui-btn" type="button">Halt</button></div>
+  </fieldset>
   </div>
   <div data-role="navbar">
    <ul>

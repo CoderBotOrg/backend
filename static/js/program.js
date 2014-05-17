@@ -1,16 +1,17 @@
-    $(document).ready(function() {
+//    $(document).ready(function() {
+$(document).on( "pagecreate", function( event ) {
       Blockly.inject(document.getElementById('blocklyDiv'),
           {path: '../../', toolbox: document.getElementById('toolbox')});
-      $("#b_new_prog").on("click", newProg).on("touchend",newProg);
-      $("#b_load_prog").on("click", loadProg).on("touchend",loadProg);
-      $("#b_save_prog").on("click", saveProg).on("touchend",saveProg);
-      $("#b_show_prog").on("click", showProg).on("touchend",showProg);
-      $("#b_run_prog").on("click", runProg).on("touchend",runProg);
-      $("#b_end_prog").on("click", endProg).on("touchend",endProg);
-      $("#b_end_prog_d").on("click", endProg).on("touchend",endProg);
+      $("#b_new_prog").on("click", newProg);
+      $("#b_load_prog").on("click", loadProg);
+      $("#b_save_prog").on("click", saveProg);
+      $("#b_show_prog").on("click", showProg);
+      $("#b_run_prog").on("click", runProg);
+      $("#b_end_prog").on("click", endProg);
+      $("#b_end_prog_d").on("click", endProg);
       $("#b_new_prog_post").on("click", newProgPost);
       $("#b_load_prog_post").on("click", loadProgPost);
-      $("#b_control").on("click", goControl).on("touchend",goControl);
+      $("#b_control").on("click", goControl);
     });
 
     var prog = {};

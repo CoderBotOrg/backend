@@ -68,5 +68,7 @@
       <block type="coderbot_adv_stop"></block>
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
+      <block type="coderbot_adv_findSignal"></block>
+      <block type="coderbot_adv_findFace"></block>
     </category>      
   </xml>

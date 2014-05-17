@@ -261,7 +261,7 @@ Blockly.Blocks['coderbot_adv_pathAhead'] = {
     this.setColour(290);
     this.appendDummyInput()
         .appendField('pathAhead');
-    this.setOutput(true, 'Boolean');
+    this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
@@ -288,7 +288,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
     this.setColour(290);
     this.appendDummyInput()
         .appendField('findLine');
-    this.setOutput(true, 'Boolean');
+    this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
@@ -302,6 +302,60 @@ Blockly.JavaScript['coderbot_adv_findLine'] = function(block) {
 Blockly.Python['coderbot_adv_findLine'] = function(block) {
   // Boolean values true and false.
   var code = 'cam.find_line()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findSignal'] = {
+  /**
+   * Block for findSignal function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField('findSignal');
+    this.setOutput(true, 'Number');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_findSignal'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_signal()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['coderbot_adv_findSignal'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_signal()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findFace'] = {
+  /**
+   * Block for findFace function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField('findFace');
+    this.setOutput(true, 'Number');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_findFace'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_face()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['coderbot_adv_findFace'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_face()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 

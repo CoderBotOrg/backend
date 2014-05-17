@@ -28,29 +28,34 @@ def handle_program():
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
-    param = request.args.get('param')
+    param1 = request.args.get('param1')
+    param2 = request.args.get('param2')
 
     if cmd == "forward":
-        bot.forward(elapse=float(param))
+        bot.forward(speed=int(param1), elapse=float(param2))
     elif cmd == "left":
-        bot.left(elapse=float(param))
+        bot.left(speed=int(param1), elapse=float(param2))
     elif cmd == "right":
-        bot.right(elapse=float(param))
+        bot.right(speed=int(param1), elapse=float(param2))
     elif cmd == "backward":
-        bot.backward(elapse=float(param))
+        bot.backward(speed=int(param1), elapse=float(param2))
     elif cmd == "stop":
         bot.stop()
     elif cmd == "set_handler":
-        print "param: " + str(param)
+        print "param: " + str(param1)
         try:
-          handler = int(param) if int(param) >= 0 else None
+          handler = int(param1) if int(param1) >= 0 else None
           cam_h.set_active_handler(handler)      
         except e:
           print e 
 
     elif cmd == "say":
-        print "say: " + str(param)
-	bot.say(param)
+        print "say: " + str(param1)
+	bot.say(param1)
+
+    elif cmd == "halt":
+        print "shutting down"
+	bot.halt()
 
     return "ok"
 
@@ -135,4 +140,5 @@ init()
 """
 
 def run_server():
+  bot.say("$startup.mp3")
   app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)

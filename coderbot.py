@@ -12,6 +12,7 @@ class CoderBot:
   def __init__(self):
     pigpio.start('localhost')
     self.stop()
+    self._is_moving = False
 
   the_bot = None
 
@@ -22,6 +23,7 @@ class CoderBot:
     return cls.the_bot
 
   def forward(self, speed=100, elapse=-1):
+    self._is_moving = True
     speed = (255 * speed) / 100
     pigpio.write(PIN_RIGHT_FORWARD, 1)
     pigpio.write(PIN_LEFT_FORWARD, 1)
@@ -34,6 +36,7 @@ class CoderBot:
       self.stop()
 
   def backward(self, speed=100, elapse=-1):
+    self._is_moving = True
     speed = (255 * speed) / 100
     pigpio.write(PIN_RIGHT_FORWARD, 0)
     pigpio.write(PIN_LEFT_FORWARD, 0)
@@ -46,6 +49,7 @@ class CoderBot:
       self.stop()
 
   def left(self, speed=100, elapse=-1):
+    self._is_moving = True
     speed = (255 * speed) / 100
     pigpio.write(PIN_RIGHT_FORWARD, 1)
     pigpio.write(PIN_LEFT_FORWARD, 0)
@@ -58,6 +62,7 @@ class CoderBot:
       self.stop()
 
   def right(self, speed=100, elapse=-1):
+    self._is_moving = True
     speed = (255 * speed) / 100
     pigpio.write(PIN_RIGHT_FORWARD, 0)
     pigpio.write(PIN_LEFT_FORWARD, 1)
@@ -107,9 +112,19 @@ class CoderBot:
     pigpio.write(PIN_LEFT_BACKWARD, 0)
     pigpio.write(PIN_RIGHT_FORWARD, 0)
     pigpio.write(PIN_RIGHT_BACKWARD, 0)
+    self._is_moving = False
+
+  def is_moving(self):
+    return self._is_moving
 
   def say(self, what):
-    os.system ('espeak -vit -p 66 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
+    if "$" in what:
+      os.system ('omxplayer sounds/' + what[1:])
+    else:
+      os.system ('espeak -vit -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
+
+  def halt(self):
+    os.system ('sudo halt')
 
 
   
