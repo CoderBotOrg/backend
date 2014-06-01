@@ -56,7 +56,6 @@ $(document).on( "pagebeforecreate", function( event ) {
       try {
         var data =  {'name': prog.name};
         $.ajax({url: '/program/load', data: data, type: "GET", success:function(data) {
-          alert(data);
           var xml = Blockly.Xml.textToDom(data);
           Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
           $.mobile.loading("hide");
