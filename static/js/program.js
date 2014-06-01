@@ -1,7 +1,9 @@
-//    $(document).ready(function() {
-$(document).on( "pagecreate", function( event ) {
+$(document).on( "pageshow", function( event, ui ) {
       Blockly.inject(document.getElementById('blocklyDiv'),
           {path: '../../', toolbox: document.getElementById('toolbox')});
+});
+
+$(document).on( "pagebeforecreate", function( event ) {
       $("#b_new_prog").on("click", newProg);
       $("#b_load_prog").on("click", loadProg);
       $("#b_save_prog").on("click", saveProg);
@@ -54,6 +56,7 @@ $(document).on( "pagecreate", function( event ) {
       try {
         var data =  {'name': prog.name};
         $.ajax({url: '/program/load', data: data, type: "GET", success:function(data) {
+          alert(data);
           var xml = Blockly.Xml.textToDom(data);
           Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
           $.mobile.loading("hide");

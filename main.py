@@ -19,11 +19,11 @@ app.prog_engine = ProgramEngine.get_instance()
 
 @app.route("/")
 def handle_home():
-    return render_template('control.html', host=request.host[:request.host.find(':')])
+    return render_template('control.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port)
 
 @app.route("/program")
 def handle_program():
-    return render_template('program.html', host=request.host[:request.host.find(':')])
+    return render_template('program.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port)
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():

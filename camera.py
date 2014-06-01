@@ -14,8 +14,9 @@ class Camera(Thread):
   _cam_props = {"width":640, "height":480}
   _cam_off_img = SimpleCV.Image("coderdojo-logo.png")
   _warp_corners_1 = [(0, 0), (640, 0), (380, 480), (260, 480)]
-  _warp_corners_2 = [(0, 0), (320, 0), (190, 240), (130, 240)]
+  _warp_corners_2 = [(0, -60), (320, -60), (190, 240), (130, 240)]
   _warp_corners_4 = [(0, 0), (160, 0), (95, 120), (65, 120)]
+  stream_port = 8090
 
   @classmethod
   def get_instance(cls):
@@ -27,7 +28,7 @@ class Camera(Thread):
   def __init__(self):
     print "starting camera"
     self._camera = SimpleCV.Camera(prop_set=self._cam_props)
-    self._streamer = SimpleCV.JpegStreamer("0.0.0.0:8090", st=0.1)
+    self._streamer = SimpleCV.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     self._cam_off_img.save(self._streamer)
     self._run = True
     self._image_time = 0
@@ -37,13 +38,13 @@ class Camera(Thread):
   def run(self):
     while self._run:
       ts = time.time()
-      print "run.1"
+      #print "run.1"
       self._image_lock.acquire()
       self._image = self._camera.getImage()
-      print "run.2: " + str(time.time()-ts)
+      #print "run.2: " + str(time.time()-ts)
       if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
         self.save_image(self._image)
-        print "run.3: " + str(time.time()-ts)
+        #print "run.3: " + str(time.time()-ts)
       self._image_lock.release()
       time.sleep(CAMERA_REFRESH_INTERVAL)
     
@@ -80,35 +81,60 @@ class Camera(Thread):
 
     
   def find_signal(self):
-    print "signal"
+    #print "signal"
     angle = None
     ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    print "signal.get_image: " + str(time.time() - ts)
+    #print "signal.get_image: " + str(time.time() - ts)
     warped = img.resize(320).warp(self._warp_corners_2).resize(640)
-    print "signal.warp: " + str(time.time() - ts)
+    #print "signal.warp: " + str(time.time() - ts)
+    cropped = warped.crop(260, 160, 120, 320)
 
-    blobs = warped.findBlobs(minsize=1000, maxsize=1500)
-    print "signal.blobs: " + str(time.time() - ts)
+    binarized = cropped.binarize()
+
+    blobs = binarized.findBlobs(minsize=3000, maxsize=4000)
+    #print "signal.blobs: " + str(time.time() - ts)
+    signal = binarized
     coordY = 60
     if blobs and len(blobs):
+      blobs.draw()
       signals = blobs.filter([b.isSquare() for b in blobs]) 
-      print signals
+      #print signals
       if signals:
-        signal = signals.sortDistance(320, 480)[0].crop()
-        line = signal.findLines(minlenght=10)
-        if line:
-          angle = line.angle()
+        signal = signals.sortDistance((320, 480))[0].crop().crop(8,8,46,46)
+        #print "found signal: " + str(signal)
+        lines = signal.findLines(threshold=10, minlinelength=10, maxlinegap=2, cannyth1=50, cannyth2=100)
+        #print "lines: " + str(lines)
+        if lines and len(lines):
+          lines = lines.sortLength()
+        
+          center_line = lines[-1]
+          center_line.draw()
+
+          #print "center_line: " + str(center_line.length())
+
+          angle = center_line.angle()
+          #print "angle raw: " + str(angle)
+          if angle < 0.0:
+            angle = angle + 360
+          if (((angle < 45.0 or angle > 315.0) and (center_line.coordinates()[0] < (signal.width / 2))) or
+             ((angle > 45.0 and angle < 135.0)  and (center_line.coordinates()[1] > (signal.height / 2))) or
+             ((angle > 135.0 and angle < 225.0) and (center_line.coordinates()[0] > (signal.width / 2))) or
+             ((angle > 225.0 and angle < 315.0)  and (center_line.coordinates()[1] < (signal.height / 2)))):
+            angle = angle + 180
+          if angle > 360.0:
+            angle = angle - 360
+          
           img.drawText("signal found pointing at " + str(angle), 0, 0, fontsize=32 )
-          print angle
+          #print "angle final: " + str(angle)
         else:
           angle = -1
           img.drawText("stop signal found", 0, 0, fontsize=32 )
 
     self.save_image(img)
     self._image_lock.release()
-    print "signal: " + str(time.time() - ts)
+    #print "signal: " + str(time.time() - ts)
     return angle
 
   def find_face(self):
@@ -182,6 +208,26 @@ class Camera(Thread):
     self._image_lock.release()
     print "path_ahead: " + str(time.time() - ts)
     return coordY
+
+  def find_code(self):
+    #print "code"
+    code_data = None
+    ts = time.time()
+    self._image_lock.acquire()
+    img = self.get_image(0)
+    #print "signal.get_image: " + str(time.time() - ts)
+    warped = img.resize(320).warp(self._warp_corners_2).resize(640)
+    #print "code.warp: " + str(time.time() - ts)
+    cropped = warped.crop(260, 160, 120, 320)
+
+    barcode = cropped.findBarcode()
+    if barcode:
+      code_data = barcode.data
+      img.drawText("code found: " + data, 0, 0, fontsize=32 )
+    self.save_image(img)
+    self._image_lock.release()
+    #print "code: " + str(time.time() - ts)
+    return code_data
     
   def sleep(self, elapse):
     print "sleep"

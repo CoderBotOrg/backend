@@ -1,13 +1,13 @@
 var bot = new CoderBot()
 
 $(document).on( "pagecreate", function( event ) {
-	if(false/*(('ontouchstart' in window) ||
+	if(('ontouchstart' in window) ||
      	   (navigator.maxTouchPoints > 0) ||
-     	   (navigator.msMaxTouchPoints > 0)*/) {
-       	   /* browser with either Touch Events of Pointer Events running on touch-capable device */	
+     	   (navigator.msMaxTouchPoints > 0)) {
+       	        /* browser with either Touch Events of Pointer Events running on touch-capable device */	
 		$('#b_forward')
-	  	.on("touchstart", function (){bot.forward(100,-1);})
-	  	.on("touchend", function (){bot.stop();});
+	  	.on("touchstart", function (){console.log("start"); bot.forward(100,-1);})
+	  	.on("touchend", function (){console.log("end"); bot.stop();});
 		$('#b_backward')
 	  	.on("touchstart", function (){bot.backward(100,-1);})
 	  	.on("touchend", function (){bot.stop();});

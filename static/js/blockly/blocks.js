@@ -359,3 +359,29 @@ Blockly.Python['coderbot_adv_findFace'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
+Blockly.Blocks['coderbot_adv_findCode'] = {
+  /**
+   * Block for findSignal function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField('findCode');
+    this.setOutput(true, 'Number');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_findCode'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_code()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['coderbot_adv_findCode'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_code()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
