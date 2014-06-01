@@ -55,6 +55,7 @@ def handle_bot():
 
     elif cmd == "halt":
         print "shutting down"
+        bot.say("$shutdown.mp3")
 	bot.halt()
 
     return "ok"
