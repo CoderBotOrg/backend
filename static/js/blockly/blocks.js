@@ -24,7 +24,7 @@ Blockly.Blocks['coderbot_moveForward'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('moveForward');
+        .appendField(Blockly.Msg.CODERBOT_MOVE_FORWARD);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveForwardTooltip');
@@ -47,7 +47,7 @@ Blockly.Blocks['coderbot_moveBackward'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('moveBackward');
+        .appendField(Blockly.Msg.CODERBOT_MOVE_BACKWARD);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveBackwardTooltip');
@@ -70,7 +70,7 @@ Blockly.Blocks['coderbot_turnLeft'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField("turnLeft");
+        .appendField(Blockly.Msg.CODERBOT_MOVE_LEFT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));
@@ -79,12 +79,12 @@ Blockly.Blocks['coderbot_turnLeft'] = {
 
 Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
   // Generate JavaScript for turning left.
-  return 'bot.left(elapse=0.15);\n';
+  return 'bot.left(speed=80, elapse=0.10);\n';
 };
 
 Blockly.Python['coderbot_turnLeft'] = function(block) {
   // Generate Python for turning left.
-  return 'bot.left(elapse=0.15)\n';
+  return 'bot.left(speed=80, elapse=0.10)\n';
 };
 
 Blockly.Blocks['coderbot_turnRight'] = {
@@ -93,7 +93,7 @@ Blockly.Blocks['coderbot_turnRight'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField("turnRight");
+        .appendField(Blockly.Msg.CODERBOT_MOVE_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));
@@ -102,12 +102,12 @@ Blockly.Blocks['coderbot_turnRight'] = {
 
 Blockly.JavaScript['coderbot_turnRight'] = function(block) {
   // Generate JavaScript for turning left or right.
-  return 'bot.right(elapse=0.15);\n';
+  return 'bot.right(speed=80, elapse=0.10);\n';
 };
 
 Blockly.Python['coderbot_turnRight'] = function(block) {
   // Generate Python for turning left or right.
-  return 'bot.right(elapse=0.15)\n';
+  return 'bot.right(speed=80, elapse=0.10)\n';
 };
 
 Blockly.Blocks['coderbot_say'] = {
@@ -117,7 +117,7 @@ Blockly.Blocks['coderbot_say'] = {
     this.setColour(290);
     this.appendValueInput('TEXT')
         .setCheck(["String", "Number", "Date"])
-        .appendField('say');
+        .appendField(Blockly.Msg.CODERBOT_SAY);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_sayTooltip'));
@@ -145,7 +145,7 @@ Blockly.Blocks['coderbot_sleep'] = {
     this.setColour(290);
     this.appendValueInput('ELAPSE')
         .setCheck(["Number"])
-        .appendField('sleep');
+        .appendField(Blockly.Msg.CODERBOT_SLEEP);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_sleepTooltip'));
@@ -176,7 +176,7 @@ Blockly.Blocks['coderbot_adv_move'] = {
         ['right', 'RIGHT']]
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(290);
-    this.interpolateMsg("move bot ",
+    this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_ADV_MOVE,
                         ['TEXT', null, Blockly.ALIGN_RIGHT],
                         Blockly.ALIGN_RIGHT);
     
@@ -184,22 +184,22 @@ Blockly.Blocks['coderbot_adv_move'] = {
        .appendField(new Blockly.FieldDropdown(ACTIONS), 'ACTION');
     this.appendValueInput('SPEED')
         .setCheck('Number')
-        .appendField("at speed");
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_SPEED);
     this.appendValueInput('ELAPSE')
         .setCheck('Number')
-        .appendField("for");
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_ELAPSE);
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
     this.setTooltip(function() {
       var mode = thisBlock.getFieldValue('ACTION');
       var TOOLTIPS = {
-        FORWARD: "Move forward",
-        BACKWARD: "Move backward",
-        LEFT: "Turn left",
-        RIGHT: "Turn right",
+        FORWARD: Blockly.Msg.CODERBOT_MOVE_ADV_TIP_FORWARD,
+        BACKWARD: Blockly.Msg.CODERBOT_MOVE_ADV_TIP_BACKWARD,
+        LEFT: Blockly.Msg.CODERBOT_MOVE_ADV_TIP_LEFT,
+        RIGHT: Blockly.Msg.CODERBOT_MOVE_ADV_TIP_RIGHT,
       };
-      return TOOLTIPS[mode] + " at speed (0-100%) for time (seconds)";
+      return TOOLTIPS[mode] + Blockly.Msg.CODERBOT_MOVE_ADV_TIP_TAIL;
     });
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -233,7 +233,7 @@ Blockly.Blocks['coderbot_adv_stop'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Stop');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField("stop");
+        .appendField(Blockly.Msg.CODERBOT_MOVE_STOP);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_stopTooltip'));
@@ -260,7 +260,7 @@ Blockly.Blocks['coderbot_adv_pathAhead'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('pathAhead');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_PATHAHEAD);
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -287,7 +287,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('findLine');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLINE);
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -314,7 +314,7 @@ Blockly.Blocks['coderbot_adv_findSignal'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('findSignal');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDSIGNAL);
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -341,7 +341,7 @@ Blockly.Blocks['coderbot_adv_findFace'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('findFace');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDFACE);
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -368,7 +368,7 @@ Blockly.Blocks['coderbot_adv_findCode'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField('findCode');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCODE);
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -383,5 +383,32 @@ Blockly.JavaScript['coderbot_adv_findCode'] = function(block) {
 Blockly.Python['coderbot_adv_findCode'] = function(block) {
   // Boolean values true and false.
   var code = 'cam.find_code()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findLogo'] = {
+  /**
+   * Block for findLogo function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLOGO);
+    this.setOutput(true, 'Number');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_findLogo'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_logo()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Python['coderbot_adv_findLogo'] = function(block) {
+  // Boolean values true and false.
+  var code = 'cam.find_logo()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };

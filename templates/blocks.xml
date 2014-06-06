@@ -72,6 +72,7 @@
       <block type="coderbot_adv_findSignal"></block>
       <block type="coderbot_adv_findFace"></block>
       <block type="coderbot_adv_findCode"></block>
+      <block type="coderbot_adv_findLogo"></block>
     </category>
     <category name="Sound">
       <block type="coderbot_say"></block>

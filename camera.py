@@ -13,9 +13,9 @@ class Camera(Thread):
   _instance = None
   _cam_props = {"width":640, "height":480}
   _cam_off_img = SimpleCV.Image("coderdojo-logo.png")
-  _warp_corners_1 = [(0, 0), (640, 0), (380, 480), (260, 480)]
+  _warp_corners_1 = [(0, -120), (640, -120), (380, 480), (260, 480)]
   _warp_corners_2 = [(0, -60), (320, -60), (190, 240), (130, 240)]
-  _warp_corners_4 = [(0, 0), (160, 0), (95, 120), (65, 120)]
+  _warp_corners_4 = [(0, -30), (160, -30), (95, 120), (65, 120)]
   stream_port = 8090
 
   @classmethod
@@ -94,7 +94,8 @@ class Camera(Thread):
     binarized = cropped.binarize()
 
     blobs = binarized.findBlobs(minsize=3000, maxsize=4000)
-    #print "signal.blobs: " + str(time.time() - ts)
+    #print blobs
+    print "signal.blobs: " + str(time.time() - ts)
     signal = binarized
     coordY = 60
     if blobs and len(blobs):
@@ -228,6 +229,29 @@ class Camera(Thread):
     self._image_lock.release()
     #print "code: " + str(time.time() - ts)
     return code_data
+    
+  def find_logo(self):
+    #print "logo"
+    logo_y = None
+    ts = time.time()
+    self._image_lock.acquire()
+    img = self.get_image(0)
+    #print "logo.get_image: " + str(time.time() - ts)
+    warped = img.resize(320).warp(self._warp_corners_2).resize(640)
+    #print "logo.warp: " + str(time.time() - ts)
+    cropped = warped.crop(260, 160, 120, 320)
+
+    logo = img.findKeypointMatch(self._cam_off_img)
+    if logo:
+      #logo = logos[-1]
+      x, y = logo.coordinates()
+      print "found logo at: " + str(x) + " " + str(y)
+      logo_y = 60 - ((y * 48) / cropped.height) 
+      img.drawText("logo found at: " + str(logo.coordinates()), 0, 0, fontsize=32 )
+    self.save_image(img)
+    self._image_lock.release()
+    #print "code: " + str(time.time() - ts)
+    return logo_y 
     
   def sleep(self, elapse):
     print "sleep"

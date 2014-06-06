@@ -13,7 +13,6 @@ $(document).on( "pagebeforecreate", function( event ) {
       $("#b_end_prog_d").on("click", endProg);
       $("#b_new_prog_post").on("click", newProgPost);
       $("#b_load_prog_post").on("click", loadProgPost);
-      $("#b_control").on("click", goControl);
     });
 
     var prog = {};
@@ -127,8 +126,4 @@ $(document).on( "pagebeforecreate", function( event ) {
           setTimeout(statusProg, 1000);
         }  
       }});
-    }
-
-    function goControl() {
-      $.mobile.changePage("/");
     }
