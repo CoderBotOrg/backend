@@ -1,0 +1,7 @@
+README
+speaklater.py
+pip-egg-info/speaklater.egg-info/PKG-INFO
+pip-egg-info/speaklater.egg-info/SOURCES.txt
+pip-egg-info/speaklater.egg-info/dependency_links.txt
+pip-egg-info/speaklater.egg-info/not-zip-safe
+pip-egg-info/speaklater.egg-info/top_level.txt
