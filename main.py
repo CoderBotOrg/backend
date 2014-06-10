@@ -6,16 +6,30 @@ from camera import Camera
 from program import ProgramEngine, Program
 
 from flask import Flask, render_template, request
+from flask.ext.babel import Babel
 #from flask_sockets import Sockets
 
 bot = CoderBot.get_instance()
 cam = Camera.get_instance()
 
 app = Flask(__name__,static_url_path="")
+#app.config.from_pyfile('coderbot.cfg')
+babel = Babel(app)
 app.debug = True
 #sockets = Sockets(app)
 
 app.prog_engine = ProgramEngine.get_instance()
+
+@babel.localeselector
+def get_locale():
+    # if a user is logged in, use the locale from the user settings
+    #user = getattr(g, 'user', None)
+    #if user is not None:
+    #    return user.locale
+    # otherwise try to guess the language from the user accept
+    # header the browser transmits.  We support de/fr/en in this
+    # example.  The best match wins.
+    return request.accept_languages.best_match(['it', 'en'])
 
 @app.route("/")
 def handle_home():

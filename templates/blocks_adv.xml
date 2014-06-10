@@ -1,5 +1,5 @@
   <xml id="toolbox" style="display: none">
-    <category name="Control">
+    <category name="{% trans %}Control{% endtrans %}">
       <block type="controls_if"></block>
       <block type="controls_repeat_ext">
         <value name="TIMES">
@@ -10,18 +10,18 @@
       </block>
       <block type="controls_whileUntil"></block>
     </category>
-    <category name="Logic">
+    <category name="{% trans %}Logic{% endtrans %}">
       <block type="logic_compare"></block>
       <block type="logic_operation"></block>
       <block type="logic_negate"></block>
       <block type="logic_boolean"></block>
     </category>
-    <category name="Variables">
+    <category name="{% trans %}Variables{% endtrans %}">
       <block type="variables_get"></block>
       <block type="variables_set"></block>
       <block type="variables_set"></block>
     </category>
-    <category name="Procedures">
+    <category name="{% trans %}Procedures{% endtrans %}">
       <block type="procedures_defnoreturn"></block>
       <block type="procedures_defreturn"></block>
       <block type="procedures_mutatorcontainer"></block>
@@ -30,17 +30,17 @@
       <block type="procedures_callreturn"></block>
       <block type="procedures_ifreturn"></block>
     </category>
-    <category name="Math">
+    <category name="{% trans %}Math{% endtrans %}">
       <block type="math_number"></block>
       <block type="math_arithmetic"></block>
       <block type="math_single"></block>
     </category>
-    <category name="Text">
+    <category name="{% trans %}Text{% endtrans %}">
       <block type="text"></block>
       <block type="text_length"></block>
       <block type="text_print"></block>
     </category>
-    <category name="Movement">
+    <category name="{% trans %}Movement{% endtrans %}">
       <block type="coderbot_moveForward"></block>
       <block type="coderbot_moveBackward"></block>
       <block type="coderbot_turnLeft"></block>
@@ -66,7 +66,7 @@
         </value>
       </block>
     </category>
-    <category name="Sensor">
+    <category name="{% trans %}Sensor{% endtrans %}">
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
       <block type="coderbot_adv_findSignal"></block>
@@ -74,7 +74,7 @@
       <block type="coderbot_adv_findCode"></block>
       <block type="coderbot_adv_findLogo"></block>
     </category>
-    <category name="Sound">
+    <category name="{% trans %}Sound{% endtrans %}">
       <block type="coderbot_say"></block>
     </category>      
   </xml>
