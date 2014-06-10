@@ -22,22 +22,17 @@ app.prog_engine = ProgramEngine.get_instance()
 
 @babel.localeselector
 def get_locale():
-    # if a user is logged in, use the locale from the user settings
-    #user = getattr(g, 'user', None)
-    #if user is not None:
-    #    return user.locale
     # otherwise try to guess the language from the user accept
-    # header the browser transmits.  We support de/fr/en in this
-    # example.  The best match wins.
+    # header the browser transmits.
     return request.accept_languages.best_match(['it', 'en'])
 
 @app.route("/")
 def handle_home():
-    return render_template('control.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port)
+    return render_template('control.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale())
 
 @app.route("/program")
 def handle_program():
-    return render_template('program.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port)
+    return render_template('program.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale=get_locale(), program_level="adv")
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
