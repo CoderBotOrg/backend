@@ -118,9 +118,9 @@ class CoderBot:
     return self._is_moving
 
   def say(self, what):
-    if "$" in what:
+    if what and "$" in what:
       os.system ('omxplayer sounds/' + what[1:])
-    else:
+    elif what and len(what):
       os.system ('espeak -vit -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
 
   def halt(self):

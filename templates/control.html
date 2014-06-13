@@ -14,7 +14,7 @@
 <body>
 <div data-role="page" class="" id="pagecontrol">
  <div data-role="header">
-  <a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
+  <a href="#" id="a_bot_status" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
   <h1>CoderBot</h1>
   <a href="#panel-preferences" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">{% trans %}Preferences{% endtrans %}</a>
   <div data-role="navbar">
@@ -46,21 +46,39 @@
    <div class="ui-block-a"><button id="b_halt" class="ui-btn" type="button">{% trans %}Halt{% endtrans %}</button></div>
   </fieldset>
   </div>
-  <div data-role="panel" id="panel-preferences" data-position="right" data-display="reveal" data-theme="a">
-   <form class="preferences">
-    <h2>{% trans %}Programming{% endtrans %}</h2>
-    <fieldset data-role="controlgroup" data-mini="true">
-     <legend>{% trans %}Editor level{% endtrans %}</legend>
-     <input type="radio" name="radio-choice-v-6" id="radio-choice-v-6a" value="on" checked="checked">
-     <label for="radio-choice-v-6a">{% trans %}Basic{% endtrans %}</label>
-     <input type="radio" name="radio-choice-v-6" id="radio-choice-v-6b" value="off">
-     <label for="radio-choice-v-6b">{% trans %}Standard{% endtrans %}</label>
-     <input type="radio" name="radio-choice-v-6" id="radio-choice-v-6c" value="other">
-     <label for="radio-choice-v-6c">{% trans %}Advances{% endtrans %}</label>
-    </fieldset>
+  <div data-role="panel" id="panel-preferences" data-position="right" data-display="overlay" data-theme="a">
+   <form class="config" id="f_config">
+    <div data-role="tabs" id="tabs">
+     <div data-role="navbar">
+      <ul>
+       <li><a href="#t_programming" class="ui-btn-active" data-ajax="true">{% trans %}Programming{% endtrans %}</a></li>
+       <li><a href="#t_sound" data-ajax="true">{% trans %}Sounds{% endtrans %}</a></li>
+       <li><a href="#t_sensor" data-ajax="true">{% trans %}Sensor{% endtrans %}</a></li>
+     </ul>
+    </div>
+    <div id="t_programming" class="ui-body-d ui-content">
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}Editor level{% endtrans %}</legend>
+      <input type="radio" name="prog_level" id="r_prog_level_a" value="basic" {%if config.prog_level=='basic'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_a">{% trans %}Basic{% endtrans %}</label>
+      <input type="radio" name="prog_level" id="r_prog_level_b" value="std" {%if config.prog_level=='std'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_b">{% trans %}Standard{% endtrans %}</label>
+      <input type="radio" name="prog_level" id="r_prog_level_c" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_c">{% trans %}Advanced{% endtrans %}</label>
+     </fieldset>
+    </div>
+    <div id="t_sound" class="ui-body-d ui-content">
+     <label for="i_sound_start">{% trans %}Start sound{% endtrans %}</label>
+     <input type="text" id="i_sound_start" name="sound_start" value="{{config.sound_start}}">
+     <label for="i_sound_stop">{% trans %}Stop sound{% endtrans %}</label>
+     <input type="text" id="i_sound_stop" name="sound_stop" value="{{config.sound_stop}}">
+    </div>
+    <div id="t_sensor" class="ui-body-d ui-content">
+     <legend>{% trans %}Sensor{% endtrans %}</legend>
+    </div>
     <div class="ui-grid-a">
      <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
-     <div class="ui-block-b"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</a></div>
+     <div class="ui-block-b"><button type="submit" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
     </div>
    </form>
   </div><!-- /panel -->

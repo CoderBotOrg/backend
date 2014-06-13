@@ -9,6 +9,8 @@ from flask import Flask, render_template, request
 from flask.ext.babel import Babel
 #from flask_sockets import Sockets
 
+CONFIG_FILE = "coderbot.cfg"
+
 bot = CoderBot.get_instance()
 cam = Camera.get_instance()
 
@@ -28,11 +30,19 @@ def get_locale():
 
 @app.route("/")
 def handle_home():
-    return render_template('control.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale())
+    return render_template('control.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale(), config=app.bot_config)
 
 @app.route("/program")
 def handle_program():
-    return render_template('program.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale=get_locale(), program_level="adv")
+    return render_template('program.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale=get_locale(), program_level=app.bot_config.get("prog_level", "std"))
+
+@app.route("/config", methods=["POST"])
+def handle_config():
+    app.bot_config = request.form
+    f = open(CONFIG_FILE, 'w')
+    json.dump(app.bot_config, f)
+    print str(app.bot_config)
+    return "ok";
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
@@ -64,10 +74,15 @@ def handle_bot():
 
     elif cmd == "halt":
         print "shutting down"
-        bot.say("$shutdown.mp3")
+        bot.say(app.bot_config.get("sound_stop"))
 	bot.halt()
 
     return "ok"
+
+@app.route("/bot/status", methods=["GET"])
+def handle_bot_status():
+    print "bot_status"
+    return json.dumps({'status': 'ok'}) 
 
    
 @app.route("/program/list", methods=["GET"])
@@ -150,5 +165,12 @@ init()
 """
 
 def run_server():
-  bot.say("$startup.mp3")
+  f = open(CONFIG_FILE, 'r')
+  try:
+    app.bot_config = json.load(f)
+  except ValueError as e:
+    app.bot_config = {}
+    print e
+
+  bot.say(app.bot_config.get("sound_start"))
   app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)

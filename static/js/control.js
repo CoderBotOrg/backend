@@ -40,9 +40,31 @@ $(document).on( "pagecreate", function( event ) {
 		bot.set_handler(param);
                 $('#f_stream').attr('src', $('#f_stream').attr('src'));
 	});
+	$('#f_config').on("submit", function (){
+		var form_data = $(this).serialize();
+                $.post(url='/config', form_data, success=function(){
+                  alert("saved ok");}
+                );
+                return false;
+	});
 	$('#b_halt').on("click", function (){
 		if(confirm("Shutdown CoderBot?")){
 			bot.halt();
 		}
 	});
+        botStatus();
 });
+
+    function botStatus() {
+      $.ajax({url:'/bot/status',dataType:'json'}).done(function (data) {
+        if(data.status == 'ok') {
+          $('#a_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+        } else {
+          $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+        }
+      }).error(function(){
+        $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+      });
+      setTimeout(botStatus, 1000);
+    }
+
