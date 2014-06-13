@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-13 20:30+0000\n"
+"POT-Creation-Date: 2014-06-13 21:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,6 +47,7 @@ msgid "Movement"
 msgstr ""
 
 #: templates/blocks_adv.xml:69 templates/blocks_std.xml:69
+#: templates/control.html:56 templates/control.html:77
 msgid "Sensor"
 msgstr ""
 
@@ -86,43 +87,43 @@ msgstr ""
 msgid "Halt"
 msgstr ""
 
-#: templates/control.html:51
+#: templates/control.html:54
 msgid "Programming"
 msgstr ""
 
-#: templates/control.html:53
-msgid "Editor level"
-msgstr ""
-
 #: templates/control.html:55
-msgid "Basic"
-msgstr ""
-
-#: templates/control.html:57
-msgid "Standard"
-msgstr ""
-
-#: templates/control.html:59
-msgid "Advanced"
-msgstr ""
-
-#: templates/control.html:62
 msgid "Sounds"
 msgstr ""
 
+#: templates/control.html:61
+msgid "Editor level"
+msgstr ""
+
 #: templates/control.html:63
-msgid "Start sound"
+msgid "Basic"
 msgstr ""
 
 #: templates/control.html:65
+msgid "Standard"
+msgstr ""
+
+#: templates/control.html:67
+msgid "Advanced"
+msgstr ""
+
+#: templates/control.html:71
+msgid "Start sound"
+msgstr ""
+
+#: templates/control.html:73
 msgid "Stop sound"
 msgstr ""
 
-#: templates/control.html:69
+#: templates/control.html:80
 msgid "Cancel"
 msgstr ""
 
-#: templates/control.html:70 templates/program.html:28
+#: templates/control.html:81 templates/program.html:28
 msgid "Save"
 msgstr ""
 
