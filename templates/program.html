@@ -1,69 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="favicon.ico">
-  <link rel="stylesheet"  href="../css/jquery.mobile-1.4.2.min.css">
-  <meta charset="utf-8">
-  <title>CoderBot - Program</title>
-  <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
-  <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
-  <script type="text/javascript" src="js/blockly/javascript_compressed.js"></script>
-  <script type="text/javascript" src="js/blockly/python_compressed.js"></script>
-  <script type="text/javascript" src="js/blockly/{{locale}}.js"></script>
-  <script type="text/javascript" src="js/blockly/bot_{{locale}}.js"></script>
-  <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
-  <script type="text/javascript" src="js/jquery.mobile-1.4.2.min.js"></script>
-  <script type="text/javascript" src="js/coderbot.js"></script>
-  <script type="text/javascript" src="js/blockly/blocks.js"></script>
-  <script type="text/javascript" src="js/program.js"></script>
-</head>
-<body>
-<div data-role="page" class="" id="pageprogram">
- <div data-role="header"><h1>CoderBot</h1></div>
+<div data-role="page" id="page-program">
+ <div data-role="header">
+  <h1>CoderBot</h1>
+  <div data-role="navbar">
+   <ul>
+    <li><a href="#page-control">{% trans %}Control{% endtrans %}</a></li>
+    <li><a href="#page-program">{% trans %}Program{% endtrans %}</a></li>
+   </ul>
+  </div><!-- /navbar -->
+ </div>
  <div role="main" class="ui-content">
   <fieldset class="ui-grid-b">
-    <div class="ui-block-a"><button id="b_new_prog" class="ui-btn" type="button">{% trans %}New{% endtrans %}</button></div>
-    <div class="ui-block-b"><button id="b_load_prog" class="ui-btn" type="button">{% trans %}Load{% endtrans %}</button></div>
-    <div class="ui-block-c"><button id="b_save_prog" class="ui-btn" type="button">{% trans %}Save{% endtrans %}</button></div>
+   <div class="ui-block-a"><button id="b_new_prog" class="ui-btn" type="button">{% trans %}New{% endtrans %}</button></div>
+   <div class="ui-block-b"><button id="b_load_prog" class="ui-btn" type="button">{% trans %}Load{% endtrans %}</button></div>
+   <div class="ui-block-c"><button id="b_save_prog" class="ui-btn" type="button">{% trans %}Save{% endtrans %}</button></div>
   </fieldset>
   <fieldset class="ui-grid-b">
-    <div class="ui-block-a"><button id="b_show_prog" class="ui-btn" type="button">{% trans %}Show{% endtrans %}</button></div>
-    <div class="ui-block-b"><button id="b_run_prog" class="ui-btn" type="button">{% trans %}Run{% endtrans %}</button></div>
-    <div class="ui-block-c"><button id="b_end_prog" class="ui-btn" type="button">{% trans %}Stop{% endtrans %}</button></div>
+   <div class="ui-block-a"><button id="b_show_prog" class="ui-btn" type="button">{% trans %}Show{% endtrans %}</button></div>
+   <div class="ui-block-b"><button id="b_run_prog" class="ui-btn" type="button">{% trans %}Run{% endtrans %}</button></div>
+   <div class="ui-block-c"><button id="b_end_prog" class="ui-btn" type="button">{% trans %}Stop{% endtrans %}</button></div>
   </fieldset>
   <div id="blocklyDiv" style="height: 480px; width:100%;"></div>
   {%include "blocks_"+program_level+".xml"%}
  </div>
- <div data-role="navbar">
-  <ul>
-   <li><a href="/" data-ajax="false">{% trans %}Control{% endtrans %}</a></li>
-   <li><a href="#" class="ui-btn-active">{% trans %}Program{% endtrans %}</a></li>
-  </ul>
- </div><!-- /navbar -->
  <div data-role="popup" id="dialogRunning" data-history="false" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:680px;">
   <div data-role="header" data-theme="a">
-   <h1 id="i_dialog_running_title">CoderBot {% trans %}is running{% endtrans %}</h1>
+   <h1 id="i_dialog_running_title">CoderBot {% trans %}is running{% endtrans %}</h1> 
   </div>
   <div role="main" class="ui-content">
    <iframe id="f_stream" src="http://{{host}}:{{stream_port}}" width="640" height="480" style="display:block;margin: 0 auto;"></iframe>
    <button href="#" id="b_end_prog_d" class="ui-btn ui-corner-all ui-shadow ui-btn-b" data-rel="back">End program</button>
   </div>
  </div>
-<div data-role="popup" id="dialogNewProg" data-history="false" data-theme="a" class="ui-corner-all">
+ <div data-role="popup" id="dialogNewProg" data-history="false" data-theme="a" class="ui-corner-all">
   <div style="padding:10px 20px;">
    <h3>{% trans %}New Program{% endtrans %}</h3>
    <label for="un" class="ui-hidden-accessible">{% trans %}Program name{% endtrans %}:</label>
    <input type="text" name="name" id="i_new_prog_name" value="" placeholder="program name" data-theme="a">
    <button type="button" id="b_new_prog_post" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">{% trans %}Create{% endtrans %}</button>
   </div>
-</div>
-<div data-role="popup" id="dialogLoadProg" data-history="false" data-theme="a" class="ui-corner-all">
+ </div>
+ <div data-role="popup" id="dialogLoadProg" data-history="false" data-theme="a" class="ui-corner-all">
   <div style="padding:10px 20px;">
    <h3>{% trans %}Load Program{% endtrans %}</h3>
    <ul id="i_prog_list" data-role="listview" data-split-icon="delete" data-split-theme="a" data-inset="true"></ul>
   </div>
-</div>
+ </div>
 </div> 
-</body>
-</html>

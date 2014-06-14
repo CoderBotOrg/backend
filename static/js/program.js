@@ -1,9 +1,17 @@
-$(document).on( "pageshow", function( event, ui ) {
-      Blockly.inject(document.getElementById('blocklyDiv'),
-          {path: '../../', toolbox: document.getElementById('toolbox')});
+var inject_once = true;
+
+$(document).on( "pageshow", '#page-program', function( event, ui ) {
+      if(inject_once) {
+        inject_once=false;
+        Blockly.inject(document.getElementById('blocklyDiv'),
+            {path: '../../', toolbox: document.getElementById('toolbox')});
+      }
+
+      $('[href="#page-program"]').addClass( "ui-btn-active" );
+      $('[href="#page-control"]').removeClass( "ui-btn-active" );
 });
 
-$(document).on( "pagebeforecreate", function( event ) {
+$(document).on( "pagecreate", '#page-program', function( event ) {
       $("#b_new_prog").on("click", newProg);
       $("#b_load_prog").on("click", loadProg);
       $("#b_save_prog").on("click", saveProg);

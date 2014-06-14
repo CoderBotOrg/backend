@@ -1,6 +1,11 @@
 var bot = new CoderBot()
 
-$(document).on( "pagecreate", function( event ) {
+$(document).on( "pageshow", '#page-control', function( event, ui ) {
+      $('[href="#page-control"]').addClass( "ui-btn-active" );
+      $('[href="#page-program"]').removeClass( "ui-btn-active" );
+});
+
+$(document).on( "pagecreate", '#page-control', function( event ) {
 	if(('ontouchstart' in window) ||
      	   (navigator.maxTouchPoints > 0) ||
      	   (navigator.msMaxTouchPoints > 0)) {
@@ -55,16 +60,17 @@ $(document).on( "pagecreate", function( event ) {
         botStatus();
 });
 
-    function botStatus() {
-      $.ajax({url:'/bot/status',dataType:'json'}).done(function (data) {
-        if(data.status == 'ok') {
-          $('#a_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
-        } else {
-          $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
-        }
-      }).error(function(){
-        $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
-      });
-      setTimeout(botStatus, 1000);
-    }
+function botStatus() {
+  $.ajax({url:'/bot/status',dataType:'json'})
+  .done(function (data) {
+    if(data.status == 'ok') {
+      $('#a_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+    } else {
+      $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+    }})
+  .error(function() {
+    $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+  });
+  setTimeout(botStatus, 1000);
+}
 

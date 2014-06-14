@@ -1,0 +1,54 @@
+<div data-role="page" id="page-preferences">
+ <div data-role="header">
+  <a href="#page-control" data-rel="close" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-a">{% trans %}Back{% endtrans %}</a>
+  <h1>CoderBot</h1>
+ </div>
+ <div role="main" class="ui-content">
+  <form class="config" id="f_config">
+   <div data-role="tabs" id="tabs">
+    <div data-role="navbar">
+     <ul>
+      <li><a href="#t_programming" class="ui-btn-active" data-ajax="true">{% trans %}Programming{% endtrans %}</a></li>
+      <li><a href="#t_sound" data-ajax="true">{% trans %}Sounds{% endtrans %}</a></li>
+      <li><a href="#t_sensor" data-ajax="true">{% trans %}Sensor{% endtrans %}</a></li>
+      <li><a href="#t_movement" data-ajax="true">{% trans %}Movement{% endtrans %}</a></li>
+     </ul>
+    </div>
+    <div id="t_programming" class="ui-body-d ui-content">
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}Editor level{% endtrans %}</legend>
+      <input type="radio" name="prog_level" id="r_prog_level_a" value="basic" {%if config.prog_level=='basic'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_a">{% trans %}Basic{% endtrans %}</label>
+      <input type="radio" name="prog_level" id="r_prog_level_b" value="std" {%if config.prog_level=='std'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_b">{% trans %}Standard{% endtrans %}</label> 
+      <input type="radio" name="prog_level" id="r_prog_level_c" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_c">{% trans %}Advanced{% endtrans %}</label>     
+     </fieldset>
+    </div>
+    <div id="t_sound" class="ui-body-d ui-content">
+     <label for="i_sound_start">{% trans %}Start sound{% endtrans %}</label>
+     <input type="text" id="i_sound_start" name="sound_start" value="{{config.sound_start}}">
+     <label for="i_sound_stop">{% trans %}Stop sound{% endtrans %}</label>
+     <input type="text" id="i_sound_stop" name="sound_stop" value="{{config.sound_stop}}">
+    </div>
+    <div id="t_sensor" class="ui-body-d ui-content">
+     <legend>{% trans %}Sensor{% endtrans %}</legend>
+    </div>
+    <div id="t_movement" class="ui-body-d ui-content">
+     <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
+     <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">
+     <label for="i_move_fw_elapse">{% trans %}Forward elapse{% endtrans %}</label>
+     <input type="text" id="i_move_fw_elapse" name="move_fw_elapse" value="{{config.move_fw_elapse}}">
+     <label for="i_move_tr_speed">{% trans %}Turn speed{% endtrans %}</label>
+     <input type="text" id="i_move_tr_speed" name="move_tr_speed" value="{{config.move_tr_speed}}">
+     <label for="i_move_tr_elapse">{% trans %}Turn elapse{% endtrans %}</label>
+     <input type="text" id="i_move_tr_elapse" name="move_tr_elapse" value="{{config.move_tr_elapse}}">
+    </div>
+    <div class="ui-grid-a">
+     <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
+     <div class="ui-block-b"><button type="submit" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
+    </div>
+   </div>
+  </form>
+ </div>
+</div>

@@ -30,11 +30,7 @@ def get_locale():
 
 @app.route("/")
 def handle_home():
-    return render_template('control.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale(), config=app.bot_config)
-
-@app.route("/program")
-def handle_program():
-    return render_template('program.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale=get_locale(), program_level=app.bot_config.get("prog_level", "std"))
+    return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"))
 
 @app.route("/config", methods=["POST"])
 def handle_config():
@@ -134,35 +130,6 @@ def handle_program_status():
     if app.prog:
       prog = app.prog
     return json.dumps({'name': prog.name, "running": prog.is_running()}) 
-
-"""
-@sockets.route('/bot_ws')
-def bot_ws(ws):
-  while True:
-    m = ws.receive()
-    print m
-    if m == "forward":
-      bot.forward()
-    if m == "backward":
-      bot.backward()
-    if m == "left":
-      bot.left()
-    if m == "right":
-      bot.right()
-    elif m == "stop":
-      bot.stop()
-
-cam_h = camera.CameraHandler.get_instance()
-
-def init():
-  cam_h.add_handler(camera.SimpleHandler())
-  cam_h.add_handler(signal.SignalHandler(coderbot.CoderBot.get_instance()))
-  cam_h.add_handler(logo.LogoHandler("coderdojo-logo.png", coderbot.CoderBot.get_instance()))
-  cam_h.set_active_handler(None)
-  cam_h.start()
-
-init()
-"""
 
 def run_server():
   f = open(CONFIG_FILE, 'r')

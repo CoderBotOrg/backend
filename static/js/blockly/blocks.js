@@ -33,12 +33,12 @@ Blockly.Blocks['coderbot_moveForward'] = {
 
 Blockly.JavaScript['coderbot_moveForward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return 'bot.forward(elapse=0.25);\n';
+  return 'bot.forward(' + CODERBOT_MOV_FW_DEF_SPEED + ', ' + CODERBOT_MOV_FW_DEF_ELAPSE + ');\n';
 };
 
 Blockly.Python['coderbot_moveForward'] = function(block) {
   // Generate Python for moving forward.
-  return 'bot.forward(elapse=0.25)\n';
+  return 'bot.forward(speed=' + CODERBOT_MOV_FW_DEF_SPEED + ', elapse=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
 };
 
 Blockly.Blocks['coderbot_moveBackward'] = {
@@ -56,12 +56,12 @@ Blockly.Blocks['coderbot_moveBackward'] = {
 
 Blockly.JavaScript['coderbot_moveBackward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return 'bot.backward(elapse=0.25);\n';
+  return 'bot.backward(' + CODERBOT_MOV_FW_DEF_SPEED + ', ' + CODERBOT_MOV_FW_DEF_ELAPSE + ');\n';
 };
 
 Blockly.Python['coderbot_moveBackward'] = function(block) {
   // Generate Python for moving forward.
-  return 'bot.backward(elapse=0.25)\n';
+  return 'bot.backward(speed=' + CODERBOT_MOV_FW_DEF_SPEED + ', elapse=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
 };
 
 Blockly.Blocks['coderbot_turnLeft'] = {
@@ -79,12 +79,12 @@ Blockly.Blocks['coderbot_turnLeft'] = {
 
 Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
   // Generate JavaScript for turning left.
-  return 'bot.left(speed=80, elapse=0.10);\n';
+  return 'bot.left(' + CODERBOT_MOV_TR_DEF_SPEED + ', ' + CODERBOT_MOV_TR_DEF_ELAPSE + ');\n';
 };
 
 Blockly.Python['coderbot_turnLeft'] = function(block) {
   // Generate Python for turning left.
-  return 'bot.left(speed=80, elapse=0.10)\n';
+  return 'bot.left(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
 };
 
 Blockly.Blocks['coderbot_turnRight'] = {
@@ -102,12 +102,12 @@ Blockly.Blocks['coderbot_turnRight'] = {
 
 Blockly.JavaScript['coderbot_turnRight'] = function(block) {
   // Generate JavaScript for turning left or right.
-  return 'bot.right(speed=80, elapse=0.10);\n';
+  return 'bot.right(' + CODERBOT_MOV_TR_DEF_SPEED + ', ' + CODERBOT_MOV_TR_DEF_ELAPSE + ');\n';
 };
 
 Blockly.Python['coderbot_turnRight'] = function(block) {
   // Generate Python for turning left or right.
-  return 'bot.right(speed=80, elapse=0.10)\n';
+  return 'bot.right(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
 };
 
 Blockly.Blocks['coderbot_say'] = {
