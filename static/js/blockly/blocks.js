@@ -24,7 +24,8 @@ Blockly.Blocks['coderbot_moveForward'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_MOVE_FORWARD);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_FORWARD)
+        .appendField(new Blockly.FieldImage('/images/blocks/move_forward.png', 32, 32, '*'));
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveForwardTooltip');
@@ -47,7 +48,8 @@ Blockly.Blocks['coderbot_moveBackward'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_MOVE_BACKWARD);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_BACKWARD)
+        .appendField(new Blockly.FieldImage('/images/blocks/move_backward.png', 32, 32, '*'));
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveBackwardTooltip');
@@ -70,7 +72,8 @@ Blockly.Blocks['coderbot_turnLeft'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_MOVE_LEFT);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_LEFT)
+        .appendField(new Blockly.FieldImage('/images/blocks/move_left.png', 32, 32, '*'));
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));
@@ -93,7 +96,8 @@ Blockly.Blocks['coderbot_turnRight'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(290);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_MOVE_RIGHT);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_RIGHT)
+        .appendField(new Blockly.FieldImage('/images/blocks/move_right.png', 32, 32, '*'));
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));

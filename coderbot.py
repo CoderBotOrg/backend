@@ -7,13 +7,22 @@ PIN_LEFT_FORWARD = 25
 PIN_LEFT_BACKWARD = 24
 PIN_RIGHT_FORWARD = 4
 PIN_RIGHT_BACKWARD = 17
+PIN_PUSHBUTTON = 18
+
+def pushed_button(gpio, level, tick):
+  return CoderBot.get_instance().pushed_button(level, tick)
 
 class CoderBot:
   def __init__(self):
     pigpio.start('localhost')
+    pigpio.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
+    self._cb_pushbutton = None
+    self._cb_last_tick = 0
+    self._elapse_pushbutton = 0    
+    cb1 = pigpio.callback(PIN_PUSHBUTTON, pigpio.RISING_EDGE, pushed_button)
     self.stop()
     self._is_moving = False
-
+ 
   the_bot = None
 
   @classmethod
@@ -74,38 +83,6 @@ class CoderBot:
       time.sleep(elapse)
       self.stop()
 
-  def forward_old(self, seconds=-1):
-    pigpio.write(PIN_LEFT_FORWARD, 1)
-    pigpio.write(PIN_RIGHT_FORWARD, 1)
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
-    if seconds > 0:
-      time.sleep(seconds)
-      self.stop()
-
-  def backward_old(self, seconds=-1):
-    pigpio.write(PIN_LEFT_BACKWARD, 1)
-    pigpio.write(PIN_RIGHT_BACKWARD, 1)
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
-    if seconds > 0:
-      time.sleep(seconds)
-      self.stop()     
-    
-  def left_old(self, seconds=-1):
-    pigpio.write(PIN_LEFT_BACKWARD, 1)
-    pigpio.write(PIN_RIGHT_FORWARD, 1)
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
-    if seconds > 0:
-      time.sleep(seconds)
-      self.stop()    
-
-  def right_old(self, seconds=-1):
-    pigpio.write(PIN_LEFT_FORWARD, 1)
-    pigpio.write(PIN_RIGHT_BACKWARD, 1)
-    pigpio.write(PIN_MOTOR_ENABLE, 1)
-    if seconds > 0:
-      time.sleep(seconds)
-      self.stop()
-
   def stop(self):
     pigpio.write(PIN_MOTOR_ENABLE, 0)
     pigpio.write(PIN_LEFT_FORWARD, 0)
@@ -122,6 +99,17 @@ class CoderBot:
       os.system ('omxplayer sounds/' + what[1:])
     elif what and len(what):
       os.system ('espeak -vit -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
+
+  def set_pushed_button_callback(callback, elapse):
+    self._elapse_pushbutton = elapse
+    self._cb_pushbutton = callback
+
+  def pushed_button(self, level, tick):
+    if tick - self._cb_last_tick > 10000: 
+      self._cb_last_tick = tick
+      print "pushed: ", level, tick
+      if self._cb_pushbutton:
+        self._cb_pushbutton(self, level, tick)
 
   def halt(self):
     os.system ('sudo halt')

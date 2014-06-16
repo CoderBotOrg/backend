@@ -4,7 +4,7 @@ goog.provide('Blockly.Msg.it');
 
 goog.require('Blockly.Msg');
 
-Blockly.Msg.CODERBOT_MOVE_FORWARD = "muovi avati";
+Blockly.Msg.CODERBOT_MOVE_FORWARD = "muovi avanti";
 Blockly.Msg.CODERBOT_MOVE_BACKWARD = "muovi indietro";
 Blockly.Msg.CODERBOT_MOVE_LEFT = "gira a sinistra";
 Blockly.Msg.CODERBOT_MOVE_RIGHT = "gira a destra";
