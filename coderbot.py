@@ -9,17 +9,17 @@ PIN_RIGHT_FORWARD = 4
 PIN_RIGHT_BACKWARD = 17
 PIN_PUSHBUTTON = 18
 
-def pushed_button(gpio, level, tick):
-  return CoderBot.get_instance().pushed_button(level, tick)
+def coderbot_callback(gpio, level, tick):
+  return CoderBot.get_instance().callback(gpio, level, tick)
 
 class CoderBot:
   def __init__(self):
     pigpio.start('localhost')
     pigpio.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
-    self._cb_pushbutton = None
-    self._cb_last_tick = 0
-    self._elapse_pushbutton = 0    
-    cb1 = pigpio.callback(PIN_PUSHBUTTON, pigpio.RISING_EDGE, pushed_button)
+    self._cb = dict()
+    self._cb_last_tick = dict()
+    self._cb_elapse = dict()    
+    cb1 = pigpio.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, coderbot_callback)
     self.stop()
     self._is_moving = False
  
@@ -100,16 +100,21 @@ class CoderBot:
     elif what and len(what):
       os.system ('espeak -vit -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
 
-  def set_pushed_button_callback(callback, elapse):
-    self._elapse_pushbutton = elapse
-    self._cb_pushbutton = callback
+  def set_callback(self, gpio, callback, elapse):
+    self._cb_elapse[gpio] = elapse * 1000
+    self._cb[gpio] = callback
+    self._cb_last_tick[gpio] = 0
 
-  def pushed_button(self, level, tick):
-    if tick - self._cb_last_tick > 10000: 
-      self._cb_last_tick = tick
-      print "pushed: ", level, tick
-      if self._cb_pushbutton:
-        self._cb_pushbutton(self, level, tick)
+  def callback(self, gpio, level, tick):
+    cb = self._cb.get(gpio)
+    if cb:
+      elapse = self._cb_elapse.get(gpio)
+      if level == 0:
+        self._cb_last_tick[gpio] = tick
+      elif tick - self._cb_last_tick[gpio] > elapse: 
+        self._cb_last_tick[gpio] = tick
+        print "pushed: ", level, tick
+        cb()
 
   def halt(self):
     os.system ('sudo halt')

@@ -1,7 +1,7 @@
 import os
 import json
 
-from coderbot import CoderBot
+from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
 from program import ProgramEngine, Program
 
@@ -90,7 +90,8 @@ def handle_program_list():
 def handle_program_load():
     print "program_load"
     name = request.args.get('name')
-    return app.prog_engine.load(name).dom_code
+    app.prog = app.prog_engine.load(name)
+    return app.prog.dom_code
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
@@ -131,6 +132,10 @@ def handle_program_status():
       prog = app.prog
     return json.dumps({'name': prog.name, "running": prog.is_running()}) 
 
+def button_pushed():
+  if app.prog and app.prog.is_running():
+    app.prog.end()
+
 def run_server():
   f = open(CONFIG_FILE, 'r')
   try:
@@ -139,5 +144,6 @@ def run_server():
     app.bot_config = {}
     print e
 
+  bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
   bot.say(app.bot_config.get("sound_start"))
   app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)
