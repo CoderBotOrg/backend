@@ -76,8 +76,14 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       // Generate Dom code and display it.
       Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
       var xml_code = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
-      var code = Blockly.Xml.domToText(xml_code);
-      var data =  {'name': prog.name, 'dom_code': code};
+      var dom_code = Blockly.Xml.domToText(xml_code);
+
+      window.LoopTrap = 1000;
+      Blockly.Python.INFINITE_LOOP_TRAP = '  program.check_end()\n';
+      var code = Blockly.Python.workspaceToCode();
+      Blockly.Python.INFINITE_LOOP_TRAP = null;
+
+      var data =  {'name': prog.name, 'dom_code': dom_code, 'code': code};
       $.ajax({url: '/program/save', data: data, type: "POST", success:function() {
 	  alert('saved ok');
 	}});

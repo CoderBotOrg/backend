@@ -98,7 +98,8 @@ def handle_program_save():
     print "program_save"
     name = request.form.get('name')
     dom_code = request.form.get('dom_code')
-    prog = Program(name, dom_code = dom_code)
+    code = request.form.get('code')
+    prog = Program(name, dom_code = dom_code, code = code)
     app.prog_engine.save(prog)
     return "ok"
 
@@ -135,6 +136,8 @@ def handle_program_status():
 def button_pushed():
   if app.prog and app.prog.is_running():
     app.prog.end()
+  if app.prog and not app.prog.is_running():
+    app.prog.execute()
 
 def run_server():
   f = open(CONFIG_FILE, 'r')

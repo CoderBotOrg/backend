@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import json
 
 import coderbot
 import camera
@@ -34,13 +35,13 @@ class ProgramEngine:
   def save(self, program):
     program = self._repository[program.name] = program
     f = open(PROGRAM_PATH + PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX, 'w')
-    f.write(program.dom_code)
+    json.dump(program.as_json(), f)
+    f.close()
     
   def load(self, name):
     #return self._repository[name]
     f = open(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX, 'r')
-    dom_code = f.read()
-    return Program(name=name, dom_code=dom_code)
+    return Program.from_json(json.load(f))
 
   def delete(self, name):
     del self._repository[name]
@@ -100,3 +101,12 @@ class Program(threading.Thread):
     except RuntimeError as re:
       print "quit: " + str(re)
     self._running = False
+
+  def as_json(self):
+    return {'name': self.name,
+            'dom_code': self._dom_code,
+            'code': self._code}
+
+  @classmethod
+  def from_json(cls, map):
+    return Program(name=map['name'], dom_code=map['dom_code'], code=map['code'])
