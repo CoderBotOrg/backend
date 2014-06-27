@@ -12,6 +12,8 @@
       <li><a href="#t_sound" data-ajax="true">{% trans %}Sounds{% endtrans %}</a></li>
       <li><a href="#t_sensor" data-ajax="true">{% trans %}Sensor{% endtrans %}</a></li>
       <li><a href="#t_movement" data-ajax="true">{% trans %}Movement{% endtrans %}</a></li>
+      <li><a href="#t_start" data-ajax="true">{% trans %}Start{% endtrans %}</a></li>
+      <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
      </ul>
     </div>
     <div id="t_programming" class="ui-body-d ui-content">
@@ -43,6 +45,18 @@
      <input type="text" id="i_move_tr_speed" name="move_tr_speed" value="{{config.move_tr_speed}}">
      <label for="i_move_tr_elapse">{% trans %}Turn elapse{% endtrans %}</label>
      <input type="text" id="i_move_tr_elapse" name="move_tr_elapse" value="{{config.move_tr_elapse}}">
+    </div>
+    <div id="t_start" class="ui-body-d ui-content">
+     <label for="i_load_at_start">{% trans %}Load at start{% endtrans %}</label>
+     <input type="text" id="i_load_at_start" name="load_at_start" value="{{config.load_at_start}}">
+    </div>
+    <div id="t_button" class="ui-body-d ui-content">
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}Button function{% endtrans %}</legend>
+      <input type="radio" name="button_func" id="r_button_func_a" value="none" {%if config.button_func=='none'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_a">{% trans %}Start/Stop current program{% endtrans %}</label>
+      <input type="radio" name="button_func" id="r_button_func_b" value="startstop" {%if config.button_func=='startstop'%}checked="checked"{%endif%}>
+     </fieldset>
     </div>
     <div class="ui-grid-a">
      <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>

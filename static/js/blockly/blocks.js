@@ -174,10 +174,10 @@ Blockly.Blocks['coderbot_adv_move'] = {
   // Block for moving forward.
   init: function() {
     var ACTIONS =
-        [['forward', 'FORWARD'],
-        ['backward', 'BACKWARD'],
-        ['left', 'LEFT'],
-        ['right', 'RIGHT']]
+        [[Blockly.Msg.CODERBOT_MOVE_ADV_TIP_FORWARD, 'FORWARD'],
+        [Blockly.Msg.CODERBOT_MOVE_ADV_TIP_BACKWARD, 'BACKWARD'],
+        [Blockly.Msg.CODERBOT_MOVE_ADV_TIP_LEFT, 'LEFT'],
+        [Blockly.Msg.CODERBOT_MOVE_ADV_TIP_RIGHT, 'RIGHT']]
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(290);
     this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_ADV_MOVE,

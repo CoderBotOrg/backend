@@ -51,8 +51,8 @@ class ProgramEngine:
   def is_running(self, name):
     return self._repository[name].is_running()
 
-class Program(threading.Thread):
-
+#class Program(threading.Thread):
+class Program:
   _running = False
 
   @property
@@ -60,7 +60,8 @@ class Program(threading.Thread):
     return self._dom_code
 
   def __init__(self, name, code=None, dom_code=None):
-    super(Program, self).__init__()
+    #super(Program, self).__init__()
+    self._thread = None
     self.name = name
     self._dom_code = dom_code
     self._code = code 
@@ -73,15 +74,17 @@ class Program(threading.Thread):
     self._running = True
 
     try:
-      self.start()
+      self._thread = threading.Thread(target=self.run)
+      self._thread.start()
     except RuntimeError as re:
       print "RuntimeError:" + str(re)
     print "execute.2"
     return "ok"
 
   def end(self):
-    self._running = False
-    self.join()
+    if self._running:
+      self._running = False
+      self._thread.join()
 
   def check_end(self):
     if self._running == False:
@@ -110,3 +113,4 @@ class Program(threading.Thread):
   @classmethod
   def from_json(cls, map):
     return Program(name=map['name'], dom_code=map['dom_code'], code=map['code'])
+

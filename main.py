@@ -21,6 +21,7 @@ app.debug = True
 #sockets = Sockets(app)
 
 app.prog_engine = ProgramEngine.get_instance()
+app.prog = None
 
 @babel.localeselector
 def get_locale():
@@ -134,10 +135,11 @@ def handle_program_status():
     return json.dumps({'name': prog.name, "running": prog.is_running()}) 
 
 def button_pushed():
-  if app.prog and app.prog.is_running():
-    app.prog.end()
-  if app.prog and not app.prog.is_running():
-    app.prog.execute()
+  if app.bot_config.get('button_func') == "startstop":
+    if app.prog and app.prog.is_running():
+      app.prog.end()
+    elif app.prog and not app.prog.is_running():
+      app.prog.execute()
 
 def run_server():
   f = open(CONFIG_FILE, 'r')
@@ -146,6 +148,8 @@ def run_server():
   except ValueError as e:
     app.bot_config = {}
     print e
+  if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
+    app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
 
   bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
   bot.say(app.bot_config.get("sound_start"))
