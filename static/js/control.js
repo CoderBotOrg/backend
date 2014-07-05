@@ -17,10 +17,10 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	  	.on("touchstart", function (){bot.backward(100,-1);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_left')
-	  	.on("touchstart", function (){bot.left(40,-1);})
+	  	.on("touchstart", function (){bot.left(60,-1);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_right')
-	  	.on("touchstart", function (){bot.right(40,-1);})
+	  	.on("touchstart", function (){bot.right(60,-1);})
 	  	.on("touchend", function (){bot.stop();});
 	} else {
 		$('#b_forward')
@@ -30,10 +30,10 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
           	.on("mousedown", function (){bot.backward(100, -1);})
 	  	.on("mouseup", function (){bot.stop();})
 		$('#b_left')
-	  	.on("mousedown", function (){bot.left(40,-1);})
+	  	.on("mousedown", function (){bot.left(60,-1);})
 	  	.on("mouseup", function (){bot.stop();})
 		$('#b_right')
-          	.on("mousedown", function (){bot.right(40, -1);})
+          	.on("mousedown", function (){bot.right(60, -1);})
 	  	.on("mouseup", function (){bot.stop();})
 	}
 	$('#b_say').on("click", function (){
