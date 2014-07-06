@@ -231,6 +231,50 @@ Blockly.Python['coderbot_adv_move'] = function(block) {
   return code;
 };
 
+Blockly.Blocks['coderbot_adv_motor'] = {
+  // Block for moving forward.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Motor');
+    this.setColour(290);
+    this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR,
+                        ['TEXT', null, Blockly.ALIGN_RIGHT],
+                        Blockly.ALIGN_RIGHT);
+    
+    this.appendValueInput('SPEED_LEFT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_SPEED_LEFT);
+    this.appendValueInput('SPEED_RIGHT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_SPEED_RIGHT);
+    this.appendValueInput('ELAPSE')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_ELAPSE);
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+    var thisBlock = this;
+    this.setTooltip(function() {
+      var mode = thisBlock.getFieldValue('ACTION');
+      return TOOLTIPS[mode] + Blockly.Msg.CODERBOT_MOVE_ADV_TIP_TAIL;
+    });
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.JavaScript['coderbot_adv_motor'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'bot.motor();\n';
+};
+
+Blockly.Python['coderbot_adv_motor'] = function(block) {
+  // Generate Python for moving forward.
+  var speed_left = Blockly.Python.valueToCode(block, 'SPEED_LEFT', Blockly.Python.ORDER_NONE);
+  var speed_right = Blockly.Python.valueToCode(block, 'SPEED_RIGHT', Blockly.Python.ORDER_NONE);
+  var elapse = Blockly.Python.valueToCode(block, 'ELAPSE', Blockly.Python.ORDER_NONE);
+  var code = "bot.motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", elapse=" + elapse + ")\n";
+  return code;
+};
+
 Blockly.Blocks['coderbot_adv_stop'] = {
   // Block to stop the bot.
   init: function() {

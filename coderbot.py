@@ -83,6 +83,37 @@ class CoderBot:
       time.sleep(elapse)
       self.stop()
 
+  def motor_control(self, speed_left=100, speed_right=100, elapse=-1):
+    self._is_moving = True
+
+    speed_left = (255 * speed_left) / 100
+    speed_right = (255 * speed_right) / 100
+
+    if speed_left < 0:
+      speed_left = abs(speed_left)
+      self.pi.write(PIN_LEFT_FORWARD, 0)
+      self.pi.set_PWM_frequency(PIN_LEFT_BACKWARD, 100)
+      self.pi.set_PWM_dutycycle(PIN_LEFT_BACKWARD, speed_left)
+    else:
+      self.pi.write(PIN_LEFT_BACKWARD, 0)
+      self.pi.set_PWM_frequency(PIN_LEFT_FORWARD, 100)
+      self.pi.set_PWM_dutycycle(PIN_LEFT_FORWARD, speed_left)
+
+    if speed_right < 0:
+      speed_right = abs(speed_right)
+      self.pi.write(PIN_RIGHT_FORWARD, 0)
+      self.pi.set_PWM_frequency(PIN_RIGHT_BACKWARD, 100)
+      self.pi.set_PWM_dutycycle(PIN_RIGHT_BACKWARD, speed_right)
+    else:
+      self.pi.write(PIN_RIGHT_BACKWARD, 0)
+      self.pi.set_PWM_frequency(PIN_RIGHT_FORWARD, 100)
+      self.pi.set_PWM_dutycycle(PIN_RIGHT_FORWARD, speed_right)
+
+    self.pi.write(PIN_MOTOR_ENABLE, 1)
+    if elapse > 0:
+      time.sleep(elapse)
+      self.stop()
+
   def stop(self):
     self.pi.write(PIN_MOTOR_ENABLE, 0)
     self.pi.write(PIN_LEFT_FORWARD, 0)

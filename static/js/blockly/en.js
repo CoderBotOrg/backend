@@ -7,6 +7,7 @@ goog.provide('Blockly.Msg.en');
 goog.require('Blockly.Msg');
 
 Blockly.Msg.ADD_COMMENT = "Add Comment";
+Blockly.Msg.AUTH = "Please authorize this app to enable your work to be saved and to allow it to be shared by you.";
 Blockly.Msg.CHANGE_VALUE_TITLE = "Change value:";
 Blockly.Msg.CHAT = "Chat with your collaborator by typing in this box!";
 Blockly.Msg.COLLAPSE_ALL = "Collapse Blocks";
@@ -278,7 +279,9 @@ Blockly.Msg.PROCEDURES_HIGHLIGHT_DEF = "Highlight function definition";
 Blockly.Msg.PROCEDURES_IFRETURN_TOOLTIP = "If a value is true, then return a second value.";
 Blockly.Msg.PROCEDURES_IFRETURN_WARNING = "Warning: This block may be used only within a function definition.";
 Blockly.Msg.PROCEDURES_MUTATORARG_TITLE = "input name:";
+Blockly.Msg.PROCEDURES_MUTATORARG_TOOLTIP = "Add an input to the function.";
 Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TITLE = "inputs";
+Blockly.Msg.PROCEDURES_MUTATORCONTAINER_TOOLTIP = "Add, remove, or reorder inputs to this function.";
 Blockly.Msg.REMOVE_COMMENT = "Remove Comment";
 Blockly.Msg.RENAME_VARIABLE = "Rename variable...";
 Blockly.Msg.RENAME_VARIABLE_TITLE = "Rename all '%1' variables to:";
