@@ -114,11 +114,11 @@
       <block type="text_changeCase"></block>
       <block type="text_trim"></block>
       <block type="text_print"></block>
-      <block type="text_prompt_ext">
+      <!--block type="text_prompt_ext">
         <value name="TEXT">
           <block type="text"></block>
         </value>
-      </block>
+      </block-->
     </category>
     <category name="{% trans %}Lists{% endtrans %}">
       <block type="lists_create_empty"></block>
@@ -161,12 +161,12 @@
         </value>
       </block>
     </category>
-    <category name="{% trans %}Colour{% endtrans %}">
+    <!--category name="{% trans %}Colour{% endtrans %}">
       <block type="colour_picker"></block>
       <block type="colour_random"></block>
       <block type="colour_rgb"></block>
       <block type="colour_blend"></block>
-    </category>
+    </category-->
     <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE"></category>
     <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE"></category>
     <category name="{% trans %}Movement{% endtrans %}">
