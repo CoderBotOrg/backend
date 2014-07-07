@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-13 21:50+0000\n"
+"POT-Creation-Date: 2014-07-07 21:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,153 +17,219 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: templates/blocks_adv.xml:2 templates/blocks_std.xml:2
-#: templates/control.html:22 templates/program.html:40
-msgid "Control"
-msgstr ""
-
-#: templates/blocks_adv.xml:13 templates/blocks_std.xml:13
+#: templates/blocks_adv.xml:2 templates/blocks_std.xml:13
 msgid "Logic"
 msgstr ""
 
-#: templates/blocks_adv.xml:19 templates/blocks_std.xml:19
-msgid "Variables"
+#: templates/blocks_adv.xml:11
+msgid "Loops"
 msgstr ""
 
-#: templates/blocks_adv.xml:24 templates/blocks_std.xml:24
-msgid "Procedures"
-msgstr ""
-
-#: templates/blocks_adv.xml:33 templates/blocks_std.xml:33
+#: templates/blocks_adv.xml:40 templates/blocks_std.xml:33
 msgid "Math"
 msgstr ""
 
-#: templates/blocks_adv.xml:38 templates/blocks_std.xml:38
+#: templates/blocks_adv.xml:83 templates/blocks_std.xml:38
 msgid "Text"
 msgstr ""
 
-#: templates/blocks_adv.xml:43 templates/blocks_std.xml:43
+#: templates/blocks_adv.xml:96 templates/blocks_adv.xml:103
+#: templates/blocks_adv.xml:110
+msgid "text"
+msgstr ""
+
+#: templates/blocks_adv.xml:123
+msgid "Lists"
+msgstr ""
+
+#: templates/blocks_adv.xml:138 templates/blocks_adv.xml:145
+#: templates/blocks_adv.xml:152 templates/blocks_adv.xml:159
+msgid "list"
+msgstr ""
+
+#: templates/blocks_adv.xml:164
+msgid "Colour"
+msgstr ""
+
+#: templates/blocks_adv.xml:170 templates/blocks_std.xml:19
+msgid "Variables"
+msgstr ""
+
+#: templates/blocks_adv.xml:171
+msgid "Functions"
+msgstr ""
+
+#: templates/blocks_adv.xml:172 templates/blocks_std.xml:43
+#: templates/config.html:14
 msgid "Movement"
 msgstr ""
 
-#: templates/blocks_adv.xml:69 templates/blocks_std.xml:69
-#: templates/control.html:56 templates/control.html:77
+#: templates/blocks_adv.xml:223 templates/blocks_std.xml:69
+#: templates/config.html:13 templates/config.html:37
 msgid "Sensor"
 msgstr ""
 
-#: templates/blocks_adv.xml:77 templates/blocks_std.xml:77
+#: templates/blocks_adv.xml:231 templates/blocks_std.xml:77
 msgid "Sound"
 msgstr ""
 
-#: templates/control.html:19
-msgid "Preferences"
+#: templates/blocks_std.xml:2 templates/control.html:8 templates/program.html:6
+msgid "Control"
 msgstr ""
 
-#: templates/control.html:23 templates/program.html:41
-msgid "Program"
+#: templates/blocks_std.xml:24
+msgid "Procedures"
 msgstr ""
 
-#: templates/control.html:29
-msgid "Forward"
+#: templates/config.html:3
+msgid "Back"
 msgstr ""
 
-#: templates/control.html:32
-msgid "Left"
-msgstr ""
-
-#: templates/control.html:33
-msgid "Right"
-msgstr ""
-
-#: templates/control.html:36
-msgid "Backward"
-msgstr ""
-
-#: templates/control.html:40
-msgid "Say"
-msgstr ""
-
-#: templates/control.html:46
-msgid "Halt"
-msgstr ""
-
-#: templates/control.html:54
+#: templates/config.html:11
 msgid "Programming"
 msgstr ""
 
-#: templates/control.html:55
+#: templates/config.html:12
 msgid "Sounds"
 msgstr ""
 
-#: templates/control.html:61
+#: templates/config.html:15
+msgid "Start"
+msgstr ""
+
+#: templates/config.html:16
+msgid "Button"
+msgstr ""
+
+#: templates/config.html:21
 msgid "Editor level"
 msgstr ""
 
-#: templates/control.html:63
+#: templates/config.html:23
 msgid "Basic"
 msgstr ""
 
-#: templates/control.html:65
+#: templates/config.html:25
 msgid "Standard"
 msgstr ""
 
-#: templates/control.html:67
+#: templates/config.html:27
 msgid "Advanced"
 msgstr ""
 
-#: templates/control.html:71
+#: templates/config.html:31
 msgid "Start sound"
 msgstr ""
 
-#: templates/control.html:73
+#: templates/config.html:33
 msgid "Stop sound"
 msgstr ""
 
-#: templates/control.html:80
+#: templates/config.html:40
+msgid "Forward speed"
+msgstr ""
+
+#: templates/config.html:42
+msgid "Forward elapse"
+msgstr ""
+
+#: templates/config.html:44
+msgid "Turn speed"
+msgstr ""
+
+#: templates/config.html:46
+msgid "Turn elapse"
+msgstr ""
+
+#: templates/config.html:50
+msgid "Load at start"
+msgstr ""
+
+#: templates/config.html:55
+msgid "Button function"
+msgstr ""
+
+#: templates/config.html:57
+msgid "Start/Stop current program"
+msgstr ""
+
+#: templates/config.html:62
 msgid "Cancel"
 msgstr ""
 
-#: templates/control.html:81 templates/program.html:28
+#: templates/config.html:63 templates/program.html:15
 msgid "Save"
 msgstr ""
 
-#: templates/program.html:26
+#: templates/control.html:5
+msgid "Preferences"
+msgstr ""
+
+#: templates/control.html:9 templates/program.html:7
+msgid "Program"
+msgstr ""
+
+#: templates/control.html:15
+msgid "Forward"
+msgstr ""
+
+#: templates/control.html:18
+msgid "Left"
+msgstr ""
+
+#: templates/control.html:19
+msgid "Right"
+msgstr ""
+
+#: templates/control.html:22
+msgid "Backward"
+msgstr ""
+
+#: templates/control.html:26
+msgid "Say"
+msgstr ""
+
+#: templates/control.html:32
+msgid "Halt"
+msgstr ""
+
+#: templates/program.html:13
 msgid "New"
 msgstr ""
 
-#: templates/program.html:27
+#: templates/program.html:14
 msgid "Load"
 msgstr ""
 
-#: templates/program.html:31
+#: templates/program.html:18
 msgid "Show"
 msgstr ""
 
-#: templates/program.html:32
+#: templates/program.html:19
 msgid "Run"
 msgstr ""
 
-#: templates/program.html:33
+#: templates/program.html:20
 msgid "Stop"
 msgstr ""
 
-#: templates/program.html:46
+#: templates/program.html:27
 msgid "is running"
 msgstr ""
 
-#: templates/program.html:55
+#: templates/program.html:36
 msgid "New Program"
 msgstr ""
 
-#: templates/program.html:56
+#: templates/program.html:37
 msgid "Program name"
 msgstr ""
 
-#: templates/program.html:58
+#: templates/program.html:39
 msgid "Create"
 msgstr ""
 
-#: templates/program.html:63
+#: templates/program.html:44
 msgid "Load Program"
 msgstr ""
 
