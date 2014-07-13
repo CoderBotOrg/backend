@@ -52,7 +52,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	  	.on("mouseup", function (){bot.stop();})
 	}
 	$('#b_say').on("click", function (){
-		var text = $('#i_say').val();
+		var text = window.prompt(BotMessages.Input);
                 bot.say(text);
 	});
 	$('.b_camera').on("click", function (){
@@ -72,7 +72,7 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 	$('#f_config').on("submit", function (){
 		var form_data = $(this).serialize();
                 $.post(url='/config', form_data, success=function(){
-                  alert("saved ok");
+                  alert(BotMessages.Saved);
                   location.href="/";
                 });
                 return false;
