@@ -1,5 +1,20 @@
 var bot = new CoderBot()
 
+$(document).on( "pagecontainershow", function(){
+    ScaleContentToDevice();
+    
+    $(window).on("resize orientationchange", function(){
+        ScaleContentToDevice();
+    })
+});
+
+function ScaleContentToDevice(){
+    scroll(0, 0);
+    var content = $.mobile.getScreenHeight() - $(".ui-header").outerHeight() -         $(".ui-footer").outerHeight() - $(".ui-content").outerHeight() + $(".ui-content").height();
+    $(".ui-content").height(content);
+}
+
+if($('#page-control')) {
 $(document).on( "pageshow", '#page-control', function( event, ui ) {
       $('[href="#page-control"]').addClass( "ui-btn-active" );
       $('[href="#page-program"]').removeClass( "ui-btn-active" );
@@ -45,31 +60,41 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 		bot.set_handler(param);
                 $('#f_stream').attr('src', $('#f_stream').attr('src'));
 	});
-	$('#f_config').on("submit", function (){
-		var form_data = $(this).serialize();
-                $.post(url='/config', form_data, success=function(){
-                  alert("saved ok");}
-                );
-                return false;
-	});
 	$('#b_halt').on("click", function (){
 		if(confirm("Shutdown CoderBot?")){
 			bot.halt();
 		}
 	});
-        botStatus();
 });
+}
+
+$(document).on( "pagecreate", '#page-preferences', function( event ) {
+	$('#f_config').on("submit", function (){
+		var form_data = $(this).serialize();
+                $.post(url='/config', form_data, success=function(){
+                  alert("saved ok");
+                  location.href="/";
+                });
+                return false;
+	});
+});
+
+        Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
+          $.mobile.pageContainer.pagecontainer('change', '#page-preferences');
+          return false;
+        });
+        botStatus();
 
 function botStatus() {
   $.ajax({url:'/bot/status',dataType:'json'})
   .done(function (data) {
     if(data.status == 'ok') {
-      $('#a_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+      $('.s_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
     } else {
-      $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+      $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
     }})
   .error(function() {
-    $('#a_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+    $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
   });
   setTimeout(botStatus, 1000);
 }

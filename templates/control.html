@@ -1,36 +1,63 @@
-<div data-role="page" id="page-control">
+<style>
+.ui-content-stream {
+background:url('http://{{host}}:{{stream_port}}/stream') no-repeat; 
+background-size: auto 100% !important;
+background-position: center;
+}
+.ui-btn-traslucent {
+background:rgba(246,246,246,0.5) !important;
+border-radius: 14em;
+}
+.ui-center {
+text-align: center;
+}
+</style>
+{%if config.show_page_control%}<div data-role="page" id="page-control">
  <div data-role="header">
-  <a href="#" id="a_bot_status" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
+  <a href="#" id="a_bot_status" class="s_bot_status ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
   <h1>CoderBot</h1>
-  <a href="#page-preferences" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">{% trans %}Preferences{% endtrans %}</a>
+  {%if config.show_page_prefs%}<a href="#page-preferences" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">{% trans %}Preferences{% endtrans %}</a>{%endif%}
   <div data-role="navbar">
    <ul>
     <li><a href="#page-control">{% trans %}Control{% endtrans %}</a></li>
-    <li><a href="#page-program">{% trans %}Program{% endtrans %}</a></li>
+    {%if config.show_page_program%}<li><a href="#page-program">{% trans %}Program{% endtrans %}</a></li>{%endif%}
    </ul>
   </div><!-- /navbar -->
  </div>
- <div role="main" class="ui-content">
-  <fieldset class="ui-grid-solo">
-   <div class="ui-block-a"><button id="b_forward" onclick="void(0)" class="ui-btn ui-icon-arrow-u ui-btn-icon-top" type="button">{% trans %}Forward{% endtrans %}</button></div>
-  </fieldset>
-  <fieldset class="ui-grid-a">
-   <div class="ui-block-a"><button id="b_left" onclick="void(0)" class="ui-btn ui-icon-arrow-l ui-btn-icon-top" type="button">{% trans %}Left{% endtrans %}</button></div>
-   <div class="ui-block-b"><button id="b_right" onclick="void(0)" class="ui-btn ui-icon-arrow-r ui-btn-icon-top" type="button">{% trans %}Right{% endtrans %}</button></div>
-  </fieldset>
-  <fieldset class="ui-grid-solo">
-   <div class="ui-block-a"><button id="b_backward" onclick="void(0)" class="ui-btn ui-icon-arrow-d ui-btn-icon-top" type="button">{% trans %}Backward{% endtrans %}</button></div>
-  </fieldset>
-  <fieldset class="ui-grid-a">
-   <div class="ui-block-a"><input id="i_say" type="text" name="say"></div>
-   <div class="ui-block-b"><button id="b_say" class="ui-btn" type="button">{% trans %}Say{% endtrans %}</button></div>
-  </fieldset>
-  <div class="ui-grid-solo">
-   <div class="ui-block-a"><iframe id="f_stream" src="http://{{host}}:{{stream_port}}" width="640" height="480" style="display:block;margin: 0 auto;"></iframe></div>
+ <div role="main" class="ui-content ui-content-stream">
+  <div class="ui-grid-a">
+   <div class="ui-block-a">
+    <fieldset class="ui-grid-solo">
+     <div class="ui-block-a ui-center"><button id="b_forward" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-u ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Forward{% endtrans %}</button></div>
+    </fieldset>
+    <fieldset class="ui-grid-a">
+     <div class="ui-block-a ui-center"><button id="b_left" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-l ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Left{% endtrans %}</button></div>
+     <div class="ui-block-b ui-center"><button id="b_right" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-r ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Right{% endtrans %}</button></div>
+    </fieldset>
+    <fieldset class="ui-grid-solo">
+     <div class="ui-block-a ui-center"><button id="b_backward" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Backward{% endtrans %}</button></div>
+    </fieldset>
+   </div>
+   <div class="ui-block-b ui-center">
+    <div class="ui-grid-solo">
+     <div class="ui-block-a">
+      <button id="b_say" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Say{% endtrans %}</button>
+     </div>
+    </div>
+    <div class="ui-grid-solo">
+     <div class="ui-block-a">
+      <button id="b_halt" class="ui-btn ui-btn-inline ui-icon-power ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Halt{% endtrans %}</button>
+     </div>
+    </div>
+   </div>
   </div>
-  <fieldset class="ui-grid-solo">
+  <!--fieldset class="ui-grid-a">
+   <div class="ui-block-a"><input id="i_say" type="text" name="say"></div>
+  </fieldset-->
+  <!--fieldset class="ui-grid-solo">
    <div class="ui-block-a"><button id="b_halt" class="ui-btn" type="button">{% trans %}Halt{% endtrans %}</button></div>
-  </fieldset>
+  </fieldset-->
   </div>
  </div>
 </div>
+{%endif%}

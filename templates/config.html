@@ -1,6 +1,6 @@
 <div data-role="page" id="page-preferences">
  <div data-role="header">
-  <a href="#page-control" data-rel="close" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-a">{% trans %}Back{% endtrans %}</a>
+  <a href="java" href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-a">{% trans %}Back{% endtrans %}</a>
   <h1>CoderBot</h1>
  </div>
  <div role="main" class="ui-content">
@@ -14,6 +14,7 @@
       <li><a href="#t_movement" data-ajax="true">{% trans %}Movement{% endtrans %}</a></li>
       <li><a href="#t_start" data-ajax="true">{% trans %}Start{% endtrans %}</a></li>
       <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
+      <li><a href="#t_ui" data-ajax="true">{% trans %}User Interface{% endtrans %}</a></li>
      </ul>
     </div>
     <div id="t_programming" class="ui-body-d ui-content">
@@ -53,9 +54,21 @@
     <div id="t_button" class="ui-body-d ui-content">
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Button function{% endtrans %}</legend>
+      <label for="r_button_func_a">{% trans %}None{% endtrans %}</label>
       <input type="radio" name="button_func" id="r_button_func_a" value="none" {%if config.button_func=='none'%}checked="checked"{%endif%}>
-      <label for="r_prog_level_a">{% trans %}Start/Stop current program{% endtrans %}</label>
+      <label for="r_button_func_b">{% trans %}Start/Stop current program{% endtrans %}</label>
       <input type="radio" name="button_func" id="r_button_func_b" value="startstop" {%if config.button_func=='startstop'%}checked="checked"{%endif%}>
+     </fieldset>
+    </div>
+    <div id="t_ui" class="ui-body-d ui-content">
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}User Interface{% endtrans %}</legend>
+      <label for="c_show_page_control">{% trans %}Show Control page{% endtrans %}</label>
+      <input type="checkbox" name="show_page_control" id="c_show_page_control" value="true" {%if config.show_page_control=='true'%}checked="checked"{%endif%}>
+      <label for="c_show_page_program">{% trans %}Show Program page{% endtrans %}</label>
+      <input type="checkbox" name="show_page_program" id="c_show_page_program" value="true" {%if config.show_page_program=='true'%}checked="checked"{%endif%}>
+      <label for="c_show_page_prefs">{% trans %}Show Preferences button{% endtrans %}</label>
+      <input type="checkbox" name="show_page_prefs" id="c_show_page_prefs" value="true" {%if config.show_page_prefs=='true'%}checked="checked"{%endif%}>
      </fieldset>
     </div>
     <div class="ui-grid-a">

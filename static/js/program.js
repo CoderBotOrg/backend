@@ -1,5 +1,5 @@
 var inject_once = true;
-
+if($('#page-program')) {
 $(document).on( "pageshow", '#page-program', function( event, ui ) {
       if(inject_once) {
         inject_once=false;
@@ -9,6 +9,7 @@ $(document).on( "pageshow", '#page-program', function( event, ui ) {
 
       $('[href="#page-program"]').addClass( "ui-btn-active" );
       $('[href="#page-control"]').removeClass( "ui-btn-active" );
+      $('#f_stream').attr('src', $('#f_stream').attr('src')); //refresh
 });
 
 $(document).on( "pagecreate", '#page-program', function( event ) {
@@ -22,7 +23,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       $("#b_new_prog_post").on("click", newProgPost);
       $("#b_load_prog_post").on("click", loadProgPost);
     });
-
+}
     var prog = {};
 
     function newProg() {

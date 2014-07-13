@@ -1,9 +1,11 @@
-<div data-role="page" id="page-program">
+{%if config.show_page_program%}<div data-role="page" id="page-program">
  <div data-role="header">
+  <a href="#" id="a_bot_status" class="s_bot_status ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
   <h1>CoderBot</h1>
+  {%if config.show_page_prefs%}<a href="#page-preferences" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">{% trans %}Preferences{% endtrans %}</a>{%endif%}
   <div data-role="navbar">
    <ul>
-    <li><a href="#page-control">{% trans %}Control{% endtrans %}</a></li>
+    {%if config.show_page_control%}<li><a href="#page-control">{% trans %}Control{% endtrans %}</a></li>{%endif%}
     <li><a href="#page-program">{% trans %}Program{% endtrans %}</a></li>
    </ul>
   </div><!-- /navbar -->
@@ -46,3 +48,4 @@
   </div>
  </div>
 </div> 
+{%endif%}
