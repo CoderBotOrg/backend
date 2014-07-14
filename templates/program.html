@@ -11,10 +11,11 @@
   </div><!-- /navbar -->
  </div>
  <div role="main" class="ui-content">
-  <fieldset class="ui-grid-b">
+  <fieldset class="ui-grid-c">
    <div class="ui-block-a"><button id="b_new_prog" class="ui-btn" type="button">{% trans %}New{% endtrans %}</button></div>
    <div class="ui-block-b"><button id="b_load_prog" class="ui-btn" type="button">{% trans %}Load{% endtrans %}</button></div>
    <div class="ui-block-c"><button id="b_save_prog" class="ui-btn" type="button">{% trans %}Save{% endtrans %}</button></div>
+   <div class="ui-block-c"><button id="b_save_prog_as" class="ui-btn" type="button">{% trans %}Save as{% endtrans %}</button></div>
   </fieldset>
   <fieldset class="ui-grid-b">
    <div class="ui-block-a"><button id="b_show_prog" class="ui-btn" type="button">{% trans %}Show{% endtrans %}</button></div>
@@ -37,8 +38,16 @@
   <div style="padding:10px 20px;">
    <h3>{% trans %}New Program{% endtrans %}</h3>
    <label for="un" class="ui-hidden-accessible">{% trans %}Program name{% endtrans %}:</label>
-   <input type="text" name="name" id="i_new_prog_name" value="" placeholder="program name" data-theme="a">
+   <input type="text" name="name" id="i_new_prog_name" value="" placeholder=">{% trans %}Program name{% endtrans %}" data-theme="a">
    <button type="button" id="b_new_prog_post" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">{% trans %}Create{% endtrans %}</button>
+  </div>
+ </div>
+ <div data-role="popup" id="dialogSaveProgAs" data-history="false" data-theme="a" class="ui-corner-all">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}Save Program As{% endtrans %}</h3>
+   <label for="un" class="ui-hidden-accessible">{% trans %}Program name{% endtrans %}:</label>
+   <input type="text" name="name" id="i_save_prog_as_name" value="" placeholder="{%trans%}Program name{%endtrans%}" data-theme="a">
+   <button type="button" id="b_save_prog_as_post" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">{% trans %}Create{% endtrans %}</button>
   </div>
  </div>
  <div data-role="popup" id="dialogLoadProg" data-history="false" data-theme="a" class="ui-corner-all">
