@@ -1,3 +1,13 @@
+<style>
+.ui-content-stream-program {
+background:url('http://{{host}}:{{stream_port}}/stream') no-repeat;
+background-size: auto auto !important;
+background-position: center;
+}
+.ui-center {
+text-align: center;
+}
+</style>
 {%if config.show_page_program%}<div data-role="page" id="page-program">
  <div data-role="header">
   <a href="#" id="a_bot_status" class="s_bot_status ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
@@ -30,7 +40,8 @@
    <h1 id="i_dialog_running_title">CoderBot {% trans %}is running{% endtrans %}</h1> 
   </div>
   <div role="main" class="ui-content">
-   <iframe id="f_stream" src="http://{{host}}:{{stream_port}}" width="640" height="480" style="display:block;margin: 0 auto;"></iframe>
+   <div class="ui-content-stream-program" style="width:640px;height:480px;"></div>
+   <!--iframe id="f_stream" src="http://{{host}}:{{stream_port}}" width="640" height="480" style="display:block;margin: 0 auto;"></iframe-->
    <button href="#" id="b_end_prog_d" class="ui-btn ui-corner-all ui-shadow ui-btn-b" data-rel="back">End program</button>
   </div>
  </div>
