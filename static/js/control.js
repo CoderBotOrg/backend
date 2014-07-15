@@ -17,44 +17,33 @@ function ScaleContentToDevice(){
     var height = h - $(".ui-header").outerHeight() - $(".ui-footer").outerHeight();
     var contentHeight = height - $(".ui-content").outerHeight() + $(".ui-content").height();
     var contentWidth = (contentHeight * 4) / 3;
-    console.log("width: " + width);
-    console.log("height: " + height);
-    console.log("contentHeight: " + contentHeight);
-    console.log("contentWidth: " + contentWidth);
 
     if (width - contentWidth > 384) {
       $("#ui_control_left").width((width - contentWidth)/2);
       $("#ui_control_center").width(contentWidth);
       $("#ui_control_right").width((width - contentWidth)/2);      
-      console.log("control_left: " + (width - contentWidth)/2);
-      console.log("control_center: " + (contentWidth));
-      console.log("control_right: " + (width - contentWidth)/2);
     } else {
       $("#ui_control_left").width((width)/2);
       $("#ui_control_center").width(0);
       $("#ui_control_right").width((width)/2);      
-      console.log("control_left: " + width/2);
-      console.log("control_center: " + 0);
-      console.log("control_right: " + width/2);
     }
 
     $(".ui-content-stream").height(contentHeight);
 }
 
-if($('#page-control')) {
+
+if($("#page-control")) {
 $(document).on( "pageshow", '#page-control', function( event, ui ) {
       $('[href="#page-control"]').addClass( "ui-btn-active" );
       $('[href="#page-program"]').removeClass( "ui-btn-active" );
 });
 
 $(document).on( "pagecreate", '#page-control', function( event ) {
-	if(('ontouchstart' in window) ||
-     	   (navigator.maxTouchPoints > 0) ||
-     	   (navigator.msMaxTouchPoints > 0)) {
+	if(Modernizr.touch){
        	        /* browser with either Touch Events of Pointer Events running on touch-capable device */	
 		$('#b_forward')
-	  	.on("touchstart", function (){console.log("start"); bot.forward(100,-1);})
-	  	.on("touchend", function (){console.log("end"); bot.stop();});
+	  	.on("touchstart", function (){bot.forward(100,-1);})
+	  	.on("touchend", function (){bot.stop();});
 		$('#b_backward')
 	  	.on("touchstart", function (){bot.backward(100,-1);})
 	  	.on("touchend", function (){bot.stop();});
@@ -67,16 +56,17 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	} else {
 		$('#b_forward')
           	.on("mousedown", function (){bot.forward(100, -1);})
-	  	.on("mouseup", function (){bot.stop();})
+	  	.on("mouseup", function (){bot.stop();});
 		$('#b_backward')
           	.on("mousedown", function (){bot.backward(100, -1);})
-	  	.on("mouseup", function (){bot.stop();})
+	  	.on("mouseup", function (){bot.stop();});
 		$('#b_left')
 	  	.on("mousedown", function (){bot.left(60,-1);})
-	  	.on("mouseup", function (){bot.stop();})
+	  	.on("mouseup", function (){bot.stop();});
 		$('#b_right')
           	.on("mousedown", function (){bot.right(60, -1);})
-	  	.on("mouseup", function (){bot.stop();})
+	  	.on("mouseup", function (){bot.stop();});
+                $('body').on("mouseup", function (){bot.stop();});
 	}
 	$('#b_say').on("click", function (){
 		var text = window.prompt(BotMessages.Input);
