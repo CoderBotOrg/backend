@@ -10,8 +10,35 @@ $(document).on( "pagecontainershow", function(){
 
 function ScaleContentToDevice(){
     scroll(0, 0);
-    var content = $.mobile.getScreenHeight() - $(".ui-header").outerHeight() -         $(".ui-footer").outerHeight() - $(".ui-content").outerHeight() + $(".ui-content").height();
-    $(".ui-content").height(content);
+    var w = $( window ).width();
+    var h = $( window ).height();
+  
+    var width =  w;
+    var height = h - $(".ui-header").outerHeight() - $(".ui-footer").outerHeight();
+    var contentHeight = height - $(".ui-content").outerHeight() + $(".ui-content").height();
+    var contentWidth = (contentHeight * 4) / 3;
+    console.log("width: " + width);
+    console.log("height: " + height);
+    console.log("contentHeight: " + contentHeight);
+    console.log("contentWidth: " + contentWidth);
+
+    if (width - contentWidth > 384) {
+      $("#ui_control_left").width((width - contentWidth)/2);
+      $("#ui_control_center").width(contentWidth);
+      $("#ui_control_right").width((width - contentWidth)/2);      
+      console.log("control_left: " + (width - contentWidth)/2);
+      console.log("control_center: " + (contentWidth));
+      console.log("control_right: " + (width - contentWidth)/2);
+    } else {
+      $("#ui_control_left").width((width)/2);
+      $("#ui_control_center").width(0);
+      $("#ui_control_right").width((width)/2);      
+      console.log("control_left: " + width/2);
+      console.log("control_center: " + 0);
+      console.log("control_right: " + width/2);
+    }
+
+    $(".ui-content-stream").height(contentHeight);
 }
 
 if($('#page-control')) {
