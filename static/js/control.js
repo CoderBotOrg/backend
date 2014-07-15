@@ -125,4 +125,3 @@ function botStatus() {
   });
   setTimeout(botStatus, 1000);
 }
-

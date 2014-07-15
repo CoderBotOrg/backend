@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-07 21:00+0000\n"
+"POT-Creation-Date: 2014-07-14 22:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,7 @@ msgid "Movement"
 msgstr ""
 
 #: templates/blocks_adv.xml:223 templates/blocks_std.xml:69
-#: templates/config.html:13 templates/config.html:37
+#: templates/config.html:13 templates/config.html:38
 msgid "Sensor"
 msgstr ""
 
@@ -73,7 +73,8 @@ msgstr ""
 msgid "Sound"
 msgstr ""
 
-#: templates/blocks_std.xml:2 templates/control.html:8 templates/program.html:6
+#: templates/blocks_std.xml:2 templates/control.html:22
+#: templates/program.html:8
 msgid "Control"
 msgstr ""
 
@@ -101,135 +102,180 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: templates/config.html:21
+#: templates/config.html:17 templates/config.html:65
+msgid "User Interface"
+msgstr ""
+
+#: templates/config.html:22
 msgid "Editor level"
 msgstr ""
 
-#: templates/config.html:23
+#: templates/config.html:24
 msgid "Basic"
 msgstr ""
 
-#: templates/config.html:25
+#: templates/config.html:26
 msgid "Standard"
 msgstr ""
 
-#: templates/config.html:27
+#: templates/config.html:28
 msgid "Advanced"
 msgstr ""
 
-#: templates/config.html:31
+#: templates/config.html:32
 msgid "Start sound"
 msgstr ""
 
-#: templates/config.html:33
+#: templates/config.html:34
 msgid "Stop sound"
 msgstr ""
 
-#: templates/config.html:40
+#: templates/config.html:41
 msgid "Forward speed"
 msgstr ""
 
-#: templates/config.html:42
+#: templates/config.html:43
 msgid "Forward elapse"
 msgstr ""
 
-#: templates/config.html:44
+#: templates/config.html:45
 msgid "Turn speed"
 msgstr ""
 
-#: templates/config.html:46
+#: templates/config.html:47
 msgid "Turn elapse"
 msgstr ""
 
-#: templates/config.html:50
+#: templates/config.html:51
 msgid "Load at start"
 msgstr ""
 
-#: templates/config.html:55
+#: templates/config.html:56
 msgid "Button function"
 msgstr ""
 
 #: templates/config.html:57
+msgid "None"
+msgstr ""
+
+#: templates/config.html:59
 msgid "Start/Stop current program"
 msgstr ""
 
-#: templates/config.html:62
+#: templates/config.html:66
+msgid "Show Control page"
+msgstr ""
+
+#: templates/config.html:68
+msgid "Show Program page"
+msgstr ""
+
+#: templates/config.html:70
+msgid "Show Preferences button"
+msgstr ""
+
+#: templates/config.html:75
 msgid "Cancel"
 msgstr ""
 
-#: templates/config.html:63 templates/program.html:15
+#: templates/config.html:76 templates/program.html:17
 msgid "Save"
 msgstr ""
 
-#: templates/control.html:5
+#: templates/config_params.html:8
+msgid "Say what:"
+msgstr ""
+
+#: templates/config_params.html:9
+msgid "Saved"
+msgstr ""
+
+#: templates/config_params.html:10
+msgid "Program saved"
+msgstr ""
+
+#: templates/config_params.html:11
+msgid "Program name already in use, overwrite?"
+msgstr ""
+
+#: templates/control.html:19 templates/program.html:5
 msgid "Preferences"
 msgstr ""
 
-#: templates/control.html:9 templates/program.html:7
+#: templates/control.html:23 templates/program.html:9
 msgid "Program"
 msgstr ""
 
-#: templates/control.html:15
+#: templates/control.html:31
 msgid "Forward"
 msgstr ""
 
-#: templates/control.html:18
+#: templates/control.html:34
 msgid "Left"
 msgstr ""
 
-#: templates/control.html:19
+#: templates/control.html:35
 msgid "Right"
 msgstr ""
 
-#: templates/control.html:22
+#: templates/control.html:38
 msgid "Backward"
 msgstr ""
 
-#: templates/control.html:26
+#: templates/control.html:44
 msgid "Say"
 msgstr ""
 
-#: templates/control.html:32
+#: templates/control.html:49 templates/control.html:58
 msgid "Halt"
 msgstr ""
 
-#: templates/program.html:13
+#: templates/program.html:15
 msgid "New"
 msgstr ""
 
-#: templates/program.html:14
+#: templates/program.html:16
 msgid "Load"
 msgstr ""
 
 #: templates/program.html:18
+msgid "Save as"
+msgstr ""
+
+#: templates/program.html:21
 msgid "Show"
 msgstr ""
 
-#: templates/program.html:19
+#: templates/program.html:22
 msgid "Run"
 msgstr ""
 
-#: templates/program.html:20
+#: templates/program.html:23
 msgid "Stop"
 msgstr ""
 
-#: templates/program.html:27
+#: templates/program.html:30
 msgid "is running"
 msgstr ""
 
-#: templates/program.html:36
+#: templates/program.html:39
 msgid "New Program"
 msgstr ""
 
-#: templates/program.html:37
+#: templates/program.html:40 templates/program.html:41
+#: templates/program.html:48 templates/program.html:49
 msgid "Program name"
 msgstr ""
 
-#: templates/program.html:39
+#: templates/program.html:42 templates/program.html:50
 msgid "Create"
 msgstr ""
 
-#: templates/program.html:44
+#: templates/program.html:47
+msgid "Save Program As"
+msgstr ""
+
+#: templates/program.html:55
 msgid "Load Program"
 msgstr ""
 
