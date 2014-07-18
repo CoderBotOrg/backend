@@ -1,5 +1,6 @@
 import time
 import copy
+import os
 from threading import Thread, Lock
 
 import SimpleCV
@@ -7,6 +8,9 @@ import SimpleCV
 CAMERA_REFRESH_INTERVAL=0.3
 CAMERA_DELAY_INTERVAL=0.3
 MAX_IMAGE_AGE = 0.0
+PHOTO_PATH = "./photos"
+PHOTO_PREFIX = "DSC"
+PHOTO_FILE_EXT = ".jpg"
 
 class Camera(Thread):
 
@@ -33,6 +37,14 @@ class Camera(Thread):
     self._run = True
     self._image_time = 0
     self._image_lock = Lock()
+
+    self._photos = []
+   
+    for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
+      for filename in filenames:
+        if PHOTO_PREFIX in filename:
+          self._photos.append(filename)
+   
     super(Camera, self).__init__()
 
   def run(self):
@@ -54,6 +66,25 @@ class Camera(Thread):
   def save_image(self, image):
     image.save(self._streamer)
     self._image_time=time.time()
+
+  def take_photo(self):
+    last_photo_index = 0
+    if len(self._photos):
+      last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(PHOTO_FILE_EXT)])
+    filename = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_FILE_EXT;
+    of = open(PHOTO_PATH + "/" + filename, "w+")
+    self._image.save(of)
+    self._photos.append(filename)
+
+  def list_photos(self):
+    return self._photos
+
+  def get_photo(self, filename):
+    return Image(PHOTO_PATH + "/" + filename)
+
+  def delete_photo(self, filename):
+    os.remove(PHOTO_PATH + "/" + filename)
+    self._photos.remove(filename)
 
   def exit(self):
     self._run = False

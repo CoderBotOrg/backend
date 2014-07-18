@@ -29,8 +29,8 @@ CoderBot.prototype.stop = function() {
 	this.command('stop', 0);
 }
 
-CoderBot.prototype.set_handler = function(h) {
-	this.command('set_handler', h);
+CoderBot.prototype.takePhoto = function() {
+	this.command('take_photo', 0);
 }
 
 CoderBot.prototype.say = function(h) {

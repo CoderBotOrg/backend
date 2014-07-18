@@ -53,7 +53,8 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 		$('#b_right')
 	  	.on("touchstart", function (){bot.right(60,-1);})
 	  	.on("touchend", function (){bot.stop();});
-	} else {
+                $('body').on("touchend", function (){bot.stop();});
+           } else {
 		$('#b_forward')
           	.on("mousedown", function (){bot.forward(100, -1);})
 	  	.on("mouseup", function (){bot.stop();});
@@ -72,10 +73,8 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 		var text = window.prompt(BotMessages.Input);
                 bot.say(text);
 	});
-	$('.b_camera').on("click", function (){
-		var param = $(this).attr('data-param');
-		bot.set_handler(param);
-                $('#f_stream').attr('src', $('#f_stream').attr('src'));
+	$('#b_camera').on("click", function (){
+                bot.takePhoto();
 	});
 	$('#b_halt').on("click", function (){
 		if(confirm("Shutdown CoderBot?")){

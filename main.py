@@ -27,7 +27,10 @@ app.prog = None
 def get_locale():
     # otherwise try to guess the language from the user accept
     # header the browser transmits.
-    return request.accept_languages.best_match(['it', 'en'])
+    loc = request.accept_languages.best_match(['it', 'en'])
+    if loc is None:
+      loc = 'it'
+    return loc
 
 @app.route("/")
 def handle_home():
@@ -57,13 +60,8 @@ def handle_bot():
         bot.backward(speed=int(param1), elapse=float(param2))
     elif cmd == "stop":
         bot.stop()
-    elif cmd == "set_handler":
-        print "param: " + str(param1)
-        try:
-          handler = int(param1) if int(param1) >= 0 else None
-          cam_h.set_active_handler(handler)      
-        except e:
-          print e 
+    elif cmd == "take_photo":
+        cam.take_photo()
 
     elif cmd == "say":
         print "say: " + str(param1)
@@ -81,6 +79,15 @@ def handle_bot_status():
     print "bot_status"
     return json.dumps({'status': 'ok'}) 
 
+@app.route("/photos", methods=["GET"])
+def handle_photos_list():
+    print "photos_list"
+    return json.dumps(app.cam.get_phots())
+
+@app.route("/photos/<filename>", methods=["GET"])
+def handle_photo(filename):
+    print "photo"
+    return cam.get_photo(filename)
    
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():

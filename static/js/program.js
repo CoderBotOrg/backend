@@ -9,7 +9,6 @@ $(document).on( "pageshow", '#page-program', function( event, ui ) {
 
       $('[href="#page-program"]').addClass( "ui-btn-active" );
       $('[href="#page-control"]').removeClass( "ui-btn-active" );
-      $('#f_stream').attr('src', $('#f_stream').attr('src')); //refresh
 });
 
 $(document).on( "pagecreate", '#page-program', function( event ) {
