@@ -32,7 +32,7 @@
 *.sqlite
 
 # Pictures taken
-./photos/*.jpg
+photos/
 
 # OS generated files #
 ######################

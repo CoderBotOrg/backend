@@ -10,6 +10,7 @@ CAMERA_DELAY_INTERVAL=0.3
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
 PHOTO_PREFIX = "DSC"
+PHOTO_THUMB_SUFFIX = "_thumb"
 PHOTO_FILE_EXT = ".jpg"
 
 class Camera(Thread):
@@ -42,7 +43,7 @@ class Camera(Thread):
    
     for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
       for filename in filenames:
-        if PHOTO_PREFIX in filename:
+        if PHOTO_PREFIX in filename and PHOTO_THUMB_SUFFIX not in filename:
           self._photos.append(filename)
    
     super(Camera, self).__init__()
@@ -72,15 +73,21 @@ class Camera(Thread):
     if len(self._photos):
       last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(PHOTO_FILE_EXT)])
     filename = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_FILE_EXT;
+    filename_thumb = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT;
     of = open(PHOTO_PATH + "/" + filename, "w+")
+    oft = open(PHOTO_PATH + "/" + filename_thumb, "w+")
     self._image.save(of)
+    self._image.resize(64).save(oft)
     self._photos.append(filename)
 
-  def list_photos(self):
+  def get_photo_list(self):
     return self._photos
 
-  def get_photo(self, filename):
-    return Image(PHOTO_PATH + "/" + filename)
+  def get_photo_file(self, filename):
+    return open(PHOTO_PATH + "/" + filename)
+
+  def get_photo_thumb_file(self, filename):
+    return open(PHOTO_PATH + "/" + filename[:-4] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT)
 
   def delete_photo(self, filename):
     os.remove(PHOTO_PATH + "/" + filename)

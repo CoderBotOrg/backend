@@ -76,6 +76,9 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	$('#b_camera').on("click", function (){
                 bot.takePhoto();
 	});
+	$('#b_photos').on("click", function (){
+        	$.mobile.pageContainer.pagecontainer('change', '#page-photos');
+	});
 	$('#b_halt').on("click", function (){
 		if(confirm("Shutdown CoderBot?")){
 			bot.halt();
@@ -85,7 +88,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 }
 
 $(document).on( "pagecreate", '#page-preferences', function( event ) {
-	$('#f_config').on("submit", function (){
+	$('#f_config').on("submit", function (){	
 		var form_data = $(this).serialize();
                 $.post(url='/config', form_data, success=function(){
                   alert(BotMessages.Saved);
@@ -95,11 +98,22 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 	});
 });
 
-        Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
-          $.mobile.pageContainer.pagecontainer('change', '#page-preferences');
-          return false;
-        });
-        botStatus();
+$(document).on( "pageshow", '#page-photos', function( event ) {
+	var photos = $('#photos').empty();
+	$.get(url='/photos', success=function(data){
+                for( p in data) {
+			var photo = data[p];
+			photos.append('<li><img class="ui-li-thumb" src="/photos/' + photo + '"></li>');
+		}
+        }, dataType="json");       
+});
+
+Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
+	$.mobile.pageContainer.pagecontainer('change', '#page-preferences');
+        return false;
+});
+        
+botStatus();
 
 function botStatus() {
   $.ajax({url:'/bot/status',dataType:'json'})

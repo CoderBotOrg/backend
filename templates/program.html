@@ -1,14 +1,4 @@
-<style>
-.ui-content-stream-program {
-background:url('http://{{host}}:{{stream_port}}/stream') no-repeat;
-background-size: auto auto !important;
-background-position: center;
-}
-.ui-center {
-text-align: center;
-}
-</style>
-{%if config.show_page_program%}<div data-role="page" id="page-program">
+<div data-role="page" id="page-program">
  <div data-role="header">
   <a href="#" id="a_bot_status" class="s_bot_status ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
   <h1>CoderBot</h1>
@@ -67,5 +57,4 @@ text-align: center;
    <ul id="i_prog_list" data-role="listview" data-split-icon="delete" data-split-theme="a" data-inset="true"></ul>
   </div>
  </div>
-</div> 
-{%endif%}
+</div>

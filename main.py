@@ -5,7 +5,7 @@ from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
 from program import ProgramEngine, Program
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 from flask.ext.babel import Babel
 #from flask_sockets import Sockets
 
@@ -80,14 +80,19 @@ def handle_bot_status():
     return json.dumps({'status': 'ok'}) 
 
 @app.route("/photos", methods=["GET"])
-def handle_photos_list():
-    print "photos_list"
-    return json.dumps(app.cam.get_phots())
+def handle_photos():
+    print "photos"
+    return json.dumps(cam.get_photo_list())
 
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo(filename):
     print "photo"
-    return cam.get_photo(filename)
+    return send_file(cam.get_photo_file(filename))
+
+@app.route("/photos/<filename>/thumb", methods=["GET"])
+def handle_photo_thumb(filename):
+    print "photo_thumb"
+    return send_file(cam.get_photo_thumb_file(filename))
    
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():

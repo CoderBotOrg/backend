@@ -6,6 +6,7 @@
  <title>CoderBot</title>
  <link rel="shortcut icon" href="favicon.ico">
  <link rel="stylesheet"  href="../css/jquery.mobile-1.4.2.min.css">
+ <link rel="stylesheet"  href="../css/coderbot.css">
  {%include "config_params.html"%}
  <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
  <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>
@@ -23,8 +24,8 @@
  <script type="text/javascript" src="js/program.js"></script>
 </head>
 <body>
-{%include "control.html"%}
-{%include "program.html"%}
+{%if config.show_page_control%}{%include "control.html"%}{%endif%}
+{%if config.show_page_program%}{%include "program.html"%}{%endif%}
 {%include "config.html"%}
 </body>
 </html>
