@@ -89,6 +89,12 @@ def handle_photo(filename):
     print "photo"
     return send_file(cam.get_photo_file(filename))
 
+@app.route("/photos/<filename>", methods=["POST"])
+def handle_photo_cmd(filename):
+    print "photo delete"
+    cam.delete_photo(filename)
+    return "ok"
+
 @app.route("/photos/<filename>/thumb", methods=["GET"])
 def handle_photo_thumb(filename):
     print "photo_thumb"

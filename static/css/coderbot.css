@@ -5,49 +5,50 @@ border-radius: 14em;
 .ui-center {
 text-align: center;
 }
+
 /* A bit custom styling */
-.my-page .ui-listview li .ui-btn p {
+#page-photos .ui-listview li .ui-btn p {
     color: #c0c0c0;
 }
-.my-page .ui-listview li .ui-btn .ui-li-aside {
+#page-photos .ui-listview li .ui-btn .ui-li-aside {
     color: #eee;
 }
 /* First breakpoint is 48em (768px). 3 column layout. Tiles 250x250 pixels incl. margin at the breakpoint. */
 @media ( min-width: 48em ) {
-    .my-page .ui-content {
+    #page-photos .ui-content {
         padding: .5625em; /* 9px */
     }
-    .my-page .ui-listview li {
+    #page-photos .ui-listview li {
         float: left;
         width: 30.9333%; /* 33.3333% incl. 2 x 1.2% margin */
-        height: 14.5em; /* 232p */
+        height: 173px; /* 232p */
         margin: .5625em 1.2%;
     }
-    .my-page .ui-listview li > .ui-btn {
+    #page-photos .ui-listview li > .ui-btn {
         -webkit-box-sizing: border-box; /* include padding and border in height so we can set it to 100% */
         -moz-box-sizing: border-box;
         box-sizing: border-box;
         height: 100%;
     }
-    .my-page .ui-listview li.ui-li-has-thumb .ui-li-thumb {
+    #page-photos .ui-listview li.ui-li-has-thumb .ui-li-thumb {
         height: auto; /* To keep aspect ratio. */
         max-width: 100%;
         max-height: none;
     }
     /* Make all list items and anchors inherit the border-radius from the UL. */
-    .my-page .ui-listview li,
-    .my-page .ui-listview li .ui-btn,
-    .my-page .ui-listview .ui-li-thumb {
+    #page-photos .ui-listview li,
+    #page-photos .ui-listview li .ui-btn,
+    #page-photos .ui-listview .ui-li-thumb {
         -webkit-border-radius: inherit;
         border-radius: inherit;
     }
     /* Hide the icon */
-    .my-page .ui-listview .ui-btn-icon-right:after {
+    #page-photos .ui-listview .ui-btn-icon-right:after {
         display: none;
     }
     /* Make text wrap. */
-    .my-page .ui-listview h2,
-    .my-page .ui-listview p {
+    #page-photos .ui-listview h2,
+    #page-photos .ui-listview p {
         white-space: normal;
         overflow: visible;
         position: absolute;
@@ -55,13 +56,13 @@ text-align: center;
         right: 0;
     }
     /* Text position */
-    .my-page .ui-listview h2 {
+    #page-photos .ui-listview h2 {
         font-size: 1.25em;
         margin: 0;
         padding: .125em 1em;
         bottom: 50%;
     }
-    .my-page .ui-listview p {
+    #page-photos .ui-listview p {
         font-size: 1em;
         margin: 0;
         padding: 0 1.25em;
@@ -81,7 +82,7 @@ text-align: center;
         min-height: 35%;
     }
     /* ui-li-aside has class .ui-li-desc as well so we have to override some things. */
-    .my-page .ui-listview .ui-li-aside {
+    #page-photos .ui-listview .ui-li-aside {
         padding: .125em .625em;
         width: auto;
         min-height: 0;
@@ -99,20 +100,20 @@ text-align: center;
         border-bottom-right-radius: 0;
     }
     /* If you want to add shadow, don't kill the focus style. */
-    .my-page .ui-listview li {
+    #page-photos .ui-listview li {
         -moz-box-shadow: 0px 0px 9px #111;
         -webkit-box-shadow: 0px 0px 9px #111;
         box-shadow: 0px 0px 9px #111;
     }
     /* Images mask the hover bg color so we give desktop users feedback by applying the focus style on hover as well. */
-    .my-page .ui-listview li > .ui-btn:hover {
+    #page-photos .ui-listview li > .ui-btn:hover {
         -moz-box-shadow: 0px 0px 12px #33ccff;
         -webkit-box-shadow: 0px 0px 12px #33ccff;
         box-shadow: 0px 0px 12px #33ccff;
     }
     /* Animate focus and hover style, and resizing. */
-    .my-page .ui-listview li,
-    .my-page .ui-listview .ui-btn {
+    #page-photos .ui-listview li,
+    #page-photos .ui-listview .ui-btn {
         -webkit-transition: all 500ms ease;
         -moz-transition: all 500ms ease;
         -o-transition: all 500ms ease;
@@ -122,20 +123,20 @@ text-align: center;
 }
 /* Second breakpoint is 63.75em (1020px). 4 column layout. Tiles will be 250x250 pixels incl. margin again at the breakpoint. */
 @media ( min-width: 63.75em ) {
-    .my-page .ui-content {
+    #page-photos .ui-content {
         padding: .625em; /* 10px */
     }
     /* Set a max-width for the last breakpoint to prevent too much stretching on large screens.
     By setting the max-width equal to the breakpoint width minus padding we keep square tiles. */
-    .my-page .ui-listview {
+    #page-photos .ui-listview {
         max-width: 62.5em; /* 1000px */
         margin: 0 auto;
     }
     /* Because of the 1000px max-width the width will always be 230px (and margin left/right 10px),
     but we stick to percentage values for demo purposes. */
-    .my-page .ui-listview li {
+    #page-photos .ui-listview li {
         width: 23%;
-        height: 230px;
+        #height: 230px;
         margin: .625em 1%;
     }
 }

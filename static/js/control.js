@@ -84,6 +84,12 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 			bot.halt();
 		}
 	});
+	$( ".photopopup" ).on({
+        	popupbeforeposition: function() {
+            	var maxHeight = $( window ).height() - 60 + "px";
+            	$( ".photopopup img" ).css( "max-height", maxHeight );
+        	}
+    	});
 });
 }
 
@@ -103,9 +109,35 @@ $(document).on( "pageshow", '#page-photos', function( event ) {
 	$.get(url='/photos', success=function(data){
                 for( p in data) {
 			var photo = data[p];
-			photos.append('<li><img class="ui-li-thumb" src="/photos/' + photo + '"></li>');
+			photos.append('<li class="ui-li-has-thumb"><a href="#popup-photo" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" src="/photos/' + photo + '"><p class="p_photo_cmd" style="display:none;"><button class="ui-btn ui-btn-inline ui-btn-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
 		}
+$('li.ui-li-has-thumb').hover( function( event ) {
+        console.log('in');
+	$(this).find('.p_photo_cmd').show();
+}, function( event ) {
+        console.log('out');
+        $(this).find('.p_photo_cmd').hide();
+});
+
         }, dataType="json");       
+});
+
+$(document).on( "click", 'a[data-rel="popup"]', function( event ) {
+	var src = $(this).find('img').attr('src');
+        $('#popup-photo').find('img').attr('src', src);
+});
+
+$(document).on( "click", '.b_photo_delete', function( event ) {
+        var ul = $(this).parents('ul');
+        var li = $(this).parents('li');
+	var src = li.find('img').attr('src');
+	if(confirm(BotMessages.DeletePhotoConfirm + src + " ?")) {
+        	$.post(url=src, data={'cmd':'delete'}, success=function(data){
+			li.remove();
+                        ul.listview('refresh');
+        	});
+	}
+        event.preventDefault();
 });
 
 Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
