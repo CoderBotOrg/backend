@@ -161,12 +161,12 @@
         </value>
       </block>
     </category>
-    <!--category name="{% trans %}Colour{% endtrans %}">
+    <category name="{% trans %}Colour{% endtrans %}">
       <block type="colour_picker"></block>
       <block type="colour_random"></block>
       <block type="colour_rgb"></block>
       <block type="colour_blend"></block>
-    </category-->
+    </category>
     <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE"></category>
     <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE"></category>
     <category name="{% trans %}Movement{% endtrans %}">
@@ -227,6 +227,7 @@
       <block type="coderbot_adv_findFace"></block>
       <block type="coderbot_adv_findCode"></block>
       <block type="coderbot_adv_findLogo"></block>
+      <block type="coderbot_adv_findObject"></block>
     </category>
     <category name="{% trans %}Sound{% endtrans %}">
       <block type="coderbot_say"></block>

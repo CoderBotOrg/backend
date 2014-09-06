@@ -1,6 +1,7 @@
 import time
 import copy
 import os
+import math
 from threading import Thread, Lock
 
 import SimpleCV
@@ -207,7 +208,7 @@ class Camera(Thread):
     print "path_ahead.warp: " + str(time.time() - ts)
     #ar_layer = SimpleCV.DrawingLayer((warped.width, warped.height))
     #ar_layer.rectangle((260,120),(120,320), color=(0,255,0))
-    cropped = warped.crop(260, 160, 120, 320)
+    cropped = warped.crop(260, 160, 120, 480)
     control = cropped.crop(0, 280, 160, 40)
 
     control_color = control.meanColor()
@@ -228,7 +229,7 @@ class Camera(Thread):
     coordY = 60
     if blobs and len(blobs):
       print blobs
-      obstacle = blobs.sortDistance(point=(60,320))[0]
+      obstacle = blobs.sortDistance(point=(60,480))[0]
       print "path_ahead.sortdistnace: " + str(time.time() - ts)
       #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
       #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
@@ -267,6 +268,33 @@ class Camera(Thread):
     self._image_lock.release()
     #print "code: " + str(time.time() - ts)
     return code_data
+    
+  def find_color(self, s_color):
+    color = (int(s_color[1:3],16), int(s_color[3:5],16), int(s_color[5:7],16))
+    code_data = None
+    ts = time.time()
+    self._image_lock.acquire()
+    img = self.get_image(0)
+    #print "signal.get_image: " + str(time.time() - ts)
+    warped = img.colorDistance(color).resize(160).warp(self._warp_corners_4).binarize(80)
+    #print "oject.warp: " + str(time.time() - ts)
+    objects = warped.findBlobs(minsize=200, maxsize=4000)
+    print objects
+    dist = -1
+    angle = 180
+
+    if objects and len(objects):
+      object = objects[-1]
+      coordinates = object.coordinates()
+      print "coordinates: " + str(coordinates)
+      dist = 70 - (48 * math.sqrt(math.pow(coordinates[0] - 80, 2) + math.pow(coordinates[1] + (object.height() / 2), 2)) / 120)
+      angle = math.atan2(coordinates[0] - 80, 120 - coordinates[1]) * 180 / math.pi
+      print "object found, dist: " + str(dist) + " angle: " + str(angle)
+      img.drawText("object found, dist: " + str(dist) + " angle: " + str(angle), 0, 0, fontsize=32 )
+    self.save_image(img)
+    self._image_lock.release()
+    #print "object: " + str(time.time() - ts)
+    return [dist, angle]
     
   def find_logo(self):
     #print "logo"

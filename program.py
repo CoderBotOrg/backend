@@ -10,6 +10,15 @@ PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".data"
 
+def get_cam():
+  return camera.Camera.get_instance()
+
+def get_bot():
+  return coderbot.CoderBot.get_instance()
+
+def get_prog_eng():
+  return ProgramEngine.get_instance()
+
 class ProgramEngine:
 
   _instance = None
@@ -33,7 +42,7 @@ class ProgramEngine:
     return self._repository.keys()
     
   def save(self, program):
-    program = self._repository[program.name] = program
+    self._program = self._repository[program.name] = program
     f = open(PROGRAM_PATH + PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX, 'w')
     json.dump(program.as_json(), f)
     f.close()
@@ -41,15 +50,23 @@ class ProgramEngine:
   def load(self, name):
     #return self._repository[name]
     f = open(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX, 'r')
-    return Program.from_json(json.load(f))
+    self._program = Program.from_json(json.load(f))
+    return self._program
 
   def delete(self, name):
     del self._repository[name]
     os.remove(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX)
     return "ok"
 
+  def create(self, name, code):
+    self._program = Program(name, code)
+    return self._program
+
   def is_running(self, name):
     return self._repository[name].is_running()
+
+  def check_end(self):
+    return self._program.check_end()
 
 #class Program(threading.Thread):
 class Program:
@@ -89,6 +106,7 @@ class Program:
   def check_end(self):
     if self._running == False:
       raise RuntimeError('end requested')
+    return None
 
   def is_running(self):
     return self._running

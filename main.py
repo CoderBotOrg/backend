@@ -134,7 +134,7 @@ def handle_program_exec():
     print "program_exec"
     name = request.form.get('name')
     code = request.form.get('code')
-    app.prog = Program(name, code)
+    app.prog = app.prog_engine.create(name, code)
     return json.dumps(app.prog.execute())
 
 @app.route("/program/end", methods=["POST"])

@@ -91,7 +91,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       var dom_code = Blockly.Xml.domToText(xml_code);
 
       window.LoopTrap = 1000;
-      Blockly.Python.INFINITE_LOOP_TRAP = '  program.check_end()\n';
+      Blockly.Python.INFINITE_LOOP_TRAP = '  get_prog_eng().check_end()\n';
       var code = Blockly.Python.workspaceToCode();
       Blockly.Python.INFINITE_LOOP_TRAP = null;
 
@@ -142,7 +142,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       var bot = new CoderBot();
       // Generate JavaScript code and run it.
       window.LoopTrap = 1000;
-      Blockly.Python.INFINITE_LOOP_TRAP = '  program.check_end()\n';
+      Blockly.Python.INFINITE_LOOP_TRAP = '  get_prog_eng().check_end()\n';
       var code = Blockly.Python.workspaceToCode();
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       try {
