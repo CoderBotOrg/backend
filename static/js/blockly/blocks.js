@@ -438,7 +438,7 @@ Blockly.Python['coderbot_adv_findCode'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_adv_findObject'] = {
+Blockly.Blocks['coderbot_adv_findColor'] = {
   /**
    * Block for findSignal function.
    * @this Blockly.Block
@@ -449,28 +449,31 @@ Blockly.Blocks['coderbot_adv_findObject'] = {
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_FIND)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_DIST, 'DIST'], [Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_ANGLE, 'ANGLE'],[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_BOTH,'BOTH']]), 'RETVAL')
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_COLOR)
-        .appendField(new Blockly.FieldColour('#ff0000'), 'COLOR');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_COLOR);
+        //.appendField(new Blockly.FieldColour('#ff0000'), 'COLOR');
+    this.appendValueInput('COLOR')
+        .setCheck('Colour');
+    this.setInputsInline(true);
     this.setOutput(true, ['Number', 'Array']);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
 
-Blockly.JavaScript['coderbot_adv_findObject'] = function(block) {
+Blockly.JavaScript['coderbot_adv_findColor'] = function(block) {
   // Boolean values true and false.
-  var color = block.getFieldValue('COLOR');
+  var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
   var retval = block.getFieldValue('RETVAL');
   var ret_code = {'DIST': '[0]', 'ANGLE': '[1]', 'BOTH': ''}[retval];
   var code = 'get_cam().find_color(' + color + ')' + ret_code + ';';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Python['coderbot_adv_findObject'] = function(block) {
+Blockly.Python['coderbot_adv_findColor'] = function(block) {
   // Boolean values true and false.
-  var color = block.getFieldValue('COLOR');
+  var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
   var retval = block.getFieldValue('RETVAL');
   var ret_code = {'DIST': '[0]', 'ANGLE': '[1]', 'BOTH': ''}[retval];
-  var code = 'get_cam().find_color("' + color + '")' + ret_code;
+  var code = 'get_cam().find_color(' + color + ')' + ret_code;
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
