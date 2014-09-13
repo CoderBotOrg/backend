@@ -62,6 +62,7 @@ def handle_bot():
         bot.stop()
     elif cmd == "take_photo":
         cam.take_photo()
+        bot.say(app.bot_config.get("sound_shutter"))
 
     elif cmd == "say":
         print "say: " + str(param1)
