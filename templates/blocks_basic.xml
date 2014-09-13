@@ -3,5 +3,18 @@
       <block type="coderbot_moveBackward"></block>
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
-      <block type="coderbot_say"></block>
+      <block type="coderbot_say">
+        <value name="TEXT">
+          <block type="text">
+            <field name="TEXT">Ciao</field>
+          </block>
+        </value>
+      </block>
+      <block type="coderbot_repeat"></block>
+        <value name="TIMES">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
   </xml>

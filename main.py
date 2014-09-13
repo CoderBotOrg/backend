@@ -5,7 +5,7 @@ from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
 from program import ProgramEngine, Program
 
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect
 from flask.ext.babel import Babel
 #from flask_sockets import Sockets
 
@@ -151,6 +151,10 @@ def handle_program_status():
     if app.prog:
       prog = app.prog
     return json.dumps({'name': prog.name, "running": prog.is_running()}) 
+
+@app.route("/tutorial")
+def handle_tutorial():
+    return redirect("/blockly-tutorial/apps/index.html", code=302)
 
 def button_pushed():
   if app.bot_config.get('button_func') == "startstop":
