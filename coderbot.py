@@ -18,12 +18,17 @@ def coderbot_callback(gpio, level, tick):
 class CoderBot:
   _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD]
 
-  def __init__(self):
+  def __init__(self, servo=True):
     self.pi = pigpio.pi('localhost')
     self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
     self._cb = dict()
     self._cb_last_tick = dict()
-    self._cb_elapse = dict()    
+    self._cb_elapse = dict()
+    self._servo = servo
+    if self._servo:
+      self.motor_control = self._servo_control    
+    else:
+      self.motor_control = self._motor_control
     cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, coderbot_callback)
     for pin in self._pin_out:
       self.pi.set_PWM_frequency(pin, PWM_FREQUENCY)
@@ -52,7 +57,7 @@ class CoderBot:
   def right(self, speed=100, elapse=-1):
     self.motor_control(speed_left=speed, speed_right= -speed, elapse=elapse)
 
-  def motor_control(self, speed_left=100, speed_right=100, elapse=-1):
+  def _motor_control(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
 
     if speed_left < 0:
@@ -76,9 +81,9 @@ class CoderBot:
       time.sleep(elapse)
       self.stop()
 
-  def servo_control(self, speed_left=100, speed_right=100, elapse=-1):
+  def _servo_control(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
-    speed_left = ((speed_left + 100) * 50 / 200) + 50
+    speed_left = ((-speed_left + 100) * 50 / 200) + 50
     speed_right = ((speed_right + 100) * 50 / 200) + 50
 
     self.pi.write(PIN_MOTOR_ENABLE, 1)
