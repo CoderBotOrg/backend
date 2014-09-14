@@ -21,6 +21,55 @@ Blockly.HSV_VALUE=.99;
 
 // Extensions to Blockly's language and JavaScript generator.
 
+Blockly.Blocks['coderbot_repeat'] = {
+  /**
+   * Block for repeat n times (internal number).
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.CONTROLS_REPEAT_HELPURL);
+    this.setColour(120);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldImage('/images/blocks/loop_repeat.png', 32, 32, '*'))
+        //.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_REPEAT)
+        .appendField(new Blockly.FieldTextInput('10',
+            Blockly.FieldTextInput.nonnegativeIntegerValidator), 'TIMES');
+        //.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_TIMES);
+    this.appendStatementInput('DO');
+        //.appendField(Blockly.Msg.CONTROLS_REPEAT_INPUT_DO);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.CONTROLS_REPEAT_TOOLTIP);
+  }
+};
+
+Blockly.JavaScript['coderbot_repeat'] = function(block) {
+  // Repeat n times (internal number).
+  var repeats = Number(block.getFieldValue('TIMES'));
+  var branch = Blockly.JavaScript.statementToCode(block, 'DO');
+  branch = Blockly.JavaScript.addLoopTrap(branch, block.id);
+  var loopVar = Blockly.JavaScript.variableDB_.getDistinctName(
+      'count', Blockly.Variables.NAME_TYPE);
+  var code = 'for (var ' + loopVar + ' = 0; ' +
+      loopVar + ' < ' + repeats + '; ' +
+      loopVar + '++) {\n' +
+      branch + '}\n';
+  return code;
+};
+
+Blockly.Python['coderbot_repeat'] = function(block) {
+  // Repeat n times (internal number).
+  var repeats = parseInt(block.getFieldValue('TIMES'), 10);
+  var branch = Blockly.Python.statementToCode(block, 'DO');
+  branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+      Blockly.Python.LOOP_PASS;
+  var loopVar = Blockly.Python.variableDB_.getDistinctName(
+      'count', Blockly.Variables.NAME_TYPE);
+  var code = 'for ' + loopVar + ' in range(' + repeats + '):\n' + branch;
+  return code;
+};
+
+
 Blockly.Blocks['coderbot_moveForward'] = {
   // Block for moving forward.
   init: function() {
