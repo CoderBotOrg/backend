@@ -11,8 +11,8 @@ from flask.ext.babel import Babel
 
 CONFIG_FILE = "coderbot.cfg"
 
-bot = CoderBot.get_instance()
-cam = Camera.get_instance()
+bot = None
+cam = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -166,8 +166,12 @@ def button_pushed():
 
 def run_server():
   f = open(CONFIG_FILE, 'r')
+  global bot
+  global cam
   try:
     app.bot_config = json.load(f)
+    bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"))
+    cam = Camera.get_instance()
   except ValueError as e:
     app.bot_config = {}
     print e

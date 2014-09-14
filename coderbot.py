@@ -18,7 +18,7 @@ def coderbot_callback(gpio, level, tick):
 class CoderBot:
   _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD]
 
-  def __init__(self, servo=True):
+  def __init__(self, servo=False):
     self.pi = pigpio.pi('localhost')
     self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
     self._cb = dict()
@@ -40,9 +40,9 @@ class CoderBot:
   the_bot = None
 
   @classmethod
-  def get_instance(cls):
+  def get_instance(cls, servo=False):
     if not cls.the_bot:
-      cls.the_bot = CoderBot()
+      cls.the_bot = CoderBot(servo)
     return cls.the_bot
 
   def forward(self, speed=100, elapse=-1):
