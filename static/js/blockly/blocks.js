@@ -195,6 +195,35 @@ Blockly.Python['coderbot_say'] = function(block) {
   return 'get_bot().say(' + text + ')\n';
 };
 
+Blockly.Blocks['coderbot_icon_say'] = {
+  // Block for text to speech.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Say');
+    this.setColour(290);
+    this.appendValueInput('TEXT')
+        .setCheck(["String", "Number", "Date"])
+        .appendField(new Blockly.FieldImage('/images/blocks/say.png', 32, 32, '*'));
+        //.appendField(Blockly.Msg.CODERBOT_SAY);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(('CoderBot_sayTooltip'));
+  }
+};
+
+Blockly.JavaScript['coderbot_icon_say'] = function(block) {
+  // Generate JavaScript for turning left or right.
+  var text = Blockly.JavaScript.valueToCode(block, 'TEXT',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'';
+  return 'get_bot().say(' + text + ');\n';
+};
+
+Blockly.Python['coderbot_icon_say'] = function(block) {
+  // Generate Python for turning left or right.
+  var text = Blockly.Python.valueToCode(block, 'TEXT',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  return 'get_bot().say(' + text + ')\n';
+};
+
 Blockly.Blocks['coderbot_sleep'] = {
   // Block for text to sleep.
   init: function() {
