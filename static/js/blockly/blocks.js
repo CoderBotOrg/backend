@@ -29,14 +29,21 @@ Blockly.Blocks['coderbot_repeat'] = {
   init: function() {
     this.setHelpUrl(Blockly.Msg.CONTROLS_REPEAT_HELPURL);
     this.setColour(120);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldImage('/images/blocks/loop_repeat.png', 32, 32, '*'))
-        //.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_REPEAT)
-        .appendField(new Blockly.FieldTextInput('10',
+    var di = this.appendDummyInput();
+    if(CODERBOT_PROG_LEVEL=="basic") {
+    	di.appendField(new Blockly.FieldImage('/images/blocks/loop_repeat.png', 32, 32, '*'));
+    } else {
+        di.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_REPEAT)
+    }		
+    di.appendField(new Blockly.FieldTextInput('10',
             Blockly.FieldTextInput.nonnegativeIntegerValidator), 'TIMES');
-        //.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_TIMES);
-    this.appendStatementInput('DO');
-        //.appendField(Blockly.Msg.CONTROLS_REPEAT_INPUT_DO);
+    if(CODERBOT_PROG_LEVEL!="basic") {
+        di.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_TIMES);
+    }
+    var si = this.appendStatementInput('DO');
+    if(CODERBOT_PROG_LEVEL!="basic") {
+    	si.appendField(Blockly.Msg.CONTROLS_REPEAT_INPUT_DO);
+    }
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(Blockly.Msg.CONTROLS_REPEAT_TOOLTIP);
@@ -75,9 +82,12 @@ Blockly.Blocks['coderbot_moveForward'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
-    this.appendDummyInput()
-        //.appendField(Blockly.Msg.CODERBOT_MOVE_FORWARD)
-        .appendField(new Blockly.FieldImage('/images/blocks/move_forward.png', 32, 32, '*'));
+    var di = this.appendDummyInput()
+    if(CODERBOT_PROG_LEVEL=="basic") {
+        di.appendField(new Blockly.FieldImage('/images/blocks/move_forward.png', 32, 32, '*'));
+    } else {
+        di.appendField(Blockly.Msg.CODERBOT_MOVE_FORWARD)
+    }
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveForwardTooltip');
@@ -100,9 +110,12 @@ Blockly.Blocks['coderbot_moveBackward'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
-    this.appendDummyInput()
-        //.appendField(Blockly.Msg.CODERBOT_MOVE_BACKWARD)
-        .appendField(new Blockly.FieldImage('/images/blocks/move_backward.png', 32, 32, '*'));
+    var di = this.appendDummyInput()
+    if(CODERBOT_PROG_LEVEL=="basic") {
+        di.appendField(new Blockly.FieldImage('/images/blocks/move_backward.png', 32, 32, '*'));
+    } else {
+        di.appendField(Blockly.Msg.CODERBOT_MOVE_BACKWARD)
+    }
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveBackwardTooltip');
@@ -124,9 +137,12 @@ Blockly.Blocks['coderbot_turnLeft'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(40);
-    this.appendDummyInput()
-        //.appendField(Blockly.Msg.CODERBOT_MOVE_LEFT)
-        .appendField(new Blockly.FieldImage('/images/blocks/move_left.png', 32, 32, '*'));
+    var di = this.appendDummyInput()
+    if(CODERBOT_PROG_LEVEL=="basic") {
+        di.appendField(new Blockly.FieldImage('/images/blocks/move_left.png', 32, 32, '*'));
+    } else {
+        di.appendField(Blockly.Msg.CODERBOT_MOVE_LEFT);
+    }
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));
@@ -148,9 +164,12 @@ Blockly.Blocks['coderbot_turnRight'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(40);
-    this.appendDummyInput()
-        //.appendField(Blockly.Msg.CODERBOT_MOVE_RIGHT)
-        .appendField(new Blockly.FieldImage('/images/blocks/move_right.png', 32, 32, '*'));
+    var di = this.appendDummyInput()
+    if(CODERBOT_PROG_LEVEL=="basic") {
+        di.appendField(new Blockly.FieldImage('/images/blocks/move_right.png', 32, 32, '*'));
+    } else {
+        di.appendField(Blockly.Msg.CODERBOT_MOVE_RIGHT)
+    }
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));
@@ -172,9 +191,13 @@ Blockly.Blocks['coderbot_say'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Say');
     this.setColour(290);
-    this.appendValueInput('TEXT')
-        .setCheck(["String", "Number", "Date"])
-        .appendField(Blockly.Msg.CODERBOT_SAY);
+    var vi = this.appendValueInput('TEXT');
+    vi.setCheck(["String", "Number", "Date"]);
+    if(CODERBOT_PROG_LEVEL=="basic") {
+        vi.appendField(new Blockly.FieldImage('/images/blocks/say.png', 32, 32, '*'));
+    } else {
+    	vi.appendField(Blockly.Msg.CODERBOT_SAY);
+    }
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_sayTooltip'));
@@ -195,6 +218,7 @@ Blockly.Python['coderbot_say'] = function(block) {
   return 'get_bot().say(' + text + ')\n';
 };
 
+/*
 Blockly.Blocks['coderbot_icon_say'] = {
   // Block for text to speech.
   init: function() {
@@ -223,6 +247,7 @@ Blockly.Python['coderbot_icon_say'] = function(block) {
       Blockly.Python.ORDER_NONE) || '\'\'';
   return 'get_bot().say(' + text + ')\n';
 };
+*/
 
 Blockly.Blocks['coderbot_sleep'] = {
   // Block for text to sleep.
