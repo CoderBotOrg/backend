@@ -1,48 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>CoderBot</title>
-	<link rel="shortcut icon" href="favicon.ico">
-	<link rel="stylesheet"  href="../css/jquery.mobile-1.4.2.min.css">
-	<script src="js/jquery-2.1.0.min.js"></script>
-	<script src="js/jquery.mobile-1.4.2.min.js"></script>
-	<script src="js/coderbot.js"></script>
-	<script src="js/control.js"></script>
-</head>
-<body>
-<div data-role="page" class="" id="pagecontrol">
- <div data-role="header"><h1>CoderBot</h1></div>
- <div role="main" class="ui-content">
-  <fieldset class="ui-grid-solo">
-   <div class="ui-block-a"><button id="b_forward" onclick="void(0)" class="ui-btn ui-icon-arrow-u ui-btn-icon-top" type="button">Forward</button></div>
-  </fieldset>
-  <fieldset class="ui-grid-a">
-   <div class="ui-block-a"><button id="b_left" onclick="void(0)" class="ui-btn ui-icon-arrow-l ui-btn-icon-top" type="button">Left</button></div>
-   <div class="ui-block-b"><button id="b_right" onclick="void(0)" class="ui-btn ui-icon-arrow-r ui-btn-icon-top" type="button">Right</button></div>
-  </fieldset>
-  <fieldset class="ui-grid-solo">
-   <div class="ui-block-a"><button id="b_backward" onclick="void(0)" class="ui-btn ui-icon-arrow-d ui-btn-icon-top" type="button">Backward</button></div>
-  </fieldset>
-  <fieldset class="ui-grid-a">
-   <div class="ui-block-a"><input id="i_say" type="text" name="say"></div>
-   <div class="ui-block-b"><button id="b_say" class="ui-btn" type="button">Say</button></div>
-  </fieldset>
-  <div class="ui-grid-solo">
-   <div class="ui-block-a"><iframe id="f_stream" src="http://{{host}}:{{stream_port}}" width="640" height="480" style="display:block;margin: 0 auto;"></iframe></div>
-  </div>
-  <fieldset class="ui-grid-solo">
-   <div class="ui-block-a"><button id="b_halt" class="ui-btn" type="button">Halt</button></div>
-  </fieldset>
-  </div>
+<div data-role="page" id="page-control">
+ <div data-role="header">
+  <a href="#" id="a_bot_status" class="s_bot_status ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-check ui-btn-a">Online</a>
+  <h1>CoderBot</h1>
+  {%if config.show_page_prefs%}<a href="#page-preferences" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">{% trans %}Preferences{% endtrans %}</a>{%endif%}
   <div data-role="navbar">
    <ul>
-    <li><a href="#" class="ui-btn-active">Control</a></li>
-    <li><a href="/program" data-ajax="false">Program</a></li>
+    <li><a href="#page-control">{% trans %}Control{% endtrans %}</a></li>
+    {%if config.show_page_program%}<li><a href="#page-program">{% trans %}Program{% endtrans %}</a></li>{%endif%}
    </ul>
   </div><!-- /navbar -->
  </div>
+ <div role="main" class="ui-content ui-content-stream">
+  <div class="" style="position:fixed;right:32px;top:80px;">
+   <button id="b_halt" class="ui-btn ui-btn-inline ui-icon-power ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Halt{% endtrans %}</button>
+  </div>
+  <div class="ui-grid-b" style="position:fixed; width:100%;bottom:0px;">
+   <div class="ui-block-a" id="ui_control_left">
+    <fieldset class="ui-grid-solo">
+     <div class="ui-block-a ui-center"><button id="b_forward" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-u ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Forward{% endtrans %}</button></div>
+    </fieldset>
+    <fieldset class="ui-grid-a">
+     <div class="ui-block-a ui-center"><button id="b_left" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-l ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Left{% endtrans %}</button></div>
+     <div class="ui-block-b ui-center"><button id="b_right" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-r ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Right{% endtrans %}</button></div>
+    </fieldset>
+    <fieldset class="ui-grid-solo">
+     <div class="ui-block-a ui-center"><button id="b_backward" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Backward{% endtrans %}</button></div>
+    </fieldset>
+   </div>
+   <div class="ui-block-b ui-center" id="ui_control_center">
+   </div>
+   <div class="ui-block-c ui-center" id="ui_control_right">
+    <div class="ui-grid-solo">
+     <div class="ui-block-a">
+      <button id="b_say" class="ui-btn ui-btn-inline ui-icon-comment ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Say{% endtrans %}</button>
+     </div>
+    </div>
+    <div class="ui-grid-solo">
+     <div class="ui-block-a">
+      <button id="b_camera" class="ui-btn ui-btn-inline ui-icon-camera ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Photo{% endtrans %}</button>
+     </div>
+     <div class="ui-block-a">
+      <button id="b_photos" class="ui-btn ui-btn-inline ui-icon-grid ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Photos{% endtrans %}</button>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
 </div>
-</body>
-</html>
+<div data-role="page" id="page-photos">
+ <div data-role="header">
+  <a href="java" href="#" data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-a">{% trans %}Back{% endtrans %}</a>
+  <h1>CoderBot</h1>
+ </div>
+ <div role="main" class="ui-content">
+  <ul data-role="listview" data-inset="true" id="photos">
+  </ul>
+ </div>
+<div data-role="popup" id="popup-photo" class="photopopup" data-overlay-theme="a" data-corners="false" data-tolerance="30,15">
+    <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img src="" alt="Photo">
+</div>
+</div>

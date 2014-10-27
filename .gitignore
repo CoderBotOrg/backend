@@ -31,6 +31,12 @@
 *.sql
 *.sqlite
 
+# Pictures taken
+photos/
+
+# Tutorial
+static/blockly-tutorial
+
 # OS generated files #
 ######################
 .DS_Store
