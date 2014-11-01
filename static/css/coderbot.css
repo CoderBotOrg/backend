@@ -13,6 +13,64 @@ text-align: center;
 #page-photos .ui-listview li .ui-btn .ui-li-aside {
     color: #eee;
 }
+
+.ui-icon-cb-new:after {
+	background-image: url("/css/images/icons-svg/cb-new.svg");
+	background-size: 14px 14px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-new:after {
+	background-image: url("/css/images/icons-png/cb-new.png");
+}
+.ui-icon-cb-load:after {
+        background-image: url("/css/images/icons-svg/cb-load.svg");
+        background-size: 16px 16px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-load:after {
+        background-image: url("/css/images/icons-png/cb-load.png");
+}
+.ui-icon-cb-save:after {
+        background-image: url("/css/images/icons-svg/cb-save.svg");
+        background-size: 16px 16px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-save:after {
+        background-image: url("/css/images/icons-png/cb-save.png");
+}
+.ui-icon-cb-copy:after {
+        background-image: url("/css/images/icons-svg/cb-copy.svg");
+        background-size: 14px 14px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-copy:after {
+        background-image: url("/css/images/icons-png/cb-copy.png");
+}
+.ui-icon-cb-code:after {
+        background-image: url("/css/images/icons-svg/cb-code.svg");
+        background-size: 14px 14px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-code:after {
+        background-image: url("/css/images/icons-png/cb-code.png");
+}
+.ui-icon-cb-run:after {
+        background-image: url("/css/images/icons-svg/cb-run.svg");
+        background-size: 14px 14px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-run:after {
+        background-image: url("/css/images/icons-png/cb-run.png");
+}
+.ui-icon-cb-stop:after {
+        background-image: url("/css/images/icons-svg/cb-stop.svg");
+        background-size: 14px 14px;
+}
+/* Fallback */
+.ui-nosvg .ui-icon-cb-stop:after {
+        background-image: url("/css/images/icons-png/cb-stop.png");
+}
+
 /* First breakpoint is 48em (768px). 3 column layout. Tiles 250x250 pixels incl. margin at the breakpoint. */
 @media ( min-width: 48em ) {
     #page-photos .ui-content {
