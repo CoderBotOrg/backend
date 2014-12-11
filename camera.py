@@ -51,15 +51,15 @@ class Camera(Thread):
 
   def run(self):
     while self._run:
-      ts = time.time()
-      #print "run.1"
-      self._image_lock.acquire()
-      self._image = self._camera.getImage()
-      #print "run.2: " + str(time.time()-ts)
       if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
+        ts = time.time()
+        print "run.1"
+        self._image_lock.acquire()
+        self._image = self._camera.getImage()
+        print "run.2: " + str(time.time()-ts)
         self.save_image(self._image)
-        #print "run.3: " + str(time.time()-ts)
-      self._image_lock.release()
+        print "run.3: " + str(time.time()-ts)
+        self._image_lock.release()
       time.sleep(CAMERA_REFRESH_INTERVAL)
     
   def get_image(self, maxage = MAX_IMAGE_AGE):
