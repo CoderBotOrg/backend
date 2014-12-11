@@ -4,9 +4,9 @@ import os
 import math
 from threading import Thread, Lock
 
-import SimpleCV
+from viz import camera, streamer, image, blob
 
-CAMERA_REFRESH_INTERVAL=0.3
+CAMERA_REFRESH_INTERVAL=0.1
 CAMERA_DELAY_INTERVAL=0.3
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
@@ -18,7 +18,7 @@ class Camera(Thread):
 
   _instance = None
   _cam_props = {"width":640, "height":480}
-  _cam_off_img = SimpleCV.Image("coderdojo-logo.png")
+  #_cam_off_img = SimpleCV.Image("coderdojo-logo.png")
   _warp_corners_1 = [(0, -120), (640, -120), (380, 480), (260, 480)]
   _warp_corners_2 = [(0, -60), (320, -60), (190, 240), (130, 240)]
   _warp_corners_4 = [(0, -30), (160, -30), (95, 120), (65, 120)]
@@ -33,9 +33,9 @@ class Camera(Thread):
 
   def __init__(self):
     print "starting camera"
-    self._camera = SimpleCV.Camera(prop_set=self._cam_props)
-    self._streamer = SimpleCV.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
-    self._cam_off_img.save(self._streamer)
+    self._camera = camera.Camera(props=self._cam_props)
+    self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
+    #self._cam_off_img.save(self._streamer)
     self._run = True
     self._image_time = 0
     self._image_lock = Lock()
@@ -55,9 +55,10 @@ class Camera(Thread):
         ts = time.time()
         print "run.1"
         self._image_lock.acquire()
-        self._image = self._camera.getImage()
+        #self._image = self._camera.get_image_bgr(
+        self._camera.grab()
         print "run.2: " + str(time.time()-ts)
-        self.save_image(self._image)
+        self.save_image(self._camera.get_image_jpeg())
         print "run.3: " + str(time.time()-ts)
         self._image_lock.release()
       time.sleep(CAMERA_REFRESH_INTERVAL)
@@ -66,7 +67,7 @@ class Camera(Thread):
     return self._camera.getImage()
 
   def save_image(self, image):
-    image.save(self._streamer)
+    self._streamer.set_image(image)
     self._image_time=time.time()
 
   def take_photo(self):
