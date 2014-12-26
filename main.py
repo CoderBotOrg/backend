@@ -63,6 +63,12 @@ def handle_bot():
     elif cmd == "take_photo":
         cam.take_photo()
         bot.say(app.bot_config.get("sound_shutter"))
+    elif cmd == "video_rec":
+        cam.video_rec()
+        bot.say(app.bot_config.get("sound_shutter"))
+    elif cmd == "video_stop":
+        cam.video_stop()
+        bot.say(app.bot_config.get("sound_shutter"))
 
     elif cmd == "say":
         print "say: " + str(param1)
@@ -88,7 +94,8 @@ def handle_photos():
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo(filename):
     print "photo"
-    return send_file(cam.get_photo_file(filename))
+    mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
+    return send_file(cam.get_photo_file(filename), mimetype.get(filename[:-4],'image'), cache_timeout=0)
 
 @app.route("/photos/<filename>", methods=["POST"])
 def handle_photo_cmd(filename):

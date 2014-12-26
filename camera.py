@@ -2,17 +2,19 @@ import time
 import copy
 import os
 import math
+from PIL import Image as PILImage
+from StringIO import StringIO
 from threading import Thread, Lock
 
 from viz import camera, streamer, image, blob
 
 CAMERA_REFRESH_INTERVAL=0.1
-CAMERA_DELAY_INTERVAL=0.3
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
 PHOTO_PREFIX = "DSC"
+VIDEO_PREFIX = "VID"
 PHOTO_THUMB_SUFFIX = "_thumb"
-PHOTO_FILE_EXT = ".jpg"
+PHOTO_THUMB_SIZE = (240,180)
 
 class Camera(Thread):
 
@@ -36,6 +38,7 @@ class Camera(Thread):
     self._camera = camera.Camera(props=self._cam_props)
     self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     #self._cam_off_img.save(self._streamer)
+    self.recording = False
     self._run = True
     self._image_time = 0
     self._image_lock = Lock()
@@ -44,44 +47,75 @@ class Camera(Thread):
    
     for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
       for filename in filenames:
-        if PHOTO_PREFIX in filename and PHOTO_THUMB_SUFFIX not in filename:
+        if (PHOTO_PREFIX in filename or VIDEO_PREFIX in filename) and PHOTO_THUMB_SUFFIX not in filename:
           self._photos.append(filename)
    
     super(Camera, self).__init__()
 
   def run(self):
+    self._camera.grab_start()
     while self._run:
       if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
         ts = time.time()
         print "run.1"
         self._image_lock.acquire()
-        #self._image = self._camera.get_image_bgr(
-        self._camera.grab()
-        print "run.2: " + str(time.time()-ts)
+        self._camera.grab_one()
+        #print "run.2: " + str(time.time()-ts)
+        #self.save_image(image.Image(self._camera.get_image_bgr()).filter_color((140, 53, 44)).to_jpeg())
         self.save_image(self._camera.get_image_jpeg())
-        print "run.3: " + str(time.time()-ts)
+        #print "run.3: " + str(time.time()-ts)
         self._image_lock.release()
-      time.sleep(CAMERA_REFRESH_INTERVAL)
-    
-  def get_image(self, maxage = MAX_IMAGE_AGE):
-    return self._camera.getImage()
+      else:
+        time.sleep(time.time() - self._image_time)
 
-  def save_image(self, image):
-    self._streamer.set_image(image)
+    self._camera.grab_stop()
+
+  def get_image(self, maxage = MAX_IMAGE_AGE):
+    return image.Image(self._camera.get_image_bgr())
+
+  def save_image(self, image_jpeg):
+    self._streamer.set_image(image_jpeg)
     self._image_time=time.time()
 
   def take_photo(self):
     last_photo_index = 0
     if len(self._photos):
-      last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(PHOTO_FILE_EXT)])
-    filename = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_FILE_EXT;
-    filename_thumb = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT;
+      last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
+    filename = PHOTO_PREFIX + str(last_photo_index+1) + self._camera.PHOTO_FILE_EXT;
+    filename_thumb = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
     of = open(PHOTO_PATH + "/" + filename, "w+")
     oft = open(PHOTO_PATH + "/" + filename_thumb, "w+")
-    self._image.save(of)
-    self._image.resize(64).save(oft)
+    im_str = self._camera.get_image_jpeg()
+    of.write(im_str)
+    # thumb
+    im_pil = PILImage.open(StringIO(im_str)) 
+    im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
     self._photos.append(filename)
 
+  def is_recording(self):
+    return self.recording
+
+  def video_rec(self):
+    if self.is_recording():
+      return
+    self.recording = True
+
+    last_photo_index = 0
+    if len(self._photos):
+      last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
+    filename = VIDEO_PREFIX + str(last_photo_index+1) + self._camera.VIDEO_FILE_EXT;
+    filename_thumb = VIDEO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
+    oft = open(PHOTO_PATH +  "/" + filename_thumb, "w")
+    im_str = self._camera.get_image_jpeg()
+    im_pil = PILImage.open(StringIO(im_str)) 
+    im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
+    self._photos.append(filename)
+    self._camera.video_rec(PHOTO_PATH + "/" + filename)
+
+  def video_stop(self):
+    self._camera.video_stop()
+    self.recording = False
+    
   def get_photo_list(self):
     return self._photos
 
@@ -89,10 +123,12 @@ class Camera(Thread):
     return open(PHOTO_PATH + "/" + filename)
 
   def get_photo_thumb_file(self, filename):
-    return open(PHOTO_PATH + "/" + filename[:-4] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT)
+    return open(PHOTO_PATH + "/" + filename[:-len(PHOTO_FILE_EXT)] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT)
 
   def delete_photo(self, filename):
+    print filename
     os.remove(PHOTO_PATH + "/" + filename)
+    os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
     self._photos.remove(filename)
 
   def exit(self):
@@ -106,20 +142,19 @@ class Camera(Thread):
   def find_line(self):
     self._image_lock.acquire()
     img = self.get_image(0)
-    img.drawRectangle(0,200,640,40)
-    img.drawRectangle(240,200,160,40, color=(0,0,255))
+    #img.drawRectangle(0,200,640,40)
+    #img.drawRectangle(240,200,160,40, color=(0,0,255))
     cropped = img.crop(0, 200, 640, 40)
-    blobs = cropped.findBlobs(minsize=800, maxsize=4000)
+    blobs = cropped.find_blobs(minsize=800, maxsize=4000)
     coordX = 50
     if blobs and len(blobs):
       line = blobs[-1]
-      img.drawRectangle(line.minRect()[0][0], 200, line.width(), line.height(), color=(0,255,0))
-      coordX = (line.coordinates()[0] * 100) / cropped.width
+      #img.drawRectangle(line.minRect()[0][0], 200, line.width(), line.height(), color=(0,255,0))
+      coordX = (line.center[0] * 100) / cropped.width
     
     self._image_lock.release()
     return coordX
 
-    
   def find_signal(self):
     #print "signal"
     angle = None
@@ -133,7 +168,7 @@ class Camera(Thread):
 
     binarized = cropped.binarize()
 
-    blobs = binarized.findBlobs(minsize=3000, maxsize=4000)
+    blobs = binarized.find_blobs(minsize=3000, maxsize=4000)
     #print blobs
     print "signal.blobs: " + str(time.time() - ts)
     signal = binarized
@@ -150,8 +185,8 @@ class Camera(Thread):
         if lines and len(lines):
           lines = lines.sortLength()
         
-          center_line = lines[-1]
-          center_line.draw()
+          #center_line = lines[-1]
+          #center_line.draw()
 
           #print "center_line: " + str(center_line.length())
 
@@ -184,15 +219,13 @@ class Camera(Thread):
     ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    faces = img.resize(160).findHaarFeatures('face.xml')
-    print "face.findHaar: " + str(time.time() - ts)
+    faces = img.find_faces()
     if faces is not None and len(faces):
       # Get the largest face 
-      faces = faces.sortArea() 
       bigFace = faces[-1]
       # Draw a green box around the face 
       #bigFace.draw()
-      faceX = (bigFace.coordinates()[0] * 100) / 80
+      faceX = (bigFace.center[0] * 100) / 80
 
     self.save_image(img)
     self._image_lock.release()
@@ -205,15 +238,10 @@ class Camera(Thread):
     self._image_lock.acquire()
     img = self.get_image(0)
     print "path_ahead.get_image: " + str(time.time() - ts)
-    warped = img.resize(160).warp(self._warp_corners_4).resize(640)
-    print "path_ahead.warp: " + str(time.time() - ts)
-    #ar_layer = SimpleCV.DrawingLayer((warped.width, warped.height))
-    #ar_layer.rectangle((260,120),(120,320), color=(0,255,0))
-    cropped = warped.crop(260, 160, 120, 480)
-    control = cropped.crop(0, 280, 160, 40)
+    img.crop(0, 100, 160, 120)
 
     control_color = control.meanColor()
-    color_distance = cropped.dilate().colorDistance(control_color)
+    color_distance = cropped.dilate().color_distance(control_color)
 
     control_hue = control.getNumpy().mean()
     #hue_distance = cropped.dilate().hueDistance(control_hue)
@@ -235,7 +263,7 @@ class Camera(Thread):
       #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
       #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
       #img.drawRectangle(dw_x, dw_y, obstacle.width(), obstacle.height(), color=(255,0,0))
-      coordY = 60 - (((obstacle.coordinates()[1]+(obstacle.height()/2)) * 48) / cropped.height) 
+      coordY = 60 - (((obstacle.center()[1]+(obstacle.height()/2)) * 48) / cropped.height) 
       #print obstacle.coordinates()[1]+(obstacle.height()/2)
       #ar_layer.centeredRectangle(obstacle.coordinates(), (obstacle.width(), obstacle.height()))
       #warped.addDrawingLayer(ar_layer)
@@ -278,23 +306,28 @@ class Camera(Thread):
     self._image_lock.acquire()
     img = self.get_image(0)
     #print "signal.get_image: " + str(time.time() - ts)
-    warped = img.colorDistance(color).resize(160).warp(self._warp_corners_4).binarize(80)
+    #warped = img.colorDistance(color).resize(160).warp(self._warp_corners_4).binarize(80)
     #print "oject.warp: " + str(time.time() - ts)
-    objects = warped.findBlobs(minsize=200, maxsize=4000)
-    #print objects
+    #objects = warped.findBlobs(minsize=200, maxsize=4000)
+    bw = img.filter_color(color)
+    objects = bw.find_blobs(minsize=50, maxsize=1000)
+    print objects
     dist = -1
     angle = 180
 
     if objects and len(objects):
       object = objects[-1]
-      coordinates = object.coordinates()
-      #print "coordinates: " + str(coordinates)
+      bottom = object.bottom
+      print "bottom: ", object.center[0], object.bottom
+      x, y = bw.transform(object.center[0], object.bottom)
+      print "coordinates: ", x, y
       #print "height: " + str(object.height())
-      dist = math.sqrt(math.pow(12 + (68 * (120 - coordinates[1] - (object.height() / 2)) / 100),2) + (math.pow(coordinates[1]-80*60/160,2)))
-      angle = math.atan2(coordinates[0] - 80, 120 - coordinates[1]) * 180 / math.pi
+      dist = math.sqrt(math.pow(12 + (68 * (120 - y) / 100),2) + (math.pow((x-80)*60/160,2)))
+      angle = math.atan2(x - 80, 120 - y) * 180 / math.pi
       print "object found, dist: " + str(dist) + " angle: " + str(angle)
-      img.drawText("object found, dist: " + str(dist) + " angle: " + str(angle), 0, 0, fontsize=32 )
-    self.save_image(img)
+      #img.drawText("object found, dist: " + str(dist) + " angle: " + str(angle), 0, 0, fontsize=32 )
+    #self.save_image(self._camera.get_image_jpeg())
+    #self.save_image(img.to_jpeg())
     self._image_lock.release()
     #print "object: " + str(time.time() - ts)
     return [dist, angle]

@@ -87,14 +87,14 @@ class CoderBot:
     speed_right = ((speed_right + 100) * 50 / 200) + 50
 
     self.pi.write(PIN_MOTOR_ENABLE, 1)
-    self.pi.write(PIN_RIGHT_BACKWARD, 0)
-    self.pi.write(PIN_LEFT_BACKWARD, 0)
-    self.pi.set_PWM_range(PIN_LEFT_FORWARD, 1000)
-    self.pi.set_PWM_range(PIN_RIGHT_FORWARD, 1000)
-    self.pi.set_PWM_frequency(PIN_LEFT_FORWARD, 50)
-    self.pi.set_PWM_frequency(PIN_RIGHT_FORWARD, 50)
-    self.pi.set_PWM_dutycycle(PIN_LEFT_FORWARD, speed_left)
-    self.pi.set_PWM_dutycycle(PIN_RIGHT_FORWARD, speed_right)
+    self.pi.write(PIN_RIGHT_FORWARD, 0)
+    self.pi.write(PIN_LEFT_FORWARD, 0)
+    self.pi.set_PWM_range(PIN_LEFT_BACKWARD, 1000)
+    self.pi.set_PWM_range(PIN_RIGHT_BACKWARD, 1000)
+    self.pi.set_PWM_frequency(PIN_LEFT_BACKWARD, 50)
+    self.pi.set_PWM_frequency(PIN_RIGHT_BACKWARD, 50)
+    self.pi.set_PWM_dutycycle(PIN_LEFT_BACKWARD, speed_left)
+    self.pi.set_PWM_dutycycle(PIN_RIGHT_BACKWARD, speed_right)
     if elapse > 0:
       time.sleep(elapse)
       self.stop()

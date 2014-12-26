@@ -73,8 +73,14 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 		var text = window.prompt(BotMessages.Input);
                 bot.say(text);
 	});
-	$('#b_camera').on("click", function (){
+	$('#b_photo').on("click", function (){
                 bot.takePhoto();
+	});
+	$('#b_video_rec').on("click", function (){
+                bot.videoRec();
+	});
+	$('#b_video_stop').on("click", function (){
+                bot.videoStop();
 	});
 	$('#b_photos').on("click", function (){
         	$.mobile.pageContainer.pagecontainer('change', '#page-photos');
@@ -105,11 +111,14 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 });
 
 $(document).on( "pageshow", '#page-photos', function( event ) {
-	var photos = $('#photos').empty();
+	var media_list = $('#media').empty();
 	$.get(url='/photos', success=function(data){
                 for( p in data) {
-			var photo = data[p];
-			photos.append('<li class="ui-li-has-thumb"><a href="#popup-photo" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" src="/photos/' + photo + '"><p class="p_photo_cmd" style="display:none;"><button class="ui-btn ui-btn-inline ui-btn-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
+			var media = data[p];
+			var media_name = media.substring(0, media.indexOf('.'));
+			var media_thumb = media_name + '_thumb.jpg';
+			var media_type = media.indexOf('jpg') > 0 ? 'photo' : 'video';
+			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><p class="p_photo_cmd" style="display:none;"><button class="ui-btn ui-btn-inline ui-btn-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
 		}
 $('li.ui-li-has-thumb').hover( function( event ) {
         console.log('in');
@@ -123,14 +132,15 @@ $('li.ui-li-has-thumb').hover( function( event ) {
 });
 
 $(document).on( "click", 'a[data-rel="popup"]', function( event ) {
-	var src = $(this).find('img').attr('src');
+	var src = "/photos/" + $(this).find('img').attr('data-src');
         $('#popup-photo').find('img').attr('src', src);
+        $('#popup-video').find('video').attr('src', src);
 });
 
 $(document).on( "click", '.b_photo_delete', function( event ) {
         var ul = $(this).parents('ul');
         var li = $(this).parents('li');
-	var src = li.find('img').attr('src');
+	var src = "/photos/" + li.find('img').attr('data-src');
 	if(confirm(BotMessages.DeletePhotoConfirm + src + " ?")) {
         	$.post(url=src, data={'cmd':'delete'}, success=function(data){
 			li.remove();
