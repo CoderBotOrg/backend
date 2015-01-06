@@ -40,6 +40,7 @@ class Camera(Thread):
     self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     #self._cam_off_img.save(self._streamer)
     self.recording = False
+    self.video_start_time = time.time() + 8640000
     self._run = True
     self._image_time = 0
     self._image_lock = Lock()
