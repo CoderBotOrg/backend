@@ -148,7 +148,8 @@ def handle_program_exec():
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
     print "program_end"
-    app.prog.end()
+    if app.prog:
+        app.prog.end()
     app.prog = None  
     return "ok"
 

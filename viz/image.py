@@ -8,6 +8,8 @@ r_from = np.float32([[0, 0], [160, 0], [160, 120], [0, 120]])
 r_dest   = np.float32([[0, -30], [160, -30], [95, 120], [65, 120]])
 
 class Image():
+    _face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    _kernel = np.ones((3,3),np.uint8)
 
     def __init__(self, array):
       self._data = array
@@ -15,26 +17,24 @@ class Image():
     def resize(self, width, heigth):
       return Image(cv2.resize(self._data, (width, heigth)))
 
-    def crop(self, x, y, x1, y1):
-      self._data = self._data[x:y, x1-x:y1-y]
+    def crop(self, x1, y1, x2, y2):
+      return Image(self._data[y1:y2,x1:x2])
 
     def warp(self, r_from, r_dest):
       tx = cv2.getPerspectiveTransform(r_from, r_dest)
       dest = cv2.warpPerspective(self._data, tx, (640,480))
       return Image(dest)
 
-    def transform(self, x, y):
+    @classmethod
+    def transform(cls, vector):
       tx = cv2.getPerspectiveTransform(r_from, r_dest)
-      v = np.array([[x, y]], dtype='float32')
+      v = np.array(vector, dtype='float32')
       v = np.array([v])
       dest = cv2.perspectiveTransform(v, tx)
-      print dest
-      dest = dest[0][0]
-      return dest[0], dest[1]
+      return dest[0]
 
     def find_faces(self):
-      face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-      faces = face_cascade.detectMultiScale(self._data)
+      faces = self._face_cascade.detectMultiScale(self._data)
       return faces
 
     def filter_color(self, color):
@@ -43,17 +43,39 @@ class Image():
       h = h * 180
       s = s * 255
       v = v * 255
-      print h, s, v
       #print str(image_hsv.shape)
       lower_color = np.array([h-10, s-80, v-80])
       upper_color = np.array([h+10, s+80, v+80])
       mask = cv2.inRange(image_hsv, lower_color, upper_color)
       return Image(mask)
 
+    def dilate(self):
+      data = cv2.dilate(self._datai, self._kernel)
+      return Image(data)
+
+    def erode(self):
+      data = cv2.erode(self._data, self._kernel)
+      return Image(data)
+  
+    def open(self):
+      data = cv2.morphologyEx(self._data, cv2.MORPH_OPEN, self._kernel)
+      return Image(data)
+  
+    def close(self):
+      data = cv2.morphologyEx(self._data, cv2.MORPH_CLOSE, self._kernel)
+      return Image(data)
+  
+    def grayscale(self):
+      data = cv2.cvtColor(self._data, cv2.cv.CV_BGR2GRAY)
+      return Image(data)
+
+    def invert(self):
+      data = cv2.bitwise_not(self._data)
+      return Image(data)
 
     def binarize(self):
       data = cv2.cvtColor(self._data, cv2.cv.CV_BGR2GRAY)
-      data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+      data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 5, 3)
       return Image(data)
 
     def find_blobs(self, minsize=0, maxsize=10000000):
@@ -62,10 +84,15 @@ class Image():
       for c in contours:
         area = cv2.contourArea(c)
         if area > minsize and area < maxsize:
-          blobs.append(blob.Blob(c))
+	  if len(blobs) and area > blobs[0].area:
+            blobs.insert(0, blob.Blob(c))
+          else:  
+	    blobs.append(blob.Blob(c))
+          
       return blobs
 
     def to_jpeg(self):
       ret, jpeg_array = cv2.imencode('.jpeg', self._data)
       return np.array(jpeg_array).tostring()
+
 

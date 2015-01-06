@@ -18,6 +18,7 @@ class Camera():
     self.camera = picamera.PiCamera()
     self.camera.resolution = (props.get('width', 640), props.get('height', 240))
     self.camera.framerate = 30
+    self.camera.exposure_mode = 'sports'
     self.out_jpeg = io.BytesIO()
     self.out_rgb = picamera.array.PiRGBArray(self.camera, size=(160,120))
     self.h264_encoder = None
@@ -58,8 +59,8 @@ class Camera():
     self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=40)
     camera_port_1, output_port_1 = self.camera._get_ports(True, 1)
     self.rgb_encoder = self.camera._get_image_encoder(camera_port_1, output_port_1, 'bgr', (160, 120))
-    print "g.1: " + str(ts - time.time())
-    ts = time.time()
+    #print "g.1: " + str(ts - time.time())
+    #ts = time.time()
 
     with self.camera._encoders_lock:
       self.camera._encoders[0] = self.jpeg_encoder
@@ -92,42 +93,31 @@ class Camera():
     self.rgb_encoder.close()
 
     print "g.5: " + str(ts - time.time())
-    ts = time.time()
 
   def grab_start(self):
     print "grab_start"
 
-    ts = time.time()
+    #ts = time.time()
     camera_port_0, output_port_0 = self.camera._get_ports(True, 0)
     self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=40)
     camera_port_1, output_port_1 = self.camera._get_ports(True, 1)
     self.rgb_encoder = self.camera._get_image_encoder(camera_port_1, output_port_1, 'bgr', (160, 120))
-
-    ts = time.time()
 
     with self.camera._encoders_lock:
       self.camera._encoders[0] = self.jpeg_encoder
       self.camera._encoders[1] = self.rgb_encoder
 
   def grab_one(self):
-    #print "grab_one"
-
     self.out_jpeg.seek(0)
     self.out_rgb.seek(0)
 
     self.jpeg_encoder.start(self.out_jpeg)
     self.rgb_encoder.start(self.out_rgb)
 
-    #print "g.3: " + str(ts - time.time())
-    #ts = time.time()
-
     if not self.jpeg_encoder.wait(10):
       raise picamera.PiCameraError('Timed out')
     if not self.rgb_encoder.wait(10):
       raise picamera.PiCameraError('Timed out')
-
-    #print "g.4: " + str(ts - time.time())
-    #ts = time.time()
 
   def grab_stop(self):
     print "grab_stop"
@@ -139,14 +129,33 @@ class Camera():
     self.jpeg_encoder.close()
     self.rgb_encoder.close()
 
-    print "g.5: " + str(ts - time.time())
-    ts = time.time()
-
   def get_image_jpeg(self):
     return self.out_jpeg.getvalue()
 
   def get_image_bgr(self):
     return self.out_rgb.array
+
+  def grab_jpeg(self):
+    ts = time.time()
+    self.out_jpeg.seek(0)
+
+    self.jpeg_encoder.start(self.out_jpeg)
+
+    if not self.jpeg_encoder.wait(10):
+      raise picamera.PiCameraError('Timed out')
+
+    #print time.time() - ts
+
+  def grab_bgr(self):
+    ts = time.time()
+    self.out_rgb.seek(0)
+
+    self.rgb_encoder.start(self.out_rgb)
+
+    if not self.rgb_encoder.wait(10):
+      raise picamera.PiCameraError('Timed out')
+   
+    #print time.time() - ts
     
   def close(self):
     self.camera.close()

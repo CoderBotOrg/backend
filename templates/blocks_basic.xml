@@ -10,6 +10,9 @@
           </block>
         </value>
       </block>
+      <block type="coderbot_camera_photoTake"></block>
+      <block type="coderbot_camera_videoRec"></block>
+      <block type="coderbot_camera_videoStop"></block>
       <block type="coderbot_repeat"></block>
         <value name="TIMES">
           <block type="math_number">

@@ -5,6 +5,7 @@ import json
 
 import coderbot
 import camera
+import motion
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -15,6 +16,9 @@ def get_cam():
 
 def get_bot():
   return coderbot.CoderBot.get_instance()
+
+def get_motion():
+  return motion.Motion.get_instance()
 
 def get_prog_eng():
   return ProgramEngine.get_instance()
@@ -113,12 +117,13 @@ class Program:
 
   def run(self):
     try:
-      print "run.1"
+      #print "run.1"
       bot = coderbot.CoderBot.get_instance()
       cam = camera.Camera.get_instance()
       program = self
       exec(self._code)
-      print "run.2"
+      get_cam().video_stop() #if video is running, stop it
+      #print "run.2"
     except RuntimeError as re:
       print "quit: " + str(re)
     self._running = False

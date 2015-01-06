@@ -72,8 +72,10 @@ class JpegStreamHandler(SimpleHTTPRequestHandler):
                         self.wfile.write("\r\n")
                         lasttimeserved = time.time()
                     except socket.error, e:
-                        return
-                    except IOError, e:
+			print "send_response socket.error: " + str(e)
+                        return    
+                    #except IOError, e:
+			print "send_response generic IOError: " + str(e)
                         return
                     count = count + 1
 

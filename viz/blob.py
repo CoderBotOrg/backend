@@ -28,3 +28,6 @@ class Blob():
     def area(self):
         return cv2.contourArea(self._contour)
 
+    @classmethod
+    def sort_distance(cls, point, blobs):
+      return sorted(blobs, key=lambda blob: (point[0] - blob.bottom))
