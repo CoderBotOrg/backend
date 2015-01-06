@@ -48,7 +48,7 @@ class Camera():
     self.h264_encoder.close()
 
     # pack in mp4 container
-    params = " -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
+    params = " -fps 30 -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
     os.system(self.FFMPEG_CMD + params)
     # remove h264 file
     os.remove(self.video_filename + self.VIDEO_FILE_EXT_H264)
@@ -156,6 +156,9 @@ class Camera():
       raise picamera.PiCameraError('Timed out')
    
     #print time.time() - ts
+
+  def set_overlay_text(self, text):
+    self.camera.annotate_text = text
     
   def close(self):
     self.camera.close()

@@ -25,7 +25,7 @@ class Camera(Thread):
   _warp_corners_1 = [(0, -120), (640, -120), (380, 480), (260, 480)]
   _warp_corners_2 = [(0, -60), (320, -60), (190, 240), (130, 240)]
   _warp_corners_4 = [(0, -30), (160, -30), (95, 120), (65, 120)]
-  stream_port = 8090
+  stream_port = 9080
 
   @classmethod
   def get_instance(cls):
@@ -82,6 +82,8 @@ class Camera(Thread):
     self._streamer.set_image(image_jpeg)
     self._image_time=time.time()
 
+  def set_text(self, text):
+    self._camera.set_overlay_text(text)
   def take_photo(self):
     last_photo_index = 0
     if len(self._photos):
@@ -225,7 +227,7 @@ class Camera(Thread):
     return angle
 
   def find_face(self):
-    print "face"
+    #print "face"
     faceX = None
     ts = time.time()
     self._image_lock.acquire()

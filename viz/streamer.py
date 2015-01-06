@@ -46,7 +46,7 @@ class JpegStreamHandler(SimpleHTTPRequestHandler):
 
         elif (self.path == "/stream"):
             self.send_response(200)
-            self.send_header("Connection", "close")
+            #self.send_header("Connection", "close")
             self.send_header("Max-Age", "0")
             self.send_header("Expires", "0")
             self.send_header("Cache-Control", "no-cache, private")
@@ -66,15 +66,15 @@ class JpegStreamHandler(SimpleHTTPRequestHandler):
                         self.send_header("Content-type", "image/jpeg")
                         self.send_header("Content-Length", str(len(_jpegstreamers[port].jpgdata)))
                         self.end_headers()
-                        _jpegstreamers[port]._lock.acquire()
+                        #_jpegstreamers[port]._lock.acquire()
                         self.wfile.write(_jpegstreamers[port].jpgdata)
-                        _jpegstreamers[port]._lock.release()
+                        #_jpegstreamers[port]._lock.release()
                         self.wfile.write("\r\n")
                         lasttimeserved = time.time()
                     except socket.error, e:
 			print "send_response socket.error: " + str(e)
                         return    
-                    #except IOError, e:
+                    except IOError, e:
 			print "send_response generic IOError: " + str(e)
                         return
                     count = count + 1
