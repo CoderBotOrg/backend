@@ -48,7 +48,8 @@ class Camera():
     self.h264_encoder.close()
 
     # pack in mp4 container
-    params = " -fps 30 -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
+    params = " -fps 12 -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
+    #avconv_params = " -r 30 -i "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + " -vcodec copy  " + self.video_filename + self.VIDEO_FILE_EXT
     os.system(self.FFMPEG_CMD + params)
     # remove h264 file
     os.remove(self.video_filename + self.VIDEO_FILE_EXT_H264)
