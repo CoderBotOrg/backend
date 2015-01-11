@@ -39,6 +39,7 @@ class Motion:
         self.target_angle = 0.0
 
     _motion = None
+
     @classmethod
     def get_instance(cls):
         if not cls._motion:

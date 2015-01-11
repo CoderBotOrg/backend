@@ -1,4 +1,6 @@
-function CoderBot() {
+function CoderBot(elemCounterId) {
+    this.element = elemCounterId
+    this.counter = 0;
 };
 
 CoderBot.prototype.command = function(cmd, param1, param2) {
@@ -9,24 +11,44 @@ CoderBot.prototype.command = function(cmd, param1, param2) {
 	$.ajax({url: this.url, data: data, async: true, type: "GET"});
 }
 
-CoderBot.prototype.forward = function(speed, elapse) {
-	this.command('forward', speed, elapse );
+CoderBot.prototype.counterInc = function() {
+    this.counter++;
+    $(this.element).html(this.counter);
 }
 
-CoderBot.prototype.left = function(speed, elapse) {
-	this.command('left', speed, elapse );
+CoderBot.prototype.counterDec = function() {
+    this.counter--;
+    $(this.element).html(this.counter);
 }
 
-CoderBot.prototype.right = function(speed, elapse) {
-	this.command('right', speed, elapse );
+CoderBot.prototype.counterReset = function() {
+    this.counter = 0;
+    $(this.element).html(this.counter);
 }
 
-CoderBot.prototype.backward = function(speed, elapse) {
-	this.command('backward', speed, elapse );
+CoderBot.prototype.move = function(speed, amount) {
+    if(CODERBOT_CTRL_MOVE_MOTION) {
+        this.command('move_motion', speed, amount );
+    } else {
+        this.command('move', speed, amount );
+    }
+    this.counterInc();
 }
+
+CoderBot.prototype.turn = function(speed, amount) {
+    if(CODERBOT_CTRL_MOVE_MOTION) {
+        this.command('turn_motion', speed, amount );
+    } else {
+        this.command('turn', speed, amount );
+    }
+    this.counterInc();
+}
+
 
 CoderBot.prototype.stop = function() {
-	this.command('stop', 0);
+	if(CODERBOT_CTRL_FW_ELAPSE < 0) {
+		this.command('stop', 0);
+        }
 }
 
 CoderBot.prototype.takePhoto = function() {

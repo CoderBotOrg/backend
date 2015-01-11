@@ -47,17 +47,23 @@ class CoderBot:
       cls.the_bot = CoderBot(servo)
     return cls.the_bot
 
-  def forward(self, speed=100, elapse=-1):
+  def move(self, speed=100, elapse=-1):
     self.motor_control(speed_left=speed, speed_right=speed, elapse=elapse)
 
+  def turn(self, speed=100, elapse=-1):
+    self.motor_control(speed_left=speed, speed_right=-speed, elapse=elapse)
+
+  def forward(self, speed=100, elapse=-1):
+    self.move(speed=speed, elapse=elapse)
+
   def backward(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=-speed, speed_right=-speed, elapse=elapse)
+    self.move(speed=-speed, elapse=elapse)
 
   def left(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=-speed, speed_right=speed, elapse=elapse)
+    self.turn(speed=-speed, elapse=elapse)
 
   def right(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=speed, speed_right= -speed, elapse=elapse)
+    self.turn(speed=speed, elapse=elapse)
 
   def servo3(self, speed):
     self._servo_control(PIN_SERVO_3, speed)

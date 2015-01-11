@@ -3,6 +3,7 @@ import json
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
+from motion import Motion
 from program import ProgramEngine, Program
 
 from flask import Flask, render_template, request, send_file, redirect
@@ -13,6 +14,7 @@ CONFIG_FILE = "coderbot.cfg"
 
 bot = None
 cam = None
+motion = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -50,14 +52,14 @@ def handle_bot():
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
 
-    if cmd == "forward":
-        bot.forward(speed=int(param1), elapse=float(param2))
-    elif cmd == "left":
-        bot.left(speed=int(param1), elapse=float(param2))
-    elif cmd == "right":
-        bot.right(speed=int(param1), elapse=float(param2))
-    elif cmd == "backward":
-        bot.backward(speed=int(param1), elapse=float(param2))
+    if cmd == "move":
+        bot.move(speed=int(param1), elapse=float(param2))
+    elif cmd == "turn":
+        bot.turn(speed=int(param1), elapse=float(param2))
+    elif cmd == "move_motion":
+        motion.move(dist=float(param2))
+    elif cmd == "turn_motion":
+        motion.backward(angle=float(param2))
     elif cmd == "stop":
         bot.stop()
     elif cmd == "take_photo":
@@ -176,10 +178,12 @@ def run_server():
   f = open(CONFIG_FILE, 'r')
   global bot
   global cam
+  global motion
   try:
     app.bot_config = json.load(f)
     bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"))
     cam = Camera.get_instance()
+    motion = Motion.get_instance()
   except ValueError as e:
     app.bot_config = {}
     print e

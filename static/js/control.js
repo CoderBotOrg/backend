@@ -1,4 +1,4 @@
-var bot = new CoderBot()
+var bot = new CoderBot('#b_counter');
 
 $(document).on( "pagecontainershow", function(){
     ScaleContentToDevice();
@@ -42,32 +42,34 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	if(Modernizr.touch){
        	        /* browser with either Touch Events of Pointer Events running on touch-capable device */	
 		$('#b_forward')
-	  	.on("touchstart", function (){bot.forward(100,-1);})
+	  	.on("touchstart", function (){bot.move(CODERBOT_CTRL_FW_SPEED,CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_backward')
-	  	.on("touchstart", function (){bot.backward(100,-1);})
+	  	.on("touchstart", function (){bot.move(CODERBOT_CTRL_FW_SPEED,-CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_left')
-	  	.on("touchstart", function (){bot.left(60,-1);})
+	  	.on("touchstart", function (){bot.turn(CODERBOT_CTRL_TR_SPEED,-CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_right')
-	  	.on("touchstart", function (){bot.right(60,-1);})
-	  	.on("touchend", function (){bot.stop();});
+	  	.on("touchstart", function (){bot.turn(CODERBOT_CTRL_TR_SPEED,CODERBOT_CTRL_TR_ELAPSE);})
+	  	.on("touchend", function (){ bot.stop();});
                 $('body').on("touchend", function (){bot.stop();});
+                $('#b_counter').on("touchend", function (){bot.reset();});
            } else {
 		$('#b_forward')
-          	.on("mousedown", function (){bot.forward(100, -1);})
+          	.on("mousedown", function (){bot.move(CODERBOT_CTRL_FW_SPEED, CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
 		$('#b_backward')
-          	.on("mousedown", function (){bot.backward(100, -1);})
+          	.on("mousedown", function (){bot.move(CODERBOT_CTRL_FW_SPEED, -CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
 		$('#b_left')
-	  	.on("mousedown", function (){bot.left(60,-1);})
+	  	.on("mousedown", function (){bot.turn(CODERBOT_CTRL_TR_SPEED,-CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
 		$('#b_right')
-          	.on("mousedown", function (){bot.right(60, -1);})
+          	.on("mousedown", function (){bot.turn(CODERBOT_CTRL_TR_SPEED, CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
                 $('body').on("mouseup", function (){bot.stop();});
+                $('#b_counter').on("click", function (){bot.reset();});
 	}
 	$('#b_say').on("click", function (){
 		var text = window.prompt(BotMessages.Input);
