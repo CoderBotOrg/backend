@@ -167,10 +167,16 @@ class Motion:
         
         vectors_t = vectors_t[:min(len(vectors_t), 20)] #max 10 keypoints
 
+        #avg_delta_x_t = 0.0
         if len(vectors_t) > 0:
             vectors_t = image.Image.transform(vectors_t)
             for v in vectors_t.reshape(-1, 2, 2):
                 avg_delta_y += (v[1][1] - v[0][1])
+                #avg_delta_x_t += v[1][0] - v[0][0]
+            #avg_delta_x_t = avg_delta_x_t / (vectors_t.shape[0] / 2)
+            #for v in vectors_t.reshape(-1, 2, 2):
+                #if abs(v[1][0] - v[0][0] - avg_delta_x_t) > 2:
+                    #print "this is an obstacle: ", str(v[1]), " delta_x: ", v[1][0] - v[0][0] 
         
         if count > 0:        
             avg_delta_x = (avg_delta_x / count)
@@ -178,40 +184,11 @@ class Motion:
         
             self.delta_angle -= (avg_delta_x * PI_CAM_FOV_H_DEG ) / IMAGE_WIDTH
             self.delta_dist += (avg_delta_y * PI_CAM_FOV_V_CM) / IMAGE_HEIGHT
-            print "count: ", count, "delta_a: ", self.delta_angle, " avg_delta_x: ", avg_delta_x, " delta_y: ", self.delta_dist, " avg_delta_y: ", avg_delta_y
+            #print "count: ", count, "delta_a: ", self.delta_angle, " avg_delta_x: ", avg_delta_x, " delta_y: ", self.delta_dist, " avg_delta_y: ", avg_delta_y
 
         #cv2.line(self.vis, (int(80+deltaAngle),20), (80,20), (0, 0, 255))
         #cv2.putText(self.vis, "delta: " + str(int((self.deltaAngle*53.0)/160.0)) + " avg_delta: " + str(int(((avg_delta_x*53.0)/160.0))), (0,20), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255))
         return self.delta_angle, self.delta_dist
-
-    def calc_drift(self):
-	trs = sorted(self.tracks, key=lambda tr: abs(tr[0][0]-80))
-        #most centered
-	ct = trs[0]
-        track_points_max = 10
-	deltaX = (ct[0][0]-ct[min(len(ct)-1,track_points_max)][0])
-        deltaAngle = deltaX * 53.0 / 160.0 
-	#cv2.line(self.vis, (int(80+deltaX),10), (80,10), (255, 255, 0))
-        return deltaAngle
-
-    def calc_rotation(self):
-	vectors = self.tracks
-        def dist(p1, p2):
-            return p2[0]-p1[0]
-            #return math.sqrt(math.pow(p2[0]-p1[0],2)+math.pow(p2[1]-p1[1],2))
-
-        avg_delta_x = 0.0
-	for vect in vectors:
-            if len(vect) > 1:
-                avg_delta_x += dist(vect[-1], vect[-2])
-	avg_delta_x = (avg_delta_x / len(vectors))
-
- 	self.delta_angle += (avg_delta_x * PI_CAM_FOV_H_DEG ) / IMAGE_WIDTH
-
-	print "delta: ", str(self.delta_angle), " avg_delta: ", str(avg_delta_x)
-	#cv2.line(self.vis, (int(80+deltaAngle),20), (80,20), (0, 0, 255))
-        #cv2.putText(self.vis, "delta: " + str(int((self.deltaAngle*53.0)/160.0)) + " avg_delta: " + str(int(((avg_delta_x*53.0)/160.0))), (0,20), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255))
-        return self.delta_angle
 
     def bot_turn(self, target_angle, delta_angle):
         power_angles = [[15, (80, -1)], [4, (100, 0.05)], [1, (100,0.02)], [0, (0, 0)]]
@@ -228,13 +205,13 @@ class Motion:
         return done
     
     def bot_move(self, target_dist, delta_dist, delta_angle):
+        base_power = 100 * (target_dist/abs(target_dist))
+        print "base power", base_power
         self.delta_power += (delta_angle * 0.01)
         print( "delta power: ", self.delta_power)
-        if delta_dist < target_dist:
-            self.bot.motor_control(min(max(100-self.delta_power,0),100), min(max(100+self.delta_power,0),100), -1)
+        if abs(delta_dist) < abs(target_dist):
+            self.bot.motor_control(min(max(base_power-self.delta_power,-100),100), min(max(base_power+self.delta_power,-100),100), -1)
         else:
             self.bot.stop()
-        return delta_dist >= target_dist
-        
-        return done
+        return abs(delta_dist) >= abs(target_dist)
 

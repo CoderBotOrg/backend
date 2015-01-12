@@ -23,11 +23,11 @@
      <legend>{% trans %}Control mode{% endtrans %}</legend>
      <label for="i_ctrl_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
      <input type="text" id="i_ctrl_fw_speed" name="ctrl_fw_speed" value="{{config.ctrl_fw_speed}}">
-     <label for="i_ctrl_fw_elapse">{% trans %}Forward elapse{% endtrans %}</label>
+     <label for="i_ctrl_fw_elapse">{% trans %}Forward elapse / distance{% endtrans %}</label>
      <input type="text" id="i_ctrl_fw_elapse" name="ctrl_fw_elapse" value="{{config.ctrl_fw_elapse}}">
      <label for="i_ctrl_tr_speed">{% trans %}Turn speed{% endtrans %}</label>
      <input type="text" id="i_ctrl_tr_speed" name="ctrl_tr_speed" value="{{config.ctrl_tr_speed}}">
-     <label for="i_ctrl_tr_elapse">{% trans %}Turn elapse{% endtrans %}</label>
+     <label for="i_ctrl_tr_elapse">{% trans %}Turn elapse / angle{% endtrans %}</label>
      <input type="text" id="i_ctrl_tr_elapse" name="ctrl_tr_elapse" value="{{config.ctrl_tr_elapse}}">
      <label for="i_ctrl_counter">{% trans %}Control counter{% endtrans %}</label>
      <input type="checkbox" data-role="flipswitch" id="i_ctrl_counter" name="ctrl_counter" value="yes"{%if config.ctrl_counter%} checked{%endif%}>

@@ -28,7 +28,7 @@ CoderBot.prototype.counterReset = function() {
 
 CoderBot.prototype.move = function(speed, amount) {
     if(CODERBOT_CTRL_MOVE_MOTION) {
-        this.command('move_motion', speed, amount );
+        this.command('move_motion', Math.abs(speed), Math.sign(speed) * amount );
     } else {
         this.command('move', speed, amount );
     }
@@ -37,7 +37,7 @@ CoderBot.prototype.move = function(speed, amount) {
 
 CoderBot.prototype.turn = function(speed, amount) {
     if(CODERBOT_CTRL_MOVE_MOTION) {
-        this.command('turn_motion', speed, amount );
+        this.command('turn_motion', Math.abs(speed), Math.sign(speed) * amount );
     } else {
         this.command('turn', speed, amount );
     }

@@ -45,31 +45,31 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	  	.on("touchstart", function (){bot.move(CODERBOT_CTRL_FW_SPEED,CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_backward')
-	  	.on("touchstart", function (){bot.move(CODERBOT_CTRL_FW_SPEED,-CODERBOT_CTRL_FW_ELAPSE);})
+	  	.on("touchstart", function (){bot.move(0-CODERBOT_CTRL_FW_SPEED,CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_left')
-	  	.on("touchstart", function (){bot.turn(CODERBOT_CTRL_TR_SPEED,-CODERBOT_CTRL_TR_ELAPSE);})
+	  	.on("touchstart", function (){bot.turn(0-CODERBOT_CTRL_TR_SPEED,CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("touchend", function (){bot.stop();});
 		$('#b_right')
 	  	.on("touchstart", function (){bot.turn(CODERBOT_CTRL_TR_SPEED,CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("touchend", function (){ bot.stop();});
                 $('body').on("touchend", function (){bot.stop();});
-                $('#b_counter').on("touchend", function (){bot.reset();});
+                $('#b_counter').on("touchend", function (){if(confirm(BotMessages.CounterReset)) bot.counterReset();});
            } else {
 		$('#b_forward')
           	.on("mousedown", function (){bot.move(CODERBOT_CTRL_FW_SPEED, CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
 		$('#b_backward')
-          	.on("mousedown", function (){bot.move(CODERBOT_CTRL_FW_SPEED, -CODERBOT_CTRL_FW_ELAPSE);})
+          	.on("mousedown", function (){bot.move(0-CODERBOT_CTRL_FW_SPEED, CODERBOT_CTRL_FW_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
 		$('#b_left')
-	  	.on("mousedown", function (){bot.turn(CODERBOT_CTRL_TR_SPEED,-CODERBOT_CTRL_TR_ELAPSE);})
+	  	.on("mousedown", function (){bot.turn(0-CODERBOT_CTRL_TR_SPEED,CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
 		$('#b_right')
           	.on("mousedown", function (){bot.turn(CODERBOT_CTRL_TR_SPEED, CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
                 $('body').on("mouseup", function (){bot.stop();});
-                $('#b_counter').on("click", function (){bot.reset();});
+                $('#b_counter').on("click", function (){if(confirm(BotMessages.CounterReset)) bot.counterReset();});
 	}
 	$('#b_say').on("click", function (){
 		var text = window.prompt(BotMessages.Input);

@@ -59,7 +59,7 @@ def handle_bot():
     elif cmd == "move_motion":
         motion.move(dist=float(param2))
     elif cmd == "turn_motion":
-        motion.backward(angle=float(param2))
+        motion.turn(angle=float(param2))
     elif cmd == "stop":
         bot.stop()
     elif cmd == "take_photo":
