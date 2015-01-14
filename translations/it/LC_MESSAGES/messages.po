@@ -124,7 +124,7 @@ msgstr "Avanti"
 
 #: templates/config.html:26
 msgid "Forward elapse / distance"
-msgstr "Durata avanti"
+msgstr "Durata / distanza avanti"
 
 #: templates/config.html:28 templates/config.html:64
 msgid "Turn speed"
@@ -132,7 +132,7 @@ msgstr "Velocità di rotazione"
 
 #: templates/config.html:30
 msgid "Turn elapse / angle"
-msgstr "Tempo di rotazione"
+msgstr "Tempo / angolo di rotazione"
 
 #: templates/config.html:32
 msgid "Control counter"
