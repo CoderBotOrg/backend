@@ -1,14 +1,14 @@
 # Italian translations for PROJECT.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-11-02 15:03+0000\n"
-"PO-Revision-Date: 2014-06-13 20:19+0000\n"
+"POT-Creation-Date: 2015-01-14 21:42+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
+# Translations template for PROJECT.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #: templates/blocks_adv.xml:2 templates/blocks_std.xml:13
 msgid "Logic"
 msgstr "Logica"
@@ -35,7 +39,6 @@ msgstr "Testo"
 
 #: templates/blocks_adv.xml:96 templates/blocks_adv.xml:103
 #: templates/blocks_adv.xml:110
-#, fuzzy
 msgid "text"
 msgstr "Testo"
 
@@ -61,20 +64,25 @@ msgid "Functions"
 msgstr "Funzioni"
 
 #: templates/blocks_adv.xml:172 templates/blocks_std.xml:43
-#: templates/config.html:14
+#: templates/config.html:15
 msgid "Movement"
 msgstr "Movimento"
 
-#: templates/blocks_adv.xml:223 templates/blocks_std.xml:69
-#: templates/config.html:13 templates/config.html:40
+#: templates/blocks_adv.xml:229
+msgid "Camera"
+msgstr "Camera"
+
+#: templates/blocks_adv.xml:234 templates/blocks_std.xml:69
+#: templates/config.html:14 templates/config.html:55
 msgid "Sensor"
 msgstr "Sensore"
 
-#: templates/blocks_adv.xml:237 templates/blocks_std.xml:83
+#: templates/blocks_adv.xml:248 templates/blocks_std.xml:83
 msgid "Sound"
 msgstr "Suono"
 
-#: templates/blocks_std.xml:2 templates/control.html:8 templates/program.html:8
+#: templates/blocks_std.xml:2 templates/config.html:11 templates/control.html:8
+#: templates/program.html:8
 msgid "Control"
 msgstr "Controllo"
 
@@ -82,142 +90,157 @@ msgstr "Controllo"
 msgid "Procedures"
 msgstr "Procedure"
 
-#: templates/config.html:3 templates/control.html:52
+#: templates/config.html:3 templates/control.html:55
 msgid "Back"
 msgstr "Indietro"
 
-#: templates/config.html:11
+#: templates/config.html:12
 msgid "Programming"
 msgstr "Programmazione"
 
-#: templates/config.html:12
+#: templates/config.html:13
 msgid "Sounds"
 msgstr "Suoni"
 
-#: templates/config.html:15
+#: templates/config.html:16
 msgid "Start"
 msgstr "Avvio"
 
-#: templates/config.html:16
+#: templates/config.html:17
 msgid "Button"
 msgstr "Bottone"
 
-#: templates/config.html:17 templates/config.html:69
+#: templates/config.html:18 templates/config.html:84
 msgid "User Interface"
 msgstr "Interfaccia utente"
 
-#: templates/config.html:22
-msgid "Editor level"
-msgstr "Livello editor"
-
-#: templates/config.html:24
-msgid "Basic"
-msgstr "Base"
-
-#: templates/config.html:26
-msgid "Standard"
-msgstr "Normale"
-
-#: templates/config.html:28
-msgid "Advanced"
-msgstr "Avanzato"
-
-#: templates/config.html:32
-msgid "Start sound"
-msgstr "Suono avvio"
-
-#: templates/config.html:34
-msgid "Stop sound"
-msgstr "Suono stop"
-
-#: templates/config.html:36
-#, fuzzy
-msgid "Shutter sound"
-msgstr "Suono avvio"
-
-#: templates/config.html:43
-msgid "Motor control mode"
+#: templates/config.html:23
+msgid "Control mode"
 msgstr "Tipo di motori (dc | servo)"
 
-#: templates/config.html:45
-#, fuzzy
+#: templates/config.html:24 templates/config.html:60
 msgid "Forward speed"
 msgstr "Avanti"
 
-#: templates/config.html:47
-msgid "Forward elapse"
+#: templates/config.html:26
+msgid "Forward elapse / distance"
 msgstr "Durata avanti"
 
-#: templates/config.html:49
+#: templates/config.html:28 templates/config.html:64
 msgid "Turn speed"
 msgstr "Velocità di rotazione"
 
+#: templates/config.html:30
+msgid "Turn elapse / angle"
+msgstr "Tempo di rotazione"
+
+#: templates/config.html:32
+msgid "Control counter"
+msgstr "Tipo di motori (dc | servo)"
+
+#: templates/config.html:37
+msgid "Editor level"
+msgstr "Livello editor"
+
+#: templates/config.html:39
+msgid "Basic"
+msgstr "Base"
+
+#: templates/config.html:41
+msgid "Standard"
+msgstr "Normale"
+
+#: templates/config.html:43
+msgid "Advanced"
+msgstr "Avanzato"
+
+#: templates/config.html:47
+msgid "Start sound"
+msgstr "Suono avvio"
+
+#: templates/config.html:49
+msgid "Stop sound"
+msgstr "Suono stop"
+
 #: templates/config.html:51
+msgid "Shutter sound"
+msgstr "Suono avvio"
+
+#: templates/config.html:58
+msgid "Motor control mode"
+msgstr "Tipo di motori (dc | servo)"
+
+#: templates/config.html:62
+msgid "Forward elapse"
+msgstr "Durata avanti"
+
+#: templates/config.html:66
 msgid "Turn elapse"
 msgstr "Tempo di rotazione"
 
-#: templates/config.html:55
+#: templates/config.html:70
 msgid "Load at start"
 msgstr "Carica all'avvio"
 
-#: templates/config.html:60
+#: templates/config.html:75
 msgid "Button function"
 msgstr "Funzione del bottone"
 
-#: templates/config.html:61
+#: templates/config.html:76
 msgid "None"
 msgstr "Nessuno"
 
-#: templates/config.html:63
+#: templates/config.html:78
 msgid "Start/Stop current program"
 msgstr "Avvia/Ferma il programma caricato"
 
-#: templates/config.html:70
+#: templates/config.html:85
 msgid "Show Control page"
 msgstr "Mostra pagina Controllo"
 
-#: templates/config.html:72
-#, fuzzy
+#: templates/config.html:87
 msgid "Show Program page"
 msgstr "Nome programma"
 
-#: templates/config.html:74
+#: templates/config.html:89
 msgid "Show Preferences button"
 msgstr "Mostra bottone Preferenze"
 
-#: templates/config.html:79
+#: templates/config.html:94
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/config.html:80 templates/program.html:17
+#: templates/config.html:95 templates/program.html:17
 msgid "Save"
 msgstr "Salva"
 
-#: templates/config_params.html:10
+#: templates/config_params.html:16
 msgid "Say what:"
 msgstr "Frase:"
 
-#: templates/config_params.html:11
-#, fuzzy
+#: templates/config_params.html:17
 msgid "Saved"
 msgstr "Salvato"
 
-#: templates/config_params.html:12
-#, fuzzy
+#: templates/config_params.html:18
 msgid "Program saved"
 msgstr "Nome programma"
 
-#: templates/config_params.html:13
+#: templates/config_params.html:19
 msgid "Program name already in use, overwrite?"
 msgstr "Esiste già un programma con questo nome, sovrascriverlo?"
 
-#: templates/config_params.html:14
+#: templates/config_params.html:20
 msgid "Delete"
 msgstr "Cancella"
 
-#: templates/config_params.html:15
+#: templates/config_params.html:21
 msgid "Delete photo"
 msgstr "Cancellare la foto"
+
+#: templates/config_params.html:22
+msgid "Reset move counter?"
+msgstr "Azzera contatore mosse?"
 
 #: templates/control.html:5 templates/program.html:5
 msgid "Preferences"
@@ -227,35 +250,35 @@ msgstr "Preferenze"
 msgid "Program"
 msgstr "Programma"
 
-#: templates/control.html:15
+#: templates/control.html:18
 msgid "Halt"
 msgstr "Stop"
 
-#: templates/control.html:20
+#: templates/control.html:23
 msgid "Forward"
 msgstr "Avanti"
 
-#: templates/control.html:23
+#: templates/control.html:26
 msgid "Left"
 msgstr "Sinistra"
 
-#: templates/control.html:24
+#: templates/control.html:27
 msgid "Right"
 msgstr "Destra"
 
-#: templates/control.html:27
+#: templates/control.html:30
 msgid "Backward"
 msgstr "Indietro"
 
-#: templates/control.html:35
+#: templates/control.html:38
 msgid "Say"
 msgstr "Parla"
 
-#: templates/control.html:40
+#: templates/control.html:43
 msgid "Photo"
 msgstr "Foto"
 
-#: templates/control.html:43
+#: templates/control.html:46
 msgid "Photos"
 msgstr "Album"
 
@@ -301,12 +324,10 @@ msgid "Create"
 msgstr "Crea"
 
 #: templates/program.html:48
-#, fuzzy
 msgid "Save Program As"
 msgstr "Nuovo programma"
 
 #: templates/program.html:56
 msgid "Load Program"
 msgstr "Carica programma"
-
 
