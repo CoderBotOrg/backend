@@ -19,8 +19,11 @@
      </ul>
     </div>
     <div id="t_control" class="ui-body-d ui-content">
-     <input type="checkbox" data-role="flipswitch" id="i_ctrl_move_mode" name="ctrl_move_motion" value="yes"{%if config.ctrl_move_motion%} checked{%endif%}>
-     <legend>{% trans %}Control mode{% endtrans %}</legend>
+     <div class="ui-field-contain">
+      <label for="i_ctrl_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_ctrl_move_mode" name="ctrl_move_motion" value="yes"{%if config.ctrl_move_motion%} checked{%endif%}>
+     </div>
+     <legend>{% trans %}Step timing | distance / angle{% endtrans %}</legend>
      <label for="i_ctrl_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
      <input type="text" id="i_ctrl_fw_speed" name="ctrl_fw_speed" value="{{config.ctrl_fw_speed}}">
      <label for="i_ctrl_fw_elapse">{% trans %}Forward elapse / distance{% endtrans %}</label>
@@ -29,8 +32,10 @@
      <input type="text" id="i_ctrl_tr_speed" name="ctrl_tr_speed" value="{{config.ctrl_tr_speed}}">
      <label for="i_ctrl_tr_elapse">{% trans %}Turn elapse / angle{% endtrans %}</label>
      <input type="text" id="i_ctrl_tr_elapse" name="ctrl_tr_elapse" value="{{config.ctrl_tr_elapse}}">
-     <label for="i_ctrl_counter">{% trans %}Control counter{% endtrans %}</label>
-     <input type="checkbox" data-role="flipswitch" id="i_ctrl_counter" name="ctrl_counter" value="yes"{%if config.ctrl_counter%} checked{%endif%}>
+     <div class="ui-field-contain">
+      <label for="i_ctrl_counter">{% trans %}Show control counter{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_ctrl_counter" name="ctrl_counter" value="yes"{%if config.ctrl_counter%} checked{%endif%}>
+     </div>
     </div>
     <div id="t_programming" class="ui-body-d ui-content">
      <fieldset data-role="controlgroup" data-mini="true">

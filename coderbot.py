@@ -98,14 +98,13 @@ class CoderBot:
   def _servo_motor(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
     speed_left = -speed_left
-    speed_right = ((speed_right + 100) * 50 / 200) + 50
 
     self.pi.write(PIN_MOTOR_ENABLE, 1)
-    self.pi.write(PIN_RIGHT_FORWARD, 0)
-    self.pi.write(PIN_LEFT_FORWARD, 0)
+    self.pi.write(PIN_RIGHT_BACKWARD, 0)
+    self.pi.write(PIN_LEFT_BACKWARD, 0)
 
-    self._servo_control(PIN_LEFT_BACKWARD, speed_left)
-    self._servo_control(PIN_RIGHT_BACKWARD, speed_right)
+    self._servo_control(PIN_LEFT_FORWARD, speed_left)
+    self._servo_control(PIN_RIGHT_FORWARD, speed_right)
     if elapse > 0:
       time.sleep(elapse)
       self.stop()
