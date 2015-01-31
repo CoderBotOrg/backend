@@ -3,9 +3,12 @@
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
+#, fuzzy
+msgid ""
+msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-14 21:31+0000\n"
+"POT-Creation-Date: 2015-01-31 10:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +69,7 @@ msgid "Camera"
 msgstr ""
 
 #: templates/blocks_adv.xml:234 templates/blocks_std.xml:69
-#: templates/config.html:14 templates/config.html:55
+#: templates/config.html:14 templates/config.html:60
 msgid "Sensor"
 msgstr ""
 
@@ -103,107 +106,111 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: templates/config.html:18 templates/config.html:84
+#: templates/config.html:18 templates/config.html:89
 msgid "User Interface"
 msgstr ""
 
 #: templates/config.html:23
-msgid "Control mode"
-msgstr ""
-
-#: templates/config.html:24 templates/config.html:60
-msgid "Forward speed"
+msgid "Movement assisted by vision"
 msgstr ""
 
 #: templates/config.html:26
+msgid "Step timing | distance / angle"
+msgstr ""
+
+#: templates/config.html:27 templates/config.html:65
+msgid "Forward speed"
+msgstr ""
+
+#: templates/config.html:29
 msgid "Forward elapse / distance"
 msgstr ""
 
-#: templates/config.html:28 templates/config.html:64
+#: templates/config.html:31 templates/config.html:69
 msgid "Turn speed"
 msgstr ""
 
-#: templates/config.html:30
+#: templates/config.html:33
 msgid "Turn elapse / angle"
 msgstr ""
 
-#: templates/config.html:32
-msgid "Control counter"
+#: templates/config.html:36
+msgid "Show control counter"
 msgstr ""
 
-#: templates/config.html:37
+#: templates/config.html:42
 msgid "Editor level"
 msgstr ""
 
-#: templates/config.html:39
+#: templates/config.html:44
 msgid "Basic"
 msgstr ""
 
-#: templates/config.html:41
+#: templates/config.html:46
 msgid "Standard"
 msgstr ""
 
-#: templates/config.html:43
+#: templates/config.html:48
 msgid "Advanced"
 msgstr ""
 
-#: templates/config.html:47
+#: templates/config.html:52
 msgid "Start sound"
 msgstr ""
 
-#: templates/config.html:49
+#: templates/config.html:54
 msgid "Stop sound"
 msgstr ""
 
-#: templates/config.html:51
+#: templates/config.html:56
 msgid "Shutter sound"
 msgstr ""
 
-#: templates/config.html:58
+#: templates/config.html:63
 msgid "Motor control mode"
 msgstr ""
 
-#: templates/config.html:62
+#: templates/config.html:67
 msgid "Forward elapse"
 msgstr ""
 
-#: templates/config.html:66
+#: templates/config.html:71
 msgid "Turn elapse"
 msgstr ""
 
-#: templates/config.html:70
+#: templates/config.html:75
 msgid "Load at start"
 msgstr ""
 
-#: templates/config.html:75
+#: templates/config.html:80
 msgid "Button function"
 msgstr ""
 
-#: templates/config.html:76
+#: templates/config.html:81
 msgid "None"
 msgstr ""
 
-#: templates/config.html:78
+#: templates/config.html:83
 msgid "Start/Stop current program"
 msgstr ""
 
-#: templates/config.html:85
+#: templates/config.html:90
 msgid "Show Control page"
 msgstr ""
 
-#: templates/config.html:87
+#: templates/config.html:92
 msgid "Show Program page"
 msgstr ""
 
-#: templates/config.html:89
+#: templates/config.html:94
 msgid "Show Preferences button"
 msgstr ""
 
-#: templates/config.html:94
+#: templates/config.html:99
 msgid "Cancel"
 msgstr ""
 
-#: templates/config.html:95 templates/program.html:17
+#: templates/config.html:100 templates/program.html:17
 msgid "Save"
 msgstr ""
 
@@ -241,6 +248,10 @@ msgstr ""
 
 #: templates/control.html:9 templates/program.html:9
 msgid "Program"
+msgstr ""
+
+#: templates/control.html:14
+msgid "Move counter"
 msgstr ""
 
 #: templates/control.html:18
