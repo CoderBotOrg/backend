@@ -240,7 +240,7 @@ class Camera(Thread):
       #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
       #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
       #img.drawRectangle(dw_x, dw_y, obstacle.width(), obstacle.height(), color=(255,0,0))
-      x, y = img.transform(obstacle.center[0], obstacle.bottom)
+      x, y = img.transform((obstacle.center[0], obstacle.bottom))
       coordY = 60 - ((y * 48) / 100) 
       print "coordY: " + str(coordY)
       #print obstacle.coordinates()[1]+(obstacle.height()/2)
@@ -278,8 +278,10 @@ class Camera(Thread):
       obj = objects[-1]
       bottom = obj.bottom
       print "bottom: ", obj.center[0], obj.bottom
-      x, y = bw.transform(obj.center[0], obj.bottom)
-      print "coordinates: ", x, y
+      coords = bw.transform([(obj.center[0], obj.bottom)])
+      print "coordinates: ", coords
+      x = coords[0][0]
+      y = coords[0][1]
       #print "height: " + str(object.height())
       dist = math.sqrt(math.pow(12 + (68 * (120 - y) / 100),2) + (math.pow((x-80)*60/160,2)))
       angle = math.atan2(x - 80, 120 - y) * 180 / math.pi

@@ -29,6 +29,7 @@ function ScaleContentToDevice(){
     }
 
     $(".ui-content-stream").height(contentHeight);
+    $(".ui-content-hud").height(contentHeight);
 }
 
 
@@ -75,7 +76,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 		var text = window.prompt(BotMessages.Input);
                 bot.say(text);
 	});
-	$('#b_photo').on("click", function (){
+	$('#b_camera').on("click", function (){
                 bot.takePhoto();
 	});
 	$('#b_video_rec').on("click", function (){
