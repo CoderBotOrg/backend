@@ -36,6 +36,8 @@
       <label for="i_ctrl_counter">{% trans %}Show control counter{% endtrans %}</label>
       <input type="checkbox" data-role="flipswitch" id="i_ctrl_counter" name="ctrl_counter" value="yes"{%if config.ctrl_counter%} checked{%endif%}>
      </div>
+     <label for="i_ctrl_hud_image">{% trans %}HUD image name{% endtrans %}</label>
+     <input type="text" id="i_ctrl_hud_image" name="ctrl_hud_image" value="{{config.ctrl_hud_image}}">
     </div>
     <div id="t_programming" class="ui-body-d ui-content">
      <fieldset data-role="controlgroup" data-mini="true">

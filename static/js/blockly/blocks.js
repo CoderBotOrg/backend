@@ -76,6 +76,13 @@ Blockly.Python['coderbot_repeat'] = function(block) {
   return code;
 };
 
+Blockly.Python['text_print'] = function(block) {
+  // Print statement.
+  var argument0 = Blockly.Python.valueToCode(block, 'TEXT',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  return 'get_cam().set_text(' + argument0 + ')\n';
+};
+
 
 Blockly.Blocks['coderbot_moveForward'] = {
   // Block for moving forward.

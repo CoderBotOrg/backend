@@ -65,11 +65,11 @@ class CoderBot:
   def right(self, speed=100, elapse=-1):
     self.turn(speed=speed, elapse=elapse)
 
-  def servo3(self, speed):
-    self._servo_control(PIN_SERVO_3, speed)
+  def servo3(self, angle):
+    self._servo_control(PIN_SERVO_3, angle)
 
-  def servo4(self, speed):
-    self._servo_control(PIN_SERVO_4, speed)
+  def servo4(self, angle):
+    self._servo_control(PIN_SERVO_4, angle)
 
   def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
@@ -103,20 +103,27 @@ class CoderBot:
     self.pi.write(PIN_RIGHT_BACKWARD, 0)
     self.pi.write(PIN_LEFT_BACKWARD, 0)
 
-    self._servo_control(PIN_LEFT_FORWARD, speed_left)
-    self._servo_control(PIN_RIGHT_FORWARD, speed_right)
+    self._servo_motor_control(PIN_LEFT_FORWARD, speed_left)
+    self._servo_motor_control(PIN_RIGHT_FORWARD, speed_right)
     if elapse > 0:
       time.sleep(elapse)
       self.stop()
 
 
-  def _servo_control(self, pin, speed):
+  def _servo_motor_control(self, pin, speed):
     self._is_moving = True
     speed = ((speed + 100) * 50 / 200) + 50
 
     self.pi.set_PWM_range(pin, 1000)
     self.pi.set_PWM_frequency(pin, 50)
     self.pi.set_PWM_dutycycle(pin, speed)
+
+  def _servo_control(self, pin, angle):
+    duty = ((angle + 90) * 100 / 180) + 25
+
+    self.pi.set_PWM_range(pin, 1000)
+    self.pi.set_PWM_frequency(pin, 50)
+    self.pi.set_PWM_dutycycle(pin, duty)
 
   def stop(self):
     for pin in self._pin_out:
