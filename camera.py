@@ -85,7 +85,7 @@ class Camera(Thread):
   def set_text(self, text):
     self._camera.set_overlay_text(text)
 
-  def take_photo(self):
+  def photo_take(self):
     last_photo_index = 0
     if len(self._photos):
       last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
