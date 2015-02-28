@@ -139,6 +139,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
     }
 
     function runProg() {
+
       var bot = new CoderBot();
       // Generate JavaScript code and run it.
       window.LoopTrap = 1000;
@@ -165,9 +166,11 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       $.ajax({url: '/program/status', dataType: "json", type: "GET", success:function(data) {
         console.log(data.running);
         if(!data.running) {
-          $('#b_end_prog_d').text('Close');
-          $('#i_dialog_running_title').text('CoderBot stopped');
+          $('#b_end_prog_d').text(BotMessages.ProgramDialogClose);
+          $('#i_dialog_running_title').text('CoderBot ' + BotMessages.ProgramStatusStop);
         } else {
+          $('#b_end_prog_d').text(BotMessages.ProgramDialogStop);
+          $('#i_dialog_running_title').text('CoderBot ' + BotMessages.ProgramStatusRunning);
           setTimeout(statusProg, 1000);
         }  
       }});
