@@ -29,7 +29,7 @@ function ScaleContentToDevice(){
     }
 
     $(".ui-content-stream").height(contentHeight);
-    $(".ui-content-hud").height(contentHeight);
+    //$(".ui-content-hud").height(contentHeight);
 }
 
 
