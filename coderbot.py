@@ -8,6 +8,8 @@ PIN_LEFT_BACKWARD = 24
 PIN_RIGHT_FORWARD = 4
 PIN_RIGHT_BACKWARD = 17
 PIN_PUSHBUTTON = 18
+PIN_SERVO_3 = 9
+PIN_SERVO_4 = 10
 
 PWM_FREQUENCY = 100 #Hz
 PWM_RANGE = 100 #0-100
@@ -16,7 +18,7 @@ def coderbot_callback(gpio, level, tick):
   return CoderBot.get_instance().callback(gpio, level, tick)
 
 class CoderBot:
-  _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD]
+  _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
 
   def __init__(self, servo=False):
     self.pi = pigpio.pi('localhost')
@@ -26,9 +28,9 @@ class CoderBot:
     self._cb_elapse = dict()
     self._servo = servo
     if self._servo:
-      self.motor_control = self._servo_control    
+      self.motor_control = self._servo_motor
     else:
-      self.motor_control = self._motor_control
+      self.motor_control = self._dc_motor
     cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, coderbot_callback)
     for pin in self._pin_out:
       self.pi.set_PWM_frequency(pin, PWM_FREQUENCY)
@@ -45,19 +47,31 @@ class CoderBot:
       cls.the_bot = CoderBot(servo)
     return cls.the_bot
 
-  def forward(self, speed=100, elapse=-1):
+  def move(self, speed=100, elapse=-1):
     self.motor_control(speed_left=speed, speed_right=speed, elapse=elapse)
 
+  def turn(self, speed=100, elapse=-1):
+    self.motor_control(speed_left=speed, speed_right=-speed, elapse=elapse)
+
+  def forward(self, speed=100, elapse=-1):
+    self.move(speed=speed, elapse=elapse)
+
   def backward(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=-speed, speed_right=-speed, elapse=elapse)
+    self.move(speed=-speed, elapse=elapse)
 
   def left(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=-speed, speed_right=speed, elapse=elapse)
+    self.turn(speed=-speed, elapse=elapse)
 
   def right(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=speed, speed_right= -speed, elapse=elapse)
+    self.turn(speed=speed, elapse=elapse)
 
-  def _motor_control(self, speed_left=100, speed_right=100, elapse=-1):
+  def servo3(self, angle):
+    self._servo_control(PIN_SERVO_3, angle)
+
+  def servo4(self, angle):
+    self._servo_control(PIN_SERVO_4, angle)
+
+  def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
 
     if speed_left < 0:
@@ -81,24 +95,35 @@ class CoderBot:
       time.sleep(elapse)
       self.stop()
 
-  def _servo_control(self, speed_left=100, speed_right=100, elapse=-1):
+  def _servo_motor(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
-    speed_left = ((-speed_left + 100) * 50 / 200) + 50
-    speed_right = ((speed_right + 100) * 50 / 200) + 50
+    speed_left = -speed_left
 
     self.pi.write(PIN_MOTOR_ENABLE, 1)
     self.pi.write(PIN_RIGHT_BACKWARD, 0)
     self.pi.write(PIN_LEFT_BACKWARD, 0)
-    self.pi.set_PWM_range(PIN_LEFT_FORWARD, 1000)
-    self.pi.set_PWM_range(PIN_RIGHT_FORWARD, 1000)
-    self.pi.set_PWM_frequency(PIN_LEFT_FORWARD, 50)
-    self.pi.set_PWM_frequency(PIN_RIGHT_FORWARD, 50)
-    self.pi.set_PWM_dutycycle(PIN_LEFT_FORWARD, speed_left)
-    self.pi.set_PWM_dutycycle(PIN_RIGHT_FORWARD, speed_right)
+
+    self._servo_motor_control(PIN_LEFT_FORWARD, speed_left)
+    self._servo_motor_control(PIN_RIGHT_FORWARD, speed_right)
     if elapse > 0:
       time.sleep(elapse)
       self.stop()
 
+
+  def _servo_motor_control(self, pin, speed):
+    self._is_moving = True
+    speed = ((speed + 100) * 50 / 200) + 50
+
+    self.pi.set_PWM_range(pin, 1000)
+    self.pi.set_PWM_frequency(pin, 50)
+    self.pi.set_PWM_dutycycle(pin, speed)
+
+  def _servo_control(self, pin, angle):
+    duty = ((angle + 90) * 100 / 180) + 25
+
+    self.pi.set_PWM_range(pin, 1000)
+    self.pi.set_PWM_frequency(pin, 50)
+    self.pi.set_PWM_dutycycle(pin, duty)
 
   def stop(self):
     for pin in self._pin_out:

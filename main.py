@@ -3,6 +3,7 @@ import json
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
+from motion import Motion
 from program import ProgramEngine, Program
 
 from flask import Flask, render_template, request, send_file, redirect
@@ -13,6 +14,7 @@ CONFIG_FILE = "coderbot.cfg"
 
 bot = None
 cam = None
+motion = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -50,18 +52,24 @@ def handle_bot():
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
 
-    if cmd == "forward":
-        bot.forward(speed=int(param1), elapse=float(param2))
-    elif cmd == "left":
-        bot.left(speed=int(param1), elapse=float(param2))
-    elif cmd == "right":
-        bot.right(speed=int(param1), elapse=float(param2))
-    elif cmd == "backward":
-        bot.backward(speed=int(param1), elapse=float(param2))
+    if cmd == "move":
+        bot.move(speed=int(param1), elapse=float(param2))
+    elif cmd == "turn":
+        bot.turn(speed=int(param1), elapse=float(param2))
+    elif cmd == "move_motion":
+        motion.move(dist=float(param2))
+    elif cmd == "turn_motion":
+        motion.turn(angle=float(param2))
     elif cmd == "stop":
         bot.stop()
     elif cmd == "take_photo":
-        cam.take_photo()
+        cam.photo_take()
+        bot.say(app.bot_config.get("sound_shutter"))
+    elif cmd == "video_rec":
+        cam.video_rec()
+        bot.say(app.bot_config.get("sound_shutter"))
+    elif cmd == "video_stop":
+        cam.video_stop()
         bot.say(app.bot_config.get("sound_shutter"))
 
     elif cmd == "say":
@@ -88,7 +96,8 @@ def handle_photos():
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo(filename):
     print "photo"
-    return send_file(cam.get_photo_file(filename))
+    mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
+    return send_file(cam.get_photo_file(filename), mimetype.get(filename[:-4],'image'), cache_timeout=0)
 
 @app.route("/photos/<filename>", methods=["POST"])
 def handle_photo_cmd(filename):
@@ -141,7 +150,8 @@ def handle_program_exec():
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
     print "program_end"
-    app.prog.end()
+    if app.prog:
+        app.prog.end()
     app.prog = None  
     return "ok"
 
@@ -168,10 +178,12 @@ def run_server():
   f = open(CONFIG_FILE, 'r')
   global bot
   global cam
+  global motion
   try:
     app.bot_config = json.load(f)
     bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"))
     cam = Camera.get_instance()
+    motion = Motion.get_instance()
   except ValueError as e:
     app.bot_config = {}
     print e

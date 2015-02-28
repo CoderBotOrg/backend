@@ -174,6 +174,20 @@
       <block type="coderbot_moveBackward"></block>
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
+      <block type="coderbot_motion_move">
+        <value name="DIST">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+      <block type="coderbot_motion_turn">
+        <value name="ANGLE">
+          <block type="math_number">
+            <field name="NUM">90</field>
+          </block>
+        </value>
+      </block>
       <block type="coderbot_adv_move">
         <value name="SPEED">
           <block type="math_number">
@@ -183,14 +197,6 @@
         <value name="ELAPSE">
           <block type="math_number">
             <field name="NUM">0.2</field>
-          </block>
-        </value>
-      </block>
-      <block type="coderbot_adv_stop"></block>
-      <block type="coderbot_sleep">
-        <value name="ELAPSE">
-          <block type="math_number">
-            <field name="NUM">1.0</field>
           </block>
         </value>
       </block>
@@ -220,13 +226,16 @@
         </value>
       </block>
     </category>
+    <category name="{% trans %}Camera{% endtrans %}">
+      <block type="coderbot_camera_photoTake"></block>
+      <block type="coderbot_camera_videoRec"></block>
+      <block type="coderbot_camera_videoStop"></block>
+    </category>
     <category name="{% trans %}Sensor{% endtrans %}">
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
       <block type="coderbot_adv_findSignal"></block>
       <block type="coderbot_adv_findFace"></block>
-      <block type="coderbot_adv_findCode"></block>
-      <block type="coderbot_adv_findLogo"></block>
       <block type="coderbot_adv_findColor">
         <value name="COLOR">
           <block type="colour_picker">

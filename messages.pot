@@ -1,14 +1,14 @@
 # Translations template for PROJECT.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-14 22:34+0000\n"
+"POT-Creation-Date: 2015-01-31 10:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,20 +60,24 @@ msgid "Functions"
 msgstr ""
 
 #: templates/blocks_adv.xml:172 templates/blocks_std.xml:43
-#: templates/config.html:14
+#: templates/config.html:15
 msgid "Movement"
 msgstr ""
 
-#: templates/blocks_adv.xml:223 templates/blocks_std.xml:69
-#: templates/config.html:13 templates/config.html:38
+#: templates/blocks_adv.xml:229
+msgid "Camera"
+msgstr ""
+
+#: templates/blocks_adv.xml:234 templates/blocks_std.xml:69
+#: templates/config.html:14 templates/config.html:60
 msgid "Sensor"
 msgstr ""
 
-#: templates/blocks_adv.xml:231 templates/blocks_std.xml:77
+#: templates/blocks_adv.xml:248 templates/blocks_std.xml:83
 msgid "Sound"
 msgstr ""
 
-#: templates/blocks_std.xml:2 templates/control.html:22
+#: templates/blocks_std.xml:2 templates/config.html:11 templates/control.html:8
 #: templates/program.html:8
 msgid "Control"
 msgstr ""
@@ -82,152 +86,204 @@ msgstr ""
 msgid "Procedures"
 msgstr ""
 
-#: templates/config.html:3
+#: templates/config.html:3 templates/control.html:55
 msgid "Back"
 msgstr ""
 
-#: templates/config.html:11
+#: templates/config.html:12
 msgid "Programming"
 msgstr ""
 
-#: templates/config.html:12
+#: templates/config.html:13
 msgid "Sounds"
 msgstr ""
 
-#: templates/config.html:15
+#: templates/config.html:16
 msgid "Start"
 msgstr ""
 
-#: templates/config.html:16
+#: templates/config.html:17
 msgid "Button"
 msgstr ""
 
-#: templates/config.html:17 templates/config.html:65
+#: templates/config.html:18 templates/config.html:89
 msgid "User Interface"
 msgstr ""
 
-#: templates/config.html:22
-msgid "Editor level"
-msgstr ""
-
-#: templates/config.html:24
-msgid "Basic"
+#: templates/config.html:23
+msgid "Movement assisted by vision"
 msgstr ""
 
 #: templates/config.html:26
-msgid "Standard"
+msgid "Step timing | distance / angle"
 msgstr ""
 
-#: templates/config.html:28
-msgid "Advanced"
-msgstr ""
-
-#: templates/config.html:32
-msgid "Start sound"
-msgstr ""
-
-#: templates/config.html:34
-msgid "Stop sound"
-msgstr ""
-
-#: templates/config.html:41
+#: templates/config.html:27 templates/config.html:65
 msgid "Forward speed"
 msgstr ""
 
-#: templates/config.html:43
-msgid "Forward elapse"
+#: templates/config.html:29
+msgid "Forward elapse / distance"
 msgstr ""
 
-#: templates/config.html:45
+#: templates/config.html:31 templates/config.html:69
 msgid "Turn speed"
 msgstr ""
 
-#: templates/config.html:47
-msgid "Turn elapse"
+#: templates/config.html:33
+msgid "Turn elapse / angle"
 msgstr ""
 
-#: templates/config.html:51
-msgid "Load at start"
+#: templates/config.html:36
+msgid "Show control counter"
+msgstr ""
+
+#: templates/config.html:42
+msgid "Editor level"
+msgstr ""
+
+#: templates/config.html:44
+msgid "Basic"
+msgstr ""
+
+#: templates/config.html:46
+msgid "Standard"
+msgstr ""
+
+#: templates/config.html:48
+msgid "Advanced"
+msgstr ""
+
+#: templates/config.html:52
+msgid "Start sound"
+msgstr ""
+
+#: templates/config.html:54
+msgid "Stop sound"
 msgstr ""
 
 #: templates/config.html:56
-msgid "Button function"
+msgid "Shutter sound"
 msgstr ""
 
-#: templates/config.html:57
-msgid "None"
+#: templates/config.html:63
+msgid "Motor control mode"
 msgstr ""
 
-#: templates/config.html:59
-msgid "Start/Stop current program"
+#: templates/config.html:67
+msgid "Forward elapse"
 msgstr ""
 
-#: templates/config.html:66
-msgid "Show Control page"
-msgstr ""
-
-#: templates/config.html:68
-msgid "Show Program page"
-msgstr ""
-
-#: templates/config.html:70
-msgid "Show Preferences button"
+#: templates/config.html:71
+msgid "Turn elapse"
 msgstr ""
 
 #: templates/config.html:75
+msgid "Load at start"
+msgstr ""
+
+#: templates/config.html:80
+msgid "Button function"
+msgstr ""
+
+#: templates/config.html:81
+msgid "None"
+msgstr ""
+
+#: templates/config.html:83
+msgid "Start/Stop current program"
+msgstr ""
+
+#: templates/config.html:90
+msgid "Show Control page"
+msgstr ""
+
+#: templates/config.html:92
+msgid "Show Program page"
+msgstr ""
+
+#: templates/config.html:94
+msgid "Show Preferences button"
+msgstr ""
+
+#: templates/config.html:99
 msgid "Cancel"
 msgstr ""
 
-#: templates/config.html:76 templates/program.html:17
+#: templates/config.html:100 templates/program.html:17
 msgid "Save"
 msgstr ""
 
-#: templates/config_params.html:8
+#: templates/config_params.html:16
 msgid "Say what:"
 msgstr ""
 
-#: templates/config_params.html:9
+#: templates/config_params.html:17
 msgid "Saved"
 msgstr ""
 
-#: templates/config_params.html:10
+#: templates/config_params.html:18
 msgid "Program saved"
 msgstr ""
 
-#: templates/config_params.html:11
+#: templates/config_params.html:19
 msgid "Program name already in use, overwrite?"
 msgstr ""
 
-#: templates/control.html:19 templates/program.html:5
+#: templates/config_params.html:20
+msgid "Delete"
+msgstr ""
+
+#: templates/config_params.html:21
+msgid "Delete photo"
+msgstr ""
+
+#: templates/config_params.html:22
+msgid "Reset move counter?"
+msgstr ""
+
+#: templates/control.html:5 templates/program.html:5
 msgid "Preferences"
 msgstr ""
 
-#: templates/control.html:23 templates/program.html:9
+#: templates/control.html:9 templates/program.html:9
 msgid "Program"
 msgstr ""
 
-#: templates/control.html:31
+#: templates/control.html:14
+msgid "Move counter"
+msgstr ""
+
+#: templates/control.html:18
+msgid "Halt"
+msgstr ""
+
+#: templates/control.html:23
 msgid "Forward"
 msgstr ""
 
-#: templates/control.html:34
+#: templates/control.html:26
 msgid "Left"
 msgstr ""
 
-#: templates/control.html:35
+#: templates/control.html:27
 msgid "Right"
 msgstr ""
 
-#: templates/control.html:38
+#: templates/control.html:30
 msgid "Backward"
 msgstr ""
 
-#: templates/control.html:44
+#: templates/control.html:38
 msgid "Say"
 msgstr ""
 
-#: templates/control.html:49 templates/control.html:58
-msgid "Halt"
+#: templates/control.html:43
+msgid "Photo"
+msgstr ""
+
+#: templates/control.html:46
+msgid "Photos"
 msgstr ""
 
 #: templates/program.html:15
@@ -258,24 +314,24 @@ msgstr ""
 msgid "is running"
 msgstr ""
 
-#: templates/program.html:39
+#: templates/program.html:40
 msgid "New Program"
 msgstr ""
 
-#: templates/program.html:40 templates/program.html:41
-#: templates/program.html:48 templates/program.html:49
+#: templates/program.html:41 templates/program.html:42
+#: templates/program.html:49 templates/program.html:50
 msgid "Program name"
 msgstr ""
 
-#: templates/program.html:42 templates/program.html:50
+#: templates/program.html:43 templates/program.html:51
 msgid "Create"
 msgstr ""
 
-#: templates/program.html:47
+#: templates/program.html:48
 msgid "Save Program As"
 msgstr ""
 
-#: templates/program.html:55
+#: templates/program.html:56
 msgid "Load Program"
 msgstr ""
 
