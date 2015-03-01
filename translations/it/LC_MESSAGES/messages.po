@@ -135,9 +135,8 @@ msgid "Turn elapse / angle"
 msgstr "Tempo / angolo di rotazione"
 
 #: templates/config.html:36
-#, fuzzy
 msgid "Show control counter"
-msgstr "Tipo di motori (dc | servo)"
+msgstr "Mostra contatore mosse"
 
 #: templates/config.html:39
 msgid "HUD image name"
