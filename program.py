@@ -6,6 +6,7 @@ import json
 import coderbot
 import camera
 import motion
+import config
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -121,6 +122,9 @@ class Program:
       bot = coderbot.CoderBot.get_instance()
       cam = camera.Camera.get_instance()
       program = self
+      if config.Config.get().get("prog_video_rec") == "true":
+        get_cam().video_rec()
+        print "starting video"
       exec(self._code)
       get_cam().video_stop() #if video is running, stop it
       #print "run.2"

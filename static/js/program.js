@@ -4,7 +4,8 @@ $(document).on( "pageshow", '#page-program', function( event, ui ) {
       if(inject_once) {
         inject_once=false;
         Blockly.inject(document.getElementById('blocklyDiv'),
-            {path: '../../', toolbox: document.getElementById('toolbox')});
+            {path: '../../', toolbox: document.getElementById('toolbox'),
+             scrollbars:CODERBOT_PROG_SCROLLBARS, maxBlocks:CODERBOT_PROG_MAXBLOCKS});
       }
 
       $('[href="#page-program"]').addClass( "ui-btn-active" );

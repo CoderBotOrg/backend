@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-31 10:27+0000\n"
+"POT-Creation-Date: 2015-02-28 21:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: it <LL@li.org>\n"
@@ -69,11 +69,11 @@ msgid "Camera"
 msgstr "Camera"
 
 #: templates/blocks_adv.xml:234 templates/blocks_std.xml:69
-#: templates/config.html:14 templates/config.html:60
+#: templates/config.html:14 templates/config.html:62
 msgid "Sensor"
 msgstr "Sensore"
 
-#: templates/blocks_adv.xml:248 templates/blocks_std.xml:83
+#: templates/blocks_adv.xml:246 templates/blocks_std.xml:81
 msgid "Sound"
 msgstr "Suono"
 
@@ -86,7 +86,7 @@ msgstr "Controllo"
 msgid "Procedures"
 msgstr "Procedure"
 
-#: templates/config.html:3 templates/control.html:55
+#: templates/config.html:3 templates/control.html:62
 msgid "Back"
 msgstr "Indietro"
 
@@ -106,7 +106,7 @@ msgstr "Avvio"
 msgid "Button"
 msgstr "Bottone"
 
-#: templates/config.html:18 templates/config.html:89
+#: templates/config.html:18 templates/config.html:91
 msgid "User Interface"
 msgstr "Interfaccia utente"
 
@@ -118,7 +118,7 @@ msgstr "Movimento assistito da visione"
 msgid "Step timing | distance / angle"
 msgstr "Durata o lunghezza step (distanza / angolo)"
 
-#: templates/config.html:27 templates/config.html:65
+#: templates/config.html:27 templates/config.html:67
 msgid "Forward speed"
 msgstr "Avanti"
 
@@ -126,7 +126,7 @@ msgstr "Avanti"
 msgid "Forward elapse / distance"
 msgstr "Durata / distanza avanti"
 
-#: templates/config.html:31 templates/config.html:69
+#: templates/config.html:31 templates/config.html:71
 msgid "Turn speed"
 msgstr "Velocità di rotazione"
 
@@ -139,79 +139,83 @@ msgstr "Tempo / angolo di rotazione"
 msgid "Show control counter"
 msgstr "Tipo di motori (dc | servo)"
 
-#: templates/config.html:42
+#: templates/config.html:39
+msgid "HUD image name"
+msgstr "Nome immagine HUD"
+
+#: templates/config.html:44
 msgid "Editor level"
 msgstr "Livello editor"
 
-#: templates/config.html:44
+#: templates/config.html:46
 msgid "Basic"
 msgstr "Base"
 
-#: templates/config.html:46
+#: templates/config.html:48
 msgid "Standard"
 msgstr "Normale"
 
-#: templates/config.html:48
+#: templates/config.html:50
 msgid "Advanced"
 msgstr "Avanzato"
 
-#: templates/config.html:52
+#: templates/config.html:54
 msgid "Start sound"
 msgstr "Suono avvio"
 
-#: templates/config.html:54
+#: templates/config.html:56
 msgid "Stop sound"
 msgstr "Suono stop"
 
-#: templates/config.html:56
+#: templates/config.html:58
 msgid "Shutter sound"
 msgstr "Suono avvio"
 
-#: templates/config.html:63
+#: templates/config.html:65
 msgid "Motor control mode"
 msgstr "Tipo di motori (dc | servo)"
 
-#: templates/config.html:67
+#: templates/config.html:69
 msgid "Forward elapse"
 msgstr "Durata avanti"
 
-#: templates/config.html:71
+#: templates/config.html:73
 msgid "Turn elapse"
 msgstr "Tempo di rotazione"
 
-#: templates/config.html:75
+#: templates/config.html:77
 msgid "Load at start"
 msgstr "Carica all'avvio"
 
-#: templates/config.html:80
+#: templates/config.html:82
 msgid "Button function"
 msgstr "Funzione del bottone"
 
-#: templates/config.html:81
+#: templates/config.html:83
 msgid "None"
 msgstr "Nessuno"
 
-#: templates/config.html:83
+#: templates/config.html:85
 msgid "Start/Stop current program"
 msgstr "Avvia/Ferma il programma caricato"
 
-#: templates/config.html:90
+#: templates/config.html:92
 msgid "Show Control page"
 msgstr "Mostra pagina Controllo"
 
-#: templates/config.html:92
+#: templates/config.html:94
 msgid "Show Program page"
 msgstr "Nome programma"
 
-#: templates/config.html:94
+#: templates/config.html:96
 msgid "Show Preferences button"
 msgstr "Mostra bottone Preferenze"
 
-#: templates/config.html:99
+#: templates/config.html:101
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/config.html:100 templates/program.html:17
+#: templates/config.html:102 templates/program.html:17
 msgid "Save"
 msgstr "Salva"
 
@@ -243,6 +247,23 @@ msgstr "Cancellare la foto"
 msgid "Reset move counter?"
 msgstr "Azzera contatore mosse?"
 
+#: templates/config_params.html:23 templates/program.html:30
+msgid "is running"
+msgstr "in esecuzione"
+
+#: templates/config_params.html:24
+msgid "stopped"
+msgstr "fermo"
+
+#: templates/config_params.html:25 templates/control.html:50
+#: templates/program.html:23
+msgid "Stop"
+msgstr "Ferma"
+
+#: templates/config_params.html:26
+msgid "Close"
+msgstr "Chiudi"
+
 #: templates/control.html:5 templates/program.html:5
 msgid "Preferences"
 msgstr "Preferenze"
@@ -251,39 +272,39 @@ msgstr "Preferenze"
 msgid "Program"
 msgstr "Programma"
 
-#: templates/control.html:14
-msgid "Move counter"
-msgstr "Contatore mosse"
-
-#: templates/control.html:18
+#: templates/control.html:19
 msgid "Halt"
 msgstr "Stop"
 
-#: templates/control.html:23
+#: templates/control.html:24
 msgid "Forward"
 msgstr "Avanti"
 
-#: templates/control.html:26
+#: templates/control.html:27
 msgid "Left"
 msgstr "Sinistra"
 
-#: templates/control.html:27
+#: templates/control.html:28
 msgid "Right"
 msgstr "Destra"
 
-#: templates/control.html:30
+#: templates/control.html:31
 msgid "Backward"
 msgstr "Indietro"
 
-#: templates/control.html:38
+#: templates/control.html:39
 msgid "Say"
 msgstr "Parla"
 
-#: templates/control.html:43
+#: templates/control.html:44
 msgid "Photo"
 msgstr "Foto"
 
-#: templates/control.html:46
+#: templates/control.html:49
+msgid "Rec"
+msgstr "Registra"
+
+#: templates/control.html:53
 msgid "Photos"
 msgstr "Album"
 
@@ -307,35 +328,30 @@ msgstr "Mostra codice"
 msgid "Run"
 msgstr "Esegui"
 
-#: templates/program.html:23
-msgid "Stop"
-msgstr "Ferma"
-
-#: templates/program.html:30
-msgid "is running"
-msgstr "in esecuzione"
-
-#: templates/program.html:40
+#: templates/program.html:41
 msgid "New Program"
 msgstr "Nuovo programma"
 
-#: templates/program.html:41 templates/program.html:42
-#: templates/program.html:49 templates/program.html:50
+#: templates/program.html:42 templates/program.html:43
+#: templates/program.html:50 templates/program.html:51
 msgid "Program name"
 msgstr "Nome programma"
 
-#: templates/program.html:43 templates/program.html:51
+#: templates/program.html:44 templates/program.html:52
 msgid "Create"
 msgstr "Crea"
 
-#: templates/program.html:48
+#: templates/program.html:49
 msgid "Save Program As"
 msgstr "Nuovo programma"
 
-#: templates/program.html:56
+#: templates/program.html:57
 msgid "Load Program"
 msgstr "Carica programma"
 
 #~ msgid "Control mode"
 #~ msgstr "Tipo di motori (dc | servo)"
+
+#~ msgid "Move counter"
+#~ msgstr "Contatore mosse"
 
