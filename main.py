@@ -5,12 +5,11 @@ from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
 from motion import Motion
 from program import ProgramEngine, Program
+from config import Config
 
 from flask import Flask, render_template, request, send_file, redirect
 from flask.ext.babel import Babel
 #from flask_sockets import Sockets
-
-CONFIG_FILE = "coderbot.cfg"
 
 bot = None
 cam = None
@@ -40,10 +39,8 @@ def handle_home():
 
 @app.route("/config", methods=["POST"])
 def handle_config():
-    app.bot_config = request.form
-    f = open(CONFIG_FILE, 'w')
-    json.dump(app.bot_config, f)
-    print str(app.bot_config)
+    Config.write(request.form)
+    app.bot_config = Config.get()
     return "ok";
 
 @app.route("/bot", methods=["GET"])
@@ -175,12 +172,11 @@ def button_pushed():
       app.prog.execute()
 
 def run_server():
-  f = open(CONFIG_FILE, 'r')
   global bot
   global cam
   global motion
   try:
-    app.bot_config = json.load(f)
+    app.bot_config = Config.read()
     bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"))
     cam = Camera.get_instance()
     motion = Motion.get_instance()

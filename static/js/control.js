@@ -29,7 +29,6 @@ function ScaleContentToDevice(){
     }
 
     $(".ui-content-stream").height(contentHeight);
-    $(".ui-content-hud").height(contentHeight);
 }
 
 
@@ -121,9 +120,8 @@ $(document).on( "pageshow", '#page-photos', function( event ) {
 			var media_name = media.substring(0, media.indexOf('.'));
 			var media_thumb = media_name + '_thumb.jpg';
 			var media_type = media.indexOf('jpg') > 0 ? 'photo' : 'video';
-			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><p class="p_photo_cmd" style="display:none;"><button class="ui-btn ui-btn-inline ui-btn-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
+			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><div class="ui-content-hud" style="position:absolute;"></div><p class="p_photo_cmd" style="display:none;"><button class="ui-btn ui-btn-inline ui-btn-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
 		}
-                //media_list.listview("refresh");
 $('li.ui-li-has-thumb').hover( function( event ) {
 	$(this).find('.p_photo_cmd').show();
 }, function( event ) {

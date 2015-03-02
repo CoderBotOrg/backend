@@ -49,6 +49,18 @@
       <input type="radio" name="prog_level" id="r_prog_level_c" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
       <label for="r_prog_level_c">{% trans %}Advanced{% endtrans %}</label>     
      </fieldset>
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}Program editor details{% endtrans %}</legend>
+      <label for="c_prog_scrollbars">{% trans %}Shows Editor scrollbars{% endtrans %}</label>
+      <input type="checkbox" name="prog_scrollbars" id="c_prog_scrollbars" value="true" {%if config.prog_scrollbars=='true'%}checked="checked"{%endif%}>
+     </fieldset>
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}Other program parameters{% endtrans %}</legend>
+      <label for="c_prog_video_rec">{% trans %}Auto record video on program run{% endtrans %}</label>
+      <input type="checkbox" name="prog_video_rec" id="c_prog_video_rec" value="true" {%if config.prog_video_rec=='true'%}checked="checked"{%endif%}>
+     </fieldset>
+      <label for="c_prog_maxblocks">{% trans %}Max number of blocks allowed{% endtrans %}</label>
+      <input type="text" name="prog_maxblocks" id="c_prog_maxblocks" value="{{config.prog_maxblocks}}">
     </div>
     <div id="t_sound" class="ui-body-d ui-content">
      <label for="i_sound_start">{% trans %}Start sound{% endtrans %}</label>

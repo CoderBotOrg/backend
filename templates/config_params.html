@@ -5,6 +5,8 @@ var CODERBOT_MOV_TR_DEF_SPEED={{config.move_tr_speed}};
 var CODERBOT_MOV_TR_DEF_ELAPSE={{config.move_tr_elapse}};
 var CODERBOT_STREAM_URL="http://{{host}}:{{stream_port}}/stream"
 var CODERBOT_PROG_LEVEL="{{config.prog_level}}";
+var CODERBOT_PROG_SCROLLBARS="{{config.prog_scrollbars}}"=="true";
+var CODERBOT_PROG_MAXBLOCKS={{config.prog_maxblocks}}<=0?Infinity:{{config.prog_maxblocks}};
 var CODERBOT_CTRL_FW_SPEED="{{config.ctrl_fw_speed}}";
 var CODERBOT_CTRL_FW_ELAPSE="{{config.ctrl_fw_elapse}}";
 var CODERBOT_CTRL_TR_SPEED="{{config.ctrl_tr_speed}}";
@@ -20,6 +22,10 @@ BotMessages.ProgramExists = "{%trans%}Program name already in use, overwrite?{%e
 BotMessages.DeletePhoto = "{%trans%}Delete{%endtrans%}";
 BotMessages.DeletePhotoConfirm = "{%trans%}Delete photo{%endtrans%} ";
 BotMessages.CounterReset = "{%trans%}Reset move counter?{%endtrans%}"
+BotMessages.ProgramStatusRunning = "{%trans%}is running{%endtrans%}";
+BotMessages.ProgramStatusStop = "{%trans%}stopped{%endtrans%}";
+BotMessages.ProgramDialogStop = "{%trans%}Stop{%endtrans%}";
+BotMessages.ProgramDialogClose = "{%trans%}Close{%endtrans%}";
 </script>
 <style>
 .ui-content-stream {
@@ -38,5 +44,6 @@ top:0px; left:0px; width:100%; height:100%;
 background:url('/images/{{config.ctrl_hud_image}}') no-repeat; 
 background-size: auto 100% !important;
 background-position: center;
+height:100%;
 }
 </style>
