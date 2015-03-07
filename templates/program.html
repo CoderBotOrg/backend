@@ -11,7 +11,7 @@
   </div><!-- /navbar -->
  </div>
  <div role="main" class="ui-content">
-{%if config.prog_level=='basic'%}
+{%if "basic" in config.prog_level%}
   <fieldset class="ui-grid-d">
    <div class="ui-block-a"><button id="b_new_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-new" type="button">{% trans %}New{% endtrans %}</button></div>
    <div class="ui-block-b"><button id="b_load_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-load" type="button">{% trans %}Load{% endtrans %}</button></div>
