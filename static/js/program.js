@@ -25,6 +25,12 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       $("#b_new_prog_post").on("click", newProgPost);
       $("#b_load_prog_post").on("click", loadProgPost);
       loadProgList();
+      $('#popup-video').popup();
+      $("#b_show_last").on("click", function( event ) {
+        var src = "/photos/" + "VID" + prog.name + ".mp4" + "?t=" + (new Date()).getTime();
+        $('#popup-video').find('video').attr('src', src);
+        $('#popup-video').popup("open");
+      });
     });
 }
     var prog = {};
@@ -148,7 +154,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       var code = Blockly.Python.workspaceToCode();
       Blockly.Python.INFINITE_LOOP_TRAP = null;
       try {
-        var data =  {'name': 'one',
+        var data =  {'name': prog.name,
                      'code': code};
         $.ajax({url: '/program/exec', data: data, type: "POST"});
         $("#dialogRunning").popup("open", {transition: "pop"});

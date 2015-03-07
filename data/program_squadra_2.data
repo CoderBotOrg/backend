@@ -1,0 +1,1 @@
+{"dom_code": "<xml xmlns=\"http://www.w3.org/1999/xhtml\"><block type=\"coderbot_moveForward\" id=\"13\" x=\"309\" y=\"76\"><next><block type=\"coderbot_moveBackward\" id=\"14\"></block></next></block></xml>", "code": "get_bot().forward(speed=100, elapse=1.5)\nget_bot().backward(speed=100, elapse=1.5)\n", "name": "squadra_2"}

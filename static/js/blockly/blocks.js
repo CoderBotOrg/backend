@@ -30,18 +30,18 @@ Blockly.Blocks['coderbot_repeat'] = {
     this.setHelpUrl(Blockly.Msg.CONTROLS_REPEAT_HELPURL);
     this.setColour(120);
     var di = this.appendDummyInput();
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
     	di.appendField(new Blockly.FieldImage('/images/blocks/loop_repeat.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_REPEAT)
     }		
     di.appendField(new Blockly.FieldTextInput('10',
             Blockly.FieldTextInput.nonnegativeIntegerValidator), 'TIMES');
-    if(CODERBOT_PROG_LEVEL!="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")<0) {
         di.appendField(Blockly.Msg.CONTROLS_REPEAT_TITLE_TIMES);
     }
     var si = this.appendStatementInput('DO');
-    if(CODERBOT_PROG_LEVEL!="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")<0) {
     	si.appendField(Blockly.Msg.CONTROLS_REPEAT_INPUT_DO);
     }
     this.setPreviousStatement(true);
@@ -90,7 +90,7 @@ Blockly.Blocks['coderbot_moveForward'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/move_forward.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_MOVE_FORWARD)
@@ -118,7 +118,7 @@ Blockly.Blocks['coderbot_moveBackward'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/move_backward.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_MOVE_BACKWARD)
@@ -145,7 +145,7 @@ Blockly.Blocks['coderbot_turnLeft'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(40);
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/move_left.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_MOVE_LEFT);
@@ -172,7 +172,7 @@ Blockly.Blocks['coderbot_turnRight'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(40);
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/move_right.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_MOVE_RIGHT)
@@ -200,7 +200,7 @@ Blockly.Blocks['coderbot_say'] = {
     this.setColour(290);
     var vi = this.appendValueInput('TEXT');
     vi.setCheck(["String", "Number", "Date"]);
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         vi.appendField(new Blockly.FieldImage('/images/blocks/say.png', 32, 32, '*'));
     } else {
     	vi.appendField(Blockly.Msg.CODERBOT_SAY);
@@ -458,7 +458,7 @@ Blockly.Blocks['coderbot_camera_photoTake'] = {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Turn');
     this.setColour(120);
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/photo_take.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_PHOTO_TAKE)
@@ -486,7 +486,7 @@ Blockly.Blocks['coderbot_camera_videoRec'] = {
     this.setColour(120);
 
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/video_rec.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_VIDEO_REC)
@@ -514,7 +514,7 @@ Blockly.Blocks['coderbot_camera_videoStop'] = {
     this.setColour(120);
 
     var di = this.appendDummyInput()
-    if(CODERBOT_PROG_LEVEL=="basic") {
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
         di.appendField(new Blockly.FieldImage('/images/blocks/video_stop.png', 32, 32, '*'));
     } else {
         di.appendField(Blockly.Msg.CODERBOT_VIDEO_STOP)

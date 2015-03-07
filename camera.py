@@ -103,16 +103,25 @@ class Camera(Thread):
   def is_recording(self):
     return self.recording
 
-  def video_rec(self):
+  def video_rec(self, video_name=None):
     if self.is_recording():
       return
     self.recording = True
 
-    last_photo_index = 0
-    if len(self._photos):
-      last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
-    filename = VIDEO_PREFIX + str(last_photo_index+1) + self._camera.VIDEO_FILE_EXT;
-    filename_thumb = VIDEO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
+    if video_name is None:
+      last_photo_index = 0
+      if len(self._photos):
+        last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
+      filename = VIDEO_PREFIX + str(last_photo_index+1) + self._camera.VIDEO_FILE_EXT;
+      filename_thumb = VIDEO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
+    else:
+      filename = VIDEO_PREFIX + video_name + self._camera.VIDEO_FILE_EXT;
+      filename_thumb = VIDEO_PREFIX + video_name + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
+      try:
+        os.remove(PHOTO_PATH + "/" + filename)
+      except:
+        pass
+
     oft = open(PHOTO_PATH +  "/" + filename_thumb, "w")
     im_str = self._camera.get_image_jpeg()
     im_pil = PILImage.open(StringIO(im_str)) 

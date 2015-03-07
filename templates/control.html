@@ -20,7 +20,7 @@
   </div>
   <div class="ui-grid-b" style="position:fixed; width:100%;bottom:0px;">
    <div class="ui-block-a" id="ui_control_left">
-    <fieldset class="ui-grid-solo">
+    {% if config.show_control_move_commands%}<fieldset class="ui-grid-solo">
      <div class="ui-block-a ui-center"><button id="b_forward" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-u ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Forward{% endtrans %}</button></div>
     </fieldset>
     <fieldset class="ui-grid-a">
@@ -30,6 +30,7 @@
     <fieldset class="ui-grid-solo">
      <div class="ui-block-a ui-center"><button id="b_backward" onclick="void(0)" class="ui-btn ui-btn-inline ui-icon-arrow-d ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Backward{% endtrans %}</button></div>
     </fieldset>
+   {% endif %}
    </div>
    <div class="ui-block-b ui-center" id="ui_control_center">
    </div>

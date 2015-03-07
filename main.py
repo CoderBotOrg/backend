@@ -94,7 +94,13 @@ def handle_photos():
 def handle_photo(filename):
     print "photo"
     mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
-    return send_file(cam.get_photo_file(filename), mimetype.get(filename[:-4],'image'), cache_timeout=0)
+    video = None
+    try:
+      video = cam.get_photo_file(filename)
+    except:
+      pass
+
+    return send_file(video, mimetype.get(filename[:-3],'image'), cache_timeout=0)
 
 @app.route("/photos/<filename>", methods=["POST"])
 def handle_photo_cmd(filename):

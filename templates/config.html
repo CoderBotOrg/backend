@@ -42,12 +42,14 @@
     <div id="t_programming" class="ui-body-d ui-content">
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Editor level{% endtrans %}</legend>
-      <input type="radio" name="prog_level" id="r_prog_level_a" value="basic" {%if config.prog_level=='basic'%}checked="checked"{%endif%}>
-      <label for="r_prog_level_a">{% trans %}Basic{% endtrans %}</label>
-      <input type="radio" name="prog_level" id="r_prog_level_b" value="std" {%if config.prog_level=='std'%}checked="checked"{%endif%}>
-      <label for="r_prog_level_b">{% trans %}Standard{% endtrans %}</label> 
-      <input type="radio" name="prog_level" id="r_prog_level_c" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
-      <label for="r_prog_level_c">{% trans %}Advanced{% endtrans %}</label>     
+      <input type="radio" name="prog_level" id="r_prog_level_a" value="basic_move" {%if config.prog_level=='basic_move'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_a">{% trans %}Move{% endtrans %}</label>
+      <input type="radio" name="prog_level" id="r_prog_level_b" value="basic" {%if config.prog_level=='basic'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_b">{% trans %}Basic{% endtrans %}</label>
+      <input type="radio" name="prog_level" id="r_prog_level_c" value="std" {%if config.prog_level=='std'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_c">{% trans %}Standard{% endtrans %}</label> 
+      <input type="radio" name="prog_level" id="r_prog_level_d" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_d">{% trans %}Advanced{% endtrans %}</label>     
      </fieldset>
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Program editor details{% endtrans %}</legend>
@@ -103,6 +105,8 @@
       <legend>{% trans %}User Interface{% endtrans %}</legend>
       <label for="c_show_page_control">{% trans %}Show Control page{% endtrans %}</label>
       <input type="checkbox" name="show_page_control" id="c_show_page_control" value="true" {%if config.show_page_control=='true'%}checked="checked"{%endif%}>
+      <label for="c_show_control_move_commands">{% trans %}Show Control movement commands{% endtrans %}</label>
+      <input type="checkbox" name="show_control_move_commands" id="c_show_control_move_commands" value="true" {%if config.show_control_move_commands=='true'%}checked="checked"{%endif%}>
       <label for="c_show_page_program">{% trans %}Show Program page{% endtrans %}</label>
       <input type="checkbox" name="show_page_program" id="c_show_page_program" value="true" {%if config.show_page_program=='true'%}checked="checked"{%endif%}>
       <label for="c_show_page_prefs">{% trans %}Show Preferences button{% endtrans %}</label>

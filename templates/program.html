@@ -12,11 +12,12 @@
  </div>
  <div role="main" class="ui-content">
 {%if config.prog_level=='basic'%}
-  <fieldset class="ui-grid-c">
+  <fieldset class="ui-grid-d">
    <div class="ui-block-a"><button id="b_new_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-new" type="button">{% trans %}New{% endtrans %}</button></div>
    <div class="ui-block-b"><button id="b_load_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-load" type="button">{% trans %}Load{% endtrans %}</button></div>
    <div class="ui-block-c"><button id="b_save_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-save" type="button">{% trans %}Save{% endtrans %}</button></div>
-   <div class="ui-block-b"><button id="b_run_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-run" type="button">{% trans %}Run{% endtrans %}</button></div>
+   <div class="ui-block-d"><button id="b_run_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-run" type="button">{% trans %}Run{% endtrans %}</button></div>
+   <div class="ui-block-e"><button id="b_show_last" class="ui-btn ui-btn-icon-left ui-icon-video" type="button">{% trans %}Show last{% endtrans %}</button></div>
   </fieldset>
 {%else%}
   <fieldset class="ui-grid-c">
@@ -67,4 +68,11 @@
    <ul id="i_prog_list" data-role="listview" data-split-icon="delete" data-split-theme="a" data-inset="true"></ul>
   </div>
  </div>
+<div data-role="popup" id="popup-video" class="photopopup" data-overlay-theme="a" data-corners="false" data-tolerance="30,15">
+    <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
+ <div class="ui-content-hud" style="position:absolute;"></div>
+<video src="" alt="Video" autoplay controls>
+Sorry, your browser does not support embedded videos.
+</video>
+</div>
 </div>

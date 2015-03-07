@@ -123,7 +123,7 @@ class Program:
       cam = camera.Camera.get_instance()
       program = self
       if config.Config.get().get("prog_video_rec") == "true":
-        get_cam().video_rec()
+        get_cam().video_rec(program.name)
         print "starting video"
       exec(self._code)
       get_cam().video_stop() #if video is running, stop it
