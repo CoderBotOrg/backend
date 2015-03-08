@@ -73,7 +73,16 @@
      <input type="text" id="i_sound_shutter" name="sound_shutter" value="{{config.sound_shutter}}">
     </div>
     <div id="t_sensor" class="ui-body-d ui-content">
-     <legend>{% trans %}Sensor{% endtrans %}</legend>
+     <legend>{% trans %}Camera parameters{% endtrans %}</legend>
+     <label for="i_camera_exposure_mode">{% trans %}Exposure mode{% endtrans %}</label>
+     <select name="camera_exposure_mode" id="i_camera_exposure_mode" value="{{config.camera_exposure_mode}}">
+       <option value="auto"{%if config.camera_exposure_mode=='auto'%} selected{%endif%}>Auto</option>
+       <option value="sports"{%if config.camera_exposure_mode=='sports'%} selected{%endif%}>Sports</option>
+       <option value="night"{%if config.camera_exposure_mode=='night'%} selected{%endif%}>Night</option>
+       <option value="fixedfps"{%if config.camera_exposure_mode=='fixedfps'%} selected{%endif%}>Fixed FPS</option>
+       <option value="antishake"{%if config.camera_exposure_mode=='antishake'%} selected{%endif%}>Anti shake</option>
+       <option value="verylong"{%if config.camera_exposure_mode=='verylong'%} selected{%endif%}>Very long</option>
+     </select>
     </div>
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>

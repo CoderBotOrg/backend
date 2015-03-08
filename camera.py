@@ -7,6 +7,7 @@ from StringIO import StringIO
 from threading import Thread, Lock
 
 from viz import camera, streamer, image, blob
+import config
 
 CAMERA_REFRESH_INTERVAL=0.1
 MAX_IMAGE_AGE = 0.0
@@ -20,7 +21,6 @@ VIDEO_ELAPSE_MAX = 900
 class Camera(Thread):
 
   _instance = None
-  _cam_props = {"width":640, "height":480}
   _img_template = image.Image.load("coderdojo-logo.png")
   _warp_corners_1 = [(0, -120), (640, -120), (380, 480), (260, 480)]
   _warp_corners_2 = [(0, -60), (320, -60), (190, 240), (130, 240)]
@@ -36,7 +36,8 @@ class Camera(Thread):
 
   def __init__(self):
     print "starting camera"
-    self._camera = camera.Camera(props=self._cam_props)
+    cam_props = {"width":640, "height":480, "exposure_mode": config.Config.get().get("camera_exposure_mode")}
+    self._camera = camera.Camera(props=cam_props)
     self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     #self._cam_off_img.save(self._streamer)
     self.recording = False

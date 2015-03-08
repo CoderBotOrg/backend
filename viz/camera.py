@@ -1,4 +1,5 @@
 import picamera
+   i
 import picamera.array
 import io
 import os
@@ -18,7 +19,7 @@ class Camera():
     self.camera = picamera.PiCamera()
     self.camera.resolution = (props.get('width', 640), props.get('height', 240))
     self.camera.framerate = 30
-    self.camera.exposure_mode = 'sports'
+    self.camera.exposure_mode = props.get('exposure_mode')
     self.out_jpeg = io.BytesIO()
     self.out_rgb = picamera.array.PiRGBArray(self.camera, size=(160,120))
     self.h264_encoder = None
