@@ -26,8 +26,6 @@ PIDFILE=/var/run/$DAEMON_NAME.pid
  
 do_start () {
     log_daemon_msg "Starting system $DAEMON_NAME daemon"
-    #start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $DAEMON_USER --chdir $DIR --chuid $DAEMON_USER --startas $DAEMON
-    export LD_PRELOAD=/usr/lib/uv4l/uv4lext/armv6l/libuv4lext.so
     start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $DAEMON_USER --chdir $DIR --chuid $DAEMON_USER --exec /usr/bin/python  -- ./init.py
     log_end_msg $?
 }
