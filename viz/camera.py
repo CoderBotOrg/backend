@@ -1,5 +1,4 @@
 import picamera
-   i
 import picamera.array
 import io
 import os
