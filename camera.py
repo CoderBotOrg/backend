@@ -85,12 +85,21 @@ class Camera(Thread):
   def set_text(self, text):
     self._camera.set_overlay_text(text)
 
-  def photo_take(self):
+  def get_next_photo_index(self):
     last_photo_index = 0
-    if len(self._photos):
-      last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
-    filename = PHOTO_PREFIX + str(last_photo_index+1) + self._camera.PHOTO_FILE_EXT;
-    filename_thumb = PHOTO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
+    for p in self._photos:
+      try:
+        index = int(p[len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
+        if index > last_photo_index:
+          last_photo_index = index
+      except:
+        pass
+    return last_photo_index + 1
+
+  def photo_take(self):
+    photo_index = self.get_next_photo_index()
+    filename = PHOTO_PREFIX + str(photo_index) + self._camera.PHOTO_FILE_EXT;
+    filename_thumb = PHOTO_PREFIX + str(photo_index) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
     of = open(PHOTO_PATH + "/" + filename, "w+")
     oft = open(PHOTO_PATH + "/" + filename_thumb, "w+")
     im_str = self._camera.get_image_jpeg()
@@ -109,11 +118,9 @@ class Camera(Thread):
     self.recording = True
 
     if video_name is None:
-      last_photo_index = 0
-      if len(self._photos):
-        last_photo_index = int(self._photos[-1][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
-      filename = VIDEO_PREFIX + str(last_photo_index+1) + self._camera.VIDEO_FILE_EXT;
-      filename_thumb = VIDEO_PREFIX + str(last_photo_index+1) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
+      video_index = self.get_next_photo_index()
+      filename = VIDEO_PREFIX + str(video_index) + self._camera.VIDEO_FILE_EXT;
+      filename_thumb = VIDEO_PREFIX + str(video_index) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
     else:
       filename = VIDEO_PREFIX + video_name + self._camera.VIDEO_FILE_EXT;
       filename_thumb = VIDEO_PREFIX + video_name + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;

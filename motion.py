@@ -114,8 +114,8 @@ class Motion:
         ts = time()
         mask = np.zeros_like(image_gray._data)
 	mask[:] = 255
-	for x, y in [np.int32(tr[-1]) for tr in tracks]:
-	    cv2.circle(mask, (x, y), 5, 0, -1)
+	#for x, y in [np.int32(tr[-1]) for tr in tracks]:
+	#    cv2.circle(mask, (x, y), 5, 0, -1)
 	p = cv2.goodFeaturesToTrack(image_gray._data, mask = mask, **feature_params)
 	if p is not None:
 	    for x, y in np.float32(p).reshape(-1, 2):
@@ -191,13 +191,13 @@ class Motion:
         return self.delta_angle, self.delta_dist
 
     def bot_turn(self, target_angle, delta_angle):
-        power_angles = [[15, (80, -1)], [4, (100, 0.05)], [1, (100,0.02)], [0, (0, 0)]]
+        power_angles = [[15, (40, -1)], [4, (80, 0.05)], [1, (80,0.02)], [0, (0, 0)]]
         done = False
         sign = (target_angle - delta_angle) / abs(target_angle - delta_angle)
-        #print( "abs delta: ", abs(target_angle - delta_angle), " sign delta: ", sign ) 
+        print( "abs delta: ", abs(target_angle - delta_angle), " sign delta: ", sign ) 
         for p_a in power_angles:
            if abs(target_angle - delta_angle) > p_a[0]:
-               #print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
+               print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
                self.bot.motor_control(sign * p_a[1][0], -1 * sign * p_a[1][0], p_a[1][1])
                done = p_a[1][0] == 0 #stopped
                break
