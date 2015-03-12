@@ -109,7 +109,12 @@ Blockly.JavaScript['coderbot_moveForward'] = function(block) {
 
 Blockly.Python['coderbot_moveForward'] = function(block) {
   // Generate Python for moving forward.
-  return 'get_bot().forward(speed=' + CODERBOT_MOV_FW_DEF_SPEED + ', elapse=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
+  if(CODERBOT_PROG_MOVE_MOTION) {
+    return 'get_motion().move(dist=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
+
+  } else {
+    return 'get_bot().forward(speed=' + CODERBOT_MOV_FW_DEF_SPEED + ', elapse=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
+  }
 };
 
 Blockly.Blocks['coderbot_moveBackward'] = {
@@ -136,7 +141,12 @@ Blockly.JavaScript['coderbot_moveBackward'] = function(block) {
 
 Blockly.Python['coderbot_moveBackward'] = function(block) {
   // Generate Python for moving forward.
-  return 'get_bot().backward(speed=' + CODERBOT_MOV_FW_DEF_SPEED + ', elapse=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
+  if(CODERBOT_PROG_MOVE_MOTION) {    
+    return 'get_motion().move(dist=' + (-CODERBOT_MOV_FW_DEF_ELAPSE) + ')\n';
+    
+  } else {
+    return 'get_bot().backward(speed=' + CODERBOT_MOV_FW_DEF_SPEED + ', elapse=' + CODERBOT_MOV_FW_DEF_ELAPSE + ')\n';
+  }
 };
 
 Blockly.Blocks['coderbot_turnLeft'] = {
@@ -163,7 +173,12 @@ Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
 
 Blockly.Python['coderbot_turnLeft'] = function(block) {
   // Generate Python for turning left.
-  return 'get_bot().left(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
+  if(CODERBOT_PROG_MOVE_MOTION) {
+    return 'get_motion().turn(angle=' + (-CODERBOT_MOV_TR_DEF_ELAPSE) + ')\n';
+
+  } else {
+    return 'get_bot().left(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
+  }
 };
 
 Blockly.Blocks['coderbot_turnRight'] = {
@@ -190,7 +205,12 @@ Blockly.JavaScript['coderbot_turnRight'] = function(block) {
 
 Blockly.Python['coderbot_turnRight'] = function(block) {
   // Generate Python for turning left or right.
-  return 'get_bot().right(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
+  if(CODERBOT_PROG_MOVE_MOTION) {
+    return 'get_motion().turn(angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
+
+  } else {
+    return 'get_bot().right(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
+  } 
 };
 
 Blockly.Blocks['coderbot_say'] = {
