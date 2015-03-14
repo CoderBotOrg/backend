@@ -63,11 +63,11 @@ class Camera(Thread):
         #print "run.1"
         self._image_lock.acquire()
         self._camera.grab_one()
+        self._image_lock.release()
         #print "run.2: " + str(time.time()-ts)
         #self.save_image(image.Image(self._camera.get_image_bgr()).open().binarize().to_jpeg())
         self.save_image(self._camera.get_image_jpeg())
         #print "run.3: " + str(time.time()-ts)
-        self._image_lock.release()
       else:
         time.sleep(CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time))
 
@@ -84,7 +84,7 @@ class Camera(Thread):
     self._image_time=time.time()
 
   def set_text(self, text):
-    self._camera.set_overlay_text(text)
+    self._camera.set_overlay_text(str(text))
 
   def get_next_photo_index(self):
     last_photo_index = 0
@@ -204,23 +204,20 @@ class Camera(Thread):
     return angle
 
   def find_face(self):
-    #print "face"
     faceX = None
-    ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    faces = img.find_faces()
+    ts = time.time()
+    faces = img.grayscale().find_faces()
+    print "face.detect: " + str(time.time() - ts)
+    self._image_lock.release()
     print faces
     if len(faces):
-      # Get the largest face 
+      # Get the largest face, face is a rectangle 
       bigFace = faces[0]
-      # Draw a green box around the face 
-      #bigFace.draw()
-      faceX = (bigFace.center[0] * 100) / 160
+      center = bigFace[0]+(bigFace[2]/2)
+      faceX = (center * 100) / 160
 
-    #self.save_image(img)
-    self._image_lock.release()
-    print "face: " + str(time.time() - ts)
     return faceX
 
   def path_ahead(self):
