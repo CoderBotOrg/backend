@@ -15,9 +15,9 @@
   {%if config.ctrl_counter%}<div class="" style="position:fixed;left:32px;top:80px;">
    <button id="b_counter" class="ui-btn ui-btn-inline ui-btn-traslucent" type="button">0</button>
   </div>{%endif%}
-  <div class="" style="position:fixed;right:32px;top:80px;">
+  {%if config.show_page_prefs%}<div class="" style="position:fixed;right:32px;top:80px;">
    <button id="b_halt" class="ui-btn ui-btn-inline ui-icon-power ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Halt{% endtrans %}</button>
-  </div>
+  </div>{%endif%}
   <div class="ui-grid-b" style="position:fixed; width:100%;bottom:0px;">
    <div class="ui-block-a" id="ui_control_left">
     {% if config.show_control_move_commands%}<fieldset class="ui-grid-solo">

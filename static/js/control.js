@@ -154,7 +154,13 @@ Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
 	$.mobile.pageContainer.pagecontainer('change', '#page-preferences');
         return false;
 });
-        
+
+Mousetrap.bind(['command+alt+h', 'ctrl+alt+h'], function(e) {
+        if(confirm("Shutdown CoderBot?")){
+        	bot.halt();
+	}
+});
+ 
 botStatus();
 
 function botStatus() {
