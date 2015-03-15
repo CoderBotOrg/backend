@@ -126,11 +126,12 @@ class Program:
         get_cam().video_rec(program.name)
         print "starting video"
       exec(self._code)
-      get_cam().video_stop() #if video is running, stop it
       #print "run.2"
     except RuntimeError as re:
       print "quit: " + str(re)
-    self._running = False
+    finally:
+      get_cam().video_stop() #if video is running, stop it
+      self._running = False
 
   def as_json(self):
     return {'name': self.name,

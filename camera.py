@@ -176,9 +176,9 @@ class Camera(Thread):
     slices[0] = img.crop(0, 100, 160, 120)
     slices[1] = img.crop(0, 80, 160, 100)
     slices[2] = img.crop(0, 60, 160, 80)
-    coords = [50, 50, 50]
+    coords = [-1, -1, -1]
     for idx, slice in enumerate(slices):
-      blobs[idx] = slice.find_blobs(minsize=80, maxsize=1600)
+      blobs[idx] = slice.find_blobs(minsize=30, maxsize=160)
       #print "blobs: " + str(blobs[idx])
       if len(blobs[idx]):
         coords[idx] = (blobs[idx][0].center[0] * 100) / 160
