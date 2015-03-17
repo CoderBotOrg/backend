@@ -257,7 +257,7 @@ msgstr "Salvato"
 
 #: templates/config_params.html:21
 msgid "Program saved"
-msgstr "Nome programma"
+msgstr "Programma salvato"
 
 #: templates/config_params.html:22
 msgid "Program name already in use, overwrite?"

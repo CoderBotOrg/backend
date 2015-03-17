@@ -169,8 +169,6 @@ class Camera(Thread):
   def find_line(self):
     self._image_lock.acquire()
     img = self.get_image(0).binarize()
-    #img.drawRectangle(0,200,640,40)
-    #img.drawRectangle(240,200,160,40, color=(0,0,255))
     slices = [0,0,0]
     blobs = [0,0,0]
     slices[0] = img.crop(0, 100, 160, 120)
@@ -179,7 +177,6 @@ class Camera(Thread):
     coords = [-1, -1, -1]
     for idx, slice in enumerate(slices):
       blobs[idx] = slice.find_blobs(minsize=30, maxsize=160)
-      #print "blobs: " + str(blobs[idx])
       if len(blobs[idx]):
         coords[idx] = (blobs[idx][0].center[0] * 100) / 160
 	print "line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area())

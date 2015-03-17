@@ -55,6 +55,8 @@
       <legend>{% trans %}Program editor details{% endtrans %}</legend>
       <label for="c_prog_scrollbars">{% trans %}Shows Editor scrollbars{% endtrans %}</label>
       <input type="checkbox" name="prog_scrollbars" id="c_prog_scrollbars" value="true" {%if config.prog_scrollbars=='true'%}checked="checked"{%endif%}>
+      <label for="c_prog_saveonrun">{% trans %}Save program before every run{% endtrans %}</label>
+      <input type="checkbox" name="prog_saveonrun" id="c_prog_saveonrun" value="true" {%if config.prog_saveonrun=='true'%}checiked="checked"{%endif%}>
      </fieldset>
      <div class="ui-field-contain">
       <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
