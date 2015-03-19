@@ -60,6 +60,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
         }
       }
       prog.name = name;
+      $('#id_prog_name').text("[ " + prog.name + " ]");
     }
 
     function loadProg() {
@@ -85,6 +86,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
           var xml = Blockly.Xml.textToDom(data);
           Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
           $.mobile.loading("hide");
+          $('#id_prog_name').text("[ " + prog.name + " ]");
 	}});
       } catch (e) {
         alert(e);
@@ -122,6 +124,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
         }
       }
       prog.name = name;
+      $('#id_prog_name').text("[ " + prog.name + " ]");
       saveProg();
     }
 
