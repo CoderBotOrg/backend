@@ -55,7 +55,21 @@
       <legend>{% trans %}Program editor details{% endtrans %}</legend>
       <label for="c_prog_scrollbars">{% trans %}Shows Editor scrollbars{% endtrans %}</label>
       <input type="checkbox" name="prog_scrollbars" id="c_prog_scrollbars" value="true" {%if config.prog_scrollbars=='true'%}checked="checked"{%endif%}>
+      <label for="c_prog_saveonrun">{% trans %}Save program before every run{% endtrans %}</label>
+      <input type="checkbox" name="prog_saveonrun" id="c_prog_saveonrun" value="true" {%if config.prog_saveonrun=='true'%}checiked="checked"{%endif%}>
      </fieldset>
+     <div class="ui-field-contain">
+      <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode" name="prog_move_motion" value="yes"{%if config.prog_move_motion%} checked{%endif%}>
+     </div>
+     <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
+     <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">
+     <label for="i_move_fw_elapse">{% trans %}Forward elapse / distance{% endtrans %}</label>
+     <input type="text" id="i_move_fw_elapse" name="move_fw_elapse" value="{{config.move_fw_elapse}}">
+     <label for="i_move_tr_speed">{% trans %}Turn speed{% endtrans %}</label>
+     <input type="text" id="i_move_tr_speed" name="move_tr_speed" value="{{config.move_tr_speed}}">
+     <label for="i_move_tr_elapse">{% trans %}Turn elapse / angle{% endtrans %}</label>
+     <input type="text" id="i_move_tr_elapse" name="move_tr_elapse" value="{{config.move_tr_elapse}}">
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Other program parameters{% endtrans %}</legend>
       <label for="c_prog_video_rec">{% trans %}Auto record video on program run{% endtrans %}</label>
@@ -87,18 +101,6 @@
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>
      <input type="text" id="i_move_motor_mode" name="move_motor_mode" value="{{config.move_motor_mode}}">
-     <div class="ui-field-contain">
-      <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
-      <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode" name="prog_move_motion" value="yes"{%if config.prog_move_motion%} checked{%endif%}>
-     </div>
-     <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
-     <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">
-     <label for="i_move_fw_elapse">{% trans %}Forward elapse{% endtrans %}</label>
-     <input type="text" id="i_move_fw_elapse" name="move_fw_elapse" value="{{config.move_fw_elapse}}">
-     <label for="i_move_tr_speed">{% trans %}Turn speed{% endtrans %}</label>
-     <input type="text" id="i_move_tr_speed" name="move_tr_speed" value="{{config.move_tr_speed}}">
-     <label for="i_move_tr_elapse">{% trans %}Turn elapse{% endtrans %}</label>
-     <input type="text" id="i_move_tr_elapse" name="move_tr_elapse" value="{{config.move_tr_elapse}}">
     </div>
     <div id="t_start" class="ui-body-d ui-content">
      <label for="i_load_at_start">{% trans %}Load at start{% endtrans %}</label>

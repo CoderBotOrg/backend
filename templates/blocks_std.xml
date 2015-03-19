@@ -21,15 +21,6 @@
       <block type="variables_set"></block>
       <block type="variables_set"></block>
     </category>
-    <category name="{% trans %}Procedures{% endtrans %}">
-      <block type="procedures_defnoreturn"></block>
-      <block type="procedures_defreturn"></block>
-      <block type="procedures_mutatorcontainer"></block>
-      <block type="procedures_mutatorarg"></block>
-      <block type="procedures_callnoreturn"></block>
-      <block type="procedures_callreturn"></block>
-      <block type="procedures_ifreturn"></block>
-    </category>
     <category name="{% trans %}Math{% endtrans %}">
       <block type="math_number"></block>
       <block type="math_arithmetic"></block>
@@ -37,6 +28,7 @@
     </category>
     <category name="{% trans %}Text{% endtrans %}">
       <block type="text"></block>
+      <block type="text_join"></block>
       <block type="text_length"></block>
       <block type="text_print"></block>
     </category>

@@ -63,11 +63,11 @@ class Camera(Thread):
         #print "run.1"
         self._image_lock.acquire()
         self._camera.grab_one()
+        self._image_lock.release()
         #print "run.2: " + str(time.time()-ts)
         #self.save_image(image.Image(self._camera.get_image_bgr()).open().binarize().to_jpeg())
         self.save_image(self._camera.get_image_jpeg())
         #print "run.3: " + str(time.time()-ts)
-        self._image_lock.release()
       else:
         time.sleep(CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time))
 
@@ -84,7 +84,7 @@ class Camera(Thread):
     self._image_time=time.time()
 
   def set_text(self, text):
-    self._camera.set_overlay_text(text)
+    self._camera.set_overlay_text(str(text))
 
   def get_next_photo_index(self):
     last_photo_index = 0
@@ -169,17 +169,14 @@ class Camera(Thread):
   def find_line(self):
     self._image_lock.acquire()
     img = self.get_image(0).binarize()
-    #img.drawRectangle(0,200,640,40)
-    #img.drawRectangle(240,200,160,40, color=(0,0,255))
     slices = [0,0,0]
     blobs = [0,0,0]
     slices[0] = img.crop(0, 100, 160, 120)
     slices[1] = img.crop(0, 80, 160, 100)
     slices[2] = img.crop(0, 60, 160, 80)
-    coords = [50, 50, 50]
+    coords = [-1, -1, -1]
     for idx, slice in enumerate(slices):
-      blobs[idx] = slice.find_blobs(minsize=80, maxsize=1600)
-      #print "blobs: " + str(blobs[idx])
+      blobs[idx] = slice.find_blobs(minsize=30, maxsize=160)
       if len(blobs[idx]):
         coords[idx] = (blobs[idx][0].center[0] * 100) / 160
 	print "line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area())
@@ -204,23 +201,20 @@ class Camera(Thread):
     return angle
 
   def find_face(self):
-    #print "face"
     faceX = None
-    ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    faces = img.find_faces()
+    ts = time.time()
+    faces = img.grayscale().find_faces()
+    print "face.detect: " + str(time.time() - ts)
+    self._image_lock.release()
     print faces
     if len(faces):
-      # Get the largest face 
+      # Get the largest face, face is a rectangle 
       bigFace = faces[0]
-      # Draw a green box around the face 
-      #bigFace.draw()
-      faceX = (bigFace.center[0] * 100) / 160
+      center = bigFace[0]+(bigFace[2]/2)
+      faceX = (center * 100) / 160
 
-    #self.save_image(img)
-    self._image_lock.release()
-    print "face: " + str(time.time() - ts)
     return faceX
 
   def path_ahead(self):
