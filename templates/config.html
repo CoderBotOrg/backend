@@ -16,6 +16,7 @@
       <li><a href="#t_start" data-ajax="true">{% trans %}Start{% endtrans %}</a></li>
       <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
       <li><a href="#t_ui" data-ajax="true">{% trans %}User Interface{% endtrans %}</a></li>
+      <li><a href="#t_wifi" data-ajax="true">{% trans %}WiFi{% endtrans %}</a></li>
      </ul>
     </div>
     <div id="t_control" class="ui-body-d ui-content">
@@ -127,6 +128,20 @@
       <label for="c_show_page_prefs">{% trans %}Show Preferences button{% endtrans %}</label>
       <input type="checkbox" name="show_page_prefs" id="c_show_page_prefs" value="true" {%if config.show_page_prefs=='true'%}checked="checked"{%endif%}>
      </fieldset>
+    </div>
+   <div id="t_wifi" class="ui-body-d ui-content">
+     <fieldset data-role="controlgroup" data-mini="true">
+      <legend>{% trans %}WiFi mode{% endtrans %}</legend>
+      <input type="radio" name="wifi_mode" id="r_wifi_mode_a" value="ap" {%if config.wifi_mode=='ap'%}checked="checked"{%endif%}>
+      <label for="r_wifi_mode_a">{% trans %}Access Point{% endtrans %}</label>
+      <input type="radio" name="wifi_mode" id="r_wifi_mode_b" value="client" {%if config.wifi_mode=='client'%}checked="checked"{%endif%}>
+      <label for="r_wifi_mode_b">{% trans %}Client{% endtrans %}</label>
+     </fieldset>
+     <legend>WiFi Client mode access data</legend>
+     <label for="i_wifi_ssid">{% trans %}WiFi name{% endtrans %}</label>
+     <input type="text" id="i_wifi_ssid" name="wifi_ssid" value="{{config.wifi_ssid}}">
+     <label for="i_wifi_psk">{% trans %}WiFi password{% endtrans %}</label>
+     <input type="text" id="i_wifi_psk" name="wifi_psk" value="{{config.wifi_psk}}">
     </div>
     <div class="ui-grid-a">
      <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>

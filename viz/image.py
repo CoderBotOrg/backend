@@ -9,7 +9,8 @@ r_dest   = np.float32([[0, -30], [160, -30], [95, 120], [65, 120]])
 MIN_MATCH_COUNT = 10
 
 class Image():
-    _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
+    #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
+    _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
     _kernel = np.ones((3,3),np.uint8)
 
     def __init__(self, array):
