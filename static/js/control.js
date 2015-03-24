@@ -110,6 +110,15 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 });
                 return false;
 	});
+        $('#b_wifi_apply').on("click", function (){
+                var form_data = $(this).parents("form").serialize();
+                $.post(url='/wifi', form_data, success=function(data){
+                  alert(BotMessages.Saved);
+                  location.href=data;
+                });
+                return false;
+        });
+
 });
 
 $(document).on( "pageshow", '#page-photos', function( event ) {

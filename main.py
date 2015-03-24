@@ -43,6 +43,20 @@ def handle_config():
     app.bot_config = Config.get()
     return "ok";
 
+@app.route("/wifi", methods=["POST"])
+def handle_wifi():
+    mode = request.form.get("wifi_mode")
+    ssid = request.form.get("wifi_ssid")
+    psk = request.form.get("wifi_psk")
+    print "mode ", mode, " ssid: ", ssid, " psk: ", psk
+    client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
+    print client_params
+    os.system("sudo python wifi.py updatecfg " + mode + client_params)
+    if mode == "ap":
+      return "http://coder.bot:8080";
+    else:
+      return "http://coderbotsrv.appspot.com/"
+
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')

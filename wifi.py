@@ -77,6 +77,7 @@ class WiFi():
   def register_ipaddr(cls, ipaddr, botname):
     try:
       ret = urllib2.urlopen(cls.web_url + "?name=" + botname + "&ipaddr=" + ipaddr)
+      print str(ret.getcode())
       if ret.getcode() != 200:
         raise Exception()
     except URLError as e:
@@ -110,6 +111,8 @@ network={\n""")
     try:
       out = subprocess.check_output(["ifdown", "wlan0"])
       out = subprocess.check_output(["ifup", "wlan0"])
+      print "registering ip..."
+      cls.register_ipaddr(cls.get_ipaddr("wlan0"), "CoderBot")
     except subprocess.CalledProcessError as e:
       print e.output
       raise
@@ -126,24 +129,38 @@ network={\n""")
     out = subprocess.check_output(["ifup", "wlan0"])
     cls.start_hostapd()
 
+  @classmethod
+  def start_service(cls):
+    config = cls.load_config()
+    if config["wifi_mode"] == "ap":
+      print "starting as ap..."
+      cls.start_as_ap()
+    elif config["wifi_mode"] == "client":
+      print "starting as client..."
+      try:
+        cls.start_as_client()
+      except:
+        print "Unable to register ip, revert to ap mode"
+        cls.start_as_ap()
 
 def main():
-  print "starting wifi service..."
   w = WiFi()
-  config = w.load_config()
-
-  if config["wifi_mode"] == "ap":
-    print "starting as ap..."
-    w.start_as_ap()
-  elif config["wifi_mode"] == "client":
-    print "starting as client..."
-    w.start_as_client()
-    try:
-      print "registering ip..."
-      w.register_ipaddr(w.get_ipaddr("wlan0"), "CoderBot")
-    except:
-      print "Unable to register ip, revert to ap mode"
+  if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
+    if len(sys.argv) > 2 and sys.argv[2] == "ap":
+      w.set_start_as_ap()
       w.start_as_ap()
+    elif len(sys.argv) > 2 and sys.argv[2] == "client":
+      if len(sys.argv) > 3:
+        w.set_client_params(sys.argv[3], sys.argv[4])
+      w.set_start_as_client()
+      w.stop_hostapd()
+      try:
+        w.start_as_client()
+      except:
+        print "Unable to register ip, revert to ap mode"
+        w.start_as_ap()
+  else:
+    w.start_service()
 
 if __name__ == "__main__":
   main()
