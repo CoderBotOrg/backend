@@ -1,6 +1,7 @@
 import cv2
 import math
 import numpy as np
+import logging
 from time import clock, time, sleep
 from viz import image, streamer
 
@@ -146,7 +147,7 @@ class Motion:
         #print len(new_tracks), len(tracks)
         tracks[:] = new_tracks[:]
         if len(tracks) == 0:
-            print "lost ALL tp!"
+            logging.warn("lost ALL tp!")
             self.bot.stop()
             #exit(0)
         #cv2.polylines(self.vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
@@ -194,7 +195,7 @@ class Motion:
         power_angles = [[15, (40, -1)], [4, (80, 0.05)], [1, (80,0.02)], [0, (0, 0)]]
         done = False
         sign = (target_angle - delta_angle) / abs(target_angle - delta_angle)
-        print( "abs delta: ", abs(target_angle - delta_angle), " sign delta: ", sign ) 
+        logging.info( "abs delta: " + abs(target_angle - delta_angle) + " sign delta: " + sign )
         for p_a in power_angles:
            if abs(target_angle - delta_angle) > p_a[0]:
                print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
@@ -206,9 +207,9 @@ class Motion:
     
     def bot_move(self, target_dist, delta_dist, delta_angle):
         base_power = 100 * (target_dist/abs(target_dist))
-        print "base power", base_power
+        logging.info("base power" + base_power)
         self.delta_power += (delta_angle * 0.01)
-        print( "delta power: ", self.delta_power)
+        logging.info( "delta power: " + self.delta_power)
         if abs(delta_dist) < abs(target_dist):
             self.bot.motor_control(min(max(base_power-self.delta_power,-100),100), min(max(base_power+self.delta_power,-100),100), -1)
         else:

@@ -5,6 +5,7 @@ import math
 from PIL import Image as PILImage
 from StringIO import StringIO
 from threading import Thread, Lock
+import logging
 
 from viz import camera, streamer, image, blob
 import config
@@ -35,7 +36,7 @@ class Camera(Thread):
     return cls._instance
 
   def __init__(self):
-    print "starting camera"
+    logging.info("starting camera")
     cam_props = {"width":640, "height":480, "exposure_mode": config.Config.get().get("camera_exposure_mode")}
     self._camera = camera.Camera(props=cam_props)
     self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
@@ -153,7 +154,7 @@ class Camera(Thread):
     return open(PHOTO_PATH + "/" + filename[:-len(PHOTO_FILE_EXT)] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT)
 
   def delete_photo(self, filename):
-    print filename
+    logging.info("delete photo: " + filename)
     os.remove(PHOTO_PATH + "/" + filename)
     os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
     self._photos.remove(filename)
@@ -179,7 +180,7 @@ class Camera(Thread):
       blobs[idx] = slice.find_blobs(minsize=30, maxsize=160)
       if len(blobs[idx]):
         coords[idx] = (blobs[idx][0].center[0] * 100) / 160
-	print "line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area())
+	logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
     
     self._image_lock.release()
     return coords[0]
@@ -192,7 +193,7 @@ class Camera(Thread):
     img = self.get_image(0)
     signals = img.find_template(self._img_template)
      
-    print "signal: " + str(time.time() - ts)
+    logging.info("signal: " + str(time.time() - ts))
     if len(signals):
       angle = signals[0].angle
 
@@ -246,14 +247,14 @@ class Camera(Thread):
       #for b in blobs:
       #  print "blobs.bottom: " + str(b.bottom) + " area: " + str(b.area())
 
-      print "obstacle:" + str(obstacle.bottom) 
+      logging.info("obstacle:" + str(obstacle.bottom)) 
       #print "path_ahead.sortdistnace: " + str(time.time() - ts)
       #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
       #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
       #img.drawRectangle(dw_x, dw_y, obstacle.width(), obstacle.height(), color=(255,0,0))
       x, y = img.transform((obstacle.center[0], obstacle.bottom))
       coordY = 60 - ((y * 48) / 100) 
-      print "coordY: " + str(coordY)
+      logging.info("coordY: " + str(coordY))
       #print obstacle.coordinates()[1]+(obstacle.height()/2)
       #ar_layer.centeredRectangle(obstacle.coordinates(), (obstacle.width(), obstacle.height()))
       #warped.addDrawingLayer(ar_layer)
@@ -281,22 +282,22 @@ class Camera(Thread):
     #objects = warped.findBlobs(minsize=200, maxsize=4000)
     bw = img.filter_color(color)
     objects = bw.find_blobs(minsize=50, maxsize=1000)
-    print objects
+    logging.debug("objects: " + str(objects))
     dist = -1
     angle = 180
 
     if objects and len(objects):
       obj = objects[-1]
       bottom = obj.bottom
-      print "bottom: ", obj.center[0], obj.bottom
+      logging.info("bottom: ", obj.center[0], obj.bottom)
       coords = bw.transform([(obj.center[0], obj.bottom)])
-      print "coordinates: ", coords
+      logging.info("coordinates: " + coords)
       x = coords[0][0]
       y = coords[0][1]
       #print "height: " + str(object.height())
       dist = math.sqrt(math.pow(12 + (68 * (120 - y) / 100),2) + (math.pow((x-80)*60/160,2)))
       angle = math.atan2(x - 80, 120 - y) * 180 / math.pi
-      print "object found, dist: " + str(dist) + " angle: " + str(angle)
+      logging.info("object found, dist: " + str(dist) + " angle: " + str(angle))
       #img.drawText("object found, dist: " + str(dist) + " angle: " + str(angle), 0, 0, fontsize=32 )
     #self.save_image(self._camera.get_image_jpeg())
     #self.save_image(img.to_jpeg())
@@ -305,6 +306,6 @@ class Camera(Thread):
     return [dist, angle]
     
   def sleep(self, elapse):
-    print "sleep"
+    logging.debug("sleep: " + elapse)
     time.sleep(elapse)
 

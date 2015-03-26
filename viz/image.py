@@ -3,6 +3,7 @@ import cv2
 import colorsys
 import copy
 import blob
+import logging
 
 r_from = np.float32([[0, 0], [160, 0], [160, 120], [0, 120]])
 r_dest   = np.float32([[0, -30], [160, -30], [95, 120], [65, 120]])
@@ -130,11 +131,11 @@ class Image():
         h,w = img_template.shape
         pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts,M)
-        print "found template: ", dst
+        logging.info("found template: " + dst)
         templates[0] = dst
 
       else:
-        print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
+        logging.info( "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
         matchesMask = None
         
       return templates
