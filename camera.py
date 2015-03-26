@@ -57,25 +57,29 @@ class Camera(Thread):
     super(Camera, self).__init__()
 
   def run(self):
-    self._camera.grab_start()
-    while self._run:
-      if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
-        ts = time.time()
-        #print "run.1"
-        self._image_lock.acquire()
-        self._camera.grab_one()
-        self._image_lock.release()
-        #print "run.2: " + str(time.time()-ts)
-        #self.save_image(image.Image(self._camera.get_image_bgr()).open().binarize().to_jpeg())
-        self.save_image(self._camera.get_image_jpeg())
-        #print "run.3: " + str(time.time()-ts)
-      else:
-        time.sleep(CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time))
+    try:
+      self._camera.grab_start()
+      while self._run:
+        if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
+          ts = time.time()
+          #print "run.1"
+          self._image_lock.acquire()
+          self._camera.grab_one()
+          self._image_lock.release()
+          #print "run.2: " + str(time.time()-ts)
+          #self.save_image(image.Image(self._camera.get_image_bgr()).open().binarize().to_jpeg())
+          self.save_image(self._camera.get_image_jpeg())
+          #print "run.3: " + str(time.time()-ts)
+        else:
+          time.sleep(CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time))
 
-      if self.recording and time.time() - self.video_start_time > VIDEO_ELAPSE_MAX:
-        self.video_stop()
+        if self.recording and time.time() - self.video_start_time > VIDEO_ELAPSE_MAX:
+          self.video_stop()
 
-    self._camera.grab_stop()
+      self._camera.grab_stop()
+    except:
+      logging.error("Unexpected error:" + str(sys.exc_info()[0]))
+      raise
 
   def get_image(self, maxage = MAX_IMAGE_AGE):
     return image.Image(self._camera.get_image_bgr())
