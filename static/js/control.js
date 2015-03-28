@@ -136,7 +136,9 @@ $('li.ui-li-has-thumb').hover( function( event ) {
 }, function( event ) {
         $(this).find('.p_photo_cmd').hide();
 });
-
+$('video').on('loadeddata', function( event, ui ) {
+        $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );
+});
         }, dataType="json");       
 });
 

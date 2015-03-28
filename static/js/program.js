@@ -26,6 +26,9 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       $("#b_load_prog_post").on("click", loadProgPost);
       loadProgList();
       $('#popup-video').popup();
+      $('video').on('loadeddata', function( event, ui ) {
+        $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );}
+       );
       $("#b_show_last").on("click", function( event ) {
         var src = "/photos/" + "VID" + prog.name + ".mp4" + "?t=" + (new Date()).getTime();
         $('#popup-video').find('video').attr('src', src);
@@ -35,6 +38,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
 }
     var prog = {};
     var progList = {};
+    prog.name = "no_name";
 
     function loadProgList() {
       try {
