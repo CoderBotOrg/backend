@@ -130,25 +130,60 @@
      </fieldset>
     </div>
    <div id="t_wifi" class="ui-body-d ui-content">
-     <fieldset data-role="controlgroup" data-mini="true">
-      <legend>{% trans %}WiFi mode{% endtrans %}</legend>
-      <input type="radio" name="wifi_mode" id="r_wifi_mode_a" value="ap" {%if config.wifi_mode=='ap'%}checked="checked"{%endif%}>
-      <label for="r_wifi_mode_a">{% trans %}Access Point{% endtrans %}</label>
-      <input type="radio" name="wifi_mode" id="r_wifi_mode_b" value="client" {%if config.wifi_mode=='client'%}checked="checked"{%endif%}>
-      <label for="r_wifi_mode_b">{% trans %}Client{% endtrans %}</label>
-     </fieldset>
-     <legend>WiFi Client mode access data</legend>
-     <label for="i_wifi_ssid">{% trans %}WiFi name{% endtrans %}</label>
-     <input type="text" id="i_wifi_ssid" name="wifi_ssid" value="{{config.wifi_ssid}}">
-     <label for="i_wifi_psk">{% trans %}WiFi password{% endtrans %}</label>
-     <input type="text" id="i_wifi_psk" name="wifi_psk" value="{{config.wifi_psk}}">
-     <button type="button" id="b_wifi_apply" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Apply Wifi config{% endtrans %}</button>
+     <a href="#popup-wifi" data-rel="popup" id="b_wifi_access_mode" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}WiFi Client access mode{% endtrans %}</a>
     </div>
     <div class="ui-grid-a">
      <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
-     <div class="ui-block-b"><button type="submit" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
+     <div class="ui-block-b"><button type="submit" id="b_config_save" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
     </div>
    </div>
   </form>
  </div>
+ <div data-role="popup" id="popup-wifi" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+  <form class="config" id="f_wifi">
+   <h3>{% trans %}WiFi Client mode access data{% endtrans %}</h3>
+   <fieldset data-role="controlgroup" data-mini="true">
+    <legend>{% trans %}WiFi mode{% endtrans %}</legend>
+    <input type="radio" name="wifi_mode" id="r_wifi_mode_a" value="ap" {%if config.wifi_mode=='ap'%}checked="checked"{%endif%}>
+    <label for="r_wifi_mode_a">{% trans %}Access Point{% endtrans %}</label>
+    <input type="radio" name="wifi_mode" id="r_wifi_mode_b" value="client" {%if config.wifi_mode=='client'%}checked="checked"{%endif%}>
+    <label for="r_wifi_mode_b">{% trans %}Client{% endtrans %}</label>
+   </fieldset>
+   <label for="i_wifi_ssid">{% trans %}WiFi name{% endtrans %}</label>
+   <input type="text" id="i_wifi_ssid" name="wifi_ssid" value="{{config.wifi_ssid}}">
+   <label for="i_wifi_psk">{% trans %}WiFi password{% endtrans %}</label>
+   <input type="text" id="i_wifi_psk" name="wifi_psk" value="{{config.wifi_psk}}">
+   <div class="ui-grid-a">
+    <div class="ui-block-a"><a href="#" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
+    <div class="ui-block-b"><a href="#" id="b_wifi_apply" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Apply Wifi config{% endtrans %}</a></div>
+   </div>
+  </form>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-wifi-ap" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}WiFi AP mode access{% endtrans %}</h3>
+   <p>Access Point mode is being set:
+   <ol>
+   <li>Wait 30 seconds</li>
+   <li>Connect your device to the "coderbot" named wifi</li>
+   <li>Click on the following link: <a href="http://coderbot:8080">CoderBot local</a></li>
+   </ol>
+   </p>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-wifi-client" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}WiFi Client mode access{% endtrans %}</h3>
+   <p>Client mode is being set:
+   <ol>
+   <li>Wait 30 seconds</li>
+   <li>Connect your device to your own wifi (wifi network must be connected to internet)</li>
+   <li>Click on the following link: <a href="http://coderbotsrv.appspot.com">CoderBot Server</a></li>
+   </ol>
+   </p>
+  </div>
+ </div>
 </div>
+

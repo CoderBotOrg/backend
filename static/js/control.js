@@ -112,10 +112,13 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 	});
         $('#b_wifi_apply').on("click", function (){
                 var form_data = $(this).parents("form").serialize();
-                $.post(url='/wifi', form_data, success=function(data){
-                  alert(BotMessages.Saved);
-                  location.href=data;
-                });
+                $.post(url='/wifi', form_data);
+                $('#popup-wifi').popup('close');
+                if($("r_wifi_mode_a").attr('checked')==true){
+			$('#popup-wifi-ap').popup('open');
+                } else {
+                        $('#popup-wifi-client').popup('open');
+		}
                 return false;
         });
 
