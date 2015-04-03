@@ -114,7 +114,7 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 var form_data = $(this).parents("form").serialize();
                 $.post(url='/wifi', form_data);
                 $('#popup-wifi').popup('close');
-                if($("r_wifi_mode_a").attr('checked')==true){
+                if($("[name='wifi_mode']:checked").val()=="ap"){
 			$('#popup-wifi-ap').popup('open');
                 } else {
                         $('#popup-wifi-client').popup('open');

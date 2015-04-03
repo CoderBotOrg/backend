@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-14 22:00+0000\n"
+"POT-Creation-Date: 2015-04-04 00:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,11 +25,11 @@ msgstr ""
 msgid "Loops"
 msgstr ""
 
-#: templates/blocks_adv.xml:40 templates/blocks_std.xml:33
+#: templates/blocks_adv.xml:40 templates/blocks_std.xml:24
 msgid "Math"
 msgstr ""
 
-#: templates/blocks_adv.xml:83 templates/blocks_std.xml:38
+#: templates/blocks_adv.xml:83 templates/blocks_std.xml:29
 msgid "Text"
 msgstr ""
 
@@ -59,7 +59,7 @@ msgstr ""
 msgid "Functions"
 msgstr ""
 
-#: templates/blocks_adv.xml:172 templates/blocks_std.xml:43
+#: templates/blocks_adv.xml:172 templates/blocks_std.xml:35
 #: templates/config.html:15
 msgid "Movement"
 msgstr ""
@@ -68,22 +68,18 @@ msgstr ""
 msgid "Camera"
 msgstr ""
 
-#: templates/blocks_adv.xml:234 templates/blocks_std.xml:69
+#: templates/blocks_adv.xml:234 templates/blocks_std.xml:61
 #: templates/config.html:14
 msgid "Sensor"
 msgstr ""
 
-#: templates/blocks_adv.xml:246 templates/blocks_std.xml:81
+#: templates/blocks_adv.xml:246 templates/blocks_std.xml:73
 msgid "Sound"
 msgstr ""
 
 #: templates/blocks_std.xml:2 templates/config.html:11 templates/control.html:8
 #: templates/program.html:8
 msgid "Control"
-msgstr ""
-
-#: templates/blocks_std.xml:24
-msgid "Procedures"
 msgstr ""
 
 #: templates/config.html:3 templates/control.html:63
@@ -106,189 +102,249 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: templates/config.html:18 templates/config.html:118
+#: templates/config.html:18 templates/config.html:127
 msgid "User Interface"
 msgstr ""
 
-#: templates/config.html:23 templates/config.html:60
+#: templates/config.html:19
+msgid "WiFi"
+msgstr ""
+
+#: templates/config.html:24 templates/config.html:63
 msgid "Movement assisted by vision"
 msgstr ""
 
-#: templates/config.html:26
+#: templates/config.html:27
 msgid "Step timing | distance / angle"
 msgstr ""
 
-#: templates/config.html:27 templates/config.html:63
+#: templates/config.html:28 templates/config.html:66
 msgid "Forward speed"
 msgstr ""
 
-#: templates/config.html:29 templates/config.html:65
+#: templates/config.html:30 templates/config.html:68
 msgid "Forward elapse / distance"
 msgstr ""
 
-#: templates/config.html:31 templates/config.html:67
+#: templates/config.html:32 templates/config.html:70
 msgid "Turn speed"
 msgstr ""
 
-#: templates/config.html:33 templates/config.html:69
+#: templates/config.html:34 templates/config.html:72
 msgid "Turn elapse / angle"
 msgstr ""
 
-#: templates/config.html:36
+#: templates/config.html:37
 msgid "Show control counter"
 msgstr ""
 
-#: templates/config.html:39
+#: templates/config.html:40
 msgid "HUD image name"
 msgstr ""
 
-#: templates/config.html:44
+#: templates/config.html:45
 msgid "Editor level"
 msgstr ""
 
-#: templates/config.html:46
+#: templates/config.html:47
 msgid "Move"
 msgstr ""
 
-#: templates/config.html:48
+#: templates/config.html:49
 msgid "Basic"
 msgstr ""
 
-#: templates/config.html:50
+#: templates/config.html:51
 msgid "Standard"
 msgstr ""
 
-#: templates/config.html:52
+#: templates/config.html:53
 msgid "Advanced"
 msgstr ""
 
-#: templates/config.html:55
+#: templates/config.html:56
 msgid "Program editor details"
 msgstr ""
 
-#: templates/config.html:56
+#: templates/config.html:57
 msgid "Shows Editor scrollbars"
 msgstr ""
 
-#: templates/config.html:72
+#: templates/config.html:59
+msgid "Save program before every run"
+msgstr ""
+
+#: templates/config.html:75
 msgid "Other program parameters"
 msgstr ""
 
-#: templates/config.html:73
+#: templates/config.html:76
 msgid "Auto record video on program run"
 msgstr ""
 
-#: templates/config.html:76
+#: templates/config.html:79
 msgid "Max number of blocks allowed"
 msgstr ""
 
-#: templates/config.html:80
+#: templates/config.html:83
 msgid "Start sound"
 msgstr ""
 
-#: templates/config.html:82
+#: templates/config.html:85
 msgid "Stop sound"
 msgstr ""
 
-#: templates/config.html:84
+#: templates/config.html:87
 msgid "Shutter sound"
 msgstr ""
 
-#: templates/config.html:88
+#: templates/config.html:91
 msgid "Camera parameters"
 msgstr ""
 
-#: templates/config.html:89
+#: templates/config.html:92
 msgid "Exposure mode"
 msgstr ""
 
-#: templates/config.html:100
+#: templates/config.html:103
 msgid "Motor control mode"
 msgstr ""
 
-#: templates/config.html:104
-msgid "Load at start"
+#: templates/config.html:105
+msgid "Power (target angle -15)"
+msgstr ""
+
+#: templates/config.html:107
+msgid "Power (target angle -4)"
 msgstr ""
 
 #: templates/config.html:109
+msgid "Power (target angle -1)"
+msgstr ""
+
+#: templates/config.html:113
+msgid "Load at start"
+msgstr ""
+
+#: templates/config.html:118
 msgid "Button function"
 msgstr ""
 
-#: templates/config.html:110
+#: templates/config.html:119
 msgid "None"
 msgstr ""
 
-#: templates/config.html:112
+#: templates/config.html:121
 msgid "Start/Stop current program"
 msgstr ""
 
-#: templates/config.html:119
+#: templates/config.html:128
 msgid "Show Control page"
 msgstr ""
 
-#: templates/config.html:121
+#: templates/config.html:130
 msgid "Show Control movement commands"
 msgstr ""
 
-#: templates/config.html:123
+#: templates/config.html:132
 msgid "Show Program page"
 msgstr ""
 
-#: templates/config.html:125
+#: templates/config.html:134
 msgid "Show Preferences button"
 msgstr ""
 
-#: templates/config.html:130
+#: templates/config.html:139
+msgid "WiFi Client access mode"
+msgstr ""
+
+#: templates/config.html:142 templates/config.html:164
 msgid "Cancel"
 msgstr ""
 
-#: templates/config.html:131 templates/program.html:18
+#: templates/config.html:143 templates/program.html:18
 #: templates/program.html:26
 msgid "Save"
 msgstr ""
 
-#: templates/config_params.html:19
-msgid "Say what:"
+#: templates/config.html:151
+msgid "WiFi Client mode access data"
+msgstr ""
+
+#: templates/config.html:153
+msgid "WiFi mode"
+msgstr ""
+
+#: templates/config.html:155
+msgid "Access Point"
+msgstr ""
+
+#: templates/config.html:157
+msgid "Client"
+msgstr ""
+
+#: templates/config.html:159
+msgid "WiFi name"
+msgstr ""
+
+#: templates/config.html:161
+msgid "WiFi password"
+msgstr ""
+
+#: templates/config.html:165
+msgid "Apply Wifi config"
+msgstr ""
+
+#: templates/config.html:172
+msgid "WiFi AP mode access"
+msgstr ""
+
+#: templates/config.html:184
+msgid "WiFi Client mode access"
 msgstr ""
 
 #: templates/config_params.html:20
-msgid "Saved"
+msgid "Say what:"
 msgstr ""
 
 #: templates/config_params.html:21
-msgid "Program saved"
+msgid "Saved"
 msgstr ""
 
 #: templates/config_params.html:22
-msgid "Program name already in use, overwrite?"
+msgid "Program saved"
 msgstr ""
 
 #: templates/config_params.html:23
-msgid "Delete"
+msgid "Program name already in use, overwrite?"
 msgstr ""
 
 #: templates/config_params.html:24
-msgid "Delete photo"
+msgid "Delete"
 msgstr ""
 
 #: templates/config_params.html:25
+msgid "Delete photo"
+msgstr ""
+
+#: templates/config_params.html:26
 msgid "Reset move counter?"
 msgstr ""
 
-#: templates/config_params.html:26 templates/program.html:40
+#: templates/config_params.html:27 templates/program.html:40
 msgid "is running"
 msgstr ""
 
-#: templates/config_params.html:27
+#: templates/config_params.html:28
 msgid "stopped"
 msgstr ""
 
-#: templates/config_params.html:28 templates/control.html:51
+#: templates/config_params.html:29 templates/control.html:51
 #: templates/program.html:32
 msgid "Stop"
 msgstr ""
 
-#: templates/config_params.html:29
+#: templates/config_params.html:30
 msgid "Close"
 msgstr ""
 
