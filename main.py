@@ -82,6 +82,7 @@ def handle_bot():
         motion.turn(angle=float(param2))
     elif cmd == "stop":
         bot.stop()
+        motion.stop()
     elif cmd == "take_photo":
         cam.photo_take()
         bot.say(app.bot_config.get("sound_shutter"))
@@ -217,4 +218,4 @@ def run_server():
 
   bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
   bot.say(app.bot_config.get("sound_start"))
-  app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)
+  app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)

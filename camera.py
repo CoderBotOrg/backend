@@ -1,6 +1,7 @@
 import time
 import copy
 import os
+import sys
 import math
 from PIL import Image as PILImage
 from StringIO import StringIO
@@ -60,7 +61,8 @@ class Camera(Thread):
     try:
       self._camera.grab_start()
       while self._run:
-        if time.time() - self._image_time > CAMERA_REFRESH_INTERVAL:
+        sleep_time = CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time)
+        if sleep_time <= 0:
           ts = time.time()
           #print "run.1"
           self._image_lock.acquire()
@@ -71,7 +73,7 @@ class Camera(Thread):
           self.save_image(self._camera.get_image_jpeg())
           #print "run.3: " + str(time.time()-ts)
         else:
-          time.sleep(CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time))
+          time.sleep(sleep_time)
 
         if self.recording and time.time() - self.video_start_time > VIDEO_ELAPSE_MAX:
           self.video_stop()
@@ -274,18 +276,15 @@ class Camera(Thread):
     return coordY
 
   def find_color(self, s_color):
-    print s_color
     color = (int(s_color[1:3],16), int(s_color[3:5],16), int(s_color[5:7],16))
     code_data = None
     ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    #print "signal.get_image: " + str(time.time() - ts)
-    #warped = img.colorDistance(color).resize(160).warp(self._warp_corners_4).binarize(80)
-    #print "oject.warp: " + str(time.time() - ts)
-    #objects = warped.findBlobs(minsize=200, maxsize=4000)
+    self._image_lock.release()
     bw = img.filter_color(color)
-    objects = bw.find_blobs(minsize=50, maxsize=1000)
+    #self.save_image(bw.to_jpeg())
+    objects = bw.find_blobs(minsize=20, maxsize=1000)
     logging.debug("objects: " + str(objects))
     dist = -1
     angle = 180
@@ -293,19 +292,17 @@ class Camera(Thread):
     if objects and len(objects):
       obj = objects[-1]
       bottom = obj.bottom
-      logging.info("bottom: ", obj.center[0], obj.bottom)
+      logging.info("bottom: " + str(obj.center[0]) + " " +str(obj.bottom))
       coords = bw.transform([(obj.center[0], obj.bottom)])
-      logging.info("coordinates: " + coords)
+      logging.info("coordinates: " + str(coords))
       x = coords[0][0]
       y = coords[0][1]
-      #print "height: " + str(object.height())
       dist = math.sqrt(math.pow(12 + (68 * (120 - y) / 100),2) + (math.pow((x-80)*60/160,2)))
       angle = math.atan2(x - 80, 120 - y) * 180 / math.pi
       logging.info("object found, dist: " + str(dist) + " angle: " + str(angle))
       #img.drawText("object found, dist: " + str(dist) + " angle: " + str(angle), 0, 0, fontsize=32 )
     #self.save_image(self._camera.get_image_jpeg())
     #self.save_image(img.to_jpeg())
-    self._image_lock.release()
     #print "object: " + str(time.time() - ts)
     return [dist, angle]
     

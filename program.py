@@ -2,6 +2,7 @@ import os
 import sys
 import threading
 import json
+import logging
 
 import coderbot
 import camera
@@ -73,7 +74,6 @@ class ProgramEngine:
   def check_end(self):
     return self._program.check_end()
 
-#class Program(threading.Thread):
 class Program:
   _running = False
 
@@ -92,15 +92,13 @@ class Program:
     if self._running:
       raise RuntimeError('already running')
 
-    print "execute.1"
     self._running = True
 
     try:
       self._thread = threading.Thread(target=self.run)
       self._thread.start()
     except RuntimeError as re:
-      print "RuntimeError:" + str(re)
-    print "execute.2"
+      logging.error("RuntimeError:" + str(re))
     return "ok"
 
   def end(self):
@@ -124,13 +122,14 @@ class Program:
       program = self
       if config.Config.get().get("prog_video_rec") == "true":
         get_cam().video_rec(program.name)
-        print "starting video"
+        logging.debug("starting video")
       exec(self._code)
       #print "run.2"
     except RuntimeError as re:
-      print "quit: " + str(re)
+      logging.info("quit: " + str(re))
     finally:
       get_cam().video_stop() #if video is running, stop it
+      get_motion().stop()
       self._running = False
 
   def as_json(self):

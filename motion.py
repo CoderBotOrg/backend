@@ -7,6 +7,7 @@ from viz import image, streamer
 
 from coderbot import CoderBot
 from camera import Camera
+from program import get_prog_eng
 from config import Config
 
 lk_params = dict( winSize  = (15, 15),
@@ -35,6 +36,7 @@ class Motion:
         self.ts = time()
         self.frame_gray = None
         self.prev_gray = None
+        self.running = False
         self.delta_power = 0.0
         self.delta_dist = 0.0
         self.target_dist = 0.0
@@ -65,9 +67,12 @@ class Motion:
         self.target_angle = angle
         self.loop_turn()
  
+    def stop(self):
+        self.running = False
+
     def loop_move(self):
-        done = False
-        while not done:
+        self.running = True
+        while self.running:
             frame = self.cam.get_image()
             self.frame_gray = frame.grayscale()
 
@@ -79,15 +84,15 @@ class Motion:
 
 	    if len(self.tracks) > 0:
                 delta_angle, delta_dist = self.calc_motion()
-                done = self.bot_move(self.target_dist, delta_dist, delta_angle)
+                self.running = self.running and self.bot_move(self.target_dist, delta_dist, delta_angle)
 
             self.frame_idx += 1
             self.prev_gray = self.frame_gray
-
+        self.bot.stop()
 
     def loop_turn(self):
-        done = False
-        while not done:
+        self.running = True
+        while self.running:
             frame = self.cam.get_image()
             self.frame_gray = frame.grayscale()
 
@@ -99,7 +104,7 @@ class Motion:
 
             if len(self.tracks) > 0:
                 delta_angle, delta_dist = self.calc_motion()
-                done = self.bot_turn(self.target_angle, delta_angle)
+                self.running = self.running and self.bot_turn(self.target_angle, delta_angle)
 
             self.frame_idx += 1
             self.prev_gray = self.frame_gray
@@ -188,17 +193,17 @@ class Motion:
         return self.delta_angle, self.delta_dist
 
     def bot_turn(self, target_angle, delta_angle):
-        done = False
+        run = True
         sign = (target_angle - delta_angle) / abs(target_angle - delta_angle)
         logging.info( "abs delta: " + str(abs(target_angle - delta_angle)) + " sign delta: " + str(sign) )
         for p_a in self.power_angles:
-           if abs(target_angle - delta_angle) > p_a[0]:
+           if abs(target_angle - delta_angle) > p_a[0] and self.running:
                #print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
                self.bot.motor_control(sign * p_a[1][0], -1 * sign * p_a[1][0], p_a[1][1])
-               done = p_a[1][0] == 0 #stopped
+               run = p_a[1][0] > 0 #stopped
                break
         
-        return done
+        return run
     
     def bot_move(self, target_dist, delta_dist, delta_angle):
         base_power = 100 * (target_dist/abs(target_dist))
@@ -209,5 +214,5 @@ class Motion:
             self.bot.motor_control(min(max(base_power-self.delta_power,-100),100), min(max(base_power+self.delta_power,-100),100), -1)
         else:
             self.bot.stop()
-        return abs(delta_dist) >= abs(target_dist)
+        return abs(delta_dist) < abs(target_dist)
 

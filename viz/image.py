@@ -50,9 +50,12 @@ class Image():
       h = h * 180
       s = s * 255
       v = v * 255
-      #print str(image_hsv.shape)
-      lower_color = np.array([h-10, s-80, v-80])
-      upper_color = np.array([h+10, s+80, v+80])
+      logging.debug("color_hsv: " + str(h) + " " + str(s) + " " + str(v))
+      #lower_color = np.array([h-10 if h>=10 else 0.0, 0, 0])
+      #upper_color = np.array([h+10 if h<=170 else 179.0, 255, 255])
+      lower_color = np.array([h-10, 50, 50])
+      upper_color = np.array([h+10, 255, 255])
+      logging.debug("lower: " + str(lower_color) + " upper: " + str(upper_color))
       mask = cv2.inRange(image_hsv, lower_color, upper_color)
       return Image(mask)
 

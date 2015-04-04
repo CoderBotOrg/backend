@@ -399,8 +399,8 @@ Blockly.JavaScript['coderbot_motion_turn'] = function(block) {
 
 Blockly.Python['coderbot_motion_turn'] = function(block) {
   // Generate Python for moving forward.
-  var dist = Blockly.Python.valueToCode(block, 'DIST', Blockly.Python.ORDER_NONE);
-  var code = "get_motion().turn(angle=" + dist + ")\n";
+  var angle = Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_NONE);
+  var code = "get_motion().turn(angle=" + angle + ")\n";
   return code;
 };
 
