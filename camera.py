@@ -208,7 +208,7 @@ class Camera(Thread):
     return angle
 
   def find_face(self):
-    faceX = None
+    faceX, faceY, faceS = None
     self._image_lock.acquire()
     img = self.get_image(0)
     ts = time.time()
@@ -219,10 +219,13 @@ class Camera(Thread):
     if len(faces):
       # Get the largest face, face is a rectangle 
       bigFace = faces[0]
-      center = bigFace[0]+(bigFace[2]/2)
-      faceX = (center * 100) / 160
-
-    return faceX
+      centerX = (bigFace[0] + bigFace[2])/2
+      faceX = (centerX * 100) / 160
+      centerY = (bigFace[1] + bigFace[3])/2
+      faceY = (centerY * 100) / 120
+      size = bigFace[2] - bigFace[0]
+      faceS = (size * 100) / 160
+    return [faceX, faceY, faceS]
 
   def path_ahead(self):
     #print "path ahead"
@@ -300,8 +303,6 @@ class Camera(Thread):
       dist = math.sqrt(math.pow(12 + (68 * (120 - y) / 100),2) + (math.pow((x-80)*60/160,2)))
       angle = math.atan2(x - 80, 120 - y) * 180 / math.pi
       logging.info("object found, dist: " + str(dist) + " angle: " + str(angle))
-      #img.drawText("object found, dist: " + str(dist) + " angle: " + str(angle), 0, 0, fontsize=32 )
-    #self.save_image(self._camera.get_image_jpeg())
     #self.save_image(img.to_jpeg())
     #print "object: " + str(time.time() - ts)
     return [dist, angle]
