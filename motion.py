@@ -58,6 +58,7 @@ class Motion:
         self.delta_angle = 0.0
         self.target_dist = dist 
         self.target_angle = 0.0
+        self.delta_power = 0.0
         self.loop_move()
 
     def turn(self, angle):
@@ -207,9 +208,8 @@ class Motion:
     
     def bot_move(self, target_dist, delta_dist, delta_angle):
         base_power = 100 * (target_dist/abs(target_dist))
-        logging.info("base power" + str(base_power))
         self.delta_power += (delta_angle * 0.01)
-        logging.info( "delta power: " + str(self.delta_power))
+        logging.info("base power: " + str(base_power) + " delta power: " + str(self.delta_power) + " delta_dist: " + str(delta_dist) + " target_dist: " + str(target_dist))
         if abs(delta_dist) < abs(target_dist):
             self.bot.motor_control(min(max(base_power-self.delta_power,-100),100), min(max(base_power+self.delta_power,-100),100), -1)
         else:
