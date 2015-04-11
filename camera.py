@@ -11,7 +11,7 @@ import logging
 from viz import camera, streamer, image, blob
 import config
 
-CAMERA_REFRESH_INTERVAL=0.1
+CAMERA_REFRESH_INTERVAL=0.01
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
 PHOTO_PREFIX = "DSC"
