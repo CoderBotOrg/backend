@@ -49,7 +49,8 @@ class WiFi():
     hostapd_type = cls.hostapds.get(adapter)
     try:
       print "starting hostapd..."
-      os.system("start-stop-daemon --start --oknodo --quiet --exec /usr/sbin/" + hostapd_type + " -- /etc/hostapd/" + hostapd_type + " &")
+      #os.system("start-stop-daemon --start --oknodo --quiet --exec /usr/sbin/" + hostapd_type + " -- /etc/hostapd/" + hostapd_type + " &")
+      os.system("/usr/sbin/" + hostapd_type + " /etc/hostapd/" + hostapd_type + " -B")
 
     except subprocess.CalledProcessError as e:
       print e.output
