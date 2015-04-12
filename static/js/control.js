@@ -87,11 +87,6 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	$('#b_photos').on("click", function (){
         	$.mobile.pageContainer.pagecontainer('change', '#page-photos');
 	});
-	$('#b_halt').on("click", function (){
-		if(confirm("Shutdown CoderBot?")){
-			bot.halt();
-		}
-	});
 	$( ".photopopup" ).on({
         	popupbeforeposition: function() {
             	var maxHeight = $( window ).height() - 60 + "px";
@@ -121,7 +116,21 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 		}
                 return false;
         });
-
+        $('#b_halt').on("click", function (){
+                if(confirm("Shutdown CoderBot?")){
+                        bot.halt();
+                }
+        });
+        $('#b_restart').on("click", function (){
+                if(confirm("Restart CoderBot?")){
+                        bot.restart();
+                }
+        });
+        $('#b_reboot').on("click", function (){
+                if(confirm("Reboot CoderBot?")){
+                        bot.reboot();
+                }
+        });
 });
 
 $(document).on( "pageshow", '#page-photos', function( event ) {

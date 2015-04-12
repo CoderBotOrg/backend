@@ -645,7 +645,7 @@ Blockly.Blocks['coderbot_adv_findFace'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDFACE_FIND)
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDFACE)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_X, 'X'], [Blockly.Msg.CODERBOT_SENSOR_FINDFACE_Y, 'Y'],[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_SIZE, 'SIZE'],[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_ALL,'ALL']]), 'RETVAL')
     this.setInputsInline(true);
     this.setOutput(true, ['Number', 'Array']);

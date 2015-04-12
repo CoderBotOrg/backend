@@ -70,3 +70,11 @@ CoderBot.prototype.say = function(h) {
 CoderBot.prototype.halt = function(h) {
 	this.command('halt', h);
 }
+
+CoderBot.prototype.restart = function(h) {
+        this.command('restart', h);
+}
+
+CoderBot.prototype.reboot = function(h) {
+        this.command('reboot', h);
+}

@@ -11,7 +11,7 @@ import logging
 from viz import camera, streamer, image, blob
 import config
 
-CAMERA_REFRESH_INTERVAL=0.01
+CAMERA_REFRESH_INTERVAL=0.1
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
 PHOTO_PREFIX = "DSC"
@@ -208,7 +208,7 @@ class Camera(Thread):
     return angle
 
   def find_face(self):
-    faceX, faceY, faceS = None
+    faceX = faceY = faceS = None
     self._image_lock.acquire()
     img = self.get_image(0)
     ts = time.time()
@@ -218,13 +218,13 @@ class Camera(Thread):
     print faces
     if len(faces):
       # Get the largest face, face is a rectangle 
-      bigFace = faces[0]
-      centerX = (bigFace[0] + bigFace[2])/2
-      faceX = (centerX * 100) / 160
-      centerY = (bigFace[1] + bigFace[3])/2
-      faceY = (centerY * 100) / 120
-      size = bigFace[2] - bigFace[0]
-      faceS = (size * 100) / 160
+      x, y, w, h = faces[0]
+      centerX = x + (w/2)
+      faceX = ((centerX * 100) / 160) - 50 #center = 0
+      centerY = y + (h/2)
+      faceY = 50 - (centerY * 100) / 120 #center = 0 
+      size = h 
+      faceS = (size * 100) / 120
     return [faceX, faceY, faceS]
 
   def path_ahead(self):

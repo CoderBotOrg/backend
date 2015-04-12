@@ -101,6 +101,12 @@ def handle_bot():
         logging.info("shutting down")
         bot.say(app.bot_config.get("sound_stop"))
 	bot.halt()
+    elif cmd == "restart":
+        logging.info("restarting bot")
+        bot.restart()
+    elif cmd == "reboot":
+        logging.info("rebooting")
+        bot.reboot()
 
     return "ok"
 

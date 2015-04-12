@@ -112,7 +112,7 @@ class CoderBot:
 
   def _servo_motor_control(self, pin, speed):
     self._is_moving = True
-    speed = ((speed + 100) * 50 / 200) + 50
+    speed = ((speed + 100) * 50 / 200) + 52
 
     self.pi.set_PWM_range(pin, 1000)
     self.pi.set_PWM_frequency(pin, 50)
@@ -157,6 +157,12 @@ class CoderBot:
 
   def halt(self):
     os.system ('sudo halt')
+
+  def restart(self):
+    os.system ('sudo /etc/init.d/coderbot stop && sudo pkill -9 dbus && sudo /etc/init.d/coderbot start')
+
+  def reboot(self):
+    os.system ('sudo reboot')
 
 
   

@@ -17,6 +17,7 @@
       <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
       <li><a href="#t_ui" data-ajax="true">{% trans %}User Interface{% endtrans %}</a></li>
       <li><a href="#t_wifi" data-ajax="true">{% trans %}WiFi{% endtrans %}</a></li>
+      <li><a href="#t_halt" data-ajax="true">{% trans %}Restart, Halt{% endtrans %}</a></li>
      </ul>
     </div>
     <div id="t_control" class="ui-body-d ui-content">
@@ -136,12 +137,16 @@
      </fieldset>
     </div>
    <div id="t_wifi" class="ui-body-d ui-content">
-     <a href="#popup-wifi" data-rel="popup" id="b_wifi_access_mode" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}WiFi Client access mode{% endtrans %}</a>
-    </div>
+    <a href="#popup-wifi" data-rel="popup" id="b_wifi_access_mode" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}WiFi Client access mode{% endtrans %}</a>
     <div class="ui-grid-a">
      <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
      <div class="ui-block-b"><button type="submit" id="b_config_save" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
     </div>
+   </div>
+   <div id="t_halt" class="ui-body-d ui-content">
+    <button id="b_halt" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-icon-left ui-icon-power" type="button">{% trans %}Halt{% endtrans %}</button>
+    <button id="b_restart" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" type="button">{% trans %}Restart{% endtrans %}</button>
+    <button id="b_reboot" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-icon-left ui-icon-alert" type="button">{% trans %}Reboot{% endtrans %}</button>
    </div>
   </form>
  </div>
