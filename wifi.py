@@ -113,7 +113,7 @@ network={\n""")
       out = subprocess.check_output(["ifdown", "wlan0"])
       out = subprocess.check_output(["ifup", "wlan0"])
       print "registering ip..."
-      cls.register_ipaddr(cls.get_ipaddr("wlan0"), "CoderBot")
+      cls.register_ipaddr(cls.get_ipaddr("wlan0"), self.get_config().get('bot_name', 'CoderBot'))
     except subprocess.CalledProcessError as e:
       print e.output
       raise
@@ -160,6 +160,9 @@ def main():
       except:
         print "Unable to register ip, revert to ap mode"
         w.start_as_ap()
+    elif len(sys.argv) > 3 and sys.argv[2] == "bot_name":
+      self.get_config()['bot_name'] = sys.argv[3]
+      self.save_config()
   else:
     w.start_service()
 
