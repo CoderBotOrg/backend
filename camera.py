@@ -261,7 +261,9 @@ class Camera(Thread):
       #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
       #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
       #img.drawRectangle(dw_x, dw_y, obstacle.width(), obstacle.height(), color=(255,0,0))
-      x, y = img.transform((obstacle.center[0], obstacle.bottom))
+      coords = img.transform([(obstacle.center[0], obstacle.bottom)])
+      x = coords[0][0]
+      y = coords[0][1]
       coordY = 60 - ((y * 48) / 100) 
       logging.info("coordY: " + str(coordY))
       #print obstacle.coordinates()[1]+(obstacle.height()/2)
@@ -287,7 +289,7 @@ class Camera(Thread):
     self._image_lock.release()
     bw = img.filter_color(color)
     #self.save_image(bw.to_jpeg())
-    objects = bw.find_blobs(minsize=20, maxsize=1000)
+    objects = bw.find_blobs(minsize=20, maxsize=8000)
     logging.debug("objects: " + str(objects))
     dist = -1
     angle = 180
@@ -308,6 +310,6 @@ class Camera(Thread):
     return [dist, angle]
     
   def sleep(self, elapse):
-    logging.debug("sleep: " + elapse)
+    logging.debug("sleep: " + str(elapse))
     time.sleep(elapse)
 
