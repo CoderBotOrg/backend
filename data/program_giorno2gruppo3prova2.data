@@ -1,1 +1,0 @@
-{"dom_code": "<xml xmlns=\"http://www.w3.org/1999/xhtml\"><block type=\"coderbot_moveBackward\" id=\"19\" x=\"189\" y=\"70\"></block></xml>", "code": "get_bot().backward(speed=100, elapse=1.5)\n", "name": "giorno2gruppo3prova2"}
