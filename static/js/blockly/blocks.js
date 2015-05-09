@@ -399,8 +399,8 @@ Blockly.JavaScript['coderbot_motion_turn'] = function(block) {
 
 Blockly.Python['coderbot_motion_turn'] = function(block) {
   // Generate Python for moving forward.
-  var dist = Blockly.Python.valueToCode(block, 'DIST', Blockly.Python.ORDER_NONE);
-  var code = "get_motion().turn(angle=" + dist + ")\n";
+  var angle = Blockly.Python.valueToCode(block, 'ANGLE', Blockly.Python.ORDER_NONE);
+  var code = "get_motion().turn(angle=" + angle + ")\n";
   return code;
 };
 
@@ -638,28 +638,34 @@ Blockly.Python['coderbot_adv_findSignal'] = function(block) {
 
 Blockly.Blocks['coderbot_adv_findFace'] = {
   /**
-   * Block for findFace function.
+   * Block for findSignal function.
    * @this Blockly.Block
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(290);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDFACE);
-    this.setOutput(true, 'Number');
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDFACE)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_X, 'X'], [Blockly.Msg.CODERBOT_SENSOR_FINDFACE_Y, 'Y'],[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_SIZE, 'SIZE'],[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_ALL,'ALL']]), 'RETVAL')
+    this.setInputsInline(true);
+    this.setOutput(true, ['Number', 'Array']);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
 
 Blockly.JavaScript['coderbot_adv_findFace'] = function(block) {
   // Boolean values true and false.
-  var code = 'get_cam().find_face()';
+  var retval = block.getFieldValue('RETVAL');
+  var ret_code = {'X': '[0]', 'Y': '[1]', 'SIZE': '[2]', 'ALL': ''}[retval];
+  var code = 'get_cam().find_face()' + ret_code + ';';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Python['coderbot_adv_findFace'] = function(block) {
   // Boolean values true and false.
-  var code = 'get_cam().find_face()';
+  var retval = block.getFieldValue('RETVAL');
+  var ret_code = {'X': '[0]', 'Y': '[1]', 'SIZE': '[2]', 'ALL': ''}[retval];
+  var code = 'get_cam().find_face()' + ret_code;
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
@@ -702,7 +708,6 @@ Blockly.Blocks['coderbot_adv_findColor'] = {
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_FIND)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_DIST, 'DIST'], [Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_ANGLE, 'ANGLE'],[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_BOTH,'BOTH']]), 'RETVAL')
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_COLOR);
-        //.appendField(new Blockly.FieldColour('#ff0000'), 'COLOR');
     this.appendValueInput('COLOR')
         .setCheck('Colour');
     this.setInputsInline(true);

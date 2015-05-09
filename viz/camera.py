@@ -4,7 +4,7 @@ import io
 import os
 import time
 import copy
-
+import logging
 
 class Camera():
 
@@ -14,7 +14,7 @@ class Camera():
   VIDEO_FILE_EXT_H264 = '.h264'
 
   def __init__(self, props):
-    print "camera init"
+    logging.info("camera init")
     self.camera = picamera.PiCamera()
     self.camera.resolution = (props.get('width', 640), props.get('height', 240))
     self.camera.framerate = 30
@@ -34,12 +34,12 @@ class Camera():
     with self.camera._encoders_lock:
       self.camera._encoders[2] = self.h264_encoder
 
-    print self.video_filename + self.VIDEO_FILE_EXT_H264
+    logging.debug( self.video_filename + self.VIDEO_FILE_EXT_H264 )
 
     self.h264_encoder.start(self.video_filename + self.VIDEO_FILE_EXT_H264)
 
   def video_stop(self):
-    print "video_stop"
+    logging.debug("video_stop")
     self.h264_encoder.stop()
 
     with self.camera._encoders_lock:
@@ -93,10 +93,10 @@ class Camera():
     self.jpeg_encoder.close()
     self.rgb_encoder.close()
 
-    print "g.5: " + str(ts - time.time())
+    #print "g.5: " + str(ts - time.time())
 
   def grab_start(self):
-    print "grab_start"
+    logging.debug("grab_start")
 
     #ts = time.time()
     camera_port_0, output_port_0 = self.camera._get_ports(True, 0)
@@ -121,7 +121,7 @@ class Camera():
       raise picamera.PiCameraError('Timed out')
 
   def grab_stop(self):
-    print "grab_stop"
+    logging.debug("grab_stop")
 
     with self.camera._encoders_lock:
       del self.camera._encoders[0]

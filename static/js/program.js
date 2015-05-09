@@ -26,6 +26,9 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
       $("#b_load_prog_post").on("click", loadProgPost);
       loadProgList();
       $('#popup-video').popup();
+      $('video').on('loadeddata', function( event, ui ) {
+        $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );}
+       );
       $("#b_show_last").on("click", function( event ) {
         var src = "/photos/" + "VID" + prog.name + ".mp4" + "?t=" + (new Date()).getTime();
         $('#popup-video').find('video').attr('src', src);
@@ -35,6 +38,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
 }
     var prog = {};
     var progList = {};
+    prog.name = "no_name";
 
     function loadProgList() {
       try {
@@ -60,6 +64,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
         }
       }
       prog.name = name;
+      $('#id_prog_name').text("[ " + prog.name + " ]");
     }
 
     function loadProg() {
@@ -85,6 +90,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
           var xml = Blockly.Xml.textToDom(data);
           Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
           $.mobile.loading("hide");
+          $('#id_prog_name').text("[ " + prog.name + " ]");
 	}});
       } catch (e) {
         alert(e);
@@ -122,6 +128,7 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
         }
       }
       prog.name = name;
+      $('#id_prog_name').text("[ " + prog.name + " ]");
       saveProg();
     }
 
@@ -149,10 +156,23 @@ $(document).on( "pagecreate", '#page-program', function( event ) {
 
       var bot = new CoderBot();
       // Generate JavaScript code and run it.
-      window.LoopTrap = 1000;
+      window.LoopTrap = 1000;  
       Blockly.Python.INFINITE_LOOP_TRAP = '  get_prog_eng().check_end()\n';
       var code = Blockly.Python.workspaceToCode();
-      Blockly.Python.INFINITE_LOOP_TRAP = null;
+
+      if(CODERBOT_PROG_SAVEONRUN) {
+        Blockly.Python.INFINITE_LOOP_TRAP = null;
+        var xml_code = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+        var dom_code = Blockly.Xml.domToText(xml_code);
+        var data =  {'name': prog.name, 'dom_code': dom_code, 'code': code};
+        try {
+          $.ajax({url: '/program/save', data: data, type: "POST", success:function(){
+            loadProgList();
+            }});
+        }catch (e) {
+          alert(e);
+        }
+      }
       try {
         var data =  {'name': prog.name,
                      'code': code};

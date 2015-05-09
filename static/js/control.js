@@ -87,11 +87,6 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	$('#b_photos').on("click", function (){
         	$.mobile.pageContainer.pagecontainer('change', '#page-photos');
 	});
-	$('#b_halt').on("click", function (){
-		if(confirm("Shutdown CoderBot?")){
-			bot.halt();
-		}
-	});
 	$( ".photopopup" ).on({
         	popupbeforeposition: function() {
             	var maxHeight = $( window ).height() - 60 + "px";
@@ -110,6 +105,32 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 });
                 return false;
 	});
+        $('#b_wifi_apply').on("click", function (){
+                var form_data = $(this).parents("form").serialize();
+                $.post(url='/wifi', form_data);
+                $('#popup-wifi').popup('close');
+                if($("[name='wifi_mode']:checked").val()=="ap"){
+			$('#popup-wifi-ap').popup('open');
+                } else {
+                        $('#popup-wifi-client').popup('open');
+		}
+                return false;
+        });
+        $('#b_halt').on("click", function (){
+                if(confirm("Shutdown CoderBot?")){
+                        bot.halt();
+                }
+        });
+        $('#b_restart').on("click", function (){
+                if(confirm("Restart CoderBot?")){
+                        bot.restart();
+                }
+        });
+        $('#b_reboot').on("click", function (){
+                if(confirm("Reboot CoderBot?")){
+                        bot.reboot();
+                }
+        });
 });
 
 $(document).on( "pageshow", '#page-photos', function( event ) {
@@ -120,14 +141,16 @@ $(document).on( "pageshow", '#page-photos', function( event ) {
 			var media_name = media.substring(0, media.indexOf('.'));
 			var media_thumb = media_name + '_thumb.jpg';
 			var media_type = media.indexOf('jpg') > 0 ? 'photo' : 'video';
-			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><div class="ui-content-hud" style="position:absolute;"></div><p class="p_photo_cmd" style="display:none;"><button class="ui-btn ui-btn-inline ui-btn-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
+			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><div class="ui-content-hud" style="position:absolute;"></div><p class="p_photo_cmd" style="display:none;"><span>' + media_name + '</span><br/><button class="ui-btn ui-btn-inline ui-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
 		}
 $('li.ui-li-has-thumb').hover( function( event ) {
 	$(this).find('.p_photo_cmd').show();
 }, function( event ) {
         $(this).find('.p_photo_cmd').hide();
 });
-
+$('video').on('loadeddata', function( event, ui ) {
+        $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );
+});
         }, dataType="json");       
 });
 
@@ -154,7 +177,13 @@ Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
 	$.mobile.pageContainer.pagecontainer('change', '#page-preferences');
         return false;
 });
-        
+
+Mousetrap.bind(['command+alt+h', 'ctrl+alt+h'], function(e) {
+        if(confirm("Shutdown CoderBot?")){
+        	bot.halt();
+	}
+});
+ 
 botStatus();
 
 function botStatus() {

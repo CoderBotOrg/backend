@@ -16,6 +16,8 @@
       <li><a href="#t_start" data-ajax="true">{% trans %}Start{% endtrans %}</a></li>
       <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
       <li><a href="#t_ui" data-ajax="true">{% trans %}User Interface{% endtrans %}</a></li>
+      <li><a href="#t_wifi" data-ajax="true">{% trans %}WiFi{% endtrans %}</a></li>
+      <li><a href="#t_halt" data-ajax="true">{% trans %}Restart, Halt{% endtrans %}</a></li>
      </ul>
     </div>
     <div id="t_control" class="ui-body-d ui-content">
@@ -55,7 +57,21 @@
       <legend>{% trans %}Program editor details{% endtrans %}</legend>
       <label for="c_prog_scrollbars">{% trans %}Shows Editor scrollbars{% endtrans %}</label>
       <input type="checkbox" name="prog_scrollbars" id="c_prog_scrollbars" value="true" {%if config.prog_scrollbars=='true'%}checked="checked"{%endif%}>
+      <label for="c_prog_saveonrun">{% trans %}Save program before every run{% endtrans %}</label>
+      <input type="checkbox" name="prog_saveonrun" id="c_prog_saveonrun" value="true" {%if config.prog_saveonrun=='true'%}checiked="checked"{%endif%}>
      </fieldset>
+     <div class="ui-field-contain">
+      <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode" name="prog_move_motion" value="yes"{%if config.prog_move_motion%} checked{%endif%}>
+     </div>
+     <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
+     <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">
+     <label for="i_move_fw_elapse">{% trans %}Forward elapse / distance{% endtrans %}</label>
+     <input type="text" id="i_move_fw_elapse" name="move_fw_elapse" value="{{config.move_fw_elapse}}">
+     <label for="i_move_tr_speed">{% trans %}Turn speed{% endtrans %}</label>
+     <input type="text" id="i_move_tr_speed" name="move_tr_speed" value="{{config.move_tr_speed}}">
+     <label for="i_move_tr_elapse">{% trans %}Turn elapse / angle{% endtrans %}</label>
+     <input type="text" id="i_move_tr_elapse" name="move_tr_elapse" value="{{config.move_tr_elapse}}">
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Other program parameters{% endtrans %}</legend>
       <label for="c_prog_video_rec">{% trans %}Auto record video on program run{% endtrans %}</label>
@@ -87,18 +103,12 @@
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>
      <input type="text" id="i_move_motor_mode" name="move_motor_mode" value="{{config.move_motor_mode}}">
-     <div class="ui-field-contain">
-      <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
-      <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode" name="prog_move_motion" value="yes"{%if config.prog_move_motion%} checked{%endif%}>
-     </div>
-     <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
-     <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">
-     <label for="i_move_fw_elapse">{% trans %}Forward elapse{% endtrans %}</label>
-     <input type="text" id="i_move_fw_elapse" name="move_fw_elapse" value="{{config.move_fw_elapse}}">
-     <label for="i_move_tr_speed">{% trans %}Turn speed{% endtrans %}</label>
-     <input type="text" id="i_move_tr_speed" name="move_tr_speed" value="{{config.move_tr_speed}}">
-     <label for="i_move_tr_elapse">{% trans %}Turn elapse{% endtrans %}</label>
-     <input type="text" id="i_move_tr_elapse" name="move_tr_elapse" value="{{config.move_tr_elapse}}">
+     <label for="i_move_power_angle_1">{% trans %}Power (target angle -15){% endtrans %}</label>
+     <input type="text" id="i_move_power_angle_1" name="move_power_angle_1" value="{{config.move_power_angle_1}}"> 
+     <label for="i_move_power_angle_2">{% trans %}Power (target angle -4){% endtrans %}</label>
+     <input type="text" id="i_move_power_angle_2" name="move_power_angle_2" value="{{config.move_power_angle_2}}">
+     <label for="i_move_power_angle_3">{% trans %}Power (target angle -1){% endtrans %}</label>
+     <input type="text" id="i_move_power_angle_3" name="move_power_angle_3" value="{{config.move_power_angle_3}}">
     </div>
     <div id="t_start" class="ui-body-d ui-content">
      <label for="i_load_at_start">{% trans %}Load at start{% endtrans %}</label>
@@ -126,11 +136,65 @@
       <input type="checkbox" name="show_page_prefs" id="c_show_page_prefs" value="true" {%if config.show_page_prefs=='true'%}checked="checked"{%endif%}>
      </fieldset>
     </div>
-    <div class="ui-grid-a">
-     <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
-     <div class="ui-block-b"><button type="submit" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
-    </div>
+   <div id="t_wifi" class="ui-body-d ui-content">
+    <a href="#popup-wifi" data-rel="popup" id="b_wifi_access_mode" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}WiFi Client access mode{% endtrans %}</a>
+   </div>
+   <div id="t_halt" class="ui-body-d ui-content">
+    <button id="b_halt" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-icon-left ui-icon-power" type="button">{% trans %}Halt{% endtrans %}</button>
+    <button id="b_restart" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-icon-left ui-icon-refresh" type="button">{% trans %}Restart{% endtrans %}</button>
+    <button id="b_reboot" class="ui-btn ui-btn-inline ui-shadow ui-corner-all ui-btn-icon-left ui-icon-alert" type="button">{% trans %}Reboot{% endtrans %}</button>
+   </div>
+   <div class="ui-grid-a">
+    <div class="ui-block-a"><a href="#" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
+    <div class="ui-block-b"><button type="submit" id="b_config_save" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Save{% endtrans %}</button></div>
    </div>
   </form>
  </div>
+ <div data-role="popup" id="popup-wifi" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+  <form class="config" id="f_wifi">
+   <h3>{% trans %}WiFi Client mode access data{% endtrans %}</h3>
+   <fieldset data-role="controlgroup" data-mini="true">
+    <legend>{% trans %}WiFi mode{% endtrans %}</legend>
+    <input type="radio" name="wifi_mode" id="r_wifi_mode_a" value="ap" {%if config.wifi_mode=='ap'%}checked="checked"{%endif%}>
+    <label for="r_wifi_mode_a">{% trans %}Access Point{% endtrans %}</label>
+    <input type="radio" name="wifi_mode" id="r_wifi_mode_b" value="client" {%if config.wifi_mode=='client'%}checked="checked"{%endif%}>
+    <label for="r_wifi_mode_b">{% trans %}Client{% endtrans %}</label>
+   </fieldset>
+   <label for="i_wifi_ssid">{% trans %}WiFi name{% endtrans %}</label>
+   <input type="text" id="i_wifi_ssid" name="wifi_ssid" value="{{config.wifi_ssid}}">
+   <label for="i_wifi_psk">{% trans %}WiFi password{% endtrans %}</label>
+   <input type="text" id="i_wifi_psk" name="wifi_psk" value="{{config.wifi_psk}}">
+   <div class="ui-grid-a">
+    <div class="ui-block-a"><a href="#" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini">{% trans %}Cancel{% endtrans %}</a></div>
+    <div class="ui-block-b"><a href="#" id="b_wifi_apply" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Apply Wifi config{% endtrans %}</a></div>
+   </div>
+  </form>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-wifi-ap" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}WiFi AP mode access{% endtrans %}</h3>
+   <p>Access Point mode is being set:
+   <ol>
+   <li>Wait 30 seconds</li>
+   <li>Connect your device to the "coderbot" named wifi</li>
+   <li>Click on the following link: <a href="http://coderbot:8080">CoderBot local</a></li>
+   </ol>
+   </p>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-wifi-client" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}WiFi Client mode access{% endtrans %}</h3>
+   <p>Client mode is being set:
+   <ol>
+   <li>Wait 30 seconds</li>
+   <li>Connect your device to your own wifi (wifi network must be connected to internet)</li>
+   <li>Click on the following link: <a href="http://coderbotsrv.appspot.com">CoderBot Server</a></li>
+   </ol>
+   </p>
+  </div>
+ </div>
 </div>
+

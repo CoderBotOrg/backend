@@ -3,13 +3,15 @@ import cv2
 import colorsys
 import copy
 import blob
+import logging
 
 r_from = np.float32([[0, 0], [160, 0], [160, 120], [0, 120]])
 r_dest   = np.float32([[0, -30], [160, -30], [95, 120], [65, 120]])
 MIN_MATCH_COUNT = 10
 
 class Image():
-    _face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
+    _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
     _kernel = np.ones((3,3),np.uint8)
 
     def __init__(self, array):
@@ -48,9 +50,12 @@ class Image():
       h = h * 180
       s = s * 255
       v = v * 255
-      #print str(image_hsv.shape)
-      lower_color = np.array([h-10, s-80, v-80])
-      upper_color = np.array([h+10, s+80, v+80])
+      logging.debug("color_hsv: " + str(h) + " " + str(s) + " " + str(v))
+      #lower_color = np.array([h-10 if h>=10 else 0.0, 0, 0])
+      #upper_color = np.array([h+10 if h<=170 else 179.0, 255, 255])
+      lower_color = np.array([h-10, 50, 50])
+      upper_color = np.array([h+10, 255, 255])
+      logging.debug("lower: " + str(lower_color) + " upper: " + str(upper_color))
       mask = cv2.inRange(image_hsv, lower_color, upper_color)
       return Image(mask)
 
@@ -129,11 +134,11 @@ class Image():
         h,w = img_template.shape
         pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts,M)
-        print "found template: ", dst
+        logging.info("found template: " + dst)
         templates[0] = dst
 
       else:
-        print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
+        logging.info( "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
         matchesMask = None
         
       return templates

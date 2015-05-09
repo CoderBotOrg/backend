@@ -1,5 +1,7 @@
 import os
 import json
+import logging
+import logging.handlers
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
@@ -10,6 +12,13 @@ from config import Config
 from flask import Flask, render_template, request, send_file, redirect
 from flask.ext.babel import Babel
 #from flask_sockets import Sockets
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+ 
+# add a rotating handler
+handler = logging.handlers.RotatingFileHandler('logs/coderbot.log', maxBytes=1000000, backupCount=5)
+logger.addHandler(handler)
 
 bot = None
 cam = None
@@ -43,6 +52,20 @@ def handle_config():
     app.bot_config = Config.get()
     return "ok";
 
+@app.route("/wifi", methods=["POST"])
+def handle_wifi():
+    mode = request.form.get("wifi_mode")
+    ssid = request.form.get("wifi_ssid")
+    psk = request.form.get("wifi_psk")
+    logging.info( "mode ", mode, " ssid: ", ssid, " psk: ", psk)
+    client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
+    logging.info(client_params)
+    os.system("sudo python wifi.py updatecfg " + mode + client_params)
+    if mode == "ap":
+      return "http://coder.bot:8080";
+    else:
+      return "http://coderbotsrv.appspot.com/"
+
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
@@ -59,6 +82,7 @@ def handle_bot():
         motion.turn(angle=float(param2))
     elif cmd == "stop":
         bot.stop()
+        motion.stop()
     elif cmd == "take_photo":
         cam.photo_take()
         bot.say(app.bot_config.get("sound_shutter"))
@@ -70,29 +94,35 @@ def handle_bot():
         bot.say(app.bot_config.get("sound_shutter"))
 
     elif cmd == "say":
-        print "say: " + str(param1)
+        logging.info("say: " + str(param1))
 	bot.say(param1)
 
     elif cmd == "halt":
-        print "shutting down"
+        logging.info("shutting down")
         bot.say(app.bot_config.get("sound_stop"))
 	bot.halt()
+    elif cmd == "restart":
+        logging.info("restarting bot")
+        bot.restart()
+    elif cmd == "reboot":
+        logging.info("rebooting")
+        bot.reboot()
 
     return "ok"
 
 @app.route("/bot/status", methods=["GET"])
 def handle_bot_status():
-    print "bot_status"
+    logging.info( "bot_status" )
     return json.dumps({'status': 'ok'}) 
 
 @app.route("/photos", methods=["GET"])
 def handle_photos():
-    print "photos"
+    logging.info("photos")
     return json.dumps(cam.get_photo_list())
 
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo(filename):
-    print "photo"
+    logging.info("photo")
     mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
     video = None
     try:
@@ -104,30 +134,30 @@ def handle_photo(filename):
 
 @app.route("/photos/<filename>", methods=["POST"])
 def handle_photo_cmd(filename):
-    print "photo delete"
+    logging.debug("photo delete")
     cam.delete_photo(filename)
     return "ok"
 
 @app.route("/photos/<filename>/thumb", methods=["GET"])
 def handle_photo_thumb(filename):
-    print "photo_thumb"
+    logging.debug("photo_thumb")
     return send_file(cam.get_photo_thumb_file(filename))
    
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
-    print "program_list"
+    logging.debug("program_list")
     return json.dumps(app.prog_engine.list())
 
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
-    print "program_load"
+    logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
     return app.prog.dom_code
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
-    print "program_save"
+    logging.debug("program_save")
     name = request.form.get('name')
     dom_code = request.form.get('dom_code')
     code = request.form.get('code')
@@ -137,14 +167,14 @@ def handle_program_save():
 
 @app.route("/program/delete", methods=["POST"])
 def handle_program_delete():
-    print "program_delete"
+    logging.debug("program_delete")
     name = request.form.get('name')
     app.prog_engine.delete(name)
     return "ok"
 
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
-    print "program_exec"
+    logging.debug("program_exec")
     name = request.form.get('name')
     code = request.form.get('code')
     app.prog = app.prog_engine.create(name, code)
@@ -152,7 +182,7 @@ def handle_program_exec():
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
-    print "program_end"
+    logging.debug("program_end")
     if app.prog:
         app.prog.end()
     app.prog = None  
@@ -160,7 +190,7 @@ def handle_program_end():
 
 @app.route("/program/status", methods=["GET"])
 def handle_program_status():
-    print "program_status"
+    logging.debug("program_status")
     prog = Program("")
     if app.prog:
       prog = app.prog
@@ -188,10 +218,10 @@ def run_server():
     motion = Motion.get_instance()
   except ValueError as e:
     app.bot_config = {}
-    print e
+    logging.error(e)
   if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
     app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
 
   bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
   bot.say(app.bot_config.get("sound_start"))
-  app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False)
+  app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
