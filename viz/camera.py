@@ -24,6 +24,7 @@ class Camera():
     self.h264_encoder = None
     self.recording = None
     self.video_filename = None
+    self._jpeg_quality = props.get('jpeg_quality', 20)
 
   def video_rec(self, filename):
     self.video_filename = filename[:filename.rfind(".")]
@@ -57,7 +58,7 @@ class Camera():
   def grab(self):
     ts = time.time()
     camera_port_0, output_port_0 = self.camera._get_ports(True, 0)
-    self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=40)
+    self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=self._jpeg_quality)
     camera_port_1, output_port_1 = self.camera._get_ports(True, 1)
     self.rgb_encoder = self.camera._get_image_encoder(camera_port_1, output_port_1, 'bgr', (160, 120))
     #print "g.1: " + str(ts - time.time())
@@ -100,7 +101,7 @@ class Camera():
 
     #ts = time.time()
     camera_port_0, output_port_0 = self.camera._get_ports(True, 0)
-    self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=40)
+    self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=self._jpeg_quality)
     camera_port_1, output_port_1 = self.camera._get_ports(True, 1)
     self.rgb_encoder = self.camera._get_image_encoder(camera_port_1, output_port_1, 'bgr', (160, 120))
 

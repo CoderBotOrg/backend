@@ -99,6 +99,10 @@
        <option value="antishake"{%if config.camera_exposure_mode=='antishake'%} selected{%endif%}>Anti shake</option>
        <option value="verylong"{%if config.camera_exposure_mode=='verylong'%} selected{%endif%}>Very long</option>
      </select>
+    <label for="i_camera_refresh_timeout">{% trans %}Camera refresh timeout{% endtrans %}</label>
+    <input type="text" id="i_camera_refresh_timeout" name="camera_refresh_timeout" value="{{config.camera_refresh_timeout}}">
+    <label for="i_camera_jpeg_quality">{% trans %}Camera jpeg quality{% endtrans %}</label>
+    <input type="text" id="i_camera_jpeg_quality" name="camera_jpeg_quality" value="{{config.camera_jpeg_quality}}">
     </div>
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>

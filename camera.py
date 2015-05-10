@@ -11,7 +11,6 @@ import logging
 from viz import camera, streamer, image, blob
 import config
 
-CAMERA_REFRESH_INTERVAL=0.1
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
 PHOTO_PREFIX = "DSC"
@@ -38,7 +37,7 @@ class Camera(Thread):
 
   def __init__(self):
     logging.info("starting camera")
-    cam_props = {"width":640, "height":480, "exposure_mode": config.Config.get().get("camera_exposure_mode")}
+    cam_props = {"width":640, "height":480, "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
     self._camera = camera.Camera(props=cam_props)
     self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     #self._cam_off_img.save(self._streamer)
@@ -47,6 +46,7 @@ class Camera(Thread):
     self._run = True
     self._image_time = 0
     self._image_lock = Lock()
+    self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
 
     self._photos = []
    
@@ -61,7 +61,7 @@ class Camera(Thread):
     try:
       self._camera.grab_start()
       while self._run:
-        sleep_time = CAMERA_REFRESH_INTERVAL - (time.time() - self._image_time)
+        sleep_time = self._image_refresh_timeout - (time.time() - self._image_time)
         if sleep_time <= 0:
           ts = time.time()
           #print "run.1"
