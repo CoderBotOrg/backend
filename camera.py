@@ -47,7 +47,10 @@ class Camera(Thread):
     self._image_time = 0
     self._image_lock = Lock()
     self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
-
+    self._color_object_size_min = config.Config.get().get("camera_color_object_size_min", 20)
+    self._color_object_size_max = config.Config.get().get("camera_color_object_size_max", 8000)
+    self._path_object_size_min = config.Config.get().get("camera_path_object_size_min", 20)
+    self._path_object_size_max = config.Config.get().get("camera_path_object_size_max", 20)
     self._photos = []
    
     for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
@@ -232,52 +235,20 @@ class Camera(Thread):
     ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    #print "path_ahead.get_image: " + str(time.time() - ts)
-    #img.crop(0, 100, 160, 120)
 
-    #control_color = control.meanColor()
-    #color_distance = cropped.dilate().color_distance(control_color)
-
-    #control_hue = control.getNumpy().mean()
-    #hue_distance = cropped.dilate().hueDistance(control_hue)
-
-    #print "path_ahead.crop: " + str(time.time() - ts)
-    #control_hue = control_hue - 20 if control_hue > 127 else control_hue + 20
-    #binarized = cropped.dilate().binarize(control_hue)
-    #binarized = cropped.dilate().binarize().invert()
-    #control_hue = control_hue - 10
-    #binarized = color_distance.binarize(control_hue).invert()
-    #print "path_ahead.binarize: " + str(time.time() - ts)
-    blobs = img.binarize().find_blobs(minsize=100, maxsize=8000)
-    #print "path_ahead.blobs: " + str(time.time() - ts)
+    blobs = img.binarize().find_blobs(minsize=self._sensor_path_object_size_min, maxsize=self._sensor_path_object_size_max)
     coordY = 60
     if len(blobs):
       obstacle = blob.Blob.sort_distance((80,120), blobs)[0]
-      #for b in blobs:
-      #  print "blobs.bottom: " + str(b.bottom) + " area: " + str(b.area())
 
       logging.info("obstacle:" + str(obstacle.bottom)) 
-      #print "path_ahead.sortdistnace: " + str(time.time() - ts)
-      #dw_x = 260 + obstacle.coordinates()[0] - (obstacle.width()/2)
-      #dw_y = 160 + obstacle.coordinates()[1] - (obstacle.height()/2) 
-      #img.drawRectangle(dw_x, dw_y, obstacle.width(), obstacle.height(), color=(255,0,0))
       coords = img.transform([(obstacle.center[0], obstacle.bottom)])
       x = coords[0][0]
       y = coords[0][1]
       coordY = 60 - ((y * 48) / 100) 
       logging.info("coordY: " + str(coordY))
-      #print obstacle.coordinates()[1]+(obstacle.height()/2)
-      #ar_layer.centeredRectangle(obstacle.coordinates(), (obstacle.width(), obstacle.height()))
-      #warped.addDrawingLayer(ar_layer)
-      #warped.applyLayers()
-      #self.save_image(warped.warp(self._unwarp_corners), expire=10)
 
-    #img.drawText("path ahead clear for " + str(coordY) + " cm", 0, 0, fontsize=32 )
-    #print "path_ahead.drawtext: " + str(time.time() - ts)
-    #self.save_image(img)
-    #print "path_ahead.save_image: " + str(time.time() - ts)
     self._image_lock.release()
-    #print "path_ahead: " + str(time.time() - ts)
     return coordY
 
   def find_color(self, s_color):
@@ -289,7 +260,7 @@ class Camera(Thread):
     self._image_lock.release()
     bw = img.filter_color(color)
     #self.save_image(bw.to_jpeg())
-    objects = bw.find_blobs(minsize=20, maxsize=8000)
+    objects = bw.find_blobs(minsize=self._sensor_color_object_size_min, maxsize=self._sensor_color_object_size_max)
     logging.debug("objects: " + str(objects))
     dist = -1
     angle = 180
