@@ -236,7 +236,7 @@ class Camera(Thread):
     self._image_lock.acquire()
     img = self.get_image(0)
 
-    blobs = img.binarize().find_blobs(minsize=self._sensor_path_object_size_min, maxsize=self._sensor_path_object_size_max)
+    blobs = img.binarize().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
     coordY = 60
     if len(blobs):
       obstacle = blob.Blob.sort_distance((80,120), blobs)[0]
@@ -260,7 +260,7 @@ class Camera(Thread):
     self._image_lock.release()
     bw = img.filter_color(color)
     #self.save_image(bw.to_jpeg())
-    objects = bw.find_blobs(minsize=self._sensor_color_object_size_min, maxsize=self._sensor_color_object_size_max)
+    objects = bw.find_blobs(minsize=self._color_object_size_min, maxsize=self._color_object_size_max)
     logging.debug("objects: " + str(objects))
     dist = -1
     angle = 180
