@@ -4,10 +4,17 @@ import colorsys
 import copy
 import blob
 import logging
+import tesseract
 
 r_from = np.float32([[0, 0], [160, 0], [160, 120], [0, 120]])
 r_dest   = np.float32([[0, -30], [160, -30], [95, 120], [65, 120]])
 MIN_MATCH_COUNT = 10
+
+
+api = tesseract.TessBaseAPI()
+api.Init(".", 'eng', tesseract.OEM_DEFAULT)
+api.SetVariable("tessedit_char_whitelist"," ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz0123456789")
+api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
 
 class Image():
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
@@ -90,7 +97,7 @@ class Image():
 
     def find_blobs(self, minsize=0, maxsize=10000000):
       blobs = []
-      contours, hyerarchy = cv2.findContours(self._data, cv2.cv.CV_RETR_TREE, cv2.cv.CV_CHAIN_APPROX_SIMPLE)
+      contours, hyerarchy = cv2.findContours(self._data, cv2.cv.CV_RETR_LIST, cv2.cv.CV_CHAIN_APPROX_SIMPLE)
       for c in contours:
         area = cv2.contourArea(c)
         if area > minsize and area < maxsize:
@@ -142,7 +149,42 @@ class Image():
         matchesMask = None
         
       return templates
-      
+
+    def find_rect(self, color):
+      rect_image = None
+      filtered_image = self.filter_color(color)
+      blobs = filtered_image.find_blobs(minsize=1000)
+      logging.info("blobs: " + str(blobs))
+      if len(blobs):
+        blob = blobs[0]
+        b_area = blob.area()
+        for b in blobs:
+          if b.area() > b_area:
+            blob = b
+            b_area = blob.area() 
+        rect = blob.minAreaRect()
+        rot_matrix = cv2.getRotationMatrix2D(rect[0], rect[2], 1)
+        #logging.info("center: " + str(rect[0]) + " size: " + str(rect[1]) + " angle: " + str(rect[2]))
+        #rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (int(rect[1][0]), int(rect[1][1]))))
+        rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (160, 120)))
+        logging.info("rect0, rect1: " + str(rect[0]) + " " + str(rect[1]))
+        #logging.info("x1: " + str(max(0,int(rect[0][0]-(rect[1][0])/2))) + " y1: " + str(max(0, int(rect[0][1]-(rect[1][1])/2))) + " x2: " + str(min(160,int(rect[0][0]+(rect[1][0])/2))) + " y2: " + str(min(120, int(rect[0][1]+(rect[1][1])/2))))
+        border = 10
+        rect_image = rect_image.crop(int(max(0,border+rect[0][0]-(rect[1][0])/2)), int(max(0,border+rect[0][1]-(rect[1][1]+5)/2)), int(min(160,-border+rect[0][0]+(rect[1][0])/2)), int(min(120,-border+rect[0][1]+(rect[1][1]-5)/2))) 
+      return rect_image 
+             
+    def find_text(self, lang):
+      text_found = None
+      cvmat_image=cv2.cv.fromarray(self._data)
+      iplimage =cv2.cv.GetImage(cvmat_image)
+      tesseract.SetCvImage(iplimage, api)
+      text=api.GetUTF8Text()
+      conf=api.MeanTextConf()
+      logging.info("conf: " + str(conf))
+      logging.info("text: " +str(text))
+      if conf > 60:
+        text_found = text
+      return text_found
 
     def to_jpeg(self):
       ret, jpeg_array = cv2.imencode('.jpeg', self._data)

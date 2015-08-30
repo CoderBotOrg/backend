@@ -242,6 +242,12 @@
           </block>
         </value>
       </block>
+      <block type="coderbot_adv_findText">
+        <value name="COLOR">
+          <block type="colour_picker">
+          </block>
+        </value>
+      </block>
     </category>
     <category name="{% trans %}Sound{% endtrans %}">
       <block type="coderbot_say"></block>

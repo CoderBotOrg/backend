@@ -279,7 +279,21 @@ class Camera(Thread):
     #self.save_image(img.to_jpeg())
     #print "object: " + str(time.time() - ts)
     return [dist, angle]
-    
+   
+  def find_text(self, lang, back_color):
+    text = None
+    color = (int(back_color[1:3],16), int(back_color[3:5],16), int(back_color[5:7],16))
+    logging.info("find_text")
+    self._image_lock.acquire()
+    img = self.get_image(0)
+    self._image_lock.release()
+    image = img.find_rect(color=color)
+    if image:
+      bin_image = image.binarize().invert()
+      #self.save_image(bin_image.to_jpeg())
+      text = bin_image.find_text(lang)
+    return text    
+
   def sleep(self, elapse):
     logging.debug("sleep: " + str(elapse))
     time.sleep(elapse)
