@@ -46,3 +46,9 @@ Blockly.Msg.CODERBOT_SENSOR_FINDFACE_Y = "y (ordinata)";
 Blockly.Msg.CODERBOT_SENSOR_FINDFACE_SIZE = "dimensione";
 Blockly.Msg.CODERBOT_SENSOR_FINDFACE_ALL = "x, y, dimensione (come lista)";
 Blockly.Msg.CODERBOT_SENSOR_FINDLOGO = "trova logo";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "trova testo di lingua";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_ENG = "Inglese";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_ITA = "Italiana";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_UNSPECIFIED = "non specificata";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR = "colore sfondo";
+

@@ -19,7 +19,7 @@
 Blockly.HSV_SATURATION=.99;
 Blockly.HSV_VALUE=.99;
 
-// Extensions to Blockly's language and JavaScript generator.
+// Extensions to Blockly's language and Python generator.
 
 Blockly.Blocks['coderbot_repeat'] = {
   /**
@@ -48,20 +48,6 @@ Blockly.Blocks['coderbot_repeat'] = {
     this.setNextStatement(true);
     this.setTooltip(Blockly.Msg.CONTROLS_REPEAT_TOOLTIP);
   }
-};
-
-Blockly.JavaScript['coderbot_repeat'] = function(block) {
-  // Repeat n times (internal number).
-  var repeats = Number(block.getFieldValue('TIMES'));
-  var branch = Blockly.JavaScript.statementToCode(block, 'DO');
-  branch = Blockly.JavaScript.addLoopTrap(branch, block.id);
-  var loopVar = Blockly.JavaScript.variableDB_.getDistinctName(
-      'count', Blockly.Variables.NAME_TYPE);
-  var code = 'for (var ' + loopVar + ' = 0; ' +
-      loopVar + ' < ' + repeats + '; ' +
-      loopVar + '++) {\n' +
-      branch + '}\n';
-  return code;
 };
 
 Blockly.Python['coderbot_repeat'] = function(block) {
@@ -102,11 +88,6 @@ Blockly.Blocks['coderbot_moveForward'] = {
 };
 
 
-Blockly.JavaScript['coderbot_moveForward'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'get_bot().forward(' + CODERBOT_MOV_FW_DEF_SPEED + ', ' + CODERBOT_MOV_FW_DEF_ELAPSE + ');\n';
-};
-
 Blockly.Python['coderbot_moveForward'] = function(block) {
   // Generate Python for moving forward.
   if(CODERBOT_PROG_MOVE_MOTION) {
@@ -132,11 +113,6 @@ Blockly.Blocks['coderbot_moveBackward'] = {
     this.setNextStatement(true);
     this.setTooltip('CoderBot_moveBackwardTooltip');
   }
-};
-
-Blockly.JavaScript['coderbot_moveBackward'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'get_bot().backward(' + CODERBOT_MOV_FW_DEF_SPEED + ', ' + CODERBOT_MOV_FW_DEF_ELAPSE + ');\n';
 };
 
 Blockly.Python['coderbot_moveBackward'] = function(block) {
@@ -166,11 +142,6 @@ Blockly.Blocks['coderbot_turnLeft'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_turnLeft'] = function(block) {
-  // Generate JavaScript for turning left.
-  return 'get_bot().left(' + CODERBOT_MOV_TR_DEF_SPEED + ', ' + CODERBOT_MOV_TR_DEF_ELAPSE + ');\n';
-};
-
 Blockly.Python['coderbot_turnLeft'] = function(block) {
   // Generate Python for turning left.
   if(CODERBOT_PROG_MOVE_MOTION) {
@@ -196,11 +167,6 @@ Blockly.Blocks['coderbot_turnRight'] = {
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_turnTooltip'));
   }
-};
-
-Blockly.JavaScript['coderbot_turnRight'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  return 'get_bot().right(' + CODERBOT_MOV_TR_DEF_SPEED + ', ' + CODERBOT_MOV_TR_DEF_ELAPSE + ');\n';
 };
 
 Blockly.Python['coderbot_turnRight'] = function(block) {
@@ -231,13 +197,6 @@ Blockly.Blocks['coderbot_say'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_say'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  var text = Blockly.JavaScript.valueToCode(block, 'TEXT',
-      Blockly.JavaScript.ORDER_NONE) || '\'\'';
-  return 'get_bot().say(' + text + ');\n';
-};
-
 Blockly.Python['coderbot_say'] = function(block) {
   // Generate Python for turning left or right.
   var text = Blockly.Python.valueToCode(block, 'TEXT',
@@ -259,13 +218,6 @@ Blockly.Blocks['coderbot_sleep'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_sleep'] = function(block) {
-  // Generate JavaScript for sleeping.
-  var elapse = Blockly.JavaScript.valueToCode(block, 'ELAPSE',
-      Blockly.JavaScript.ORDER_NONE) || '\'\'';
-  return 'get_cam().sleep(' + elapse + ');\n';
-};
-
 Blockly.Python['coderbot_sleep'] = function(block) {
   // Generate Python for sleeping.
   var elapse = Blockly.Python.valueToCode(block, 'ELAPSE',
@@ -283,11 +235,9 @@ Blockly.Blocks['coderbot_adv_move'] = {
         [Blockly.Msg.CODERBOT_MOVE_ADV_TIP_RIGHT, 'RIGHT']]
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
-    this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_ADV_MOVE,
-                        ['TEXT', null, Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
     
     this.appendDummyInput("ACTION")
+       .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOVE)
        .appendField(new Blockly.FieldDropdown(ACTIONS), 'ACTION');
     this.appendValueInput('SPEED')
         .setCheck('Number')
@@ -313,11 +263,6 @@ Blockly.Blocks['coderbot_adv_move'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_adv_move'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'get_bot().forward();\n';
-};
-
 Blockly.Python['coderbot_adv_move'] = function(block) {
   // Generate Python for moving forward.
   var OPERATORS = {
@@ -339,13 +284,10 @@ Blockly.Blocks['coderbot_motion_move'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
-    this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_MOTION_MOVE,
-                        ['TEXT', null, Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
 
     this.appendValueInput('DIST')
         .setCheck('Number')
-        .appendField(Blockly.Msg.CODERBOT_MOVE_MOTION_DIST);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_MOTION_MOVE + " " + Blockly.Msg.CODERBOT_MOVE_MOTION_DIST);
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -355,11 +297,6 @@ Blockly.Blocks['coderbot_motion_move'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
   }
-};
-
-Blockly.JavaScript['coderbot_motion_move'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'get_bot().forward();\n';
 };
 
 Blockly.Python['coderbot_motion_move'] = function(block) {
@@ -374,13 +311,10 @@ Blockly.Blocks['coderbot_motion_turn'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Move');
     this.setColour(40);
-    this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_MOTION_TURN,
-                        ['TEXT', null, Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
 
     this.appendValueInput('ANGLE')
         .setCheck('Number')
-        .appendField(Blockly.Msg.CODERBOT_MOVE_MOTION_ANGLE);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_MOTION_TURN + " " + Blockly.Msg.CODERBOT_MOVE_MOTION_ANGLE);
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -390,11 +324,6 @@ Blockly.Blocks['coderbot_motion_turn'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
   }
-};
-
-Blockly.JavaScript['coderbot_motion_turn'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'get_bot().right();\n';
 };
 
 Blockly.Python['coderbot_motion_turn'] = function(block) {
@@ -409,13 +338,10 @@ Blockly.Blocks['coderbot_adv_motor'] = {
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Motor');
     this.setColour(40);
-    this.interpolateMsg(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR,
-                        ['TEXT', null, Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
     
     this.appendValueInput('SPEED_LEFT')
         .setCheck('Number')
-        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_SPEED_LEFT);
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR + " " + Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_SPEED_LEFT);
     this.appendValueInput('SPEED_RIGHT')
         .setCheck('Number')
         .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_SPEED_RIGHT);
@@ -432,11 +358,6 @@ Blockly.Blocks['coderbot_adv_motor'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
   }
-};
-
-Blockly.JavaScript['coderbot_adv_motor'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'get_bot().motor();\n';
 };
 
 Blockly.Python['coderbot_adv_motor'] = function(block) {
@@ -459,11 +380,6 @@ Blockly.Blocks['coderbot_adv_stop'] = {
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_stopTooltip'));
   }
-};
-
-Blockly.JavaScript['coderbot_adv_stop'] = function(block) {
-  // Generate JavaScript to stop the get_bot().
-  return 'get_bot().stop();\n';
 };
 
 Blockly.Python['coderbot_adv_stop'] = function(block) {
@@ -489,11 +405,6 @@ Blockly.Blocks['coderbot_camera_photoTake'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_camera_photoTake'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  return 'get_cam().takePhoto();\n';
-};
-
 Blockly.Python['coderbot_camera_photoTake'] = function(block) {
   // Generate Python for turning left or right.
   return 'get_cam().photo_take()\n';
@@ -515,11 +426,6 @@ Blockly.Blocks['coderbot_camera_videoRec'] = {
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_VideoTooltip'));
   }
-};
-
-Blockly.JavaScript['coderbot_camera_videoRec'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  return 'get_cam().videoRec();\n';
 };
 
 Blockly.Python['coderbot_camera_videoRec'] = function(block) {
@@ -545,11 +451,6 @@ Blockly.Blocks['coderbot_camera_videoStop'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_camera_videoStop'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  return 'get_cam().videoStop();\n';
-};
-
 Blockly.Python['coderbot_camera_videoStop'] = function(block) {
   // Generate Python for turning left or right.
   return 'get_cam().video_stop()\n';
@@ -568,12 +469,6 @@ Blockly.Blocks['coderbot_adv_pathAhead'] = {
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
-};
-
-Blockly.JavaScript['coderbot_adv_pathAhead'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().path_ahead()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Python['coderbot_adv_pathAhead'] = function(block) {
@@ -597,12 +492,6 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_adv_findLine'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().find_line()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
-};
-
 Blockly.Python['coderbot_adv_findLine'] = function(block) {
   // Boolean values true and false.
   var code = 'get_cam().find_line()';
@@ -622,12 +511,6 @@ Blockly.Blocks['coderbot_adv_findSignal'] = {
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
-};
-
-Blockly.JavaScript['coderbot_adv_findSignal'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().find_signal()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Python['coderbot_adv_findSignal'] = function(block) {
@@ -653,14 +536,6 @@ Blockly.Blocks['coderbot_adv_findFace'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_adv_findFace'] = function(block) {
-  // Boolean values true and false.
-  var retval = block.getFieldValue('RETVAL');
-  var ret_code = {'X': '[0]', 'Y': '[1]', 'SIZE': '[2]', 'ALL': ''}[retval];
-  var code = 'get_cam().find_face()' + ret_code + ';';
-  return [code, Blockly.Python.ORDER_ATOMIC];
-};
-
 Blockly.Python['coderbot_adv_findFace'] = function(block) {
   // Boolean values true and false.
   var retval = block.getFieldValue('RETVAL');
@@ -682,12 +557,6 @@ Blockly.Blocks['coderbot_adv_findCode'] = {
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
-};
-
-Blockly.JavaScript['coderbot_adv_findCode'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().find_code()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Python['coderbot_adv_findCode'] = function(block) {
@@ -716,21 +585,40 @@ Blockly.Blocks['coderbot_adv_findColor'] = {
   }
 };
 
-Blockly.JavaScript['coderbot_adv_findColor'] = function(block) {
-  // Boolean values true and false.
-  var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
-  var retval = block.getFieldValue('RETVAL');
-  var ret_code = {'DIST': '[0]', 'ANGLE': '[1]', 'BOTH': ''}[retval];
-  var code = 'get_cam().find_color(' + color + ')' + ret_code + ';';
-  return [code, Blockly.Python.ORDER_ATOMIC];
-};
-
 Blockly.Python['coderbot_adv_findColor'] = function(block) {
   // Boolean values true and false.
   var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
   var retval = block.getFieldValue('RETVAL');
   var ret_code = {'DIST': '[0]', 'ANGLE': '[1]', 'BOTH': ''}[retval];
   var code = 'get_cam().find_color(' + color + ')' + ret_code;
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findText'] = {
+  /**
+   * Block for findText function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_ENG, 'eng'], [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_ITA, 'ita'],[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_UNSPECIFIED,'']]), 'LANG')
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR);
+    this.appendValueInput('COLOR')
+        .setCheck('Colour');
+    this.setInputsInline(true);
+    this.setOutput(true, ['Number', 'Array']);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_findText'] = function(block) {
+  // Boolean values true and false.
+  var lang = block.getFieldValue('LANG');
+  var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
+  var code = 'get_cam().find_text(lang="' + lang + '", back_color=' + color  + ')';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
@@ -747,12 +635,6 @@ Blockly.Blocks['coderbot_adv_findLogo'] = {
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
-};
-
-Blockly.JavaScript['coderbot_adv_findLogo'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().find_logo()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Python['coderbot_adv_findLogo'] = function(block) {
