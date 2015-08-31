@@ -13,8 +13,13 @@ MIN_MATCH_COUNT = 10
 
 api = tesseract.TessBaseAPI()
 api.Init(".", 'eng', tesseract.OEM_DEFAULT)
-api.SetVariable("tessedit_char_whitelist"," ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz0123456789")
 api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
+tesseract_whitelists = {
+  'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
+  'num': "1234567890 ",
+  'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
+  'unspec': None,
+}
 
 class Image():
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
@@ -163,17 +168,23 @@ class Image():
             blob = b
             b_area = blob.area() 
         rect = blob.minAreaRect()
-        rot_matrix = cv2.getRotationMatrix2D(rect[0], rect[2], 1)
-        #logging.info("center: " + str(rect[0]) + " size: " + str(rect[1]) + " angle: " + str(rect[2]))
-        #rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (int(rect[1][0]), int(rect[1][1]))))
+        center = rect[0]
+        size = rect[1]
+        angle = rect[2]
+        if size[0] < size[1]:
+          angle = angle + 90
+          size = (size[1], size[0])
+  
+        rot_matrix = cv2.getRotationMatrix2D(center, angle, 1)
+        logging.info("center: " + str(center) + " size: " + str(size) + " angle: " + str(angle))
         rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (160, 120)))
-        logging.info("rect0, rect1: " + str(rect[0]) + " " + str(rect[1]))
-        #logging.info("x1: " + str(max(0,int(rect[0][0]-(rect[1][0])/2))) + " y1: " + str(max(0, int(rect[0][1]-(rect[1][1])/2))) + " x2: " + str(min(160,int(rect[0][0]+(rect[1][0])/2))) + " y2: " + str(min(120, int(rect[0][1]+(rect[1][1])/2))))
-        border = 10
-        rect_image = rect_image.crop(int(max(0,border+rect[0][0]-(rect[1][0])/2)), int(max(0,border+rect[0][1]-(rect[1][1]+5)/2)), int(min(160,-border+rect[0][0]+(rect[1][0])/2)), int(min(120,-border+rect[0][1]+(rect[1][1]-5)/2))) 
+        border = 5
+        rect_image = rect_image.crop(int(max(0,border+center[0]-(size[0])/2)), int(max(0,border+center[1]-(size[1]+5)/2)), int(min(160,-border+center[0]+(size[0])/2)), int(min(120,-border+center[1]+(size[1]-5)/2))) 
       return rect_image 
              
-    def find_text(self, lang):
+    def find_text(self, accept):
+      wlist = tesseract_whitelists.get(accept, None)
+      api.SetVariable("tessedit_char_whitelist", wlist)
       text_found = None
       cvmat_image=cv2.cv.fromarray(self._data)
       iplimage =cv2.cv.GetImage(cvmat_image)

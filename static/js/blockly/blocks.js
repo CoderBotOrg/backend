@@ -604,7 +604,10 @@ Blockly.Blocks['coderbot_adv_findText'] = {
     this.setColour(290);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND)
-        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_ENG, 'eng'], [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_ITA, 'ita'],[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_LANG_UNSPECIFIED,'']]), 'LANG')
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHA, 'alpha'], 
+                                                [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_NUM, 'num'],
+                                                [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHANUM,'alphanum'],
+                                                [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_UNSPEC,'unspec']]), 'ACCEPT')
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR);
     this.appendValueInput('COLOR')
         .setCheck('Colour');
@@ -616,9 +619,9 @@ Blockly.Blocks['coderbot_adv_findText'] = {
 
 Blockly.Python['coderbot_adv_findText'] = function(block) {
   // Boolean values true and false.
-  var lang = block.getFieldValue('LANG');
+  var accept = block.getFieldValue('ACCEPT');
   var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
-  var code = 'get_cam().find_text(lang="' + lang + '", back_color=' + color  + ')';
+  var code = 'get_cam().find_text(accept="' + accept + '", back_color=' + color  + ')';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
