@@ -52,4 +52,10 @@ Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_NUM = "Numeri (0..9)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHANUM = "Lettere e numeri (A..Z;0..9)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_UNSPEC = "Qualsiasi";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR = "colore sfondo";
-
+Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_NAME = "registra audio su file";
+Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_ELAPSE = " per secondi";
+Blockly.Msg.CODERBOT_AUDIO_PLAY_FILE = "riproduci file";
+Blockly.Msg.CODERBOT_AUDIO_LISTEN = "ascolta";
+Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE = "commandi semplici";
+Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM = "commandi medi";
+Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_ADV = "comandi avanzati";

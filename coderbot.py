@@ -133,12 +133,6 @@ class CoderBot:
   def is_moving(self):
     return self._is_moving
 
-  def say(self, what):
-    if what and "$" in what:
-      os.system ('omxplayer sounds/' + what[1:])
-    elif what and len(what):
-      os.system ('espeak -vit -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
-
   def set_callback(self, gpio, callback, elapse):
     self._cb_elapse[gpio] = elapse * 1000
     self._cb[gpio] = callback

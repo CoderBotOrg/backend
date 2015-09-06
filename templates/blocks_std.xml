@@ -71,6 +71,6 @@
       </block>
     </category>
     <category name="{% trans %}Sound{% endtrans %}">
-      <block type="coderbot_say"></block>
+      <block type="coderbot_audio_say"></block>
     </category>      
   </xml>

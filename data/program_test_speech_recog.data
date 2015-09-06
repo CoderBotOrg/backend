@@ -1,0 +1,1 @@
+{"dom_code": "<xml xmlns=\"http://www.w3.org/1999/xhtml\"><block type=\"text_print\" id=\"26\" x=\"-24\" y=\"170\"><value name=\"TEXT\"><block type=\"coderbot_audio_listen\" id=\"10\"><field name=\"MODEL\">model_simple</field></block></value></block></xml>", "code": "get_cam().set_text(get_audio().speech_recog(model=\"model_simple))\n", "name": "test_speech_recog"}

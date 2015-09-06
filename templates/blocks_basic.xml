@@ -3,7 +3,7 @@
       <block type="coderbot_moveBackward"></block>
       <block type="coderbot_turnLeft"></block>
       <block type="coderbot_turnRight"></block>
-      <block type="coderbot_say">
+      <block type="coderbot_audio_say">
         <value name="TEXT">
           <block type="text">
             <field name="TEXT">Ciao</field>

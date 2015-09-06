@@ -6,6 +6,7 @@ import logging.handlers
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
 from motion import Motion
+from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
 
@@ -23,6 +24,7 @@ logger.addHandler(handler)
 bot = None
 cam = None
 motion = None
+audio = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -85,21 +87,21 @@ def handle_bot():
         motion.stop()
     elif cmd == "take_photo":
         cam.photo_take()
-        bot.say(app.bot_config.get("sound_shutter"))
+        audio.say(app.bot_config.get("sound_shutter"))
     elif cmd == "video_rec":
         cam.video_rec()
-        bot.say(app.bot_config.get("sound_shutter"))
+        audio.say(app.bot_config.get("sound_shutter"))
     elif cmd == "video_stop":
         cam.video_stop()
-        bot.say(app.bot_config.get("sound_shutter"))
+        audio.say(app.bot_config.get("sound_shutter"))
 
     elif cmd == "say":
         logging.info("say: " + str(param1))
-	bot.say(param1)
+	audio.say(param1)
 
     elif cmd == "halt":
         logging.info("shutting down")
-        bot.say(app.bot_config.get("sound_stop"))
+        audio.say(app.bot_config.get("sound_stop"))
 	bot.halt()
     elif cmd == "restart":
         logging.info("restarting bot")
@@ -211,11 +213,13 @@ def run_server():
   global bot
   global cam
   global motion
+  global audio
   try:
     app.bot_config = Config.read()
     bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"))
     cam = Camera.get_instance()
     motion = Motion.get_instance()
+    audio = Audio.get_instance()
   except ValueError as e:
     app.bot_config = {}
     logging.error(e)
@@ -223,5 +227,5 @@ def run_server():
     app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
 
   bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-  bot.say(app.bot_config.get("sound_start"))
+  audio.say(app.bot_config.get("sound_start"))
   app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)

@@ -8,6 +8,7 @@ import coderbot
 import camera
 import motion
 import config
+import audio
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -21,6 +22,9 @@ def get_bot():
 
 def get_motion():
   return motion.Motion.get_instance()
+
+def get_audio():
+  return audio.Audio.get_instance()
 
 def get_prog_eng():
   return ProgramEngine.get_instance()

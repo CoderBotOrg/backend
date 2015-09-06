@@ -179,7 +179,7 @@ Blockly.Python['coderbot_turnRight'] = function(block) {
   } 
 };
 
-Blockly.Blocks['coderbot_say'] = {
+Blockly.Blocks['coderbot_audio_say'] = {
   // Block for text to speech.
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Say');
@@ -197,11 +197,11 @@ Blockly.Blocks['coderbot_say'] = {
   }
 };
 
-Blockly.Python['coderbot_say'] = function(block) {
+Blockly.Python['coderbot_audio_say'] = function(block) {
   // Generate Python for turning left or right.
   var text = Blockly.Python.valueToCode(block, 'TEXT',
       Blockly.Python.ORDER_NONE) || '\'\'';
-  return 'get_bot().say(' + text + ')\n';
+  return 'get_audio().say(' + text + ')\n';
 };
 
 Blockly.Blocks['coderbot_sleep'] = {
@@ -645,3 +645,86 @@ Blockly.Python['coderbot_adv_findLogo'] = function(block) {
   var code = 'get_cam().find_logo()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
+
+Blockly.Blocks['coderbot_audio_record'] = {
+  /**
+   * Block for findLogo function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendValueInput('FILENAME')
+        .setCheck('String')
+        .appendField(Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_NAME);
+    this.appendValueInput('ELAPSE')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_ELAPSE);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(('CoderBot_audio_say_Tooltip'));
+  }
+};
+
+Blockly.Python['coderbot_audio_record'] = function(block) {
+
+  var filename = Blockly.Python.valueToCode(block, 'FILENAME',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  var elapse = Blockly.Python.valueToCode(block, 'ELAPSE',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  var code = 'get_audio().record_to_file(filename=' + filename + ', elapse=' + elapse + ')\n';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_audio_play'] = {
+  // Block for text to speech.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Play');
+    this.setColour(290);
+    var vi = this.appendValueInput('FILENAME');
+    vi.setCheck("String");
+    if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
+        vi.appendField(new Blockly.FieldImage('/images/blocks/play.png', 32, 32, '*'));
+    } else {
+        vi.appendField(Blockly.Msg.CODERBOT_AUDIO_PLAY_FILE);
+    }
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(('CoderBot_audio_play_Tooltip'));
+  }
+};
+
+Blockly.Python['coderbot_audio_play'] = function(block) {
+  // Generate Python for turning left or right.
+  var filename = Blockly.Python.valueToCode(block, 'FILENAME',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  return 'get_audio().play(' + filename + ')\n';
+};
+
+Blockly.Blocks['coderbot_audio_listen'] = {
+  /**
+   * Block for findText function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_AUDIO_LISTEN)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE, 'model_simple'],
+                                                [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM, 'model_medium'],
+                                                [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_ADV, 'model_adv']]), 'MODEL');
+    this.setInputsInline(true);
+    this.setOutput(true, ['Number', 'Array']);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_audio_listen'] = function(block) {
+  // Boolean values true and false.
+  var model = block.getFieldValue('MODEL');
+  var code = 'get_audio().speech_recog(model="' + model + '")';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
