@@ -115,6 +115,8 @@
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>
      <input type="text" id="i_move_motor_mode" name="move_motor_mode" value="{{config.move_motor_mode}}">
+     <label for="i_move_motor_trim">{% trans %}Trim factor (1.0 = center){% endtrans %}</label>
+     <input type="text" id="i_move_motor_trim" name="move_motor_trim" value="{{config.move_motor_trim}}">
      <label for="i_move_power_angle_1">{% trans %}Power (target angle -15){% endtrans %}</label>
      <input type="text" id="i_move_power_angle_1" name="move_power_angle_1" value="{{config.move_power_angle_1}}"> 
      <label for="i_move_power_angle_2">{% trans %}Power (target angle -4){% endtrans %}</label>

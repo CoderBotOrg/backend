@@ -11,7 +11,7 @@ import logging
 from pocketsphinx.pocketsphinx import *
 from sphinxbase.sphinxbase import *
 
-CHUNK_SIZE = 131072
+CHUNK_SIZE = 4096
 FORMAT = pyaudio.paInt16
 RATE = 44100
 
@@ -116,38 +116,42 @@ class Audio:
     # Create a decoder with certain model
     config = Decoder.default_config()
     config.set_string('-hmm', '/usr/local/share/pocketsphinx/model/en-us/en-us')
-    config.set_string('-kws', MODELDIR + model + '.txt')
-    #config.set_string('-lm', MODELDIR + model + '.lm')
+    config.set_int('-ds', 2)
+    config.set_int('-topn', 3)
+    config.set_int('-maxwpf', 5)
+    #config.set_string('-kws', MODELDIR + model + '.txt')
+    config.set_string('-lm', MODELDIR + model + '.lm')
     config.set_string('-dict', MODELDIR + model + '.dict')
     decoder = Decoder(config)
 
     p = pyaudio.PyAudio()
+    logging.info("device info: " + str(p.get_device_info_by_index(0)))
     #stream = p.open(format=pyaudio.paInt16, channels=1, input_device_index=0, rate=16000, input=True, frames_per_buffer=1024)
     stream = p.open(format=FORMAT, channels=1, input_device_index=0, rate=RATE,
                     input=True,
-                    frames_per_buffer=CHUNK_SIZE)
+                    frames_per_buffer=CHUNK_SIZE*256)
     stream.start_stream()
     decoder.start_utt()
     tstamp = time.time()
     recog_text = ''
 
-    while time.time() - tstamp < 10.0:
+    while len(recog_text) < 1:
       try:
         buf = stream.read(CHUNK_SIZE)
+        logging.info("actual voice")
+        decoder.process_raw(buf, False, False)
+        if decoder.hyp().hypstr != '':
+          recog_text += decoder.hyp().hypstr
+          print "text: " + decoder.hyp().hypstr
+          tstamp = time.time()
       except IOError as ex:
         if ex[1] != pyaudio.paInputOverflowed:
           raise
         buf = '\x00' * CHUNK_SIZE #white noise
         logging.info("white noise") 
-
-      decoder.process_raw(buf, False, False)
-      try:
-        if decoder.hyp().hypstr != '':
-          recog_text += decoder.hyp().hypstr
-          print "text: " + decoder.hyp().hypstr
-          tstamp = time.time()
       except AttributeError:
         pass
+
     decoder.end_utt()
     stream.close()
     p.terminate()

@@ -1,6 +1,7 @@
 import os
 import time
 import pigpio
+import config
 
 PIN_MOTOR_ENABLE = 22
 PIN_LEFT_FORWARD = 25
@@ -20,13 +21,14 @@ def coderbot_callback(gpio, level, tick):
 class CoderBot:
   _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
 
-  def __init__(self, servo=False):
+  def __init__(self, servo=False, motor_trim_factor=1.0):
     self.pi = pigpio.pi('localhost')
     self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
     self._cb = dict()
     self._cb_last_tick = dict()
     self._cb_elapse = dict()
     self._servo = servo
+    self._motor_trim_factor = motor_trim_factor
     if self._servo:
       self.motor_control = self._servo_motor
     else:
@@ -42,16 +44,16 @@ class CoderBot:
   the_bot = None
 
   @classmethod
-  def get_instance(cls, servo=False):
+  def get_instance(cls, servo=False, motor_trim_factor=1.0):
     if not cls.the_bot:
       cls.the_bot = CoderBot(servo)
     return cls.the_bot
 
   def move(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=speed, speed_right=speed, elapse=elapse)
+    self.motor_control(speed_left=speed / self._motor_trim_factor, speed_right=speed * self._motor_trim_factor, elapse=elapse)
 
   def turn(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=speed, speed_right=-speed, elapse=elapse)
+    self.motor_control(speed_left=speed / self._motor_trim_factor, speed_right=-(speed * self._motor_trim_factor), elapse=elapse)
 
   def forward(self, speed=100, elapse=-1):
     self.move(speed=speed, elapse=elapse)

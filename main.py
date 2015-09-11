@@ -216,7 +216,7 @@ def run_server():
   global audio
   try:
     app.bot_config = Config.read()
-    bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"))
+    bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor = float(app.bot_config.get('move_motor_trim', '1.0')))
     cam = Camera.get_instance()
     motion = Motion.get_instance()
     audio = Audio.get_instance()
