@@ -2,6 +2,7 @@ import os
 import time
 import pigpio
 import config
+import logging
 
 PIN_MOTOR_ENABLE = 22
 PIN_LEFT_FORWARD = 25
@@ -28,6 +29,7 @@ class CoderBot:
     self._cb_last_tick = dict()
     self._cb_elapse = dict()
     self._servo = servo
+    logging.info("move_motor_factor: " + str(motor_trim_factor))
     self._motor_trim_factor = motor_trim_factor
     if self._servo:
       self.motor_control = self._servo_motor
@@ -46,14 +48,14 @@ class CoderBot:
   @classmethod
   def get_instance(cls, servo=False, motor_trim_factor=1.0):
     if not cls.the_bot:
-      cls.the_bot = CoderBot(servo)
+      cls.the_bot = CoderBot(servo, motor_trim_factor)
     return cls.the_bot
 
   def move(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=speed / self._motor_trim_factor, speed_right=speed * self._motor_trim_factor, elapse=elapse)
+    self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse)
 
   def turn(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=speed / self._motor_trim_factor, speed_right=-(speed * self._motor_trim_factor), elapse=elapse)
+    self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=-min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse)
 
   def forward(self, speed=100, elapse=-1):
     self.move(speed=speed, elapse=elapse)
@@ -75,7 +77,7 @@ class CoderBot:
 
   def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
-
+    logging.info("speed_left: " + str(speed_left) + " speed_right: " + str(speed_right))
     if speed_left < 0:
       speed_left = abs(speed_left)
       self.pi.write(PIN_LEFT_FORWARD, 0)
