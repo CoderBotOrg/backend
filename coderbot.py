@@ -29,7 +29,6 @@ class CoderBot:
     self._cb_last_tick = dict()
     self._cb_elapse = dict()
     self._servo = servo
-    logging.info("move_motor_factor: " + str(motor_trim_factor))
     self._motor_trim_factor = motor_trim_factor
     if self._servo:
       self.motor_control = self._servo_motor
@@ -77,7 +76,6 @@ class CoderBot:
 
   def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1):
     self._is_moving = True
-    logging.info("speed_left: " + str(speed_left) + " speed_right: " + str(speed_right))
     if speed_left < 0:
       speed_left = abs(speed_left)
       self.pi.write(PIN_LEFT_FORWARD, 0)
