@@ -88,7 +88,7 @@ class Image():
       return Image(data)
   
     def grayscale(self):
-      data = cv2.cvtColor(self._data, cv2.cv.CV_BGR2GRAY)
+      data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
       return Image(data)
 
     def invert(self):
@@ -96,13 +96,13 @@ class Image():
       return Image(data)
 
     def binarize(self):
-      data = cv2.cvtColor(self._data, cv2.cv.CV_BGR2GRAY)
+      data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
       data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 5, 3)
       return Image(data)
 
     def find_blobs(self, minsize=0, maxsize=10000000):
       blobs = []
-      contours, hyerarchy = cv2.findContours(self._data, cv2.cv.CV_RETR_LIST, cv2.cv.CV_CHAIN_APPROX_SIMPLE)
+      image, contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
       for c in contours:
         area = cv2.contourArea(c)
         if area > minsize and area < maxsize:
@@ -186,9 +186,9 @@ class Image():
       wlist = tesseract_whitelists.get(accept, None)
       api.SetVariable("tessedit_char_whitelist", wlist)
       text_found = None
-      cvmat_image=cv2.cv.fromarray(self._data)
-      iplimage =cv2.cv.GetImage(cvmat_image)
-      tesseract.SetCvImage(iplimage, api)
+      #cvmat_image=cv2.cv.fromarray(self._data)
+      #iplimage = cv2.cv.GetImage(cvmat_image)
+      api.SetImage(self._data.tobytes(), self._data.shape(0), self._data.shape(1), 0, self._data.shape(0)/8)
       text=api.GetUTF8Text()
       conf=api.MeanTextConf()
       logging.info("conf: " + str(conf))

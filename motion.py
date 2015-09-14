@@ -22,8 +22,6 @@ feature_params = dict( maxCorners = 500,
 
 PI_CAM_FOV_H_DEG = 53.0
 PI_CAM_FOV_V_CM = 100.0
-IMAGE_WIDTH = 160.0
-IMAGE_HEIGHT = 120.0
 
 class Motion:
     def __init__(self):
@@ -44,7 +42,8 @@ class Motion:
         self.target_angle = 0.0
         cfg = Config.get()
         self.power_angles = [[15, (int(cfg.get("move_power_angle_1")), -1)], [4, (int(cfg.get("move_power_angle_2")), 0.05)], [1, (int(cfg.get("move_power_angle_3")), 0.02)], [0, (0, 0)]]
-
+        self.image_width = 640 / int(cfg.get("cv_image_factor"))
+        self.image_heigth = 480 / int(cfg.get("cv_image_factor"))
     _motion = None
 
     @classmethod
@@ -185,8 +184,8 @@ class Motion:
             avg_delta_x = (avg_delta_x / count)
             avg_delta_y = (avg_delta_y / (vectors_t.shape[0] / 2))
         
-            self.delta_angle -= (avg_delta_x * PI_CAM_FOV_H_DEG ) / IMAGE_WIDTH
-            self.delta_dist += (avg_delta_y * PI_CAM_FOV_V_CM) / IMAGE_HEIGHT
+            self.delta_angle -= (avg_delta_x * PI_CAM_FOV_H_DEG ) / self.image_width
+            self.delta_dist += (avg_delta_y * PI_CAM_FOV_V_CM) / self.image_heigth
             #print "count: ", count, "delta_a: ", self.delta_angle, " avg_delta_x: ", avg_delta_x, " delta_y: ", self.delta_dist, " avg_delta_y: ", avg_delta_y
 
         #cv2.line(self.vis, (int(80+deltaAngle),20), (80,20), (0, 0, 255))

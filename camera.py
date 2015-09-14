@@ -23,9 +23,6 @@ class Camera(Thread):
 
   _instance = None
   _img_template = image.Image.load("coderdojo-logo.png")
-  _warp_corners_1 = [(0, -120), (640, -120), (380, 480), (260, 480)]
-  _warp_corners_2 = [(0, -60), (320, -60), (190, 240), (130, 240)]
-  _warp_corners_4 = [(0, -30), (160, -30), (95, 120), (65, 120)]
   stream_port = 9080
 
   @classmethod
@@ -37,10 +34,9 @@ class Camera(Thread):
 
   def __init__(self):
     logging.info("starting camera")
-    cam_props = {"width":640, "height":480, "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
+    cam_props = {"width":640, "height":480, "cv_image_factor":config.Config.get().get("cv_image_factor", 4), "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
     self._camera = camera.Camera(props=cam_props)
     self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
-    #self._cam_off_img.save(self._streamer)
     self.recording = False
     self.video_start_time = time.time() + 8640000
     self._run = True
@@ -181,14 +177,14 @@ class Camera(Thread):
     img = self.get_image(0).binarize()
     slices = [0,0,0]
     blobs = [0,0,0]
-    slices[0] = img.crop(0, 100, 160, 120)
-    slices[1] = img.crop(0, 80, 160, 100)
-    slices[2] = img.crop(0, 60, 160, 80)
+    slices[0] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.2), self._camera.out_rgb_resolution[0], self._camera.out_rgb_resolution[1])
+    slices[1] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.5), self._camera.out_rgb_resolution[0], int(self._camera.out_rgb_resolution[1]/1.2))
+    slices[2] = img.crop(0, int(self._camera.out_rgb_resolution[1]/2.0), self._camera.out_rgb_resolution[0], int(self._camera.out_rgb_resolution[1]/1.5))
     coords = [-1, -1, -1]
     for idx, slice in enumerate(slices):
-      blobs[idx] = slice.find_blobs(minsize=30, maxsize=160)
+      blobs[idx] = slice.find_blobs(minsize=30, maxsize=self._camera.out_rgb_resolution[0])
       if len(blobs[idx]):
-        coords[idx] = (blobs[idx][0].center[0] * 100) / 160
+        coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
 	logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
     
     self._image_lock.release()
@@ -223,15 +219,15 @@ class Camera(Thread):
       # Get the largest face, face is a rectangle 
       x, y, w, h = faces[0]
       centerX = x + (w/2)
-      faceX = ((centerX * 100) / 160) - 50 #center = 0
+      faceX = ((centerX * 100) / self._camera.out_rgb_resolution[0]) - 50 #center = 0
       centerY = y + (h/2)
-      faceY = 50 - (centerY * 100) / 120 #center = 0 
+      faceY = 50 - (centerY * 100) / self._camera.out_rgb_resolution[1] #center = 0 
       size = h 
-      faceS = (size * 100) / 120
+      faceS = (size * 100) / self._camera.out_rgb_resolution[1]
     return [faceX, faceY, faceS]
 
   def path_ahead(self):
-    #print "path ahead"
+    image_size = self._camera.out_rgb_resolution    
     ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
@@ -239,7 +235,7 @@ class Camera(Thread):
     blobs = img.binarize().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
     coordY = 60
     if len(blobs):
-      obstacle = blob.Blob.sort_distance((80,120), blobs)[0]
+      obstacle = blob.Blob.sort_distance((image_size[0]/2,image_size[1]), blobs)[0]
 
       logging.info("obstacle:" + str(obstacle.bottom)) 
       coords = img.transform([(obstacle.center[0], obstacle.bottom)])
@@ -252,6 +248,7 @@ class Camera(Thread):
     return coordY
 
   def find_color(self, s_color):
+    image_size = self._camera.out_rgb_resolution
     color = (int(s_color[1:3],16), int(s_color[3:5],16), int(s_color[5:7],16))
     code_data = None
     ts = time.time()
@@ -273,8 +270,8 @@ class Camera(Thread):
       logging.info("coordinates: " + str(coords))
       x = coords[0][0]
       y = coords[0][1]
-      dist = math.sqrt(math.pow(12 + (68 * (120 - y) / 100),2) + (math.pow((x-80)*60/160,2)))
-      angle = math.atan2(x - 80, 120 - y) * 180 / math.pi
+      dist = math.sqrt(math.pow(12 + (68 * (image_size[1] - y) / 100),2) + (math.pow((x-(image_size[0]/2))*60/image_size[0],2)))
+      angle = math.atan2(x - (image_size[0]/2), image_size[1] - y) * 180 / math.pi
       logging.info("object found, dist: " + str(dist) + " angle: " + str(angle))
     #self.save_image(img.to_jpeg())
     #print "object: " + str(time.time() - ts)
