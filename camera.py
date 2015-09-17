@@ -41,12 +41,13 @@ class Camera(Thread):
     self.video_start_time = time.time() + 8640000
     self._run = True
     self._image_time = 0
+    self._cv_image_factor = int(config.Config.get().get("cv_image_factor", 4))
     self._image_lock = Lock()
     self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
-    self._color_object_size_min = config.Config.get().get("camera_color_object_size_min", 20)
-    self._color_object_size_max = config.Config.get().get("camera_color_object_size_max", 8000)
-    self._path_object_size_min = config.Config.get().get("camera_path_object_size_min", 20)
-    self._path_object_size_max = config.Config.get().get("camera_path_object_size_max", 20)
+    self._color_object_size_min = int(config.Config.get().get("camera_color_object_size_min", 80)) / self._cv_image_factor
+    self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / self._cv_image_factor
+    self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / self._cv_image_factor
+    self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / self._cv_image_factor
     self._photos = []
    
     for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
@@ -261,6 +262,9 @@ class Camera(Thread):
     logging.debug("objects: " + str(objects))
     dist = -1
     angle = 180
+    fov_offset = 12 #cm
+    fov_total_y = 68 #cm
+    fov_total_x = 60 #cm
 
     if objects and len(objects):
       obj = objects[-1]
@@ -270,7 +274,7 @@ class Camera(Thread):
       logging.info("coordinates: " + str(coords))
       x = coords[0][0]
       y = coords[0][1]
-      dist = math.sqrt(math.pow(12 + (68 * (image_size[1] - y) / 100),2) + (math.pow((x-(image_size[0]/2))*60/image_size[0],2)))
+      dist = math.sqrt(math.pow(fov_offset + (fov_total_y * (image_size[1] - y) / (image_size[1]/1.2)),2) + (math.pow((x-(image_size[0]/2)) * fov_total_x / image_size[0],2)))
       angle = math.atan2(x - (image_size[0]/2), image_size[1] - y) * 180 / math.pi
       logging.info("object found, dist: " + str(dist) + " angle: " + str(angle))
     #self.save_image(img.to_jpeg())
