@@ -188,7 +188,10 @@ class Image():
       text_found = None
       #cvmat_image=cv2.cv.fromarray(self._data)
       #iplimage = cv2.cv.GetImage(cvmat_image)
-      api.SetImage(self._data.tobytes(), self._data.shape(0), self._data.shape(1), 0, self._data.shape(0)/8)
+      print self._data.shape
+      print self._data.tostring()
+      api.SetImage(self._data.tostring(), int(self._data.shape[0]), int(self._data.shape[1]), 0, int(self._data.shape[0]/8))
+      print "api"
       text=api.GetUTF8Text()
       conf=api.MeanTextConf()
       logging.info("conf: " + str(conf))
