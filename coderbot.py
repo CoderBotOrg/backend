@@ -54,7 +54,7 @@ class CoderBot:
     self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse)
 
   def turn(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=-min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse)
+    self.motor_control(speed_left=min(100, max(-100, speed / self._motor_trim_factor)), speed_right=-min(100, max(-100, speed * self._motor_trim_factor)), elapse=elapse)
 
   def forward(self, speed=100, elapse=-1):
     self.move(speed=speed, elapse=elapse)

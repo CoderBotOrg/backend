@@ -6,10 +6,7 @@ import blob
 import logging
 import tesseract
 
-r_from = np.float32([[0, 0], [160, 0], [160, 120], [0, 120]])
-r_dest   = np.float32([[0, -30], [160, -30], [95, 120], [65, 120]])
 MIN_MATCH_COUNT = 10
-
 
 api = tesseract.TessBaseAPI()
 api.Init(".", 'eng', tesseract.OEM_DEFAULT)
@@ -22,12 +19,18 @@ tesseract_whitelists = {
 }
 
 class Image():
+    r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
+    r_dest   = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
+
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
     _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
     _kernel = np.ones((3,3),np.uint8)
 
     def __init__(self, array):
       self._data = array
+
+    def size(self):
+      return self._data.shape
 
     @classmethod
     def load(cls, filename):
@@ -45,12 +48,19 @@ class Image():
       return Image(dest)
 
     @classmethod
-    def transform(cls, vector):
-      tx = cv2.getPerspectiveTransform(r_from, r_dest)
+    def transform(cls, vector, tx):
       v = np.array(vector, dtype='float32')
       v = np.array([v])
       dest = cv2.perspectiveTransform(v, tx)
       return dest[0]
+
+    @classmethod
+    def get_transform(cls, image_size_x):
+      k = image_size_x / 160
+      rfrom = cls.r_from / k
+      rdest = cls.r_dest / k
+      tx = cv2.getPerspectiveTransform(rfrom, rdest)
+      return tx
 
     def find_faces(self):
       faces = self._face_cascade.detectMultiScale(self._data)

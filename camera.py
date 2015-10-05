@@ -44,10 +44,10 @@ class Camera(Thread):
     self._cv_image_factor = int(config.Config.get().get("cv_image_factor", 4))
     self._image_lock = Lock()
     self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
-    self._color_object_size_min = int(config.Config.get().get("camera_color_object_size_min", 80)) / self._cv_image_factor
-    self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / self._cv_image_factor
-    self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / self._cv_image_factor
-    self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / self._cv_image_factor
+    self._color_object_size_min = int(config.Config.get().get("camera_color_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
+    self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
+    self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
+    self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
     self._photos = []
    
     for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
@@ -183,7 +183,7 @@ class Camera(Thread):
     slices[2] = img.crop(0, int(self._camera.out_rgb_resolution[1]/2.0), self._camera.out_rgb_resolution[0], int(self._camera.out_rgb_resolution[1]/1.5))
     coords = [-1, -1, -1]
     for idx, slice in enumerate(slices):
-      blobs[idx] = slice.find_blobs(minsize=30, maxsize=self._camera.out_rgb_resolution[0])
+      blobs[idx] = slice.find_blobs(minsize=480/(self._cv_image_factor * self._cv_image_factor), maxsize=6400/(self._cv_image_factor * self._cv_image_factor))
       if len(blobs[idx]):
         coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
 	logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
@@ -239,7 +239,7 @@ class Camera(Thread):
       obstacle = blob.Blob.sort_distance((image_size[0]/2,image_size[1]), blobs)[0]
 
       logging.info("obstacle:" + str(obstacle.bottom)) 
-      coords = img.transform([(obstacle.center[0], obstacle.bottom)])
+      coords = img.transform([(obstacle.center[0], obstacle.bottom)], img.get_transform(img.size()[1]))
       x = coords[0][0]
       y = coords[0][1]
       coordY = 60 - ((y * 48) / 100) 
@@ -270,7 +270,7 @@ class Camera(Thread):
       obj = objects[-1]
       bottom = obj.bottom
       logging.info("bottom: " + str(obj.center[0]) + " " +str(obj.bottom))
-      coords = bw.transform([(obj.center[0], obj.bottom)])
+      coords = bw.transform([(obj.center[0], obj.bottom)], bw.get_transform(bw.size()[1]))
       logging.info("coordinates: " + str(coords))
       x = coords[0][0]
       y = coords[0][1]
