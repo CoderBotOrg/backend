@@ -69,7 +69,8 @@ class Camera(Thread):
           self._camera.grab_one()
           self._image_lock.release()
           #print "run.2: " + str(time.time()-ts)
-          #self.save_image(image.Image(self._camera.get_image_bgr()).open().binarize().to_jpeg())
+
+          #self.save_image(image.Image(self._camera.get_image_bgr()).filter_color((124,50,74)).to_jpeg())
           self.save_image(self._camera.get_image_jpeg())
           #print "run.3: " + str(time.time()-ts)
         else:
@@ -233,7 +234,12 @@ class Camera(Thread):
     self._image_lock.acquire()
     img = self.get_image(0)
 
-    blobs = img.binarize().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
+    size_y = img._data.shape[0]
+    size_x = img._data.shape[1]
+
+    threshold = img.crop(0, size_y - (size_y/12), size_x, size_y)._data.mean() / 2
+
+    blobs = img.binarize(threshold).dilate().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
     coordY = 60
     if len(blobs):
       obstacle = blob.Blob.sort_distance((image_size[0]/2,image_size[1]), blobs)[0]
@@ -242,8 +248,8 @@ class Camera(Thread):
       coords = img.transform([(obstacle.center[0], obstacle.bottom)], img.get_transform(img.size()[1]))
       x = coords[0][0]
       y = coords[0][1]
-      coordY = 60 - ((y * 48) / 100) 
-      logging.info("coordY: " + str(coordY))
+      coordY = 60 - ((y * 48) / (480 / self._cv_image_factor)) 
+      logging.info("x: " + str(x) + " y: " + str(y) + " coordY: " + str(coordY))
 
     self._image_lock.release()
     return coordY
@@ -255,9 +261,8 @@ class Camera(Thread):
     ts = time.time()
     self._image_lock.acquire()
     img = self.get_image(0)
-    self._image_lock.release()
     bw = img.filter_color(color)
-    #self.save_image(bw.to_jpeg())
+    self._image_lock.release()
     objects = bw.find_blobs(minsize=self._color_object_size_min, maxsize=self._color_object_size_max)
     logging.debug("objects: " + str(objects))
     dist = -1

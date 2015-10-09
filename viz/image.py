@@ -24,10 +24,12 @@ class Image():
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
     _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
-    _kernel = np.ones((3,3),np.uint8)
 
     def __init__(self, array):
       self._data = array
+      img_size_y = self._data.shape[0]
+      kernel_size = img_size_y / 40 
+      self._kernel = np.ones((kernel_size, kernel_size),np.uint8)
 
     def size(self):
       return self._data.shape
@@ -56,7 +58,7 @@ class Image():
 
     @classmethod
     def get_transform(cls, image_size_x):
-      k = image_size_x / 160
+      k = 640 / image_size_x
       rfrom = cls.r_from / k
       rdest = cls.r_dest / k
       tx = cv2.getPerspectiveTransform(rfrom, rdest)
@@ -75,14 +77,14 @@ class Image():
       logging.debug("color_hsv: " + str(h) + " " + str(s) + " " + str(v))
       #lower_color = np.array([h-10 if h>=10 else 0.0, 0, 0])
       #upper_color = np.array([h+10 if h<=170 else 179.0, 255, 255])
-      lower_color = np.array([h-10, 50, 50])
-      upper_color = np.array([h+10, 255, 255])
+      lower_color = np.array([h-5, 50, 50])
+      upper_color = np.array([h+5, 255, 255])
       logging.debug("lower: " + str(lower_color) + " upper: " + str(upper_color))
       mask = cv2.inRange(image_hsv, lower_color, upper_color)
       return Image(mask)
 
     def dilate(self):
-      data = cv2.dilate(self._datai, self._kernel)
+      data = cv2.dilate(self._data, self._kernel)
       return Image(data)
 
     def erode(self):
@@ -105,9 +107,13 @@ class Image():
       data = cv2.bitwise_not(self._data)
       return Image(data)
 
-    def binarize(self):
+    def binarize(self, threshold = -1):
       data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
-      data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 5, 3)
+      #data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 0)
+      if threshold < 0:
+        data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, (self._kernel.shape[0]/2*2)+1, 3)
+      else:
+        ret, data = cv2.threshold(data, threshold, 255, cv2.THRESH_BINARY_INV)
       return Image(data)
 
     def find_blobs(self, minsize=0, maxsize=10000000):
