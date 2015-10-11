@@ -86,7 +86,23 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	});
 	$('#b_photos').on("click", function (){
         	$.mobile.pageContainer.pagecontainer('change', '#page-photos');
+		//$("#photo_color_popup").popup();
 	});
+	$('#photo_detail').on("click", function (e) {
+                var pos = findPos(e.target);
+                var x = e.pageX - pos.x;
+                var y = e.pageY - pos.y;
+                var img = $("#photo_detail_img");
+                canvas = document.createElement("canvas");
+                canvas.width = img.width();
+                canvas.height = img.height();
+                canvas.getContext('2d').drawImage(img.get(0), 0, 0, img.width(), img.height());
+                var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
+                var colorHex = "0x" + pixelData[0].toString(16) + pixelData[1].toString(16) + pixelData[2].toString(16)
+		alert("Color at point: " + colorHex); 
+		//$("#photo_color_value").text(colorHex);
+		//$("#photo_color_popup").popup("open");
+        });
 	$( ".photopopup" ).on({
         	popupbeforeposition: function() {
             	var maxHeight = $( window ).height() - 60 + "px";
@@ -94,6 +110,18 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
         	}
     	});
 });
+}
+
+function findPos(obj) {
+    var curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+        return { x: curleft, y: curtop };
+    }
+    return undefined;
 }
 
 $(document).on( "pagecreate", '#page-preferences', function( event ) {

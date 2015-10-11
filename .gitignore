@@ -32,10 +32,11 @@
 *.sqlite
 
 # Pictures taken
-photos/
+photos/*.jpg
+photos/*.mp4
 
 # Logs
-logs/
+logs/*.log
 
 # Tutorial
 static/blockly-tutorial

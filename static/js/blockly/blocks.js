@@ -578,7 +578,7 @@ Blockly.Blocks['coderbot_adv_findColor'] = {
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_DIST, 'DIST'], [Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_ANGLE, 'ANGLE'],[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_BOTH,'BOTH']]), 'RETVAL')
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_COLOR);
     this.appendValueInput('COLOR')
-        .setCheck('Colour');
+        .setCheck(['Colour','String']);
     this.setInputsInline(true);
     this.setOutput(true, ['Number', 'Array']);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
@@ -610,7 +610,7 @@ Blockly.Blocks['coderbot_adv_findText'] = {
                                                 [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_UNSPEC,'unspec']]), 'ACCEPT')
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR);
     this.appendValueInput('COLOR')
-        .setCheck('Colour');
+        .setCheck(['Colour','String']);
     this.setInputsInline(true);
     this.setOutput(true, ['Number', 'Array']);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);

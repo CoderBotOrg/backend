@@ -28,11 +28,11 @@ class Audio:
       cls._instance = Audio()
     return cls._instance
 
-  def say(self, what):
+  def say(self, what, locale='en'):
     if what and "$" in what:
       os.system ('omxplayer sounds/' + what[1:])
     elif what and len(what):
-      os.system ('espeak -vit -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
+      os.system ('espeak -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null')
 
   def normalize(self, snd_data):
     "Average the volume out"

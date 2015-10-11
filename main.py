@@ -39,7 +39,7 @@ app.prog = None
 def get_locale():
     # otherwise try to guess the language from the user accept
     # header the browser transmits.
-    loc = request.accept_languages.best_match(['it', 'en'])
+    loc = request.accept_languages.best_match(['it', 'en', 'fr'])
     if loc is None:
       loc = 'it'
     return loc
