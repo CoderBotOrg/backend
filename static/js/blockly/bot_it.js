@@ -59,3 +59,7 @@ Blockly.Msg.CODERBOT_AUDIO_LISTEN = "ascolta";
 Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE = "commandi semplici";
 Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM = "commandi medi";
 Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_ADV = "comandi avanzati";
+Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE = "leggi distanza con";
+Blockly.Msg.CODERBOT_SONAR_SENSOR_1 = "sonar 1";
+Blockly.Msg.CODERBOT_SONAR_SENSOR_2 = "sonar 2";
+Blockly.Msg.CODERBOT_SONAR_SENSOR_3 = "sonar 3";

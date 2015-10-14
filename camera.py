@@ -92,6 +92,7 @@ class Camera(Thread):
     self._image_time=time.time()
 
   def set_text(self, text):
+    logging.info("camera.set_text: " + str(text))
     self._camera.set_overlay_text(str(text))
 
   def get_next_photo_index(self):
@@ -167,6 +168,8 @@ class Camera(Thread):
     self._photos.remove(filename)
 
   def exit(self):
+    self._streamer.server.shutdown()
+    self._streamer.server_thread.join()
     self._run = False
     self.join()
 
@@ -209,24 +212,24 @@ class Camera(Thread):
     return angle
 
   def find_face(self):
-    faceX = faceY = faceS = None
+    face_x = face_y = face_size = None
     self._image_lock.acquire()
     img = self.get_image(0)
     ts = time.time()
     faces = img.grayscale().find_faces()
-    print "face.detect: " + str(time.time() - ts)
+    logging.info("face.detect: " + str(time.time() - ts))
     self._image_lock.release()
-    print faces
     if len(faces):
       # Get the largest face, face is a rectangle 
       x, y, w, h = faces[0]
-      centerX = x + (w/2)
-      faceX = ((centerX * 100) / self._camera.out_rgb_resolution[0]) - 50 #center = 0
-      centerY = y + (h/2)
-      faceY = 50 - (centerY * 100) / self._camera.out_rgb_resolution[1] #center = 0 
+      center_x = x + (w/2)
+      face_x = ((center_x * 100) / self._camera.out_rgb_resolution[0]) - 50 #center = 0
+      center_y = y + (h/2)
+      face_y = 50 - (center_y * 100) / self._camera.out_rgb_resolution[1] #center = 0 
       size = h 
-      faceS = (size * 100) / self._camera.out_rgb_resolution[1]
-    return [faceX, faceY, faceS]
+      face_size = (size * 100) / self._camera.out_rgb_resolution[1]
+      logging.info("face found, x: " + str(face_x) + " y: " + str(face_y) + " size: " + str(face_size))
+    return [face_x, face_y, face_size]
 
   def path_ahead(self):
     image_size = self._camera.out_rgb_resolution    

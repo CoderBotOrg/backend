@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-04-04 00:32+0200\n"
+"POT-Creation-Date: 2015-10-14 21:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: it <LL@li.org>\n"
@@ -33,8 +33,8 @@ msgstr "Matematica"
 msgid "Text"
 msgstr "Testo"
 
-#: templates/blocks_adv.xml:96 templates/blocks_adv.xml:103
-#: templates/blocks_adv.xml:110
+#: templates/blocks_adv.xml:97 templates/blocks_adv.xml:104
+#: templates/blocks_adv.xml:111
 msgid "text"
 msgstr "Testo"
 
@@ -73,7 +73,7 @@ msgstr "Camera"
 msgid "Sensor"
 msgstr "Sensore"
 
-#: templates/blocks_adv.xml:246 templates/blocks_std.xml:73
+#: templates/blocks_adv.xml:253 templates/blocks_std.xml:73
 msgid "Sound"
 msgstr "Suono"
 
@@ -82,7 +82,7 @@ msgstr "Suono"
 msgid "Control"
 msgstr "Controllo"
 
-#: templates/config.html:3 templates/control.html:63
+#: templates/config.html:3 templates/control.html:60
 msgid "Back"
 msgstr "Indietro"
 
@@ -102,204 +102,253 @@ msgstr "Avvio"
 msgid "Button"
 msgstr "Bottone"
 
-#: templates/config.html:18 templates/config.html:127
+#: templates/config.html:18 templates/config.html:144
 msgid "User Interface"
 msgstr "Interfaccia utente"
 
 #: templates/config.html:19
 msgid "WiFi"
-msgstr ""
+msgstr "WiFi"
 
-#: templates/config.html:24 templates/config.html:63
+#: templates/config.html:20
+msgid "Restart, Stop"
+msgstr "Riavvia, Ferma"
+
+#: templates/config.html:25 templates/config.html:64
 msgid "Movement assisted by vision"
 msgstr "Movimento assistito da visione"
 
-#: templates/config.html:27
+#: templates/config.html:28
 msgid "Step timing | distance / angle"
 msgstr "Durata o lunghezza step (distanza / angolo)"
 
-#: templates/config.html:28 templates/config.html:66
+#: templates/config.html:29 templates/config.html:67
 msgid "Forward speed"
 msgstr "Avanti"
 
-#: templates/config.html:30 templates/config.html:68
+#: templates/config.html:31 templates/config.html:69
 msgid "Forward elapse / distance"
 msgstr "Durata / distanza avanti"
 
-#: templates/config.html:32 templates/config.html:70
+#: templates/config.html:33 templates/config.html:71
 msgid "Turn speed"
 msgstr "Velocità di rotazione"
 
-#: templates/config.html:34 templates/config.html:72
+#: templates/config.html:35 templates/config.html:73
 msgid "Turn elapse / angle"
 msgstr "Tempo / angolo di rotazione"
 
-#: templates/config.html:37
+#: templates/config.html:38
 msgid "Show control counter"
 msgstr "Mostra contatore mosse"
 
-#: templates/config.html:40
+#: templates/config.html:41
 msgid "HUD image name"
 msgstr "Nome immagine HUD"
 
-#: templates/config.html:45
+#: templates/config.html:46
 msgid "Editor level"
 msgstr "Livello editor"
 
-#: templates/config.html:47
+#: templates/config.html:48
 msgid "Move"
 msgstr "Movimento"
 
-#: templates/config.html:49
+#: templates/config.html:50
 msgid "Basic"
 msgstr "Base"
 
-#: templates/config.html:51
+#: templates/config.html:52
 msgid "Standard"
 msgstr "Normale"
 
-#: templates/config.html:53
+#: templates/config.html:54
 msgid "Advanced"
 msgstr "Avanzato"
 
-#: templates/config.html:56
+#: templates/config.html:57
 msgid "Program editor details"
 msgstr "Dettagli editor del programma"
 
-#: templates/config.html:57
+#: templates/config.html:58
 msgid "Shows Editor scrollbars"
 msgstr "Mostra le scrollbar dell'area di lavoro"
 
-#: templates/config.html:59
+#: templates/config.html:60
 msgid "Save program before every run"
 msgstr "Salva il programma prima di ogni esecuzione"
 
-#: templates/config.html:75
+#: templates/config.html:76
 msgid "Other program parameters"
 msgstr "Altri parametri del programma"
 
-#: templates/config.html:76
+#: templates/config.html:77
 msgid "Auto record video on program run"
 msgstr "Avvia automaticamente registrazione video all'avvio del programma"
 
-#: templates/config.html:79
+#: templates/config.html:80
 msgid "Max number of blocks allowed"
 msgstr "Numero massimo consentito di blocchi di programma"
 
-#: templates/config.html:83
+#: templates/config.html:84
 msgid "Start sound"
 msgstr "Suono avvio"
 
-#: templates/config.html:85
+#: templates/config.html:86
 msgid "Stop sound"
 msgstr "Suono stop"
 
-#: templates/config.html:87
+#: templates/config.html:88
 msgid "Shutter sound"
 msgstr "Suono avvio"
 
-#: templates/config.html:91
+#: templates/config.html:92
 msgid "Camera parameters"
 msgstr "Parametri videocamera"
 
-#: templates/config.html:92
+#: templates/config.html:93
 msgid "Exposure mode"
 msgstr "Esposizione"
 
-#: templates/config.html:103
+#: templates/config.html:102
+msgid "Camera refresh timeout"
+msgstr "Intervallo di refresh immagine video"
+
+#: templates/config.html:104
+msgid "Camera jpeg quality"
+msgstr "Indice qualità immagine jpeg"
+
+#: templates/config.html:106
+msgid "CV image resize factor (1/x)"
+msgstr "Fattore di scala immagini per visione artificiale"
+
+#: templates/config.html:108
+msgid "Path object min size"
+msgstr "Dimensione minima oggetto per funzione 'spazio davanti'"
+
+#: templates/config.html:110
+msgid "Path object max size"
+msgstr "Dimensione massima oggetto per funzione 'spazio davanti'"
+
+#: templates/config.html:112
+msgid "Color object min size"
+msgstr "Dimensione minima oggetto per funzione 'trova colore'"
+
+#: templates/config.html:114
+msgid "Color object max size"
+msgstr "Dimensione massima oggetto per funzione 'trova colore'"
+
+#: templates/config.html:118
 msgid "Motor control mode"
 msgstr "Tipo di motori (dc | servo)"
 
-#: templates/config.html:105
+#: templates/config.html:120
+msgid "Trim factor (1.0 = center)"
+msgstr "Fattore di correzione velocità motori (1.0 = centrato)"
+
+#: templates/config.html:122
 msgid "Power (target angle -15)"
 msgstr "Potenza (angolo target -15)"
 
-#: templates/config.html:107
+#: templates/config.html:124
 msgid "Power (target angle -4)"
 msgstr "Potenza (angolo target -4)"
 
-#: templates/config.html:109
+#: templates/config.html:126
 msgid "Power (target angle -1)"
 msgstr "Potenza (angolo target -1)"
 
-#: templates/config.html:113
+#: templates/config.html:130
 msgid "Load at start"
 msgstr "Carica all'avvio"
 
-#: templates/config.html:118
+#: templates/config.html:135
 msgid "Button function"
 msgstr "Funzione del bottone"
 
-#: templates/config.html:119
+#: templates/config.html:136
 msgid "None"
 msgstr "Nessuno"
 
-#: templates/config.html:121
+#: templates/config.html:138
 msgid "Start/Stop current program"
 msgstr "Avvia/Ferma il programma caricato"
 
-#: templates/config.html:128
+#: templates/config.html:145
 msgid "Show Control page"
 msgstr "Mostra pagina Controllo"
 
-#: templates/config.html:130
+#: templates/config.html:147
 msgid "Show Control movement commands"
 msgstr "Mostra comandi movimento in pagina Controllo"
 
-#: templates/config.html:132
+#: templates/config.html:149
 msgid "Show Program page"
 msgstr "Nome programma"
 
-#: templates/config.html:134
+#: templates/config.html:151
 msgid "Show Preferences button"
 msgstr "Mostra bottone Preferenze"
 
-#: templates/config.html:139
+#: templates/config.html:156
 msgid "WiFi Client access mode"
 msgstr "WiFi in modalità Client"
 
-#: templates/config.html:142 templates/config.html:164
+#: templates/config.html:159
+msgid "Halt"
+msgstr "Stop"
+
+#: templates/config.html:160
+#, fuzzy
+msgid "Restart"
+msgstr "Riavvia"
+
+#: templates/config.html:161
+msgid "Reboot"
+msgstr "Reboot"
+
+#: templates/config.html:164 templates/config.html:185
 msgid "Cancel"
 msgstr "Annulla"
 
-#: templates/config.html:143 templates/program.html:18
+#: templates/config.html:165 templates/program.html:18
 #: templates/program.html:26
 msgid "Save"
 msgstr "Salva"
 
-#: templates/config.html:151
+#: templates/config.html:172
 msgid "WiFi Client mode access data"
 msgstr "Dati di accesso alla rete WiFi"
 
-#: templates/config.html:153
+#: templates/config.html:174
 msgid "WiFi mode"
 msgstr "Modalità WiFi"
 
-#: templates/config.html:155
+#: templates/config.html:176
 msgid "Access Point"
-msgstr ""
+msgstr "Accesso Pint"
 
-#: templates/config.html:157
+#: templates/config.html:178
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
-#: templates/config.html:159
+#: templates/config.html:180
 msgid "WiFi name"
 msgstr "Nome rete WiFi"
 
-#: templates/config.html:161
+#: templates/config.html:182
 msgid "WiFi password"
 msgstr "Password WiFi"
 
-#: templates/config.html:165
+#: templates/config.html:186
 msgid "Apply Wifi config"
 msgstr "Applica le modifiche alla configurazione WiFi"
 
-#: templates/config.html:172
+#: templates/config.html:193
 msgid "WiFi AP mode access"
 msgstr "WiFi in modalità AP"
 
-#: templates/config.html:184
+#: templates/config.html:205
 msgid "WiFi Client mode access"
 msgstr "WiFi in modalità Client"
 
@@ -339,7 +388,7 @@ msgstr "in esecuzione"
 msgid "stopped"
 msgstr "fermo"
 
-#: templates/config_params.html:29 templates/control.html:51
+#: templates/config_params.html:29 templates/control.html:48
 #: templates/program.html:32
 msgid "Stop"
 msgstr "Ferma"
@@ -356,41 +405,41 @@ msgstr "Preferenze"
 msgid "Program"
 msgstr "Programma"
 
-#: templates/control.html:19
-msgid "Halt"
-msgstr "Stop"
-
-#: templates/control.html:24
+#: templates/control.html:21
 msgid "Forward"
 msgstr "Avanti"
 
-#: templates/control.html:27
+#: templates/control.html:24
 msgid "Left"
 msgstr "Sinistra"
 
-#: templates/control.html:28
+#: templates/control.html:25
 msgid "Right"
 msgstr "Destra"
 
-#: templates/control.html:31
+#: templates/control.html:28
 msgid "Backward"
 msgstr "Indietro"
 
-#: templates/control.html:40
+#: templates/control.html:37
 msgid "Say"
 msgstr "Parla"
 
-#: templates/control.html:45
+#: templates/control.html:42
 msgid "Photo"
 msgstr "Foto"
 
-#: templates/control.html:50
+#: templates/control.html:47
 msgid "Rec"
 msgstr "Registra"
 
-#: templates/control.html:54
+#: templates/control.html:51
 msgid "Photos"
 msgstr "Album"
+
+#: templates/control.html:72
+msgid "Color at point: "
+msgstr "Colore del punto: "
 
 #: templates/program.html:16 templates/program.html:24
 msgid "New"
@@ -436,19 +485,3 @@ msgstr "Nuovo programma"
 #: templates/program.html:67
 msgid "Load Program"
 msgstr "Carica programma"
-
-#~ msgid "Control mode"
-#~ msgstr "Tipo di motori (dc | servo)"
-
-#~ msgid "Move counter"
-#~ msgstr "Contatore mosse"
-
-#~ msgid "Forward elapse"
-#~ msgstr "Durata avanti"
-
-#~ msgid "Turn elapse"
-#~ msgstr "Tempo di rotazione"
-
-#~ msgid "Procedures"
-#~ msgstr "Procedure"
-

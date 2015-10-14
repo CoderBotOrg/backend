@@ -4,19 +4,24 @@ import colorsys
 import copy
 import blob
 import logging
-import tesseract
+
+api = None
+try:
+  import tesseract
+  api = tesseract.TessBaseAPI()
+  api.Init(".", 'eng', tesseract.OEM_DEFAULT)
+  api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
+  tesseract_whitelists = {
+    'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
+    'num': "1234567890 ",
+    'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
+    'unspec': None,
+  }
+
+except:
+  logginf.info("tesseract not availabe")
 
 MIN_MATCH_COUNT = 10
-
-api = tesseract.TessBaseAPI()
-api.Init(".", 'eng', tesseract.OEM_DEFAULT)
-api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
-tesseract_whitelists = {
-  'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
-  'num': "1234567890 ",
-  'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-  'unspec': None,
-}
 
 class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])

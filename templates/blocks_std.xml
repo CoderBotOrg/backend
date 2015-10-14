@@ -27,10 +27,10 @@
       <block type="math_single"></block>
     </category>
     <category name="{% trans %}Text{% endtrans %}">
+      <block type="text_print"></block>
       <block type="text"></block>
       <block type="text_join"></block>
       <block type="text_length"></block>
-      <block type="text_print"></block>
     </category>
     <category name="{% trans %}Movement{% endtrans %}">
       <block type="coderbot_moveForward"></block>

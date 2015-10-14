@@ -728,3 +728,28 @@ Blockly.Python['coderbot_audio_listen'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
+Blockly.Blocks['coderbot_sonar_get_distance'] = {
+  /**
+   * Block for get_distance function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SONAR_SENSOR_1, 0],
+                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_2, 1],
+                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_3, 2]]), 'SONAR');
+    this.setOutput(true, 'Number');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_sonar_get_distance'] = function(block) {
+  // Boolean values true and false.
+  var sonar = block.getFieldValue('SONAR');
+  var code = 'get_bot().get_sonar_distance(' + sonar + ')';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+

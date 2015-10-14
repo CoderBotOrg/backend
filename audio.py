@@ -3,13 +3,17 @@ import time
 from sys import byteorder
 from array import array
 from struct import pack
+import logging
 
 import pyaudio
 import wave
 import logging
 
-from pocketsphinx.pocketsphinx import *
-from sphinxbase.sphinxbase import *
+try:
+  from pocketsphinx.pocketsphinx import Decoder
+  from sphinxbase.sphinxbase import *
+except:
+  logging.info("pocketsphinx not available")
 
 CHUNK_SIZE = 4096
 FORMAT = pyaudio.paInt16
@@ -56,7 +60,7 @@ class Audio:
 
     r = array('h')
 
-    while (c * 2.0 * 8192 / 44100) < elapse:
+    while (c * 2.0 * 8192 / RATE) < elapse:
       c += 1
       # little endian, signed short
       snd_data = array('h', stream.read(CHUNK_SIZE))
@@ -77,7 +81,7 @@ class Audio:
     sample_width, data = self.record(elapse)
     data = pack('<' + ('h'*len(data)), *data)
 
-    wf = wave.open(filename, 'wb')
+    wf = wave.open(SOUNDDIR + filename, 'wb')
     wf.setnchannels(1)
     wf.setsampwidth(sample_width)
     wf.setframerate(RATE)
@@ -86,7 +90,7 @@ class Audio:
 
   def play(self, filename):
     # open the file for reading.
-    wf = wave.open(filename, 'rb')
+    wf = wave.open(SOUNDDIR + filename, 'rb')
 
     # create an audio object
     p = pyaudio.PyAudio()

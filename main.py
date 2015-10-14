@@ -39,9 +39,9 @@ app.prog = None
 def get_locale():
     # otherwise try to guess the language from the user accept
     # header the browser transmits.
-    loc = request.accept_languages.best_match(['it', 'en', 'fr'])
+    loc = request.accept_languages.best_match(['it', 'en', 'fr', 'es'])
     if loc is None:
-      loc = 'it'
+      loc = 'en'
     return loc
 
 @app.route("/")
@@ -96,8 +96,8 @@ def handle_bot():
         audio.say(app.bot_config.get("sound_shutter"))
 
     elif cmd == "say":
-        logging.info("say: " + str(param1))
-	audio.say(param1)
+        logging.info("say: " + str(param1) + " in: " + str(get_locale()))
+	audio.say(param1, get_locale())
 
     elif cmd == "halt":
         logging.info("shutting down")
@@ -215,17 +215,23 @@ def run_server():
   global motion
   global audio
   try:
-    app.bot_config = Config.read()
-    bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
-    cam = Camera.get_instance()
-    motion = Motion.get_instance()
-    audio = Audio.get_instance()
-  except ValueError as e:
-    app.bot_config = {}
-    logging.error(e)
-  if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
-    app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
+    try:
+      app.bot_config = Config.read()
+      bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
+      audio = Audio.get_instance()
+      audio.say(app.bot_config.get("sound_start"))
+      cam = Camera.get_instance()
+      motion = Motion.get_instance()
+    except ValueError as e:
+      app.bot_config = {}
+      logging.error(e)
+    if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
+      app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
 
-  bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-  audio.say(app.bot_config.get("sound_start"))
-  app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+    bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
+    app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+  finally:
+    if cam:
+      cam.exit()
+    if bot:
+      bot.exit()

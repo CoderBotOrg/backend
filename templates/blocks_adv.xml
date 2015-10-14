@@ -81,6 +81,7 @@
       <block type="math_random_float"></block>
     </category>
     <category name="{% trans %}Text{% endtrans %}">
+      <block type="text_print"></block>
       <block type="text"></block>
       <block type="text_join"></block>
       <block type="text_append">
@@ -113,7 +114,6 @@
       </block>
       <block type="text_changeCase"></block>
       <block type="text_trim"></block>
-      <block type="text_print"></block>
       <!--block type="text_prompt_ext">
         <value name="TEXT">
           <block type="text"></block>
@@ -248,6 +248,7 @@
           </block>
         </value>
       </block>
+      <block type="coderbot_sonar_get_distance"></block>
     </category>
     <category name="{% trans %}Sound{% endtrans %}">
       <block type="coderbot_audio_say"></block>
