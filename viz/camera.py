@@ -161,7 +161,10 @@ class Camera():
     #print time.time() - ts
 
   def set_overlay_text(self, text):
-    self.camera.annotate_text = text
+    try:
+      self.camera.annotate_text = text
+    except picamera.PiCameraValueError:
+      logging.info("PiCameraValueError")
     
   def close(self):
     self.camera.close()

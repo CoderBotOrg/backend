@@ -92,7 +92,6 @@ class Camera(Thread):
     self._image_time=time.time()
 
   def set_text(self, text):
-    logging.info("camera.set_text: " + str(text))
     self._camera.set_overlay_text(str(text))
 
   def get_next_photo_index(self):
@@ -298,7 +297,7 @@ class Camera(Thread):
     image = img.find_rect(color=color)
     if image:
       bin_image = image.binarize().invert()
-      self.save_image(bin_image.to_jpeg())
+      #self.save_image(bin_image.to_jpeg())
       text = bin_image.find_text(accept)
     return text    
 

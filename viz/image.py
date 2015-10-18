@@ -15,7 +15,7 @@ try:
     'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
     'num': "1234567890 ",
     'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-    'unspec': None,
+    'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
   }
 
 except:
@@ -116,7 +116,7 @@ class Image():
       data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
       #data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 0)
       if threshold < 0:
-        data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, (self._kernel.shape[0]/2*2)+1, 3)
+        data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, max((self._kernel.shape[0]/2*2)+1, 3), 3)
       else:
         ret, data = cv2.threshold(data, threshold, 255, cv2.THRESH_BINARY_INV)
       return Image(data)
@@ -205,21 +205,9 @@ class Image():
              
     def find_text(self, accept):
       wlist = tesseract_whitelists.get(accept, None)
-      api.SetVariable("tessedit_char_whitelist", wlist)
-      text_found = None
-      #cvmat_image=cv2.cv.fromarray(self._data)
-      #iplimage = cv2.cv.GetImage(cvmat_image)
-      print self._data.shape
-      print self._data.tostring()
-      api.SetImage(self._data.tostring(), int(self._data.shape[0]), int(self._data.shape[1]), 0, int(self._data.shape[0]/8))
-      print "api"
-      text=api.GetUTF8Text()
-      conf=api.MeanTextConf()
-      logging.info("conf: " + str(conf))
+      text = cv2.text.parseTextOCRTesseract(self._data, "eng", wlist)
       logging.info("text: " +str(text))
-      if conf > 60:
-        text_found = text
-      return text_found
+      return text
 
     def to_jpeg(self):
       ret, jpeg_array = cv2.imencode('.jpeg', self._data)
