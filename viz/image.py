@@ -18,7 +18,7 @@ try:
   #api.Init(".", 'eng', tesseract.OEM_DEFAULT)
   #api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
   
-  cv2.text.initCRTesseract("eng", "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890")
+  cv2.text.initOCRTesseract("eng", tesseract_whitelists['unspec'])
 except:
   logginf.info("tesseract not availabe")
 
@@ -207,7 +207,7 @@ class Image():
     def find_text(self, accept):
       wlist = tesseract_whitelists.get(accept, None)
       t = time.time()
-      text = cv2.text.parseTextOCRTesseract(self._data)
+      text = cv2.text.parseTextOCRTesseract(self._data, wlist)
       logging.info("time: " + str(time.time() - t)  + " text: " +str(text))
       return text
 
