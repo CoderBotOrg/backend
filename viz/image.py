@@ -5,19 +5,20 @@ import copy
 import blob
 import logging
 
-api = None
-try:
-  import tesseract
-  api = tesseract.TessBaseAPI()
-  api.Init(".", 'eng', tesseract.OEM_DEFAULT)
-  api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
-  tesseract_whitelists = {
-    'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
-    'num': "1234567890 ",
-    'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-    'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-  }
+tesseract_whitelists = {
+  'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
+  'num': "1234567890 ",
+  'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
+  'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
+}
 
+try:
+  #import tesseract
+  #api = tesseract.TessBaseAPI()
+  #api.Init(".", 'eng', tesseract.OEM_DEFAULT)
+  #api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
+  
+  cv2.text.initCRTesseract("eng", "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890")
 except:
   logginf.info("tesseract not availabe")
 
@@ -205,8 +206,9 @@ class Image():
              
     def find_text(self, accept):
       wlist = tesseract_whitelists.get(accept, None)
-      text = cv2.text.parseTextOCRTesseract(self._data, "eng", wlist)
-      logging.info("text: " +str(text))
+      t = time.time()
+      text = cv2.text.parseTextOCRTesseract(self._data)
+      logging.info("time: " + str(time.time() - t)  + " text: " +str(text))
       return text
 
     def to_jpeg(self):
