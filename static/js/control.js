@@ -86,7 +86,6 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 	});
 	$('#b_photos').on("click", function (){
         	$.mobile.pageContainer.pagecontainer('change', '#page-photos');
-		//$("#photo_color_popup").popup();
 	});
 	$('#photo_detail').on("click", function (e) {
                 var pos = findPos(e.target);
@@ -98,10 +97,8 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
                 canvas.height = img.height();
                 canvas.getContext('2d').drawImage(img.get(0), 0, 0, img.width(), img.height());
                 var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
-                var colorHex = "0x" + pixelData[0].toString(16) + pixelData[1].toString(16) + pixelData[2].toString(16)
+                var colorHex = "0x" + paddedHexString(pixelData[0]) + paddedHexString(pixelData[1]) + paddedHexString(pixelData[2]);
 		alert("Color at point: " + colorHex); 
-		//$("#photo_color_value").text(colorHex);
-		//$("#photo_color_popup").popup("open");
         });
 	$( ".photopopup" ).on({
         	popupbeforeposition: function() {
@@ -111,6 +108,12 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
     	});
 });
 }
+
+function paddedHexString(n) {
+        var ns = n.toString(16);
+	return ("00" + ns).substring(ns.length); 
+}
+
 
 function findPos(obj) {
     var curleft = 0, curtop = 0;
