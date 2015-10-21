@@ -111,7 +111,8 @@ msgid "WiFi"
 msgstr "WiFi"
 
 #: templates/config.html:20
-msgid "Restart, Stop"
+#, fuzzy
+msgid "Restart, Halt"
 msgstr "Riavvia, Ferma"
 
 #: templates/config.html:25 templates/config.html:64
@@ -485,3 +486,4 @@ msgstr "Nuovo programma"
 #: templates/program.html:67
 msgid "Load Program"
 msgstr "Carica programma"
+
