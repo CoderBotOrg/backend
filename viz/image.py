@@ -13,14 +13,9 @@ tesseract_whitelists = {
 }
 
 try:
-  #import tesseract
-  #api = tesseract.TessBaseAPI()
-  #api.Init(".", 'eng', tesseract.OEM_DEFAULT)
-  #api.SetPageSegMode(tesseract.PSM_SINGLE_LINE)
-  
-  cv2.text.initOCRTesseract("eng", tesseract_whitelists['unspec'])
+  ocr = cv2.text.OCRTesseract_create(".", "eng", tesseract_whitelist['unspec'], 0, cv2.text.OCR_LEVEL_TEXTLINE)
 except:
-  logginf.info("tesseract not availabe")
+  logging.info("tesseract not availabe")
 
 MIN_MATCH_COUNT = 10
 
@@ -207,7 +202,8 @@ class Image():
     def find_text(self, accept):
       wlist = tesseract_whitelists.get(accept, None)
       t = time.time()
-      text = cv2.text.parseTextOCRTesseract(self._data, wlist)
+      ocr.setWhiteList(wlist)
+      text = ocr.run(self._data, 60)
       logging.info("time: " + str(time.time() - t)  + " text: " +str(text))
       return text
 
