@@ -97,7 +97,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
                 canvas.height = img.height();
                 canvas.getContext('2d').drawImage(img.get(0), 0, 0, img.width(), img.height());
                 var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
-                var colorHex = "0x" + paddedHexString(pixelData[0]) + paddedHexString(pixelData[1]) + paddedHexString(pixelData[2]);
+                var colorHex = "#" + paddedHexString(pixelData[0]) + paddedHexString(pixelData[1]) + paddedHexString(pixelData[2]);
 		alert("Color at point: " + colorHex); 
         });
 	$( ".photopopup" ).on({
