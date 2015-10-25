@@ -1,5 +1,5 @@
   <xml id="toolbox" style="display: none">
-    <category name="{% trans %}Logic{% endtrans %}">
+    <category name="{% trans %}Logic{% endtrans %}" colour="210">
       <block type="controls_if"></block>
       <block type="logic_compare"></block>
       <block type="logic_operation"></block>
@@ -8,7 +8,7 @@
       <block type="logic_null"></block>
       <block type="logic_ternary"></block>
     </category>
-    <category name="{% trans %}Loops{% endtrans %}">
+    <category name="{% trans %}Loops{% endtrans %}" colour="120">
       <block type="controls_repeat_ext">
         <value name="TIMES">
           <block type="math_number">
@@ -37,7 +37,7 @@
       <block type="controls_forEach"></block>
       <block type="controls_flow_statements"></block>
     </category>
-    <category name="{% trans %}Math{% endtrans %}">
+    <category name="{% trans %}Math{% endtrans %}" colour="230">
       <block type="math_number"></block>
       <block type="math_arithmetic"></block>
       <block type="math_single"></block>
@@ -80,7 +80,7 @@
       </block>
       <block type="math_random_float"></block>
     </category>
-    <category name="{% trans %}Text{% endtrans %}">
+    <category name="{% trans %}Text{% endtrans %}" colour="160">
       <block type="text_print"></block>
       <block type="text"></block>
       <block type="text_join"></block>
@@ -120,7 +120,7 @@
         </value>
       </block-->
     </category>
-    <category name="{% trans %}Lists{% endtrans %}">
+    <category name="{% trans %}Lists{% endtrans %}" colour="260">
       <block type="lists_create_empty"></block>
       <block type="lists_create_with"></block>
       <block type="lists_repeat">
@@ -161,15 +161,15 @@
         </value>
       </block>
     </category>
-    <category name="{% trans %}Colour{% endtrans %}">
+    <category name="{% trans %}Colour{% endtrans %}" colour="20">
       <block type="colour_picker"></block>
       <block type="colour_random"></block>
       <block type="colour_rgb"></block>
       <block type="colour_blend"></block>
     </category>
-    <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE"></category>
-    <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE"></category>
-    <category name="{% trans %}Movement{% endtrans %}">
+    <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE" colour="330"></category>
+    <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE" colour="290"></category>
+    <category name="{% trans %}Movement{% endtrans %}" colour="40">
       <block type="coderbot_moveForward"></block>
       <block type="coderbot_moveBackward"></block>
       <block type="coderbot_turnLeft"></block>
@@ -226,12 +226,12 @@
         </value>
       </block>
     </category>
-    <category name="{% trans %}Camera{% endtrans %}">
+    <category name="{% trans %}Camera{% endtrans %}" colour="120">
       <block type="coderbot_camera_photoTake"></block>
       <block type="coderbot_camera_videoRec"></block>
       <block type="coderbot_camera_videoStop"></block>
     </category>
-    <category name="{% trans %}Sensor{% endtrans %}">
+    <category name="{% trans %}Sensor{% endtrans %}" colour="290">
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
       <block type="coderbot_adv_findSignal"></block>
@@ -250,7 +250,7 @@
       </block>
       <block type="coderbot_sonar_get_distance"></block>
     </category>
-    <category name="{% trans %}Sound{% endtrans %}">
+    <category name="{% trans %}Sound{% endtrans %}" colour="290">
       <block type="coderbot_audio_say"></block>
       <block type="coderbot_audio_record"></block>
       <block type="coderbot_audio_play"></block>
