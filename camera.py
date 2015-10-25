@@ -42,7 +42,7 @@ class Camera(Thread):
 
   _instance = None
   _img_template = image.Image.load("coderdojo-logo.png")
-  stream_port = 9080
+  stream_port = 8080
 
   @classmethod
   def get_instance(cls):
@@ -55,7 +55,7 @@ class Camera(Thread):
     logging.info("starting camera")
     cam_props = {"width":640, "height":480, "cv_image_factor":config.Config.get().get("cv_image_factor", 4), "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
     self._camera = camera.Camera(props=cam_props)
-    self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
+    #self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     self.recording = False
     self.video_start_time = time.time() + 8640000
     self._run = True
@@ -107,8 +107,11 @@ class Camera(Thread):
     return image.Image(self._camera.get_image_bgr())
 
   def save_image(self, image_jpeg):
-    self._streamer.set_image(image_jpeg)
+    #self._streamer.set_image(image_jpeg)
     self._image_time=time.time()
+
+  def get_image_jpeg(self):
+    return copy.copy (self._camera.get_image_jpeg())
 
   def set_text(self, text):
     self._camera.set_overlay_text(str(text))
@@ -186,8 +189,8 @@ class Camera(Thread):
     self._photos.remove(filename)
 
   def exit(self):
-    self._streamer.server.shutdown()
-    self._streamer.server_thread.join()
+    #self._streamer.server.shutdown()
+    #self._streamer.server_thread.join()
     self._run = False
     self.join()
 

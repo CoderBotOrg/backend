@@ -20,6 +20,7 @@
 import os
 import json
 import logging
+import time
 import logging.handlers
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
@@ -29,7 +30,7 @@ from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
 
-from flask import Flask, render_template, request, send_file, redirect
+from flask import Flask, render_template, request, send_file, redirect, Response
 from flask.ext.babel import Babel
 #from flask_sockets import Sockets
 
@@ -135,6 +136,40 @@ def handle_bot():
 def handle_bot_status():
     logging.info( "bot_status" )
     return json.dumps({'status': 'ok'}) 
+
+def video_stream(cam):
+    refresh_timeout = float(app.bot_config.get("camera_refresh_timeout", "0.1")) 
+    while True:
+        last_refresh_time = time.time()
+        frame = cam.get_image_jpeg()
+        yield ("--BOUNDARYSTRING\r\n" +
+               "Content-type: image/jpeg\r\n" +
+               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
+               frame + "\r\n")
+        now = time.time()
+        if now - last_refresh_time < refresh_timeout:
+            time.sleep(refresh_timeout - (now - last_refresh_time))
+
+@app.route("/video")
+def handle_video():
+    return """
+<html>
+<head>
+<style type=text/css>
+    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
+</style>
+</head>
+<body>
+&nbsp;
+</body>
+</html>
+"""
+
+@app.route("/video/stream")
+def handle_video_stream():
+    try:
+        return Response(video_stream(cam), mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
+    except: pass
 
 @app.route("/photos", methods=["GET"])
 def handle_photos():
