@@ -38,6 +38,12 @@ except:
 
 MIN_MATCH_COUNT = 10
 
+try:
+  import zbar
+  code_scanner = zbar.ImageScanner()
+except:
+  logging.info("zbar not availabe")
+
 class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
     r_dest   = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
@@ -230,6 +236,16 @@ class Image():
       text = ocr.run(self._data, 60)
       logging.info("time: " + str(time.time() - t)  + " text: " +str(text))
       return text
+
+    def find_code(self):
+      text_found = None
+      img_size = self._data.shape
+      image_code = zbar.Image(img_size[1], img_size[0], "Y800", self._data.tostring())
+      code_num = code_scanner.scan(image_code)
+      for symbol in image_code:
+        text_found = symbol.data
+        break
+      return text_found
 
     def to_jpeg(self):
       ret, jpeg_array = cv2.imencode('.jpeg', self._data)

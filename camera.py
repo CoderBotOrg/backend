@@ -323,6 +323,13 @@ class Camera(Thread):
       text = bin_image.find_text(accept)
     return text    
 
+  def find_code(self):
+    self._image_lock.acquire()
+    img = self.get_image(0)
+    self._image_lock.release()
+    return img.grayscale().find_code()
+
+
   def sleep(self, elapse):
     logging.debug("sleep: " + str(elapse))
     time.sleep(elapse)

@@ -545,27 +545,6 @@ Blockly.Python['coderbot_adv_findFace'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_adv_findCode'] = {
-  /**
-   * Block for findSignal function.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
-    this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCODE);
-    this.setOutput(true, 'Number');
-    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
-  }
-};
-
-Blockly.Python['coderbot_adv_findCode'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().find_code()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
-};
-
 Blockly.Blocks['coderbot_adv_findColor'] = {
   /**
    * Block for findSignal function.
@@ -623,6 +602,28 @@ Blockly.Python['coderbot_adv_findText'] = function(block) {
   var accept = block.getFieldValue('ACCEPT');
   var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
   var code = 'get_cam().find_text(accept="' + accept + '", back_color=' + color  + ')';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findCode'] = {
+  /**
+   * Block for findText function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCODE);
+    this.setOutput(true, 'String');
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_findCode'] = function(block) {
+  // Boolean values true and false.
+  var code = 'get_cam().find_code()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 

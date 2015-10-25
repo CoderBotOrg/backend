@@ -248,6 +248,7 @@
           </block>
         </value>
       </block>
+      <block type="coderbot_adv_findCode"></block>
       <block type="coderbot_sonar_get_distance"></block>
     </category>
     <category name="{% trans %}Sound{% endtrans %}" colour="290">
