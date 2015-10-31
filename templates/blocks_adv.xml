@@ -255,6 +255,18 @@
       <block type="coderbot_audio_say"></block>
       <block type="coderbot_audio_record"></block>
       <block type="coderbot_audio_play"></block>
+      <block type="coderbot_audio_hear">
+        <value name="LEVEL">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+        <value name="ELAPSE">
+          <block type="math_number">
+            <field name="NUM">1.0</field>
+          </block>
+        </value>
+      </block>
       <block type="coderbot_audio_listen"></block>
     </category>      
   </xml>

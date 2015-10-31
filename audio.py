@@ -26,6 +26,7 @@ import logging
 
 import pyaudio
 import wave
+import audioop
 import logging
 
 try:
@@ -51,6 +52,21 @@ class Audio:
       cls._instance = Audio()
     return cls._instance
 
+  def __init__(self):
+    self.pyaudio = pyaudio.PyAudio()
+    try:
+      self.stream_in = self.pyaudio.open(format=FORMAT, channels=1, input_device_index=0, rate=RATE,
+        input=True,
+        frames_per_buffer=CHUNK_SIZE)
+      self.stream_in.start_stream()
+    except:
+      logging.info("Audio: input stream not available")
+
+  def exit(self):
+    # cleanup stuff.
+    self.stream_in.close()  
+    self.pyaudio.terminate()
+
   def say(self, what, locale='en'):
     if what and "$" in what:
       os.system ('omxplayer sounds/' + what[1:])
@@ -68,11 +84,6 @@ class Audio:
     return r
 
   def record(self, elapse):
-    p = pyaudio.PyAudio()
-    stream = p.open(format=FORMAT, channels=1, input_device_index=0, rate=RATE,
-        input=True,
-        frames_per_buffer=CHUNK_SIZE)
-
     num_silent = 0
     snd_started = False
     c = 0
@@ -82,15 +93,12 @@ class Audio:
     while (c * 2.0 * 8192 / RATE) < elapse:
       c += 1
       # little endian, signed short
-      snd_data = array('h', stream.read(CHUNK_SIZE))
+      snd_data = array('h', self.stream_in.read(CHUNK_SIZE))
       if byteorder == 'big':
         snd_data.byteswap()
       r.extend(snd_data)
 
     sample_width = p.get_sample_size(FORMAT)
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
     
     r = self.normalize(r)
 
@@ -111,11 +119,8 @@ class Audio:
     # open the file for reading.
     wf = wave.open(SOUNDDIR + filename, 'rb')
 
-    # create an audio object
-    p = pyaudio.PyAudio()
-
     # open stream based on the wave object which has been input.
-    stream = p.open(format =
+    stream = self.pyaudio.open(format =
                 p.get_format_from_width(wf.getsampwidth()),
                 channels = wf.getnchannels(),
                 rate = wf.getframerate(),
@@ -132,7 +137,32 @@ class Audio:
 
     # cleanup stuff.
     stream.close()    
-    p.terminate()
+
+  def hear(self, level, elapse=1.0):
+    sig_hear = False
+    ts_total = time.time()
+    ts_signal = None
+
+    while time.time() - ts_total < elapse:
+      try:
+        snd_data = self.stream_in.read(CHUNK_SIZE)
+        snd_rms = audioop.rms(snd_data, 2)
+        logging.info("snd.rms: " + str(snd_rms))
+        if snd_rms > level:
+          sig_hear = True
+          break
+      
+      except IOError as ex:
+        if ex[1] != pyaudio.paInputOverflowed:
+          raise
+        buf = '\x00' * CHUNK_SIZE #white noise
+        logging.info("white noise")
+      except AttributeError:
+        pass
+
+
+    return sig_hear
+  
 
   def speech_recog(self, model):
 
@@ -147,20 +177,13 @@ class Audio:
     config.set_string('-dict', MODELDIR + model + '.dict')
     decoder = Decoder(config)
 
-    p = pyaudio.PyAudio()
-    logging.info("device info: " + str(p.get_device_info_by_index(0)))
-    #stream = p.open(format=pyaudio.paInt16, channels=1, input_device_index=0, rate=16000, input=True, frames_per_buffer=1024)
-    stream = p.open(format=FORMAT, channels=1, input_device_index=0, rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK_SIZE*256)
-    stream.start_stream()
     decoder.start_utt()
     tstamp = time.time()
     recog_text = ''
 
     while len(recog_text) < 1:
       try:
-        buf = stream.read(CHUNK_SIZE)
+        buf = self.stream_in.read(CHUNK_SIZE)
         logging.info("actual voice")
         decoder.process_raw(buf, False, False)
         if decoder.hyp().hypstr != '':
@@ -176,8 +199,6 @@ class Audio:
         pass
 
     decoder.end_utt()
-    stream.close()
-    p.terminate()
 
     logging.info("recog text: " + recog_text)
     return recog_text

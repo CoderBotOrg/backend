@@ -55,6 +55,9 @@ Blockly.Msg.CODERBOT_SENSOR_FINDCODE = "read Bar-QRCode";
 Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_NAME = "record as file";
 Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_ELAPSE = " of seconds";
 Blockly.Msg.CODERBOT_AUDIO_PLAY_FILE = "play file";
+Blockly.Msg.CODERBOT_AUDIO_HEAR = "hear sound";
+Blockly.Msg.CODERBOT_AUDIO_HEAR_LEVEL = " of level";
+Blockly.Msg.CODERBOT_AUDIO_HEAR_ELAPSE = "for up to seconds";
 Blockly.Msg.CODERBOT_AUDIO_LISTEN = "listen";
 Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE = "simple commands";
 Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM = "medium commands";
@@ -63,4 +66,3 @@ Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE = "get distance with";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_1 = "sonar 1";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_2 = "sonar 2";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_3 = "sonar 3";
-

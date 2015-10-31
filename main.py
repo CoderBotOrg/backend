@@ -49,11 +49,12 @@ audio = None
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
-app.debug = True
+app.debug = False
 #sockets = Sockets(app)
 
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
+app.shutdown_requested = False
 
 @babel.localeselector
 def get_locale():
@@ -139,7 +140,7 @@ def handle_bot_status():
 
 def video_stream(cam):
     refresh_timeout = float(app.bot_config.get("camera_refresh_timeout", "0.1")) 
-    while True:
+    while not app.shutdown_requested:
         last_refresh_time = time.time()
         frame = cam.get_image_jpeg()
         yield ("--BOUNDARYSTRING\r\n" +
@@ -289,3 +290,4 @@ def run_server():
       cam.exit()
     if bot:
       bot.exit()
+    app.shutdown_requested = True

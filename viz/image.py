@@ -22,6 +22,7 @@ import cv2
 import colorsys
 import copy
 import blob
+import time
 import logging
 
 tesseract_whitelists = {
@@ -32,7 +33,7 @@ tesseract_whitelists = {
 }
 
 try:
-  ocr = cv2.text.OCRTesseract_create(".", "eng", tesseract_whitelist['unspec'], 0, cv2.text.OCR_LEVEL_TEXTLINE)
+  ocr = cv2.text.OCRTesseract_create(".", "eng", tesseract_whitelists['unspec'], 0, cv2.text.OCR_LEVEL_TEXTLINE)
 except:
   logging.info("tesseract not availabe")
 
@@ -206,6 +207,7 @@ class Image():
       rect_image = None
       filtered_image = self.filter_color(color)
       blobs = filtered_image.find_blobs(minsize=1000)
+      image_size = self.size()
       logging.info("blobs: " + str(blobs))
       if len(blobs):
         blob = blobs[0]
@@ -224,9 +226,9 @@ class Image():
   
         rot_matrix = cv2.getRotationMatrix2D(center, angle, 1)
         logging.info("center: " + str(center) + " size: " + str(size) + " angle: " + str(angle))
-        rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (160, 120)))
+        rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (image_size[1], image_size[0])))
         border = 5
-        rect_image = rect_image.crop(int(max(0,border+center[0]-(size[0])/2)), int(max(0,border+center[1]-(size[1]+5)/2)), int(min(160,-border+center[0]+(size[0])/2)), int(min(120,-border+center[1]+(size[1]-5)/2))) 
+        rect_image = rect_image.crop(int(max(0,border+center[0]-(size[0])/2)), int(max(0,border+center[1]-(size[1]+5)/2)), int(min(image_size[1],-border+center[0]+(size[0])/2)), int(min(image_size[0],-border+center[1]+(size[1]-5)/2))) 
       return rect_image 
              
     def find_text(self, accept):

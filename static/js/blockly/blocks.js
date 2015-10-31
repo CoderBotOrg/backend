@@ -704,6 +704,34 @@ Blockly.Python['coderbot_audio_play'] = function(block) {
   return 'get_audio().play(' + filename + ')\n';
 };
 
+Blockly.Blocks['coderbot_audio_hear'] = {
+  /**
+   * Block for audio hear function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendValueInput('LEVEL')
+        .setCheck(["Number"])
+        .appendField(Blockly.Msg.CODERBOT_AUDIO_HEAR + Blockly.Msg.CODERBOT_AUDIO_HEAR_LEVEL);
+    this.appendValueInput('ELAPSE')
+        .setCheck(["Number"])
+        .appendField(Blockly.Msg.CODERBOT_AUDIO_HEAR_ELAPSE);
+    this.setInputsInline(true);
+    this.setOutput(true, ['Number']);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_audio_hear'] = function(block) {
+  // Boolean values true and false.
+  var level = Blockly.Python.valueToCode(block, 'LEVEL', Blockly.Python.ORDER_NONE) || '\'\'';
+  var elapse = Blockly.Python.valueToCode(block, 'ELAPSE', Blockly.Python.ORDER_NONE) || '\'\'';
+  var code = 'get_audio().hear(level=' + level + ', elapse=' + elapse  + ')';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
 Blockly.Blocks['coderbot_audio_listen'] = {
   /**
    * Block for findText function.
