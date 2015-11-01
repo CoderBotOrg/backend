@@ -70,7 +70,6 @@ class Camera():
 
     # pack in mp4 container
     params = " -fps 12 -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
-    #avconv_params = " -r 30 -i "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + " -vcodec copy  " + self.video_filename + self.VIDEO_FILE_EXT
     os.system(self.FFMPEG_CMD + params)
     # remove h264 file
     os.remove(self.video_filename + self.VIDEO_FILE_EXT_H264)
@@ -88,33 +87,22 @@ class Camera():
       self.camera._encoders[0] = self.jpeg_encoder
       self.camera._encoders[1] = self.rgb_encoder
 
-    #print "g.2: " + str(ts - time.time())
-    #ts = time.time()
-
     self.out_jpeg.seek(0)
     self.out_rgb.seek(0)
 
     self.jpeg_encoder.start(self.out_jpeg)
     self.rgb_encoder.start(self.out_rgb)
 
-    #print "g.3: " + str(ts - time.time())
-    #ts = time.time()
-
     if not self.jpeg_encoder.wait(10):
       raise picamera.PiCameraError('Timed out')
     if not self.rgb_encoder.wait(10):
       raise picamera.PiCameraError('Timed out')
-
-    #print "g.4: " + str(ts - time.time())
-    #ts = time.time()
 
     with self.camera._encoders_lock:
       del self.camera._encoders[0]
       del self.camera._encoders[1]
     self.jpeg_encoder.close()
     self.rgb_encoder.close()
-
-    #print "g.5: " + str(ts - time.time())
 
   def grab_start(self):
     logging.debug("grab_start")

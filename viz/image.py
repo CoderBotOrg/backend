@@ -143,6 +143,14 @@ class Image():
         ret, data = cv2.threshold(data, threshold, 255, cv2.THRESH_BINARY_INV)
       return Image(data)
 
+    def get_average(self):
+      data = cv2.cvtColor(self._data, cv2.COLOR_BGR2HSV)
+      logging.info("shape: " + str(data.shape))
+      h = np.average(data[:,:,0])
+      s = np.average(data[:,:,1])
+      v = np.average(data[:,:,2])
+      return [h, s, v]
+
     def find_blobs(self, minsize=0, maxsize=10000000):
       blobs = []
       image = contours = hyerarchy = None

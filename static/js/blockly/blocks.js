@@ -574,6 +574,34 @@ Blockly.Python['coderbot_adv_findColor'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
+Blockly.Blocks['coderbot_cam_average'] = {
+  /**
+   * Block for image.get_average() function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(290);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_AVERAGE)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_AVERAGE_HUE, 'H'], 
+                                                [Blockly.Msg.CODERBOT_SENSOR_AVERAGE_SATURATION, 'S'],
+                                                [Blockly.Msg.CODERBOT_SENSOR_AVERAGE_VALUE, 'V'],
+                                                [Blockly.Msg.CODERBOT_SENSOR_AVERAGE_ALL,'ALL']]), 'RETVAL')
+    this.setInputsInline(true);
+    this.setOutput(true, ['Number', 'Array']);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_cam_average'] = function(block) {
+  // Boolean values true and false.
+  var retval = block.getFieldValue('RETVAL');
+  var ret_code = {'H': '[0]', 'S': '[1]', 'V': '[2]', 'ALL': ''}[retval];
+  var code = 'get_cam().get_average()' + ret_code;
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
 Blockly.Blocks['coderbot_adv_findText'] = {
   /**
    * Block for findText function.

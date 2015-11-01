@@ -197,7 +197,13 @@ class Camera(Thread):
   def calibrate(self):
     img = self._camera.getImage()
     self._background = img.hueHistogram()[-1]
-        
+  
+  def get_average(self):
+    self._image_lock.acquire()
+    avg = self.get_image(0).get_average()
+    self._image_lock.release()
+    return avg
+      
   def find_line(self):
     self._image_lock.acquire()
     img = self.get_image(0).binarize()
