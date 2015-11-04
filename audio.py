@@ -76,7 +76,9 @@ class Audio:
   def normalize(self, snd_data):
     "Average the volume out"
     MAXIMUM = 16384
+    #times = float(MAXIMUM) / audioop.rms(snd_data, 2)
     times = float(MAXIMUM)/max(abs(i) for i in snd_data)
+    logging.info("times: " + str(times))
 
     r = array('h')
     for i in snd_data:
@@ -90,15 +92,23 @@ class Audio:
 
     r = array('h')
 
-    while (c * 2.0 * 8192 / RATE) < elapse:
-      c += 1
-      # little endian, signed short
-      snd_data = array('h', self.stream_in.read(CHUNK_SIZE))
-      if byteorder == 'big':
-        snd_data.byteswap()
-      r.extend(snd_data)
+    t = time.time()
+    while time.time() - t < elapse:
+      try:
+        snd_data = array('h', self.stream_in.read(CHUNK_SIZE))
+        r.extend(snd_data)
+        logging.info("read: " + str(len(snd_data)) + " elapse: " + str(time.time() - t))
+      except IOError as ex:
+        if ex[1] != pyaudio.paInputOverflowed:
+          raise
+        #buf = '\x00' * CHUNK_SIZE #white noise
+        logging.info("white noise")
 
-    sample_width = p.get_sample_size(FORMAT)
+
+    logging.info("read: " + str(len(r)) + " elapse: " + str(time.time() - t))
+
+
+    sample_width = self.pyaudio.get_sample_size(FORMAT)
     
     r = self.normalize(r)
 
@@ -121,7 +131,7 @@ class Audio:
 
     # open stream based on the wave object which has been input.
     stream = self.pyaudio.open(format =
-                p.get_format_from_width(wf.getsampwidth()),
+                self.pyaudio.get_format_from_width(wf.getsampwidth()),
                 channels = wf.getnchannels(),
                 rate = wf.getframerate(),
                 output = True)
@@ -134,6 +144,7 @@ class Audio:
       # writing to the stream is what *actually* plays the sound.
       stream.write(data)
       data = wf.readframes(CHUNK_SIZE)
+      logging.info("play")
 
     # cleanup stuff.
     stream.close()    
