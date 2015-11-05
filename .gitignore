@@ -36,8 +36,12 @@
 photos/*.jpg
 photos/*.mp4
 
+# Sounds recorded
+sounds/*.wav
+
 # Logs
 logs/*.log
+logs/*.log.*
 
 # Tutorial
 static/blockly-tutorial

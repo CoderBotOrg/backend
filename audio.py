@@ -97,7 +97,6 @@ class Audio:
       try:
         snd_data = array('h', self.stream_in.read(CHUNK_SIZE))
         r.extend(snd_data)
-        logging.info("read: " + str(len(snd_data)) + " elapse: " + str(time.time() - t))
       except IOError as ex:
         if ex[1] != pyaudio.paInputOverflowed:
           raise
@@ -126,6 +125,9 @@ class Audio:
     wf.close()
 
   def play(self, filename):
+    os.system ('omxplayer sounds/' + filename)
+
+    """
     # open the file for reading.
     wf = wave.open(SOUNDDIR + filename, 'rb')
 
@@ -148,6 +150,7 @@ class Audio:
 
     # cleanup stuff.
     stream.close()    
+    """
 
   def hear(self, level, elapse=1.0):
     sig_hear = False
