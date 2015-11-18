@@ -38,6 +38,8 @@ PIN_SONAR_2_TRIGGER = 18
 PIN_SONAR_2_ECHO = 8
 PIN_SONAR_3_TRIGGER = 18
 PIN_SONAR_3_ECHO = 23
+PIN_ENCODER_LEFT = 14
+PIN_ENCODER_RIGHT = 15
 
 PWM_FREQUENCY = 100 #Hz
 PWM_RANGE = 100 #0-100
@@ -51,6 +53,8 @@ class CoderBot:
   def __init__(self, servo=False, motor_trim_factor=1.0):
     self.pi = pigpio.pi('localhost')
     self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
+    self.pi.set_mode(PIN_ENCODER_LEFT, pigpio.INPUT)
+    self.pi.set_mode(PIN_ENCODER_RIGHT, pigpio.INPUT)
     self._cb = dict()
     self._cb_last_tick = dict()
     self._cb_elapse = dict()
@@ -61,6 +65,8 @@ class CoderBot:
     else:
       self.motor_control = self._dc_motor
     self._cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, coderbot_callback)
+    self._cb2 = self.pi.callback(PIN_ENCODER_LEFT, pigpio.RISING_EDGE, coderbot_callback)
+    self._cb3 = self.pi.callback(PIN_ENCODER_RIGHT, pigpio.RISING_EDGE, coderbot_callback)
     for pin in self._pin_out:
       self.pi.set_PWM_frequency(pin, PWM_FREQUENCY)
       self.pi.set_PWM_range(pin, PWM_RANGE)
@@ -74,6 +80,8 @@ class CoderBot:
 
   def exit(self):
     self._cb1.cancel()
+    self._cb2.cancel()
+    self._cb3.cancel()
     for s in self.sonar:
       s.cancel()
 
@@ -177,21 +185,24 @@ class CoderBot:
     self._cb_last_tick[gpio] = 0
 
   def callback(self, gpio, level, tick):
-    cb = self._cb.get(gpio)
-    if cb:
-      elapse = self._cb_elapse.get(gpio)
-      if level == 0:
-        self._cb_last_tick[gpio] = tick
-      elif tick - self._cb_last_tick[gpio] > elapse: 
-        self._cb_last_tick[gpio] = tick
-        print "pushed: ", level, tick
-        cb()
+    if gpio in [PIN_ENCODER_LEFT, PIN_ENCODER_RIGHT]:
+      print( "encoder: " + str(gpio) + " level: " + str(level) + " tick: " + str(tick))
+    else:
+      cb = self._cb.get(gpio)
+      if cb:
+        elapse = self._cb_elapse.get(gpio)
+        if level == 0:
+          self._cb_last_tick[gpio] = tick
+        elif tick - self._cb_last_tick[gpio] > elapse: 
+          self._cb_last_tick[gpio] = tick
+          print "pushed: ", level, tick
+          cb()
 
   def halt(self):
     os.system ('sudo halt')
 
   def restart(self):
-    os.system ('sudo /etc/init.d/coderbot stop && sudo pkill -9 dbus && sudo /etc/init.d/coderbot start')
+    os.system ('sudo /etc/init.d/coderbot restart')
 
   def reboot(self):
     os.system ('sudo reboot')
