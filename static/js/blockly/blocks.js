@@ -184,7 +184,7 @@ Blockly.Blocks['coderbot_audio_say'] = {
   // Block for text to speech.
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Say');
-    this.setColour(290);
+    this.setColour(220);
     var vi = this.appendValueInput('TEXT');
     vi.setCheck(["String", "Number", "Date"]);
     if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
@@ -192,6 +192,11 @@ Blockly.Blocks['coderbot_audio_say'] = {
     } else {
     	vi.appendField(Blockly.Msg.CODERBOT_SAY);
     }
+    vi.appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_LOCALE_EN, 'en'],
+			                      [Blockly.Msg.CODERBOT_LOCALE_IT, 'it'],
+                                              [Blockly.Msg.CODERBOT_LOCALE_FR, 'fr'],
+					      [Blockly.Msg.CODERBOT_LOCALE_ES, 'es']]), 'LOCALE')
+
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip(('CoderBot_sayTooltip'));
@@ -202,7 +207,8 @@ Blockly.Python['coderbot_audio_say'] = function(block) {
   // Generate Python for turning left or right.
   var text = Blockly.Python.valueToCode(block, 'TEXT',
       Blockly.Python.ORDER_NONE) || '\'\'';
-  return 'get_audio().say(' + text + ')\n';
+  var locale = block.getFieldValue('LOCALE');
+  return 'get_audio().say(' + text + ', locale="' + locale + '")\n';
 };
 
 Blockly.Blocks['coderbot_sleep'] = {
@@ -464,7 +470,7 @@ Blockly.Blocks['coderbot_adv_pathAhead'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_PATHAHEAD);
     this.setOutput(true, 'Number');
@@ -485,7 +491,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLINE);
     this.setOutput(true, 'Number');
@@ -506,7 +512,7 @@ Blockly.Blocks['coderbot_adv_findSignal'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDSIGNAL);
     this.setOutput(true, 'Number');
@@ -527,7 +533,7 @@ Blockly.Blocks['coderbot_adv_findFace'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDFACE)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_X, 'X'], [Blockly.Msg.CODERBOT_SENSOR_FINDFACE_Y, 'Y'],[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_SIZE, 'SIZE'],[Blockly.Msg.CODERBOT_SENSOR_FINDFACE_ALL,'ALL']]), 'RETVAL')
@@ -552,7 +558,7 @@ Blockly.Blocks['coderbot_adv_findColor'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_FIND)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_DIST, 'DIST'], [Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_ANGLE, 'ANGLE'],[Blockly.Msg.CODERBOT_SENSOR_FINDCOLOR_BOTH,'BOTH']]), 'RETVAL')
@@ -581,7 +587,7 @@ Blockly.Blocks['coderbot_cam_average'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_AVERAGE)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_AVERAGE_HUE, 'H'], 
@@ -609,7 +615,7 @@ Blockly.Blocks['coderbot_adv_findText'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHA, 'alpha'], 
@@ -640,7 +646,7 @@ Blockly.Blocks['coderbot_adv_findCode'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCODE);
     this.setOutput(true, 'String');
@@ -662,7 +668,7 @@ Blockly.Blocks['coderbot_adv_findLogo'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLOGO);
     this.setOutput(true, 'Number');
@@ -683,7 +689,7 @@ Blockly.Blocks['coderbot_audio_record'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(220);
     this.appendValueInput('FILENAME')
         .setCheck('String')
         .appendField(Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_NAME);
@@ -693,7 +699,7 @@ Blockly.Blocks['coderbot_audio_record'] = {
     this.setInputsInline(true);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
-    this.setTooltip(('CoderBot_audio_say_Tooltip'));
+    this.setTooltip(('CoderBot_audio_record_Tooltip'));
   }
 };
 
@@ -711,7 +717,7 @@ Blockly.Blocks['coderbot_audio_play'] = {
   // Block for text to speech.
   init: function() {
     this.setHelpUrl('http://code.google.com/p/blockly/wiki/Play');
-    this.setColour(290);
+    this.setColour(220);
     var vi = this.appendValueInput('FILENAME');
     vi.setCheck("String");
     if(CODERBOT_PROG_LEVEL.indexOf("basic")>=0) {
@@ -739,7 +745,7 @@ Blockly.Blocks['coderbot_audio_hear'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(220);
     this.appendValueInput('LEVEL')
         .setCheck(["Number"])
         .appendField(Blockly.Msg.CODERBOT_AUDIO_HEAR + Blockly.Msg.CODERBOT_AUDIO_HEAR_LEVEL);
@@ -767,7 +773,7 @@ Blockly.Blocks['coderbot_audio_listen'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(220);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_AUDIO_LISTEN)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE, 'model_simple'],
@@ -793,7 +799,7 @@ Blockly.Blocks['coderbot_sonar_get_distance'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(290);
+    this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SONAR_SENSOR_1, 0],

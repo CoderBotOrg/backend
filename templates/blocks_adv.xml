@@ -231,7 +231,7 @@
       <block type="coderbot_camera_videoRec"></block>
       <block type="coderbot_camera_videoStop"></block>
     </category>
-    <category name="{% trans %}Sensor{% endtrans %}" colour="290">
+    <category name="{% trans %}Sensor{% endtrans %}" colour="250">
       <block type="coderbot_cam_average"></block>
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
@@ -252,7 +252,7 @@
       <block type="coderbot_adv_findCode"></block>
       <block type="coderbot_sonar_get_distance"></block>
     </category>
-    <category name="{% trans %}Sound{% endtrans %}" colour="290">
+    <category name="{% trans %}Sound{% endtrans %}" colour="220">
       <block type="coderbot_audio_say"></block>
       <block type="coderbot_audio_record"></block>
       <block type="coderbot_audio_play"></block>

@@ -63,6 +63,7 @@ class Motion:
         self.power_angles = [[15, (int(cfg.get("move_power_angle_1")), -1)], [4, (int(cfg.get("move_power_angle_2")), 0.05)], [1, (int(cfg.get("move_power_angle_3")), 0.02)], [0, (0, 0)]]
         self.image_width = 640 / int(cfg.get("cv_image_factor"))
         self.image_heigth = 480 / int(cfg.get("cv_image_factor"))
+	self.transform = image.Image.get_transform(self.image_width)
     _motion = None
 
     @classmethod
@@ -190,8 +191,8 @@ class Motion:
 
         #avg_delta_x_t = 0.0
         if len(vectors_t) > 0:
-            vectors_t = image.Image.transform(vectors_t)
-            for v in vectors_t.reshape(-1, 2, 2):
+           vectors_t = image.Image.transform(vectors_t, self.transform)
+           for v in vectors_t.reshape(-1, 2, 2):
                 avg_delta_y += (v[1][1] - v[0][1])
                 #avg_delta_x_t += v[1][0] - v[0][0]
             #avg_delta_x_t = avg_delta_x_t / (vectors_t.shape[0] / 2)

@@ -118,7 +118,10 @@ class CoderBot:
   def get_sonar_distance(self, sonar_id=0):
     return self.sonar[sonar_id].get_distance()
 
-  def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1):
+  def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1, steps_left=-1, steps_right=-1 ):
+    self._encoder_target_left = steps_left
+    self._encoder_target_right = steps_right
+    
     self._is_moving = True
     if speed_left < 0:
       speed_left = abs(speed_left)
@@ -185,8 +188,16 @@ class CoderBot:
     self._cb_last_tick[gpio] = 0
 
   def callback(self, gpio, level, tick):
-    if gpio in [PIN_ENCODER_LEFT, PIN_ENCODER_RIGHT]:
-      print( "encoder: " + str(gpio) + " level: " + str(level) + " tick: " + str(tick))
+    if gpio == PIN_ENCODER_LEFT:
+      self._encoder_cur_left += 1
+      if self._encoder_target_left >= self._encoder_cur_left:
+        self.pi.write(PIN_LEFT_FORWARD, 0)
+	self.pi.write(PIN_LEFT_BACKWARD, 0)
+    elif gpio == PIN_ENCODER_RIGHT:
+      self._encoder_cur_right += 1
+      if self._encoder_target_right >= self._encoder_cur_right:
+        self.pi.write(PIN_RIGHT_FORWARD, 0)
+	self.pi.write(PIN_RIGHT_BACKWARD, 0)
     else:
       cb = self._cb.get(gpio)
       if cb:
