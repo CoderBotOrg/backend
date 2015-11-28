@@ -29,7 +29,7 @@ PIN_LEFT_FORWARD = 25
 PIN_LEFT_BACKWARD = 24
 PIN_RIGHT_FORWARD = 4
 PIN_RIGHT_BACKWARD = 17
-PIN_PUSHBUTTON = 18
+PIN_PUSHBUTTON = 11
 PIN_SERVO_3 = 9
 PIN_SERVO_4 = 10
 PIN_SONAR_1_TRIGGER = 18
@@ -76,6 +76,10 @@ class CoderBot:
     self.sonar = [sonar.Sonar(self.pi, PIN_SONAR_1_TRIGGER, PIN_SONAR_1_ECHO),
                   sonar.Sonar(self.pi, PIN_SONAR_2_TRIGGER, PIN_SONAR_2_ECHO),
                   sonar.Sonar(self.pi, PIN_SONAR_3_TRIGGER, PIN_SONAR_3_ECHO)] 
+    self._encoder_cur_left = 0
+    self._encoder_cur_right = 0
+    self._encoder_target_left = -1
+    self._encoder_target_right = -1
   the_bot = None
 
   def exit(self):
@@ -119,6 +123,8 @@ class CoderBot:
     return self.sonar[sonar_id].get_distance()
 
   def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1, steps_left=-1, steps_right=-1 ):
+    self._encoder_cur_left = 0
+    self._encoder_cur_right = 0
     self._encoder_target_left = steps_left
     self._encoder_target_right = steps_right
     
