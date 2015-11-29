@@ -67,8 +67,7 @@ def get_locale():
 
 @app.route("/")
 def handle_home():
-    stream_port = cam.stream_port if cam else None
-    return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"))
+    return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"))
 
 @app.route("/config", methods=["POST"])
 def handle_config():
