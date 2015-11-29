@@ -55,7 +55,6 @@ class Camera(Thread):
     logging.info("starting camera")
     cam_props = {"width":640, "height":480, "cv_image_factor":config.Config.get().get("cv_image_factor", 4), "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
     self._camera = camera.Camera(props=cam_props)
-    #self._streamer = streamer.JpegStreamer("0.0.0.0:"+str(self.stream_port), st=0.1)
     self.recording = False
     self.video_start_time = time.time() + 8640000
     self._run = True
