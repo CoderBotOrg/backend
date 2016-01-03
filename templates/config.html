@@ -192,11 +192,11 @@
  <div data-role="popup" id="popup-wifi-ap" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
   <div style="padding:10px 20px;">
    <h3>{% trans %}WiFi AP mode access{% endtrans %}</h3>
-   <p>Access Point mode is being set:
+   <p>{% trans %}Access Point mode is being set{% endtrans %}:
    <ol>
-   <li>Wait 30 seconds</li>
-   <li>Connect your device to the "coderbot" named wifi</li>
-   <li>Click on the following link: <a href="http://coderbot:8080">CoderBot (AP mode)</a></li>
+   <li>{% trans %}Wait 30 seconds{% endtrans %}</li>
+   <li>{% trans %}Connect your device to the "coderbot" named wifi{% endtrans %}</li>
+   <li>{% trans %}Click on the following link{% endtrans %}: <a href="http://coder.bot:8080">CoderBot (AP mode)</a></li>
    </ol>
    </p>
   </div>
@@ -204,13 +204,21 @@
  <div data-role="popup" id="popup-wifi-client" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
   <div style="padding:10px 20px;">
    <h3>{% trans %}WiFi Client mode access{% endtrans %}</h3>
-   <p>Client mode is being set:
+   <p>{% trans %}Client mode is being set{% endtrans %}:
    <ol>
-   <li>Wait 30 seconds</li>
-   <li>Connect your device to your own wifi (wifi network must be connected to internet)</li>
-   <li>Click on the following link: <a href="http://coderbot.local:8080">CoderBot (client mode)</a></li>
+   <li>{% trans %}Wait 30 seconds{% endtrans %}</li>
+   <li>{% trans %}Connect your device to your own wifi (wifi network must be connected to internet){% endtrans %}</li>
+   <li>{% trans %}Click on the following link{% endtrans %}: <a href="http://coderbot.local:8080">CoderBot (client mode)</a></li>
    </ol>
    </p>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-update-system" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="false" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}System update{% endtrans %}</h3>
+   <p>{% trans %}Update log (it may require several minutes){% endtrans %}:</p>
+   <textarea readonly=true cols="80" rows="20" style="overflow-y: scroll; height: 100px; resize: none; " id="i_update_system_log"></textarea>
+   <a href="#" id="b_update_system_close" data-rel="back" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini ui-disabled">{% trans %}Close{% endtrans %}</a>
   </div>
  </div>
 </div>

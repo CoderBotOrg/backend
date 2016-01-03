@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-14 21:55+0000\n"
+"POT-Creation-Date: 2016-01-03 21:39+0000\n"
 "PO-Revision-Date: 2015-10-10 00:21+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgstr "Caméra"
 msgid "Sensor"
 msgstr "Détecteurs"
 
-#: templates/blocks_adv.xml:253 templates/blocks_std.xml:73
+#: templates/blocks_adv.xml:255 templates/blocks_std.xml:73
 msgid "Sound"
 msgstr "Son"
 
@@ -306,50 +306,92 @@ msgstr "Relancer"
 msgid "Reboot"
 msgstr "Redémarrer"
 
-#: templates/config.html:164 templates/config.html:185
+#: templates/config.html:162
+msgid "Update System"
+msgstr ""
+
+#: templates/config.html:165 templates/config.html:186
 msgid "Cancel"
 msgstr "Annuler"
 
-#: templates/config.html:165 templates/program.html:18
+#: templates/config.html:166 templates/program.html:18
 #: templates/program.html:26
 msgid "Save"
 msgstr "Enregistrer"
 
-#: templates/config.html:172
+#: templates/config.html:173
 msgid "WiFi Client mode access data"
 msgstr "Paramétrage de la connexion Wifi"
 
-#: templates/config.html:174
+#: templates/config.html:175
 msgid "WiFi mode"
 msgstr "Mode Wifi"
 
-#: templates/config.html:176
+#: templates/config.html:177
 msgid "Access Point"
 msgstr "Access Point"
 
-#: templates/config.html:178
+#: templates/config.html:179
 msgid "Client"
 msgstr "Client"
 
-#: templates/config.html:180
+#: templates/config.html:181
 msgid "WiFi name"
 msgstr "Nom du réseau Wifi"
 
-#: templates/config.html:182
+#: templates/config.html:183
 msgid "WiFi password"
 msgstr "Mot de passe du réseau Wifi"
 
-#: templates/config.html:186
+#: templates/config.html:187
 msgid "Apply Wifi config"
 msgstr "Appliquer"
 
-#: templates/config.html:193
+#: templates/config.html:194
 msgid "WiFi AP mode access"
 msgstr "Mode Access Point"
 
-#: templates/config.html:205
+#: templates/config.html:195
+msgid "Access Point mode is being set"
+msgstr ""
+
+#: templates/config.html:197 templates/config.html:209
+msgid "Wait 30 seconds"
+msgstr ""
+
+#: templates/config.html:198
+msgid "Connect your device to the \"coderbot\" named wifi"
+msgstr ""
+
+#: templates/config.html:199 templates/config.html:211
+msgid "Click on the following link"
+msgstr ""
+
+#: templates/config.html:206
 msgid "WiFi Client mode access"
 msgstr "Mode Client"
+
+#: templates/config.html:207
+msgid "Client mode is being set"
+msgstr ""
+
+#: templates/config.html:210
+msgid ""
+"Connect your device to your own wifi (wifi network must be connected to "
+"internet)"
+msgstr ""
+
+#: templates/config.html:218
+msgid "System update"
+msgstr ""
+
+#: templates/config.html:219
+msgid "Update log (it may require several minutes)"
+msgstr ""
+
+#: templates/config.html:221 templates/config_params.html:30
+msgid "Close"
+msgstr "Fermer"
 
 #: templates/config_params.html:20
 msgid "Say what:"
@@ -392,9 +434,11 @@ msgstr "arrêté"
 msgid "Stop"
 msgstr "Arrêter"
 
-#: templates/config_params.html:30
-msgid "Close"
-msgstr "Fermer"
+#: templates/config_params.html:31
+msgid ""
+"Update System? (this requires that CoderBot is connected to the internet "
+"(via wifi or lan cable, the operation will take a few minutes)."
+msgstr ""
 
 #: templates/control.html:5 templates/program.html:5
 msgid "Preferences"
@@ -426,7 +470,7 @@ msgstr "Parler"
 
 #: templates/control.html:42
 msgid "Photo"
-msgstr Photo""
+msgstr "hoto\""
 
 #: templates/control.html:47
 msgid "Rec"
@@ -484,4 +528,10 @@ msgstr "Enregistrer le programme sous"
 #: templates/program.html:67
 msgid "Load Program"
 msgstr "Sélectionner le programme à ouvrir"
+
+#~ msgid ""
+#~ "Update System? (this requires a internet"
+#~ " connection and will takes a few "
+#~ "minutes)."
+#~ msgstr ""
 

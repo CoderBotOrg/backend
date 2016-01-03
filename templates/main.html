@@ -7,6 +7,26 @@
  <link rel="icon" type="image/png" href="/images/icons/coderbot_logo_79.png"/>
  <link rel="stylesheet"  href="../css/jquery.mobile-1.4.5.min.css">
  <link rel="stylesheet"  href="../css/coderbot.css">
+        <style>
+html,
+body,
+#page-preferences {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#page-preferences,
+#page-preferences * {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+#page-preferences .ui-content {
+  height: inherit; /* inherit height without padding nor border */
+}
+        </style>
  {%include "config_params.html"%}
  <script type="text/javascript" src="js/blockly/blockly_compressed.js"></script>
  <script type="text/javascript" src="js/blockly/blocks_compressed.js"></script>

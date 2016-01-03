@@ -163,8 +163,12 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 }
         });
         $('#b_update').on("click", function (){
-                if(confirm("Update System? (this requires a internet connection and will takes a few minutes).")){
-			$.get(url='/update');
+                if(confirm(BotMessages.UpdateSystem)){
+		        $('#popup-update-system').popup('open');	
+                        $.get(url='/update', success=function (data) {
+                                $('#i_update_system_log').text(data);
+                                $('#b_update_system_close').removeClass('ui-disabled');
+                        });
 		}
         });
 });
