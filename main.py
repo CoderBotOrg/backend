@@ -22,6 +22,7 @@ import json
 import logging
 import time
 import logging.handlers
+import subprocess
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
@@ -88,6 +89,16 @@ def handle_wifi():
       return "http://coder.bot:8080";
     else:
       return "http://coderbotsrv.appspot.com/"
+
+@app.route("/update", methods=["GET"])
+def handle_update():
+   out = subprocess.check_output((["./update_os.sh"],
+	                               stderr=subprocess.STDOUT)
+   logging.info(out)
+
+   out = subprocess.check_output((["./update_coderbot.sh"],
+	                               stderr=subprocess.STDOUT)
+   logging.info(out)
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
