@@ -162,6 +162,11 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                         bot.reboot();
                 }
         });
+        $('#b_update').on("click", function (){
+                if(confirm("Update System? (this requires a internet connection and will takes a few minutes).")){
+			$.get(url='/update');
+		}
+        });
 });
 
 $(document).on( "pageshow", '#page-photos', function( event ) {

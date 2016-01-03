@@ -92,13 +92,14 @@ def handle_wifi():
 
 @app.route("/update", methods=["GET"])
 def handle_update():
-   out = subprocess.check_output((["./update_os.sh"],
-	                               stderr=subprocess.STDOUT)
-   logging.info(out)
+   logging.info("updating system.1")
+   out = subprocess.check_output(["./scripts/update_os.sh"],
+	                          stderr=subprocess.STDOUT)
+   logging.info("updating system.2: " + str(out))
 
-   out = subprocess.check_output((["./update_coderbot.sh"],
+   out = subprocess.check_output(["./scripts/update_coderbot.sh"],
 	                               stderr=subprocess.STDOUT)
-   logging.info(out)
+   logging.info("updating system.3: " + str(out))
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
