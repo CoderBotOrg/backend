@@ -43,6 +43,9 @@ sounds/*.wav
 logs/*.log
 logs/*.log.*
 
+# User programs
+data/*.data
+
 # Tutorial
 static/blockly-tutorial
 
