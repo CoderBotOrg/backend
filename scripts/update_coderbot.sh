@@ -1,2 +1,3 @@
 #!/bin/sh
-git pull origin develop
+git pull origin master
+
