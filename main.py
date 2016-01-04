@@ -93,14 +93,7 @@ def handle_wifi():
 @app.route("/update", methods=["GET"])
 def handle_update():
    logging.info("updating system.start")
-   out_os = subprocess.check_output(["./scripts/update_os.sh"],
-	                          stderr=subprocess.STDOUT)
-   logging.info("updating system.os: " + str(out_os))
-
-   out_bot = subprocess.check_output(["./scripts/update_coderbot.sh"],
-	                          stderr=subprocess.STDOUT)
-   logging.info("updating system.bot: " + str(out_bot))
-   return out_os + out_bot
+   return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
@@ -269,6 +262,17 @@ def handle_program_status():
 @app.route("/tutorial")
 def handle_tutorial():
     return redirect("/blockly-tutorial/apps/index.html", code=302)
+
+def execute(command):
+  process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+  # Poll process for new output until finished
+  while True:
+    nextline = process.stdout.readline()
+    if nextline == '' and process.poll() != None:
+      break
+    logging.info(nextline)
+    yield nextline
 
 def button_pushed():
   if app.bot_config.get('button_func') == "startstop":
