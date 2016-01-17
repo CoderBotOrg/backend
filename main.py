@@ -294,11 +294,12 @@ def run_server():
       audio.say(app.bot_config.get("sound_start"))
       cam = Camera.get_instance()
       motion = Motion.get_instance()
+      if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
+        app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
+        app.prog.execute()
     except ValueError as e:
       app.bot_config = {}
       logging.error(e)
-    if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
-      app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
 
     bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
     app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
