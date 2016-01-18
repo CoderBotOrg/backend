@@ -79,7 +79,7 @@ class Sonar:
 
    def get_distance(self):
       time.sleep(0.05)
-      return self.read() / self.MICROSECONDS * self.SOUND_SPEED / 2 # seconds / microseconds * sound speed / 2 (half trip)
+      return round(self.read() / self.MICROSECONDS * self.SOUND_SPEED / 2, 1) # seconds / microseconds * sound speed / 2 (half trip)
 
    def cancel(self):
       """
