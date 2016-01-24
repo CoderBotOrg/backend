@@ -5,6 +5,7 @@ import subprocess
 import shutil
 import sys
 import os
+import time
 import urllib2
 import fcntl
 import struct
@@ -49,17 +50,17 @@ class WiFi():
     hostapd_type = cls.hostapds.get(adapter)
     try:
       print "starting hostapd..."
-      #os.system("start-stop-daemon --start --oknodo --quiet --exec /usr/sbin/" + hostapd_type + " -- /etc/hostapd/" + hostapd_type + " &")
-      os.system("/usr/sbin/" + hostapd_type + " /etc/hostapd/" + hostapd_type + " -B")
-
+      out = os.system("/usr/sbin/" + hostapd_type + " /etc/hostapd/" + hostapd_type + " -B")
+      print "hostapd out: " + str(out)
     except subprocess.CalledProcessError as e:
       print e.output
 
   @classmethod
   def stop_hostapd(cls):
     try:
-      out = subprocess.check_output(["pkill", "-9", "hostapd"])
-      print out
+      print "stopping hostapd..."
+      out = subprocess.check_output(["sudo", "pkill", "-9", "hostapd"])
+      print "hostapd out: " + str(out)
     except subprocess.CalledProcessError as e:
       print e.output
 
@@ -71,20 +72,16 @@ class WiFi():
         0x8915,  # SIOCGIFADDR
         struct.pack('256s', ifname[:15])
     )[20:24])
-    ipaddr = socket.gethostbyname(socket.gethostname())
-    return ipaddr
 
   @classmethod
-  def register_ipaddr(cls, ipaddr, botname):
+  def register_ipaddr(cls, botname, ipaddr):
     try:
       ret = urllib2.urlopen(cls.web_url + "?name=" + botname + "&ipaddr=" + ipaddr)
-      print str(ret.getcode())
       if ret.getcode() != 200:
         raise Exception()
     except URLError as e:
-      print e
+      print "except: " + str(e)
       raise
-    print botname, ": ", ipaddr
 
   @classmethod
   def get_wlans(cls):
@@ -110,10 +107,11 @@ network={\n""")
   def start_as_client(cls):
     cls.stop_hostapd()
     try:
-      out = subprocess.check_output(["ifdown", "wlan0"])
+      time.sleep(1.0)
+      out = subprocess.check_output(["ifdown", "--force", "wlan0"])
       out = subprocess.check_output(["ifup", "wlan0"])
-      print "registering ip..."
-      cls.register_ipaddr(cls.get_ipaddr("wlan0"), self.get_config().get('bot_name', 'CoderBot'))
+      cls.register_ipaddr(cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"))
+      print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
     except subprocess.CalledProcessError as e:
       print e.output
       raise
@@ -126,7 +124,8 @@ network={\n""")
 
   @classmethod
   def start_as_ap(cls):
-    out = subprocess.check_output(["ifdown", "wlan0"])
+    time.sleep(1.0)
+    out = subprocess.check_output(["ifdown", "--force", "wlan0"])
     out = subprocess.check_output(["ifup", "wlan0"])
     cls.start_hostapd()
 
@@ -149,20 +148,21 @@ def main():
   if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
     if len(sys.argv) > 2 and sys.argv[2] == "ap":
       w.set_start_as_ap()
-      w.start_as_ap()
+      #w.start_as_ap()
     elif len(sys.argv) > 2 and sys.argv[2] == "client":
       if len(sys.argv) > 3:
         w.set_client_params(sys.argv[3], sys.argv[4])
       w.set_start_as_client()
-      w.stop_hostapd()
+      """
       try:
         w.start_as_client()
       except:
         print "Unable to register ip, revert to ap mode"
         w.start_as_ap()
+      """
     elif len(sys.argv) > 3 and sys.argv[2] == "bot_name":
-      self.get_config()['bot_name'] = sys.argv[3]
-      self.save_config()
+      WiFi.get_config()['bot_name'] = sys.argv[3]
+      WiFi.save_config()
   else:
     w.start_service()
 

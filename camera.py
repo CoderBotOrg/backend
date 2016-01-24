@@ -323,6 +323,7 @@ class Camera(Thread):
     self._image_lock.release()
     image = img.find_rect(color=color)
     if image:
+      logging.info("image: " + str(image))
       bin_image = image.binarize().invert()
       #self.save_image(bin_image.to_jpeg())
       text = bin_image.find_text(accept)
