@@ -42,7 +42,7 @@ class WiFi():
     for a in cls.adapters:
       if a in lsusb_out:
         return a
-    return None
+    return cls.adapters[0] 
     
   @classmethod
   def start_hostapd(cls):
@@ -52,6 +52,7 @@ class WiFi():
       print "starting hostapd..."
       out = os.system("/usr/sbin/" + hostapd_type + " /etc/hostapd/" + hostapd_type + " -B")
       print "hostapd out: " + str(out)
+
     except subprocess.CalledProcessError as e:
       print e.output
 
