@@ -16,7 +16,7 @@ class WiFi():
   CONFIG_FILE = "/etc/coderbot_wifi.conf"
   adapters = ["RT5370", "RTL8188CUS"] 
   hostapds = {"RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"} 
-  web_url = "http://coderbotsrv.appspot.com/register_ip"
+  web_url = "http://my.coderbot.org/coderbot/v1.0/bot/new"
   wifi_client_conf_file = "/etc/wpa_supplicant/wpa_supplicant.conf"
   _config = {}
 
@@ -77,10 +77,16 @@ class WiFi():
   @classmethod
   def register_ipaddr(cls, botname, ipaddr):
     try:
-      ret = urllib2.urlopen(cls.web_url + "?name=" + botname + "&ipaddr=" + ipaddr)
+      data = {"bot_uid": "ABCDFGHI",
+              "bot_name": botname,
+              "bot_ip": ipaddr,
+              "bot_version": "1.0",
+              "user_email": "roberto.previtera@gmail.com"}
+      req = urllib2.Request(cls.web_url, json.dumps(data))
+      ret = urllib2.urlopen(req)
       if ret.getcode() != 200:
         raise Exception()
-    except URLError as e:
+    except Exception as e:
       print "except: " + str(e)
       raise
 
@@ -112,7 +118,7 @@ network={\n""")
       out = subprocess.check_output(["ifdown", "--force", "wlan0"])
       out = subprocess.check_output(["ifup", "wlan0"])
       cls.register_ipaddr(cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"))
-      print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
+      #print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
     except subprocess.CalledProcessError as e:
       print e.output
       raise
@@ -164,6 +170,9 @@ def main():
     elif len(sys.argv) > 3 and sys.argv[2] == "bot_name":
       WiFi.get_config()['bot_name'] = sys.argv[3]
       WiFi.save_config()
+  elif len(sys.argv) > 1 and sys.argv[1] == "register":
+    print "registering: "+ str(w.get_ipaddr("wlan0"))
+    w.register_ipaddr(w.get_config().get('bot_name', 'CoderBot'), w.get_ipaddr("wlan0"))
   else:
     w.start_service()
 

@@ -780,7 +780,7 @@ Blockly.Blocks['coderbot_audio_listen'] = {
                                                 [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM, 'model_medium'],
                                                 [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_ADV, 'model_adv']]), 'MODEL');
     this.setInputsInline(true);
-    this.setOutput(true, ['Number', 'Array']);
+    this.setOutput(true, 'String');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
