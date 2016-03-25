@@ -16,6 +16,7 @@ class Sonar:
 
    MICROSECONDS =  1000000.0
    SOUND_SPEED = 34030.0
+   ECHO_TIMEOUT = 0.1
 
    def __init__(self, pi, trigger, echo):
       """
@@ -44,7 +45,7 @@ class Sonar:
       self._inited = True
 
    def _cbf(self, gpio, level, tick):
-      if gpio == self._trig:
+      if gpio == self._trig and self._triggered == False:
          if level == 0: # trigger sent
             self._triggered = True
             self._high = None
@@ -57,7 +58,8 @@ class Sonar:
                   self._time = tick - self._high
                   self._high = None
                   self._ping = True
-
+                  self._triggered = False
+                  print "elapsed: " + str(self._time)
    def read(self):
       """
       Triggers a reading.  The returned reading is the number
@@ -70,7 +72,7 @@ class Sonar:
          self.pi.gpio_trigger(self._trig)
          start = time.time()
          while not self._ping:
-            if (time.time()-start) > 5.0:
+            if (time.time()-start) > self.ECHO_TIMEOUT:
                return 20000
             time.sleep(0.001)
          return self._time

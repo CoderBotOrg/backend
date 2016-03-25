@@ -802,9 +802,9 @@ Blockly.Blocks['coderbot_sonar_get_distance'] = {
     this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE)
-        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SONAR_SENSOR_1, 0],
-                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_2, 1],
-                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_3, 2]]), 'SONAR');
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SONAR_SENSOR_1, "0"],
+                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_2, "1"],
+                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_3, "2"]]), 'SONAR');
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
