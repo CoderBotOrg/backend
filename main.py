@@ -23,6 +23,7 @@ import logging
 import time
 import logging.handlers
 import subprocess
+import picamera
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
@@ -68,7 +69,8 @@ def get_locale():
 
 @app.route("/")
 def handle_home():
-    return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=cam.stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"))
+    stream_port = cam.stream_port if cam else "" 
+    return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"), cam=cam!=None)
 
 @app.route("/config", methods=["POST"])
 def handle_config():
@@ -111,17 +113,32 @@ def handle_bot():
         motion.turn(angle=float(param2))
     elif cmd == "stop":
         bot.stop()
-        motion.stop()
+        try:
+          motion.stop()
+        except:
+          logging.warning("Camera not present")
+          pass
     elif cmd == "take_photo":
-        cam.photo_take()
-        audio.say(app.bot_config.get("sound_shutter"))
+        try:
+	  cam.photo_take()
+          audio.say(app.bot_config.get("sound_shutter"))
+        except:
+          logging.warning("Camera not present")
+          pass
     elif cmd == "video_rec":
-        cam.video_rec()
-        audio.say(app.bot_config.get("sound_shutter"))
+        try:
+          cam.video_rec()
+          audio.say(app.bot_config.get("sound_shutter"))
+        except:
+          logging.warning("Camera not present")
+          pass
     elif cmd == "video_stop":
-        cam.video_stop()
-        audio.say(app.bot_config.get("sound_shutter"))
-
+        try:
+          cam.video_stop()
+          audio.say(app.bot_config.get("sound_shutter"))
+        except:
+          logging.warning("Camera not present")
+          pass
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
 	audio.say(param1, get_locale())
@@ -190,7 +207,7 @@ def handle_photo(filename):
     video = None
     try:
       video = cam.get_photo_file(filename)
-    except:
+    except picamera.exc.PiCameraError:
       pass
 
     return send_file(video, mimetype.get(filename[:-3],'image'), cache_timeout=0)
@@ -292,8 +309,12 @@ def run_server():
       bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
       audio = Audio.get_instance()
       audio.say(app.bot_config.get("sound_start"))
-      cam = Camera.get_instance()
-      motion = Motion.get_instance()
+      try:
+	cam = Camera.get_instance()
+        motion = Motion.get_instance()
+      except picamera.exc.PiCameraError:
+        logging.error("Camera not present")
+      
       if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
         app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
         app.prog.execute()

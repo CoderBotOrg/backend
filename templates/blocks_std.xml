@@ -57,7 +57,7 @@
           </block>
         </value>
       </block>
-    </category>
+    </category>{%if cam%}
     <category name="{% trans %}Sensor{% endtrans %}" colour="290">
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
@@ -69,7 +69,7 @@
           </block>
         </value>
       </block>
-    </category>
+    </category>{%endif%}
     <category name="{% trans %}Sound{% endtrans %}" colour="290">
       <block type="coderbot_audio_say"></block>
     </category>      
