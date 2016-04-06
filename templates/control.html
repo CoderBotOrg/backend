@@ -38,17 +38,17 @@
      </div>
     </div>
     <div class="ui-grid-solo">
-     <div class="ui-block-a">
-      <button id="b_camera" class="ui-btn ui-btn-inline ui-icon-camera ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Photo{% endtrans %}</button>
+     <div class="ui-block-a">{%if stream_port%}
+      <button id="b_camera" class="ui-btn ui-btn-inline ui-icon-camera ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Photo{% endtrans %}</button>{%endif%}
      </div>
     </div>
     <div class="ui-grid-solo">
-     <div class="ui-block-a">
+     <div class="ui-block-a">{%if stream_port%}
       <button id="b_video_rec" class="ui-btn ui-btn-inline ui-icon-video ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Rec{% endtrans %}</button>
-      <button id="b_video_stop" class="ui-btn ui-btn-inline ui-icon-cb-stop ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Stop{% endtrans %}</button>
+      <button id="b_video_stop" class="ui-btn ui-btn-inline ui-icon-cb-stop ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Stop{% endtrans %}</button>{%endif%}
      </div>
-     <div class="ui-block-a">
-      <button id="b_photos" class="ui-btn ui-btn-inline ui-icon-grid ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Photos{% endtrans %}</button>
+     <div class="ui-block-a">{%if stream_port%}
+      <button id="b_photos" class="ui-btn ui-btn-inline ui-icon-grid ui-btn-icon-top ui-btn-traslucent" type="button">{% trans %}Photos{% endtrans %}</button>{%endif%}
      </div>
     </div>
    </div>

@@ -225,7 +225,7 @@
           </block>
         </value>
       </block>
-    </category>
+    </category>{%if cam%}
     <category name="{% trans %}Camera{% endtrans %}" colour="120">
       <block type="coderbot_camera_photoTake"></block>
       <block type="coderbot_camera_videoRec"></block>
@@ -251,7 +251,7 @@
       </block>
       <block type="coderbot_adv_findCode"></block>
       <block type="coderbot_sonar_get_distance"></block>
-    </category>
+    </category>{%endif%}
     <category name="{% trans %}Sound{% endtrans %}" colour="220">
       <block type="coderbot_audio_say"></block>
       <block type="coderbot_audio_record"></block>

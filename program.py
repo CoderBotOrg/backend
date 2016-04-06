@@ -141,18 +141,25 @@ class Program:
     try:
       #print "run.1"
       bot = coderbot.CoderBot.get_instance()
-      cam = camera.Camera.get_instance()
       program = self
-      if config.Config.get().get("prog_video_rec") == "true":
-        get_cam().video_rec(program.name)
-        logging.debug("starting video")
+      try:
+	cam = camera.Camera.get_instance()
+        if config.Config.get().get("prog_video_rec") == "true":
+          get_cam().video_rec(program.name)
+          logging.debug("starting video")
+      except:
+        logging.error("Camera not available")
+      
       exec(self._code)
       #print "run.2"
     except RuntimeError as re:
       logging.info("quit: " + str(re))
     finally:
-      get_cam().video_stop() #if video is running, stop it
-      get_motion().stop()
+      try:
+        get_cam().video_stop() #if video is running, stop it
+        get_motion().stop()
+      except:
+        logging.error("Camera not available")
       self._running = False
 
   def as_json(self):
