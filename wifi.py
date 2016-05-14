@@ -11,6 +11,7 @@ import fcntl
 import struct
 import json
 
+
 class WiFi():
 
   CONFIG_FILE = "/etc/coderbot_wifi.conf"
