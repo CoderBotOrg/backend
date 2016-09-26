@@ -24,6 +24,8 @@ import config
 import logging
 import sonar
 
+import mpu
+
 PIN_MOTOR_ENABLE = 22
 PIN_LEFT_FORWARD = 25
 PIN_LEFT_BACKWARD = 24
@@ -80,6 +82,8 @@ class CoderBot:
     self._encoder_cur_right = 0
     self._encoder_target_left = -1
     self._encoder_target_right = -1
+    self._ag = mpu.AccelGyro()
+
   the_bot = None
 
   def exit(self):
@@ -100,6 +104,14 @@ class CoderBot:
 
   def turn(self, speed=100, elapse=-1):
     self.motor_control(speed_left=min(100, max(-100, speed / self._motor_trim_factor)), speed_right=-min(100, max(-100, speed * self._motor_trim_factor)), elapse=elapse)
+
+  def turn_angle(self, speed=100, angle=0):
+    z = self._ag.get_gyro_data()['z']
+    self.turn(speed, elapse=-1)
+    while abs(z - self._ag.get_gyro_data()['z']) < angle:
+      time.sleep(0.05)
+      logging.info(self._ag.get_gyro_data()['z'])
+    self.stop()
 
   def forward(self, speed=100, elapse=-1):
     self.move(speed=speed, elapse=elapse)

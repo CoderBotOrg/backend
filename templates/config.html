@@ -25,6 +25,10 @@
       <label for="i_ctrl_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
       <input type="checkbox" data-role="flipswitch" id="i_ctrl_move_mode" name="ctrl_move_motion" value="yes"{%if config.ctrl_move_motion%} checked{%endif%}>
      </div>
+     <div class="ui-field-contain">
+      <label for="i_ctrl_move_mode_mpu">{% trans %}Movement assisted by Gyroscope{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_ctrl_move_mode_mpu" name="ctrl_move_mpu" value="yes"{%if config.ctrl_move_mpu%} checked{%endif%}>
+     </div>
      <legend>{% trans %}Step timing | distance / angle{% endtrans %}</legend>
      <label for="i_ctrl_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
      <input type="text" id="i_ctrl_fw_speed" name="ctrl_fw_speed" value="{{config.ctrl_fw_speed}}">
@@ -63,6 +67,11 @@
      <div class="ui-field-contain">
       <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
       <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode" name="prog_move_motion" value="yes"{%if config.prog_move_motion%} checked{%endif%}>
+     </div>
+     <div class="ui-field-contain">
+      <label for="i_prog_move_mode_mpu">{% trans %}Movement assisted y Gyroscope{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode_mpu" name="prog_move_mpu" value="yes"{%if config.prog_move_mpu%} checked{%endif%}>
+
      </div>
      <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
      <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">

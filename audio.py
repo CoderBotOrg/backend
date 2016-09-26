@@ -55,7 +55,7 @@ class Audio:
   def __init__(self):
     self.pyaudio = pyaudio.PyAudio()
     try:
-      self.stream_in = self.pyaudio.open(format=FORMAT, channels=1, input_device_index=0, rate=RATE,
+      self.stream_in = self.pyaudio.open(format=FORMAT, channels=1, input_device_index=2, rate=RATE,
         input=True,
         frames_per_buffer=CHUNK_SIZE)
       self.stream_in.start_stream()

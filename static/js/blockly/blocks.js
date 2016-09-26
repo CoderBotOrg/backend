@@ -147,7 +147,8 @@ Blockly.Python['coderbot_turnLeft'] = function(block) {
   // Generate Python for turning left.
   if(CODERBOT_PROG_MOVE_MOTION) {
     return 'get_motion().turn(angle=' + (-CODERBOT_MOV_TR_DEF_ELAPSE) + ')\n';
-
+  } else if(CODERBOT_PROG_MOVE_MPU) {
+    return 'get_bot().turn_angle(speed=' + (-CODERBOT_MOV_TR_DEF_SPEED) + ', angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   } else {
     return 'get_bot().left(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   }
@@ -174,7 +175,8 @@ Blockly.Python['coderbot_turnRight'] = function(block) {
   // Generate Python for turning left or right.
   if(CODERBOT_PROG_MOVE_MOTION) {
     return 'get_motion().turn(angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
-
+  } else if(CODERBOT_PROG_MOVE_MPU) {
+    return 'get_bot().turn_angle(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   } else {
     return 'get_bot().right(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   } 
