@@ -1,1 +1,0 @@
-{"dom_code": "<xml xmlns=\"http://www.w3.org/1999/xhtml\"><block type=\"coderbot_moveForward\" x=\"-675\" y=\"-275\"><next><block type=\"coderbot_moveForward\"></block></next></block></xml>", "code": "get_bot().forward(speed=100, elapse=1)\nget_bot().forward(speed=100, elapse=1)\n", "name": ""}

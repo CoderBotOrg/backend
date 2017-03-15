@@ -6,9 +6,6 @@ $(document).on( "pageshow", '#page-program', function( event, ui ) {
         Blockly.inject(document.getElementById('blocklyDiv'),
             {path: '../../', toolbox: document.getElementById('toolbox'),
              scrollbars:CODERBOT_PROG_SCROLLBARS, maxBlocks:CODERBOT_PROG_MAXBLOCKS});
-        $('.blocklyToolboxDiv').appendTo('#page-program');
-        $('.blocklyTooltipDiv').appendTo('#page-program');
-        $('.blocklyWidgetDiv').appendTo('#page-program');
       }
 
       $('[href="#page-program"]').addClass( "ui-btn-active" );

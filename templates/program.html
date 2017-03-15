@@ -32,7 +32,7 @@
    <!--div class="ui-block-c"><button id="b_end_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-stop" type="button">{% trans %}Stop{% endtrans %}</button></div-->
   </fieldset>
 {%endif%}
-  <div id="blocklyDiv" style="height: 480px; width:100%;"></div>
+  <div id="blocklyDiv" style="height: 480px; left:4px; right:4px;"></div>
   {%include "blocks_"+program_level+".xml"%}
  </div>
  <div data-role="popup" id="dialogRunning" data-history="false" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:680px;">
