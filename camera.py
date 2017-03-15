@@ -155,7 +155,9 @@ class Camera(Thread):
       filename = VIDEO_PREFIX + video_name + self._camera.VIDEO_FILE_EXT;
       filename_thumb = VIDEO_PREFIX + video_name + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
       try:
+        #remove previous file and reference in album
         os.remove(PHOTO_PATH + "/" + filename)
+        self._photos.remove(filename)
       except:
         pass
 
