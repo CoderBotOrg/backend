@@ -35,6 +35,7 @@
 # Pictures taken
 photos/*.jpg
 photos/*.mp4
+photos/*.h264
 
 # Sounds recorded
 sounds/*.wav
