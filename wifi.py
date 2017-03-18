@@ -14,8 +14,8 @@ import json
 class WiFi():
 
   CONFIG_FILE = "/etc/coderbot_wifi.conf"
-  adapters = ["RT5370", "RTL8188CUS"] 
-  hostapds = {"RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"} 
+  adapters = ["default", "RT5370", "RTL8188CUS"] 
+  hostapds = {"default": "hostapd.conf", "RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"} 
   web_url = "http://coderbotsrv.appspot.com/register_ip"
   wifi_client_conf_file = "/etc/wpa_supplicant/wpa_supplicant.conf"
   _config = {}
@@ -99,6 +99,12 @@ network={\n""")
     f.write("}")
 
   @classmethod
+  def set_ap_params(cls, wssid, wpsk):
+    adapter = cls.get_adapter_type()
+    out = os.system("sudo sed -i s/ssid=.*$/ssid=" + wssid + "/ /etc/hostapd/" + cls.hostapds.get(adapter))
+    out = os.system("sudo sed -i s/wpa_passphrase=.*$/wpa_passphrase=" + wpsk + "/ /etc/hostapd/" + cls.hostapds.get(adapter))
+
+  @classmethod
   def set_start_as_client(cls):
     shutil.copy("/etc/network/interfaces_cli", "/etc/network/interfaces")
     cls._config["wifi_mode"] = "client"
@@ -149,7 +155,8 @@ def main():
   if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
     if len(sys.argv) > 2 and sys.argv[2] == "ap":
       w.set_start_as_ap()
-      #w.start_as_ap()
+      if len(sys.argv) > 4:
+        w.set_ap_params(sys.argv[3], sys.argv[4])
     elif len(sys.argv) > 2 and sys.argv[2] == "client":
       if len(sys.argv) > 3:
         w.set_client_params(sys.argv[3], sys.argv[4])

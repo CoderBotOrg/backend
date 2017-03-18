@@ -61,7 +61,7 @@ class Audio:
       self.stream_in.start_stream()
     except:
       logging.info("Audio: input stream not available")
-
+      raise
   def exit(self):
     # cleanup stuff.
     self.stream_in.close()  
