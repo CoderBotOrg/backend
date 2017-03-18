@@ -33,7 +33,7 @@ from program import ProgramEngine, Program
 from config import Config
 
 from flask import Flask, render_template, request, send_file, redirect, Response
-from flask.ext.babel import Babel
+from flask_babel import Babel
 #from flask_sockets import Sockets
 
 logger = logging.getLogger()
