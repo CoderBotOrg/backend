@@ -224,5 +224,7 @@ class CoderBot:
   def reboot(self):
     os.system ('sudo reboot')
 
+  def sleep(self, elapse):
+    time.sleep(elapse)
 
   

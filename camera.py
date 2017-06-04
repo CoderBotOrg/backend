@@ -336,9 +336,3 @@ class Camera(Thread):
     img = self.get_image(0)
     self._image_lock.release()
     return img.grayscale().find_code()
-
-
-  def sleep(self, elapse):
-    logging.debug("sleep: " + str(elapse))
-    time.sleep(elapse)
-
