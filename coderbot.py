@@ -19,6 +19,7 @@
 
 import os
 import time
+import threading
 import pigpio
 import config
 import logging
@@ -40,8 +41,8 @@ PIN_SONAR_2_TRIGGER = 18
 PIN_SONAR_2_ECHO = 8
 PIN_SONAR_3_TRIGGER = 18
 PIN_SONAR_3_ECHO = 23
-PIN_ENCODER_LEFT = 14
-PIN_ENCODER_RIGHT = 15
+PIN_ENCODER_LEFT = 15
+PIN_ENCODER_RIGHT = 14
 
 PWM_FREQUENCY = 100 #Hz
 PWM_RANGE = 100 #0-100
@@ -82,7 +83,11 @@ class CoderBot:
     self._encoder_cur_right = 0
     self._encoder_target_left = -1
     self._encoder_target_right = -1
-    self._ag = mpu.AccelGyro()
+    self._encoder_k_s_1 = 20
+    self._encoder_k_v_1 = 80
+    self._encoder_sem = threading.Condition()
+   
+    #self._ag = mpu.AccelGyro()
 
   the_bot = None
 
@@ -99,11 +104,13 @@ class CoderBot:
       cls.the_bot = CoderBot(servo, motor_trim_factor)
     return cls.the_bot
 
-  def move(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse)
+  def move(self, speed=100, elapse=-1, steps_left=-1, steps_right=-1):
+    self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse, steps_left=steps_left, steps_right=steps_right)
 
-  def turn(self, speed=100, elapse=-1):
-    self.motor_control(speed_left=min(100, max(-100, speed / self._motor_trim_factor)), speed_right=-min(100, max(-100, speed * self._motor_trim_factor)), elapse=elapse)
+  def turn(self, speed=100, elapse=-1, steps=-1):
+    steps_left = steps
+    steps_right = -steps if steps > 0 else -1
+    self.motor_control(speed_left=min(100, max(-100, speed / self._motor_trim_factor)), speed_right=-min(100, max(-100, speed * self._motor_trim_factor)), elapse=elapse, steps_left=steps_left, steps_right=steps_right)
 
   def turn_angle(self, speed=100, angle=0):
     z = self._ag.get_gyro_data()['z']
@@ -139,7 +146,17 @@ class CoderBot:
     self._encoder_cur_right = 0
     self._encoder_target_left = steps_left
     self._encoder_target_right = steps_right
-    
+    self._encoder_dir_left = cmp(speed_left, 0)
+    self._encoder_dir_right = cmp(speed_right, 0)
+    self._encoder_last_tick_time_left = 0
+    self._encoder_last_tick_time_right = 0
+    self._encoder_motor_stopping_left = False
+    self._encoder_motor_stopping_right = False
+    self._encoder_motor_stopped_left = False
+    self._encoder_motor_stopped_right = False
+    if steps_left > 0 or steps_right > 0:
+      self._encoder_sem.acquire()
+
     self._is_moving = True
     if speed_left < 0:
       speed_left = abs(speed_left)
@@ -162,7 +179,11 @@ class CoderBot:
       time.sleep(elapse)
       self.stop()
 
-  def _servo_motor(self, speed_left=100, speed_right=100, elapse=-1):
+    if steps_left > 0 or steps_right > 0:
+      self._encoder_sem.wait()
+      self._encoder_sem.release()
+
+  def _servo_motor(self, speed_left=100, speed_right=100, elapse=-1, steps_left=-1, steps_right=-1):
     self._is_moving = True
     speed_left = -speed_left
 
@@ -206,16 +227,56 @@ class CoderBot:
     self._cb_last_tick[gpio] = 0
 
   def callback(self, gpio, level, tick):
-    if gpio == PIN_ENCODER_LEFT:
+    if gpio == PIN_ENCODER_LEFT and self._encoder_target_left >= 0:
       self._encoder_cur_left += 1
-      if self._encoder_target_left >= self._encoder_cur_left:
+      delta_ticks_left = tick - self._encoder_last_tick_time_left if tick > self._encoder_last_tick_time_left else tick - self._encoder_last_tick_time_left + 4294967295
+      self._encoder_last_tick_time_left = tick
+      self._encoder_speed_left = 1000000.0 / delta_ticks_left #convert speed in steps per second
+      delta_s = self._encoder_speed_left / self._encoder_k_s_1 #delta_s is the delta (in steps)before the target  to reverse the motor in order to arrive at target
+      if (self._encoder_cur_left >= self._encoder_target_left - delta_s and 
+          not self._encoder_motor_stopping_left):
+        self._encoder_motor_stopping_left = True
+        if self._encoder_dir_left > 0:
+          self.pi.write(PIN_LEFT_FORWARD, 0)
+          self.pi.set_PWM_dutycycle(PIN_LEFT_BACKWARD, 100)
+        else:
+          self.pi.set_PWM_dutycycle(PIN_LEFT_FORWARD, 100) 
+	  self.pi.write(PIN_LEFT_BACKWARD, 0)
+      elif (self._encoder_motor_stopped_left == False and
+            ((self._encoder_motor_stopping_left and 
+             self._encoder_speed_left < self._encoder_k_v_1) or
+            (self._encoder_motor_stopping_left and
+             self._encoder_cur_left >= self._encoder_target_left))):
         self.pi.write(PIN_LEFT_FORWARD, 0)
-	self.pi.write(PIN_LEFT_BACKWARD, 0)
-    elif gpio == PIN_ENCODER_RIGHT:
+        self.pi.write(PIN_LEFT_BACKWARD, 0)
+        self._encoder_motor_stopped_left = True
+        self._encoder_check_stopped_and_notify()
+        print "LEFT: " + str(self._encoder_cur_left) + " speed: " + str(self._encoder_speed_left) 
+    elif gpio == PIN_ENCODER_RIGHT and self._encoder_target_right >= 0:
       self._encoder_cur_right += 1
-      if self._encoder_target_right >= self._encoder_cur_right:
+      delta_ticks_right = tick - self._encoder_last_tick_time_right if tick > self._encoder_last_tick_time_right else tick - self._encoder_last_tick_time_right + 4294967295
+      self._encoder_last_tick_time_right = tick
+      self._encoder_speed_right = 1000000.0 / delta_ticks_right #convert speed in steps per second
+      delta_s = self._encoder_speed_right / self._encoder_k_s_1 #delta_s is the delta (in steps)before the target  to reverse the motor in order to arrive at target
+      if (self._encoder_cur_right >= self._encoder_target_right - delta_s and
+          not self._encoder_motor_stopping_right):
+        self._encoder_motor_stopping_right = True
+        if self._encoder_dir_right > 0:
+          self.pi.write(PIN_RIGHT_FORWARD, 0)
+          self.pi.set_PWM_dutycycle(PIN_RIGHT_BACKWARD, 100)
+        else:
+          self.pi.set_PWM_dutycycle(PIN_RIGHT_FORWARD, 100)
+          self.pi.write(PIN_RIGHT_BACKWARD, 0)
+      elif (self._encoder_motor_stopped_right == False and
+            ((self._encoder_motor_stopping_right and 
+             self._encoder_speed_right < self._encoder_k_v_1) or
+            (self._encoder_motor_stopping_right and
+             self._encoder_cur_right >= self._encoder_target_right))):
         self.pi.write(PIN_RIGHT_FORWARD, 0)
-	self.pi.write(PIN_RIGHT_BACKWARD, 0)
+        self.pi.write(PIN_RIGHT_BACKWARD, 0)
+        self._encoder_motor_stopped_right = True
+        self._encoder_check_stopped_and_notify()
+        print "RIGHT: " + str(self._encoder_cur_right) + " speed: " + str(self._encoder_speed_right)
     else:
       cb = self._cb.get(gpio)
       if cb:
@@ -226,6 +287,12 @@ class CoderBot:
           self._cb_last_tick[gpio] = tick
           print "pushed: ", level, tick
           cb()
+ 
+  def _encoder_check_stopped_and_notify(self):
+    if self._encoder_motor_stopped_left and self._encoder_motor_stopped_right:
+      self._encoder_sem.acquire()
+      self._encoder_sem.notify()
+      self._encoder_sem.release()
 
   def halt(self):
     os.system ('sudo halt')
