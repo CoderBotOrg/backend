@@ -216,6 +216,16 @@
             <field name="NUM">1.0</field>
           </block>
         </value>
+        <value name="STEPS_LEFT">
+          <block type="math_number">
+            <field name="NUM">-1</field>
+          </block>
+        </value>
+        <value name="STEPS_RIGHT">
+          <block type="math_number">
+            <field name="NUM">-1</field>
+          </block>
+        </value>
       </block>
       <block type="coderbot_adv_stop"></block>
       <block type="coderbot_sleep">
@@ -250,6 +260,7 @@
         </value>
       </block>
       <block type="coderbot_adv_findCode"></block>
+      <block type="coderbot_adv_find_class"></block>
       <block type="coderbot_sonar_get_distance"></block>
     </category>{%endif%}
     <category name="{% trans %}Sound{% endtrans %}" colour="220">

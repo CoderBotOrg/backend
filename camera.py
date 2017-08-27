@@ -28,6 +28,7 @@ from threading import Thread, Lock
 import logging
 
 from viz import camera, streamer, image, blob
+from cnn_classifier import CNNClassifier
 import config
 
 MAX_IMAGE_AGE = 0.0
@@ -72,6 +73,8 @@ class Camera(Thread):
       for filename in filenames:
         if (PHOTO_PREFIX in filename or VIDEO_PREFIX in filename) and PHOTO_THUMB_SUFFIX not in filename:
           self._photos.append(filename)
+
+    self._cnn_classifier = CNNClassifier("models/applekiwi.pb", "models/applekiwi.txt", "input", "final_result", 128, 128, 0.0, 255.0)
    
     super(Camera, self).__init__()
 
@@ -337,6 +340,13 @@ class Camera(Thread):
     self._image_lock.release()
     return img.grayscale().find_code()
 
+  def find_class(self):
+    self._image_lock.acquire()
+    img = self.get_image(0)
+    self._image_lock.release()
+    classes = self._cnn_classifier.classify_image(img.mat())
+    s_classes = sorted(classes.items(), key=lambda x: x[1])
+    return s_classes[-1][0]
 
   def sleep(self, elapse):
     logging.debug("sleep: " + str(elapse))

@@ -104,13 +104,17 @@ class CoderBot:
       cls.the_bot = CoderBot(servo, motor_trim_factor)
     return cls.the_bot
 
-  def move(self, speed=100, elapse=-1, steps_left=-1, steps_right=-1):
-    self.motor_control(speed_left=min(100, max(-100, speed * self._motor_trim_factor)), speed_right=min(100, max(-100, speed / self._motor_trim_factor)), elapse=elapse, steps_left=steps_left, steps_right=steps_right)
+  def move(self, speed=100, elapse=-1, steps=-1):
+    speed_left = min(100, max(-100, speed * self._motor_trim_factor))
+    speed_right = min(100, max(-100, speed / self._motor_trim_factor))
+    self.motor_control(speed_left=speed_left, speed_right=speed_right, elapse=elapse, steps_left=steps, steps_right=steps)
 
   def turn(self, speed=100, elapse=-1, steps=-1):
     steps_left = steps
-    steps_right = -steps if steps > 0 else -1
-    self.motor_control(speed_left=min(100, max(-100, speed / self._motor_trim_factor)), speed_right=-min(100, max(-100, speed * self._motor_trim_factor)), elapse=elapse, steps_left=steps_left, steps_right=steps_right)
+    steps_right = -steps if steps >= 0 else -1
+    speed_left = min(100, max(-100, speed * self._motor_trim_factor))
+    speed_right = -min(100, max(-100, speed / self._motor_trim_factor))
+    self.motor_control(speed_left=speed_left, speed_right=speed_right, elapse=elapse, steps_left=steps, steps_right=steps)
 
   def turn_angle(self, speed=100, angle=0):
     z = self._ag.get_gyro_data()['z']
@@ -154,7 +158,7 @@ class CoderBot:
     self._encoder_motor_stopping_right = False
     self._encoder_motor_stopped_left = False
     self._encoder_motor_stopped_right = False
-    if steps_left > 0 or steps_right > 0:
+    if steps_left >= 0 or steps_right >= 0:
       self._encoder_sem.acquire()
 
     self._is_moving = True
@@ -179,7 +183,7 @@ class CoderBot:
       time.sleep(elapse)
       self.stop()
 
-    if steps_left > 0 or steps_right > 0:
+    if steps_left >= 0 or steps_right >= 0:
       self._encoder_sem.wait()
       self._encoder_sem.release()
 

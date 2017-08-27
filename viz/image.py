@@ -61,6 +61,9 @@ class Image():
     def size(self):
       return self._data.shape
 
+    def mat(self):
+      return self._data
+
     @classmethod
     def load(cls, filename):
       return Image(cv2.imread(filename))
@@ -261,4 +264,6 @@ class Image():
       ret, jpeg_array = cv2.imencode('.jpeg', self._data)
       return np.array(jpeg_array).tostring()
 
-
+    def to_rgb(self):
+      rgb_img = cv2.cvtColor(self._data, cv2.COLOR_BGR2RGB)
+      return rgb_img

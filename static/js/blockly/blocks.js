@@ -357,6 +357,12 @@ Blockly.Blocks['coderbot_adv_motor'] = {
     this.appendValueInput('ELAPSE')
         .setCheck('Number')
         .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_ELAPSE);
+    this.appendValueInput('STEPS_LEFT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_STEPS_LEFT);
+    this.appendValueInput('STEPS_RIGHT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_STEPS_RIGHT);
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -374,7 +380,9 @@ Blockly.Python['coderbot_adv_motor'] = function(block) {
   var speed_left = Blockly.Python.valueToCode(block, 'SPEED_LEFT', Blockly.Python.ORDER_NONE);
   var speed_right = Blockly.Python.valueToCode(block, 'SPEED_RIGHT', Blockly.Python.ORDER_NONE);
   var elapse = Blockly.Python.valueToCode(block, 'ELAPSE', Blockly.Python.ORDER_NONE);
-  var code = "get_bot().motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", elapse=" + elapse + ")\n";
+  var steps_left = Blockly.Python.valueToCode(block, 'STEPS_LEFT', Blockly.Python.ORDER_NONE);
+  var steps_right = Blockly.Python.valueToCode(block, 'STEPS_RIGHT', Blockly.Python.ORDER_NONE);
+  var code = "get_bot().motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", elapse=" + elapse + ", steps_left=" + steps_left + ", steps_right=" + steps_right + ")\n";
   return code;
 };
 
@@ -682,6 +690,28 @@ Blockly.Python['coderbot_adv_findLogo'] = function(block) {
   // Boolean values true and false.
   var code = 'get_cam().find_logo()';
   return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_find_class'] = {
+  /**
+   * Block for find_class function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(250);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCLASS);
+    this.setOutput(true, 'String');
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_find_class'] = function(block) {
+  // Boolean values true and false.
+  var name = 'get_cam().find_class()';
+  return [name, Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.Blocks['coderbot_audio_record'] = {
