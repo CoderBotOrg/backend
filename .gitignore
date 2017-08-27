@@ -47,6 +47,9 @@ logs/*.log.*
 # User programs
 data/*.data
 
+# CNN Models
+models/*
+
 # Tutorial
 static/blockly-tutorial
 
