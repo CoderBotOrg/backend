@@ -74,7 +74,7 @@ class Camera(Thread):
         if (PHOTO_PREFIX in filename or VIDEO_PREFIX in filename) and PHOTO_THUMB_SUFFIX not in filename:
           self._photos.append(filename)
 
-    self._cnn_classifier = CNNClassifier("cnn_models/applekiwi.pb", "cnn_models/applekiwi.txt", "input", "final_result", 128, 128, 0.0, 255.0)
+    self._cnn_classifier = CNNClassifier("cnn_models/applekiwi_1_128.pb", "cnn_models/applekiwi.txt", "input", "final_result", 128, 128, 0.0, 255.0)
    
     super(Camera, self).__init__()
 
