@@ -136,6 +136,31 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 });
                 return false;
 	});
+	$( "#popup-cnn-models" ).bind({
+   		popupbeforeposition: function(event, ui) {
+			$.get(url='/cnnmodels', success= function(data) {
+				$('#cnn-model-list').empty();
+				for(m in data) {
+					console.log(m);
+					$('#cnn-model-list').append('<li data-icon="delete"><a href="#">'+m+' [' + data[m].status +']</a></li>');
+				}
+				$('#cnn-model-list').listview('refresh');
+			}, dataType='json')
+		}
+	});
+        $( "#f_cnn_train" ).submit(function (){
+			var form = $(event.target);
+                        var data = {architecture: form.find("#i_cnn_model_arch").val(),
+				model_name: form.find("#i_cnn_model_name").val(),
+				training_steps: form.find("#i_cnn_train_steps").val(),
+				training_rate: form.find("#i_cnn_learn_rate").val(),
+				image_tags: ["apple", "kiwi", "other"]};
+			console.log(data);
+                        $.post(url='/cnnmodels', data=JSON.stringify(data), success=function(data) {
+					alert("training...");
+                                }, dataType='json');
+			return false;
+        });
         $('#b_wifi_apply').on("click", function (){
                 var form_data = $(this).parents("form").serialize();
                 $.post(url='/wifi', form_data);
@@ -172,17 +197,31 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 		}
         });
 });
+var tags = [];
 
 $(document).on( "pageshow", '#page-photos', function( event ) {
 	var media_list = $('#media').empty();
 	$.get(url='/photos', success=function(data){
-                for( p in data) {
+		tags = [];
+		for(p in data) {
 			var media = data[p];
-			var media_name = media.substring(0, media.indexOf('.'));
-			var media_thumb = media_name + '_thumb.jpg';
-			var media_type = media.indexOf('jpg') > 0 ? 'photo' : 'video';
-			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><div class="ui-content-hud" style="position:absolute;"></div><p class="p_photo_cmd" style="display:none;"><span>' + media_name + '</span><br/><button class="ui-btn ui-btn-inline ui-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
+			if(media.tag && tags.indexOf(media.tag)<0) {
+				tags.push(media.tag);
+			}
 		}
+                for(p in data) {
+			var media = data[p];
+			media.thumb = media.name.replace('.jpg', '_thumb.jpg');
+			media.type = media.name.indexOf('jpg') > 0 ? 'photo' : 'video';
+                        var tags_select = '<select class="s_media_tag" data-mini="true">';
+			tags_select += '<option value=""' + (media.tag ? '' : ' selected') + '></option>';
+                        for(t in tags) {
+                          tags_select += ('<option value="' + tags[t] + '"'  + (media.tag == tags[t] ? " selected" : "") + '>'+tags[t]+'</option>');
+			}
+			tags_select += '<option value="new" class="o_new">new...</option></select>';
+			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media.type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline a_media_thumb"><img class="ui-li-thumb" data-src="' + media.name + '" src="/photos/' + media.thumb + '"></a><div class="ui-content-hud" style=""><p class="p_photo_cmd" style="display:none;"><span>' + media.name + '</span><br/><button class="ui-btn ui-btn-inline ui-mini ui-icon-delete ui-btn-icon-left ui-corner-all b_photo_delete">' + BotMessages.DeletePhoto + '</button>' + tags_select + '</p></div></li>');
+		}
+
 $('li.ui-li-has-thumb').hover( function( event ) {
 	$(this).find('.p_photo_cmd').show();
 }, function( event ) {
@@ -191,10 +230,30 @@ $('li.ui-li-has-thumb').hover( function( event ) {
 $('video').on('loadeddata', function( event, ui ) {
         $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );
 });
+$('select.s_media_tag').change(function (e) {
+	var select = $(e.target);
+	var image = select.parents('li').find('img').attr('data-src');
+	var tag_name = select.find('option:selected').text();
+        if(tag_name == "new...") {
+		while(true) {
+			tag_name = prompt("Enter a new tag:", "");
+			if(tags.indexOf(tag_name)>=0) {
+				alert("Tag already exists");
+			} else {
+				$('<option value="' + tag_name + '">' + tag_name +'</option>').insertBefore('option.o_new');
+				select.find('option').removeAttr('selected');
+				select.find('option[value="'+tag_name+'"]').attr('selected', true);
+				break;
+			}
+		}
+	}
+	var data = {tag: tag_name};
+	$.ajax(url="/photos/"+image, {method:"PUT", data:JSON.stringify(data), dataType:'json'});
+});
         }, dataType="json");       
 });
 
-$(document).on( "click", 'a[data-rel="popup"]', function( event ) {
+$(document).on( "click", 'a.a_media_thumb[data-rel="popup"]', function( event ) {
 	var src = "/photos/" + $(this).find('img').attr('data-src');
         $('#popup-photo').find('img').attr('src', src);
         $('#popup-video').find('video').attr('src', src);
@@ -205,13 +264,20 @@ $(document).on( "click", '.b_photo_delete', function( event ) {
         var li = $(this).parents('li');
 	var src = "/photos/" + li.find('img').attr('data-src');
 	if(confirm(BotMessages.DeletePhotoConfirm + src + " ?")) {
-        	$.post(url=src, data={'cmd':'delete'}, success=function(data){
+        	$.ajax(url=src, type="DELETE", success=function(data){
 			li.remove();
                         ul.listview('refresh');
         	});
 	}
         event.preventDefault();
 });
+
+$(document).on( "click", '.b_photo_prop', function( event ) {
+        var li = $(this).parents('li');
+        $('popup-picprop').popup("open");
+        event.preventDefault();
+});
+
 
 Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
 	$.mobile.pageContainer.pagecontainer('change', '#page-preferences');

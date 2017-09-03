@@ -11,7 +11,7 @@
       <li><a href="#t_control" class="ui-btn-active" data-ajax="true">{% trans %}Control{% endtrans %}</a></li>
       <li><a href="#t_programming" data-ajax="true">{% trans %}Programming{% endtrans %}</a></li>
       <li><a href="#t_sound" data-ajax="true">{% trans %}Sounds{% endtrans %}</a></li>
-      <li><a href="#t_sensor" data-ajax="true">{% trans %}Sensor{% endtrans %}</a></li>
+      <li><a href="#t_sensor" data-ajax="true">{% trans %}Camera{% endtrans %}</a></li>
       <li><a href="#t_movement" data-ajax="true">{% trans %}Movement{% endtrans %}</a></li>
       <li><a href="#t_start" data-ajax="true">{% trans %}Start{% endtrans %}</a></li>
       <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
@@ -122,6 +122,10 @@
     <input type="text" id="i_camera_color_object_size_min" name="camera_color_object_size_min" value="{{config.camera_color_object_size_min}}">
     <label for="i_camera_color_object_size_max">{% trans %}Color object max size{% endtrans %}</label>
     <input type="text" id="i_camera_color_object_size_max" name="camera_color_object_size_max" value="{{config.camera_color_object_size_max}}">
+    <a href="#popup-cnn-models" data-rel="popup" id="b_cnn_model_manage" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Manage CNN Models{% endtrans %}</a>
+     <label for="i_cnn_default_model">{% trans %}Default CNN Model{% endtrans %}</label>
+     <select name="cnn_default_model" id="i_cnn_default_model" value="{{config.cnn_default_model}}">
+     </select>
     </div>
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>
@@ -228,6 +232,30 @@
    <p>{% trans %}Update log (it may require several minutes){% endtrans %}:</p>
    <textarea readonly=true cols="80" rows="20" style="overflow-y: scroll; height: 100px; resize: none; " id="i_update_system_log"></textarea>
    <a href="#" id="b_update_system_close" data-rel="back" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini ui-disabled">{% trans %}Close{% endtrans %}</a>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-cnn-models" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="true" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}CNN Models{% endtrans %}</h3>
+   <ul data-role="listview" data-inset="true" id="cnn-model-list">
+   </ul>
+   <h3>{% trans %}Train new CNN Model{% endtrans %}</h3>
+    <form id="f_cnn_train" action="#">
+     <label for="i_cnn_model_arch">{% trans %}Model architecture{% endtrans %}</label>
+     <select name="cnn_model_arch" id="i_cnn_model_arch" value="">
+       <option value="mobilenet_1.0_128">MobileNet 1.0 128</option>
+       <option value="mobilenet_0.75_128">MobileNet 0.75 128</option>
+       <option value="mobilenet_0.50_128">MobileNet 0.50 128</option>
+       <option value="mobilenet_0.25_128">MobileNet 0.25 128</option>
+     </select>
+     <label for="i_cnn_model_name">{% trans %}Model name{% endtrans %}</label>
+     <input type="text" id="i_cnn_model_name" name="cnn_model_name" value="">
+     <label for="i_cnn_model_train_steps">{% trans %}Training steps{% endtrans %}</label>
+     <input type="text" id="i_cnn_train_steps" name="cnn_train_steps" value="50">
+     <label for="i_cnn_learn_rate">{% trans %}Learning rate{% endtrans %}</label>
+     <input type="text" id="i_cnn_learn_rate" name="cnn_learn_rate" value="0.01">
+     <button class="ui-btn b_train_new_cnn_model">Train new Model</button>
+   </form>
   </div>
  </div>
 </div>

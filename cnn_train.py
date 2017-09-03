@@ -149,7 +149,7 @@ class CNNTrainer:
     self.model_info = self.create_model_info(self.architecture)
     if not self.model_info:
       tf.logging.error('Did not recognize architecture flag')
-      raise
+      raise Exception("Did not recognize architecture flag'")
 
     # Set up the pre-trained graph.
     self.maybe_download_and_extract(self.model_info['data_url'])
@@ -1167,9 +1167,9 @@ class CNNTrainer:
 
 
 if __name__ == '__main__':
-  cnn_trainer = CNNTrainer("mobilenet_1.0_128")
+  cnn_trainer = CNNTrainer("mobilenet_0.50_128")
   cnn_trainer.retrain(
               image_dir="/home/pi/tensorflow/data/applekiwi",
-              output_graph="./cnn_test_1",
+              output_graph="./cnn_models/applewiki_0_5_128.pb",
               training_steps=10,
               learning_rate=0.1)

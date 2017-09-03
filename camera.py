@@ -22,17 +22,19 @@ import copy
 import os
 import sys
 import math
+import json
 from PIL import Image as PILImage
 from StringIO import StringIO
 from threading import Thread, Lock
 import logging
 
-from viz import camera, streamer, image, blob
+from cv import camera, streamer, image, blob
 from cnn_classifier import CNNClassifier
 import config
 
 MAX_IMAGE_AGE = 0.0
 PHOTO_PATH = "./photos"
+PHOTO_METADATA_FILE = "./photos/metadata.json"
 PHOTO_PREFIX = "DSC"
 VIDEO_PREFIX = "VID"
 PHOTO_THUMB_SUFFIX = "_thumb"
@@ -68,13 +70,16 @@ class Camera(Thread):
     self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
     self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
     self._photos = []
-   
-    for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
-      for filename in filenames:
-        if (PHOTO_PREFIX in filename or VIDEO_PREFIX in filename) and PHOTO_THUMB_SUFFIX not in filename:
-          self._photos.append(filename)
+    self.load_photo_metadata()
+    if len(self._photos) == 0:
+      self._photos = []
+      for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
+        for filename in filenames:
+          if (PHOTO_PREFIX in filename or VIDEO_PREFIX in filename) and PHOTO_THUMB_SUFFIX not in filename:
+            self._photos.append({'name': filename})
+      self.save_photo_metadata()
 
-    self._cnn_classifier = CNNClassifier("cnn_models/applekiwi_1_128.pb", "cnn_models/applekiwi.txt", "input", "final_result", 128, 128, 0.0, 255.0)
+    self._cnn_classifier = CNNClassifier("cnn_models/applekiwi_0_5_128.pb", "cnn_models/applekiwi_0_5_128.txt", "input", "final_result", 128, 128, 0.0, 255.0)
    
     super(Camera, self).__init__()
 
@@ -118,6 +123,25 @@ class Camera(Thread):
   def set_text(self, text):
     self._camera.set_overlay_text(str(text))
 
+  def load_photo_metadata(self):
+    try:
+      f = open(PHOTO_METADATA_FILE)
+      self._photos = json.load(f)
+      f.close()
+    except IOError:
+      logging.warning("no metadata file")
+
+  def save_photo_metadata(self):
+    f = open(PHOTO_METADATA_FILE, "w")
+    json.dump(self._photos, f)
+    f.close()
+
+  def update_photo(self, photo):
+    for p in self._photos:
+      if p["name"] == photo["name"]:
+        p["tag"] = photo["tag"]
+    self.save_photo_metadata()
+
   def get_next_photo_index(self):
     last_photo_index = 0
     for p in self._photos:
@@ -140,7 +164,8 @@ class Camera(Thread):
     # thumb
     im_pil = PILImage.open(StringIO(im_str)) 
     im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
-    self._photos.append(filename)
+    self._photos.append({"name":filename})
+    self.save_photo_metadata()
 
   def is_recording(self):
     return self.recording
@@ -160,7 +185,7 @@ class Camera(Thread):
       try:
         #remove previous file and reference in album
         os.remove(PHOTO_PATH + "/" + filename)
-        self._photos.remove(filename)
+        self._photos.remove({"name":filename})
       except:
         pass
 
@@ -168,7 +193,8 @@ class Camera(Thread):
     im_str = self._camera.get_image_jpeg()
     im_pil = PILImage.open(StringIO(im_str)) 
     im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
-    self._photos.append(filename)
+    self._photos.append({"name":filename})
+    self.save_photo_metadata()
     self._camera.video_rec(PHOTO_PATH + "/" + filename)
     self.video_start_time = time.time()
 
@@ -190,7 +216,10 @@ class Camera(Thread):
     logging.info("delete photo: " + filename)
     os.remove(PHOTO_PATH + "/" + filename)
     os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
-    self._photos.remove(filename)
+    for photo in self._photos:
+      if photo["name"] == filename:
+      	self._photos.remove(photo)
+    self.save_photo_metadata()
 
   def exit(self):
     #self._streamer.server.shutdown()

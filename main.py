@@ -31,8 +31,9 @@ from motion import Motion
 from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
+from cnn_manager import CNNManager
 
-from flask import Flask, render_template, request, send_file, redirect, Response
+from flask import Flask, render_template, request, send_file, redirect, Response, jsonify
 from flask_babel import Babel
 #from flask_sockets import Sockets
 
@@ -47,6 +48,7 @@ bot = None
 cam = None
 motion = None
 audio = None
+cnn = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -201,7 +203,7 @@ def handle_photos():
     return json.dumps(cam.get_photo_list())
 
 @app.route("/photos/<filename>", methods=["GET"])
-def handle_photo(filename):
+def handle_photo_get(filename):
     logging.info("photo")
     mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
     video = None
@@ -212,7 +214,16 @@ def handle_photo(filename):
 
     return send_file(video, mimetype.get(filename[:-3],'image'), cache_timeout=0)
 
-@app.route("/photos/<filename>", methods=["POST"])
+@app.route("/photos/<filename>", methods=["PUT"])
+def handle_photo_put(filename):
+    logging.info("photo update")
+    data = request.get_data()
+    logging.info(data);
+    data = json.loads(data)
+    cam.update_photo({"name": filename, "tag":data["tag"]});
+    return jsonify({"res":"ok"}) 
+
+@app.route("/photos/<filename>", methods=["DELETE"])
 def handle_photo_cmd(filename):
     logging.debug("photo delete")
     cam.delete_photo(filename)
@@ -276,9 +287,38 @@ def handle_program_status():
       prog = app.prog
     return json.dumps({'name': prog.name, "running": prog.is_running()}) 
 
-@app.route("/tutorial")
-def handle_tutorial():
-    return redirect("/blockly-tutorial/apps/index.html", code=302)
+@app.route("/cnnmodels", methods=["GET"])
+def handle_cnn_models_list():
+    logging.info("cnn_models_list")
+    return json.dumps(app.cnn.get_models())
+
+@app.route("/cnnmodels", methods=["POST"])
+def handle_cnn_models_new():
+    logging.info("cnn_models_new")
+    data = json.loads(request.get_data())
+    app.cnn.train_new_model(model_name=data["model_name"],
+                        architecture=data["architecture"],
+                        image_tags=data["image_tags"],
+                        photos_meta=cam.get_photo_list(),
+                        training_steps=data["training_steps"],
+                        learning_rate=data["training_rate"])
+
+    return json.dumps({"name": data["model_name"], "status": 0})
+
+@app.route("/cnnmodels/<model_name>", methods=["GET"])
+def handle_cnn_models_status(model_name):
+    logging.info("cnn_models_status")
+    model_status = app.cnn.get_model(model_name=model_name)
+
+    return json.dumps(model_status)
+
+@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
+def handle_cnn_models_delete(model_name):
+    logging.info("cnn_models_delete")
+    model_status = app.cnn.delete_model(model_name=model_name)
+
+    return json.dumps(model_status)
+
 
 def execute(command):
   process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -303,6 +343,7 @@ def run_server():
   global cam
   global motion
   global audio
+  global cnn
   try:
     try:
       app.bot_config = Config.read()
@@ -314,7 +355,10 @@ def run_server():
         #motion = Motion.get_instance()
       except picamera.exc.PiCameraError:
         logging.error("Camera not present")
-      
+
+      cnn = CNNManager.get_instance()
+      app.cnn = cnn
+
       if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
         app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
         app.prog.execute()
