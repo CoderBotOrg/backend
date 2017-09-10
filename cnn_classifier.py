@@ -119,13 +119,13 @@ class CNNClassifier:
                                       input_mean=input_mean,
                                       input_std=input_std)
 
-        logging.info( "time.norm: " + str(time.time() - s_t))
+        #logging.info( "time.norm: " + str(time.time() - s_t))
         s_t = time.time()
 
         results = self._session.run(self._output_operation.outputs[0],
                                         {self._input_operation.outputs[0]: t})
 
-        logging.info( "time.cls: " + str(time.time() - s_t))
+        #logging.info( "time.cls: " + str(time.time() - s_t))
 
         results = np.squeeze(results)
 
@@ -133,4 +133,5 @@ class CNNClassifier:
         for i in results.argsort():
             pairs[self._labels[i]] = results[i]
 
+	#logging.info(pairs)
         return pairs
