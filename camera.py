@@ -29,7 +29,9 @@ from threading import Thread, Lock
 import logging
 
 from cv import camera, streamer, image, blob
-from cnn_classifier import CNNClassifier
+
+from cnn_manager import CNNManager
+
 import config
 
 MAX_IMAGE_AGE = 0.0
@@ -79,7 +81,9 @@ class Camera(Thread):
             self._photos.append({'name': filename})
       self.save_photo_metadata()
 
-    self._cnn_classifier = CNNClassifier("cnn_models/applekiwi_0_5_128.pb", "cnn_models/applekiwi_0_5_128.txt", "input", "final_result", 128, 128, 0.0, 255.0)
+    cnn_model = config.Config.get().get("cnn_default_model", "")
+    if cnn_model != "":
+      self._cnn_classifier = CNNManager.get_instance().load_model(cnn_model)
    
     super(Camera, self).__init__()
 

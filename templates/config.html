@@ -241,6 +241,10 @@
    </ul>
    <h3>{% trans %}Train new CNN Model{% endtrans %}</h3>
     <form id="f_cnn_train" action="#">
+     <label for="i_cnn_model_name">{% trans %}Model name{% endtrans %}</label>
+     <input type="text" id="i_cnn_model_name" name="cnn_model_name" value="">
+     <label for="i_cnn_image_tags">{% trans %}Image tags{% endtrans %}</label>
+     <input type="text" id="i_cnn_image_tags" name="cnn_image_tags" value="">
      <label for="i_cnn_model_arch">{% trans %}Model architecture{% endtrans %}</label>
      <select name="cnn_model_arch" id="i_cnn_model_arch" value="">
        <option value="mobilenet_1.0_128">MobileNet 1.0 128</option>
@@ -248,8 +252,6 @@
        <option value="mobilenet_0.50_128">MobileNet 0.50 128</option>
        <option value="mobilenet_0.25_128">MobileNet 0.25 128</option>
      </select>
-     <label for="i_cnn_model_name">{% trans %}Model name{% endtrans %}</label>
-     <input type="text" id="i_cnn_model_name" name="cnn_model_name" value="">
      <label for="i_cnn_model_train_steps">{% trans %}Training steps{% endtrans %}</label>
      <input type="text" id="i_cnn_train_steps" name="cnn_train_steps" value="50">
      <label for="i_cnn_learn_rate">{% trans %}Learning rate{% endtrans %}</label>

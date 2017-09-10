@@ -24,7 +24,7 @@ import numpy as np
 import tensorflow as tf
 
 class CNNClassifier:
-    def __init__(self, model_file, label_file, input_layer="input", output_layer="final_output", input_height=128, input_width=128, input_mean=127.5, input_std=127.5):
+    def __init__(self, model_file, label_file, input_layer="input", output_layer="final_result", input_height=128, input_width=128, input_mean=127.5, input_std=127.5):
         self._graph = self.load_graph(model_file)
         self._labels = self.load_labels(label_file)
         input_name = "import/" + input_layer

@@ -122,7 +122,8 @@ MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1  # ~134M
 
 
 class CNNTrainer:
-  def __init__(self, architecture):
+  def __init__(self, manager, architecture):
+    self.manager = manager
     self.architecture=architecture
     self.intermediate_output_graphs_dir = "/tmp/intermediate_graph/"
     self.intermediate_store_frequency = 0
@@ -294,6 +295,8 @@ class CNNTrainer:
           tf.logging.info('Save intermediate result to : ' +
                           intermediate_file_name)
           self.save_graph_to_file(sess, self.graph, intermediate_file_name, final_tensor_name)
+
+        self.manager.save_model_status(output_graph[output_graph.rfind("/")+1:], self.architecture, i / training_steps)
 
       # We've completed all our training, so run a final test evaluation on
       # some new images we haven't used before.

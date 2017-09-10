@@ -136,15 +136,36 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 });
                 return false;
 	});
+        $.get(url='/cnnmodels', success= function(data) {
+        	$('#i_cnn_default_model').empty();
+		$('#i_cnn_default_model').append('<option></option>');
+		for(m in data) {
+			if(Math.trunc(parseInt(data[m].status))==1){
+				$('#i_cnn_default_model').append('<option value="'+m+'">'+m+'</option>');
+			}
+		}
+		$('#i_cnn_default_model').selectmenu("refresh");
+
+	}, dataType="json");
 	$( "#popup-cnn-models" ).bind({
    		popupbeforeposition: function(event, ui) {
 			$.get(url='/cnnmodels', success= function(data) {
 				$('#cnn-model-list').empty();
 				for(m in data) {
-					console.log(m);
-					$('#cnn-model-list').append('<li data-icon="delete"><a href="#">'+m+' [' + data[m].status +']</a></li>');
+					$('#cnn-model-list').append('<li data-icon="delete"><a href="#" data-name="'+m+'" class="b_cnn_model_delete">'+m+' [' + Math.trunc(parseFloat(data[m].status) * 100) +'%]</a></li>');
 				}
 				$('#cnn-model-list').listview('refresh');
+                                $('.b_cnn_model_delete').on('click', function(event, ui) {
+					var model_name = $(event.target).attr("data-name");
+					if(confirm("Delete model " + model_name + "?")) {
+						$.ajax({url:'/cnnmodels/'+model_name, method: "DELETE", success: function(data) {
+							console.log("model_name: " + model_name);
+							$('#cnn-model-list a[data-name="' + model_name + '"]').parent().remove();
+ 							$('#cnn-model-list').listview('refresh');
+							}
+						});
+					}
+				});
 			}, dataType='json')
 		}
 	});
@@ -152,9 +173,9 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 			var form = $(event.target);
                         var data = {architecture: form.find("#i_cnn_model_arch").val(),
 				model_name: form.find("#i_cnn_model_name").val(),
-				training_steps: form.find("#i_cnn_train_steps").val(),
-				training_rate: form.find("#i_cnn_learn_rate").val(),
-				image_tags: ["apple", "kiwi", "other"]};
+				training_steps: parseInt(form.find("#i_cnn_train_steps").val()),
+				learning_rate: parseFloat(form.find("#i_cnn_learn_rate").val()),
+				image_tags: form.find("#i_cnn_image_tags").val().split(",")};
 			console.log(data);
                         $.post(url='/cnnmodels', data=JSON.stringify(data), success=function(data) {
 					alert("training...");

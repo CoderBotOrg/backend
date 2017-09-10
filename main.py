@@ -290,32 +290,32 @@ def handle_program_status():
 @app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():
     logging.info("cnn_models_list")
-    return json.dumps(app.cnn.get_models())
+    return json.dumps(cnn.get_models())
 
 @app.route("/cnnmodels", methods=["POST"])
 def handle_cnn_models_new():
     logging.info("cnn_models_new")
     data = json.loads(request.get_data())
-    app.cnn.train_new_model(model_name=data["model_name"],
+    cnn.train_new_model(model_name=data["model_name"],
                         architecture=data["architecture"],
                         image_tags=data["image_tags"],
                         photos_meta=cam.get_photo_list(),
                         training_steps=data["training_steps"],
-                        learning_rate=data["training_rate"])
+                        learning_rate=data["learning_rate"])
 
     return json.dumps({"name": data["model_name"], "status": 0})
 
 @app.route("/cnnmodels/<model_name>", methods=["GET"])
 def handle_cnn_models_status(model_name):
     logging.info("cnn_models_status")
-    model_status = app.cnn.get_model(model_name=model_name)
+    model_status = cnn.get_model(model_name=model_name)
 
     return json.dumps(model_status)
 
 @app.route("/cnnmodels/<model_name>", methods=["DELETE"])
 def handle_cnn_models_delete(model_name):
     logging.info("cnn_models_delete")
-    model_status = app.cnn.delete_model(model_name=model_name)
+    model_status = cnn.delete_model(model_name=model_name)
 
     return json.dumps(model_status)
 
@@ -357,8 +357,15 @@ def run_server():
         logging.error("Camera not present")
 
       cnn = CNNManager.get_instance()
-      app.cnn = cnn
-
+      """
+      cnn.train_new_model(model_name="test3",
+                        architecture="mobilenet_0.25_128",
+                        image_tags=["apple", "kiwi", "other"],
+                        photos_meta=cam.get_photo_list(),
+                        training_steps=10,
+                        learning_rate=0.1)
+      logging.info("trained")
+      """
       if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
         app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
         app.prog.execute()
