@@ -139,12 +139,13 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
         $.get(url='/cnnmodels', success= function(data) {
         	$('#i_cnn_default_model').empty();
 		$('#i_cnn_default_model').append('<option></option>');
+		var def_model = $('#i_cnn_default_model').attr("value");
 		for(m in data) {
 			if(Math.trunc(parseInt(data[m].status))==1){
 				$('#i_cnn_default_model').append('<option value="'+m+'">'+m+'</option>');
 			}
 		}
-		$('#i_cnn_default_model').selectmenu("refresh");
+		$('#i_cnn_default_model').val(def_model).selectmenu("refresh");
 
 	}, dataType="json");
 	$( "#popup-cnn-models" ).bind({

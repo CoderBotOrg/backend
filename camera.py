@@ -150,7 +150,7 @@ class Camera(Thread):
     last_photo_index = 0
     for p in self._photos:
       try:
-        index = int(p[len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
+        index = int(p["name"][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
         if index > last_photo_index:
           last_photo_index = index
       except:
