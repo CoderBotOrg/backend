@@ -81,9 +81,11 @@ class Camera(Thread):
             self._photos.append({'name': filename})
       self.save_photo_metadata()
 
+    self._cnn_classifiers = {}
     cnn_model = config.Config.get().get("cnn_default_model", "")
     if cnn_model != "":
-      self._cnn_classifier = CNNManager.get_instance().load_model(cnn_model)
+      self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
+      self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
    
     super(Camera, self).__init__()
 
@@ -373,13 +375,25 @@ class Camera(Thread):
     self._image_lock.release()
     return img.grayscale().find_code()
 
-  def find_class(self):
+  def cnn_classify(self, model_name=None):
+    classifier = None
+    if model_name:
+      classifier = self._cnn_classifiers.get(model_name)
+      if classifier is None:
+        classifier = CNNManager.get_instance().load_model(model_name)
+        self._cnn_classifiers[model_name] = classifier
+    else:
+      classifier = self._cnn_classifier_default
+
     self._image_lock.acquire()
     img = self.get_image(0)
     self._image_lock.release()
-    classes = self._cnn_classifier.classify_image(img.mat())
-    s_classes = sorted(classes.items(), key=lambda x: x[1])
-    return s_classes[-1][0]
+    classes = classifier.classify_image(img.mat())
+    s_classes = sorted(classes.items(), key=lambda x: x[1], reverse=True)
+    return s_classes
+
+  def find_class(self):
+    return self.cnn_classify()[0][0]
 
   def sleep(self, elapse):
     logging.debug("sleep: " + str(elapse))

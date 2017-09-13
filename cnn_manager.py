@@ -46,8 +46,11 @@ class CNNManager:
 
   def delete_model(self, model_name):
     if self._models.get(model_name):
-      os.remove(MODEL_PATH + "/" + model_name + ".pb")
-      os.remove(MODEL_PATH + "/" + model_name + ".txt")
+      try:
+        os.remove(MODEL_PATH + "/" + model_name + ".pb")
+        os.remove(MODEL_PATH + "/" + model_name + ".txt")
+      except:
+        logging.warning("model files not found: " + model_name)
       del self._models[model_name]    
       self._save_model_meta()
 
@@ -63,7 +66,6 @@ class CNNManager:
     trainer = self.TrainThread(self, model_name, architecture, image_tags, photos_meta, training_steps, learning_rate)
     trainer.start()
     self._trainers[model_name] = trainer
-    #trainer.join()
     
   def save_model_status(self, model_name, architecture, status):
     model_info = architecture.split("_")
@@ -93,13 +95,14 @@ class CNNManager:
       self.photos_metadata = photos_metadata
       self.learning_rate = learning_rate
       self.training_steps = training_steps
-      self.trainer = CNNTrainer(manager, architecture)
+      self.trainer = None 
 
     def update_train_status(self, model_name, status):
       model = self.manager._models.get(model_name)
       model["status"] = status
 
     def run(self):
+      self.trainer = CNNTrainer(self.manager, self.architecture)
       self.manager.save_model_status(self.model_name, self.architecture, 0)
       image_dir = self.prepare_images()
       logging.info("retrain")

@@ -98,7 +98,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
                 canvas.getContext('2d').drawImage(img.get(0), 0, 0, img.width(), img.height());
                 var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
                 var colorHex = "#" + paddedHexString(pixelData[0]) + paddedHexString(pixelData[1]) + paddedHexString(pixelData[2]);
-		alert("Color at point: " + colorHex); 
+		alert(BotMessages.ColorAtPoint + colorHex); 
         });
 	$( ".photopopup" ).on({
         	popupbeforeposition: function() {
@@ -179,7 +179,7 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 				image_tags: form.find("#i_cnn_image_tags").val().split(",")};
 			console.log(data);
                         $.post(url='/cnnmodels', data=JSON.stringify(data), success=function(data) {
-					alert("training...");
+					alert(BotMessages.ModelTraining);
                                 }, dataType='json');
 			return false;
         });
@@ -260,7 +260,7 @@ $('select.s_media_tag').change(function (e) {
 		while(true) {
 			tag_name = prompt("Enter a new tag:", "");
 			if(tags.indexOf(tag_name)>=0) {
-				alert("Tag already exists");
+				alert(BotMessages.TagAlreadyExists);
 			} else {
 				$('<option value="' + tag_name + '">' + tag_name +'</option>').insertBefore('option.o_new');
 				select.find('option').removeAttr('selected');
@@ -286,10 +286,10 @@ $(document).on( "click", '.b_photo_delete', function( event ) {
         var li = $(this).parents('li');
 	var src = "/photos/" + li.find('img').attr('data-src');
 	if(confirm(BotMessages.DeletePhotoConfirm + src + " ?")) {
-        	$.ajax(url=src, type="DELETE", success=function(data){
+        	$.ajax({url:src, method:"DELETE", success:function(data){
 			li.remove();
                         ul.listview('refresh');
-        	});
+        	}});
 	}
         event.preventDefault();
 });
