@@ -11,12 +11,11 @@ import fcntl
 import struct
 import json
 
-
 class WiFi():
 
   CONFIG_FILE = "/etc/coderbot_wifi.conf"
-  adapters = ["RT5370", "RTL8188CUS"] 
-  hostapds = {"RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"} 
+  adapters = ["default", "RT5370", "RTL8188CUS"] 
+  hostapds = {"default": "hostapd", "RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"} 
   web_url = "http://my.coderbot.org/coderbot/v1.0/bot/new"
   wifi_client_conf_file = "/etc/wpa_supplicant/wpa_supplicant.conf"
   _config = {}
@@ -51,8 +50,18 @@ class WiFi():
     hostapd_type = cls.hostapds.get(adapter)
     try:
       print "starting hostapd..."
-      out = os.system("/usr/sbin/" + hostapd_type + " /etc/hostapd/" + hostapd_type + " -B")
+      out = os.system("/usr/sbin/" + hostapd_type + " -B /etc/hostapd/" + hostapd_type + ".conf")
       print "hostapd out: " + str(out)
+
+    except subprocess.CalledProcessError as e:
+      print e.output
+
+  @classmethod
+  def start_dnsmasq(cls):
+    try:
+      print "starting dnsmasq..."
+      out = os.system("systemctl start dnsmasq")
+      print "dnsmasq out: " + str(out)
 
     except subprocess.CalledProcessError as e:
       print e.output
@@ -63,6 +72,15 @@ class WiFi():
       print "stopping hostapd..."
       out = subprocess.check_output(["sudo", "pkill", "-9", "hostapd"])
       print "hostapd out: " + str(out)
+    except subprocess.CalledProcessError as e:
+      print e.output
+
+  @classmethod
+  def stop_dnsmasq(cls):
+    try:
+      print "stopping dnsmasq..."
+      out = subprocess.check_output(["systemctl", "stop", "dnsmasq"])
+      print "dnsmasq out: " + str(out)
     except subprocess.CalledProcessError as e:
       print e.output
 
@@ -106,36 +124,47 @@ network={\n""")
     f.write("}")
 
   @classmethod
+  def set_ap_params(cls, wssid, wpsk):
+    adapter = cls.get_adapter_type()
+    os.system("sudo sed -i s/ssid=.*$/ssid=" + wssid + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
+    if wpsk:
+      os.system("sudo sed -i s/wpa_passphrase=.*$/wpa_passphrase=" + wpsk + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
+
+  @classmethod
   def set_start_as_client(cls):
-    shutil.copy("/etc/network/interfaces_cli", "/etc/network/interfaces")
     cls._config["wifi_mode"] = "client"
     cls.save_config()
 
   @classmethod
   def start_as_client(cls):
+    cls.stop_dnsmasq()
     cls.stop_hostapd()
     try:
       time.sleep(1.0)
-      out = subprocess.check_output(["ifdown", "--force", "wlan0"])
-      out = subprocess.check_output(["ifup", "wlan0"])
+      out = os.system("wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null 2>&1")
+      out += os.system("dhclient -1 wlan0")
+      print out
       cls.register_ipaddr(cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"))
-      #print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
+      print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
     except subprocess.CalledProcessError as e:
       print e.output
       raise
 
   @classmethod
   def set_start_as_ap(cls):
-    shutil.copy("/etc/network/interfaces_ap", "/etc/network/interfaces")
     cls._config["wifi_mode"] = "ap"
     cls.save_config()
 
   @classmethod
   def start_as_ap(cls):
     time.sleep(1.0)
-    out = subprocess.check_output(["ifdown", "--force", "wlan0"])
-    out = subprocess.check_output(["ifup", "wlan0"])
+    out = subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"])
+    out += subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"])
+    out += subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"])
+    out += subprocess.check_output(["ifconfig"])
+    print out
     cls.start_hostapd()
+    cls.start_dnsmasq()
 
   @classmethod
   def start_service(cls):
@@ -156,24 +185,15 @@ def main():
   if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
     if len(sys.argv) > 2 and sys.argv[2] == "ap":
       w.set_start_as_ap()
-      #w.start_as_ap()
+      if len(sys.argv) > 4:
+        w.set_ap_params(sys.argv[3], sys.argv[4])
     elif len(sys.argv) > 2 and sys.argv[2] == "client":
       if len(sys.argv) > 3:
         w.set_client_params(sys.argv[3], sys.argv[4])
       w.set_start_as_client()
-      """
-      try:
-        w.start_as_client()
-      except:
-        print "Unable to register ip, revert to ap mode"
-        w.start_as_ap()
-      """
     elif len(sys.argv) > 3 and sys.argv[2] == "bot_name":
       WiFi.get_config()['bot_name'] = sys.argv[3]
       WiFi.save_config()
-  elif len(sys.argv) > 1 and sys.argv[1] == "register":
-    print "registering: "+ str(w.get_ipaddr("wlan0"))
-    w.register_ipaddr(w.get_config().get('bot_name', 'CoderBot'), w.get_ipaddr("wlan0"))
   else:
     w.start_service()
 

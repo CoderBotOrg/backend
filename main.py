@@ -89,10 +89,11 @@ def handle_wifi():
     client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
     logging.info(client_params)
     os.system("sudo python wifi.py updatecfg " + mode + client_params)
+    os.system("sudo reboot")
     if mode == "ap":
       return "http://coder.bot:8080";
     else:
-      return "http://coderbotsrv.appspot.com/"
+      return "http://coderbot.locali:8080"
 
 @app.route("/update", methods=["GET"])
 def handle_update():
