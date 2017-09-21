@@ -16,7 +16,7 @@ class WiFi():
   CONFIG_FILE = "/etc/coderbot_wifi.conf"
   adapters = ["default", "RT5370", "RTL8188CUS"] 
   hostapds = {"default": "hostapd", "RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"} 
-  web_url = "http://my.coderbot.org/coderbot/v1.0/bot/new"
+  web_url = "http://my.coderbot.org/api/coderbot/1.0/bot/"
   wifi_client_conf_file = "/etc/wpa_supplicant/wpa_supplicant.conf"
   _config = {}
 
@@ -94,14 +94,20 @@ class WiFi():
     )[20:24])
 
   @classmethod
-  def register_ipaddr(cls, botname, ipaddr):
+  def get_macaddr(cls, ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', ifname[:15]))
+    return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
+
+  @classmethod
+  def register_ipaddr(cls, bot_uid, bot_name, bot_ipaddr, user_email):
     try:
-      data = {"bot_uid": "ABCDFGHI",
-              "bot_name": botname,
-              "bot_ip": ipaddr,
+      data = {"bot_uid": bot_uid,
+              "bot_name": bot_name,
+              "bot_ip": bot_ipaddr,
               "bot_version": "1.0",
-              "user_email": "roberto.previtera@gmail.com"}
-      req = urllib2.Request(cls.web_url, json.dumps(data))
+              "user_email": user_email}
+      req = urllib2.Request(cls.web_url + bot_uid, json.dumps(data), headers={"Authorization": "CoderBot 123456"})
       ret = urllib2.urlopen(req)
       if ret.getcode() != 200:
         raise Exception()
@@ -144,7 +150,7 @@ network={\n""")
       out = os.system("wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null 2>&1")
       out += os.system("dhclient -1 wlan0")
       print out
-      cls.register_ipaddr(cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"))
+      cls.register_ipaddr(cls.get_macaddr("wlan0"), cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"), "roberto.previtera@gmail.com")
       print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
     except subprocess.CalledProcessError as e:
       print e.output
