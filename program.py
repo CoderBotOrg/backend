@@ -28,6 +28,7 @@ import camera
 import motion
 import config
 import audio
+import event
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -47,6 +48,9 @@ def get_audio():
 
 def get_prog_eng():
   return ProgramEngine.get_instance()
+
+def get_event():
+  return event.EventManager.get_instance()
 
 class ProgramEngine:
 
@@ -139,7 +143,6 @@ class Program:
 
   def run(self):
     try:
-      #print "run.1"
       bot = coderbot.CoderBot.get_instance()
       program = self
       try:
@@ -149,9 +152,8 @@ class Program:
           logging.debug("starting video")
       except:
         logging.error("Camera not available")
-      
+     
       exec(self._code)
-      #print "run.2"
     except RuntimeError as re:
       logging.info("quit: " + str(re))
     finally:
@@ -161,6 +163,8 @@ class Program:
       except:
         logging.error("Camera not available")
       self._running = False
+
+      get_event_manager().wait_event_generators()
 
   def as_json(self):
     return {'name': self.name,

@@ -32,6 +32,7 @@ from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
+from event import EventManager
 
 from flask import Flask, render_template, request, send_file, redirect, Response, jsonify
 from flask_babel import Babel
@@ -49,6 +50,7 @@ cam = None
 motion = None
 audio = None
 cnn = None
+event = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -353,20 +355,13 @@ def run_server():
       audio.say(app.bot_config.get("sound_start"))
       try:
 	cam = Camera.get_instance()
-        #motion = Motion.get_instance()
+        motion = Motion.get_instance()
       except picamera.exc.PiCameraError:
         logging.error("Camera not present")
 
       cnn = CNNManager.get_instance()
-      """
-      cnn.train_new_model(model_name="test3",
-                        architecture="mobilenet_0.25_128",
-                        image_tags=["apple", "kiwi", "other"],
-                        photos_meta=cam.get_photo_list(),
-                        training_steps=10,
-                        learning_rate=0.1)
-      logging.info("trained")
-      """
+      event = EventManager.get_instance("coderbot")
+
       if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
         app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
         app.prog.execute()
