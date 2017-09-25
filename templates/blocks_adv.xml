@@ -169,6 +169,11 @@
     </category>
     <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE" colour="330"></category>
     <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE" colour="290"></category>
+    <category name="{% trans %}Event{% endtrans %}" colour="40">
+      <block type="coderbot_event_generator"></block>
+      <block type="coderbot_event_publisher"></block>
+      <block type="coderbot_event_listener"></block>
+    </category>
     <category name="{% trans %}Movement{% endtrans %}" colour="40">
       <block type="coderbot_moveForward"></block>
       <block type="coderbot_moveBackward"></block>

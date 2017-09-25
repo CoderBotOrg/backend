@@ -152,7 +152,7 @@ class Program:
           logging.debug("starting video")
       except:
         logging.error("Camera not available")
-     
+    
       exec(self._code)
     except RuntimeError as re:
       logging.info("quit: " + str(re))
@@ -164,7 +164,7 @@ class Program:
         logging.error("Camera not available")
       self._running = False
 
-      get_event_manager().wait_event_generators()
+      get_event().wait_event_generators()
 
   def as_json(self):
     return {'name': self.name,
