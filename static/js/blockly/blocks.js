@@ -737,11 +737,11 @@ Blockly.Python['coderbot_adv_cnn_classify'] = function(block) {
   return [class_scores, Blockly.Python.ORDER_ATOMIC];
 };
 
-
 Blockly.Blocks['coderbot_event_generator'] = {
   init: function() {
-    this.appendStatementInput("event_generator_function")
-        .appendField("event generator")
+    this.appendDummyInput()
+        .appendField("event generator");
+    this.appendStatementInput("generator_statements")
         .setCheck(null);
     this.setColour(15);
  this.setTooltip("event generator");
@@ -752,9 +752,8 @@ Blockly.Blocks['coderbot_event_generator'] = {
 var coderbot_generator_id = 1;
 Blockly.Python['coderbot_event_generator'] = function(block) {
   Blockly.Generator.prototype.INDENT = '    ';
-  var statements_event_generator = Blockly.Python.statementToCode(block, 'event_generator_function');
+  var statements_event_generator = Blockly.Python.statementToCode(block, 'generator_statements');
   Blockly.Generator.prototype.INDENT = '  ';
-  // TODO: Assemble Python into code variable.
   var code = 'def event_generator_' + coderbot_generator_id + '():\n' +
              '  while True:\n' +
              '    get_prog_eng().check_end()\n' +
@@ -767,12 +766,14 @@ Blockly.Python['coderbot_event_generator'] = function(block) {
 Blockly.Blocks['coderbot_event_listener'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("event listener for: ")
-        .appendField(new Blockly.FieldDropdown([["image/classified","image/classified"], ["image/face_detected","image/face_detected"], ["sonar/obstacle","sonar/obstacle"]]), "event_topic");
-   this.appendStatementInput("event_listener_code")
+        .appendField("when:")
+        .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic")
+        .appendField("with: event_data");
+    this.appendStatementInput("event_statements")
         .setCheck(null);
+    this.setInputsInline(true);
     this.setColour(15);
- this.setTooltip("event listener");
+ this.setTooltip("");
  this.setHelpUrl("");
   }
 };
@@ -780,10 +781,9 @@ Blockly.Blocks['coderbot_event_listener'] = {
 var coderbot_listener_id = 1;
 Blockly.Python['coderbot_event_listener'] = function(block) {
   var event_topic = block.getFieldValue('event_topic');
-  var statements_event_listener = Blockly.Python.statementToCode(block, 'event_listener_code');
-  // TODO: Assemble Python into code variable.
+  var event_statements = Blockly.Python.statementToCode(block, 'event_statements');
   var code = 'def event_listener_' + coderbot_listener_id + '(event_data):\n' +
-             statements_event_listener + '\n' +
+             event_statements + '\n' +
              'get_event().register_event_listener(\'' + event_topic + '\', event_listener_' + coderbot_listener_id + ')'
   coderbot_listener_id++; 
   return code;
@@ -791,12 +791,12 @@ Blockly.Python['coderbot_event_listener'] = function(block) {
 
 Blockly.Blocks['coderbot_event_publisher'] = {
   init: function() {
-    this.appendDummyInput()
-        .appendField("publish event on topic:")
-        .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic");
     this.appendValueInput("event_data")
-        .setCheck(null)
-        .appendField("data:");
+        .appendField("publish")
+        .setCheck(null);
+    this.appendDummyInput()
+        .appendField("on topic:")
+        .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic");
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);

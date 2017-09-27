@@ -161,18 +161,49 @@
         </value>
       </block>
     </category>
-    <category name="{% trans %}Colour{% endtrans %}" colour="20">
-      <block type="colour_picker"></block>
-      <block type="colour_random"></block>
-      <block type="colour_rgb"></block>
-      <block type="colour_blend"></block>
-    </category>
     <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE" colour="330"></category>
     <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE" colour="290"></category>
-    <category name="{% trans %}Event{% endtrans %}" colour="40">
-      <block type="coderbot_event_generator"></block>
-      <block type="coderbot_event_publisher"></block>
-      <block type="coderbot_event_listener"></block>
+    <category name="{% trans %}Event{% endtrans %}" colour="15">
+      <block type="coderbot_event_generator">
+        <value name="generator_statements">
+          <block type="controls_if">
+            <value name="IF0">
+              <block type="logic_compare"></block>
+            </value>
+            <value name="DO0">
+              <block type="coderbot_event_publisher">
+                <value name="event_data">
+                  <block type="text">
+                  </block>
+                </value>
+                <field name="event_topic">a_topic</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+      <block type="coderbot_event_publisher">
+        <value name="event_data">
+          <block type="text">
+          </block>
+        </value>
+        <field name="event_topic">a_topic</field>
+      </block>
+      <block type="coderbot_event_listener">
+        <field name="event_topic">a_topic</field>
+        <value name="event_statements">
+          <block type="text_print">
+            <value name="TEXT">
+              <block type="variables_get">
+                <field name="VAR">{% trans %}event_data{% endtrans %}</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+      <block type="variables_get">
+        <field name="VAR">{% trans %}event_data{% endtrans %}</field>
+      </block>
     </category>
     <category name="{% trans %}Movement{% endtrans %}" colour="40">
       <block type="coderbot_moveForward"></block>
