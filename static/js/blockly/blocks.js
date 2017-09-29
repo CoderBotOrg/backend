@@ -919,7 +919,8 @@ Blockly.Blocks['coderbot_audio_listen'] = {
 Blockly.Python['coderbot_audio_listen'] = function(block) {
   // Boolean values true and false.
   var model = block.getFieldValue('MODEL');
-  var code = 'get_audio().speech_recog(model="' + model + '")';
+  //var code = 'get_audio().speech_recog(model="' + model + '")';
+  var code = 'get_audio().speech_recog_google(locale="it_IT")';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
