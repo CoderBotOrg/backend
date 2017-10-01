@@ -160,6 +160,8 @@
           </block>
         </value>
       </block>
+      <block type="hashmap_get_value">
+      </block>
     </category>
     <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE" colour="330"></category>
     <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE" colour="290"></category>
@@ -317,5 +319,6 @@
         </value>
       </block>
       <block type="coderbot_audio_listen"></block>
+      <block type="coderbot_conv_get_action"></block>
     </category>      
   </xml>

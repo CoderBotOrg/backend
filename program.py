@@ -29,6 +29,7 @@ import motion
 import config
 import audio
 import event
+import conversation
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -51,6 +52,9 @@ def get_prog_eng():
 
 def get_event():
   return event.EventManager.get_instance()
+
+def get_conv():
+  return conversation.Conversation.get_instance()
 
 class ProgramEngine:
 

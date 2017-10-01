@@ -33,6 +33,7 @@ from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
+from conversation import Conversation
 
 from flask import Flask, render_template, request, send_file, redirect, Response, jsonify
 from flask_babel import Babel
@@ -51,6 +52,7 @@ motion = None
 audio = None
 cnn = None
 event = None
+conv = None
 
 app = Flask(__name__,static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -361,6 +363,7 @@ def run_server():
 
       cnn = CNNManager.get_instance()
       event = EventManager.get_instance("coderbot")
+      conv = Conversation.get_instance()
 
       if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
         app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))

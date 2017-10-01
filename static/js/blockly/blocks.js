@@ -813,6 +813,53 @@ Blockly.Python['coderbot_event_publisher'] = function(block) {
   return code;
 };
 
+Blockly.Blocks['hashmap_get_value'] = {
+  init: function() {
+    this.appendValueInput("key")
+        .setCheck("String")
+        .appendField("get");
+    this.appendValueInput("map")
+        .setCheck("HashMap")
+        .appendField("from ");
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    this.setColour(230);
+ this.setTooltip("get an item from an hashmap");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['hashmap_get_value'] = function(block) {
+  var value_key = Blockly.Python.valueToCode(block, 'key', Blockly.Python.ORDER_ATOMIC);
+  var value_map = Blockly.Python.valueToCode(block, 'map', Blockly.Python.ORDER_ATOMIC);
+  var code = value_map + '.get(' + value_key + ')';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['coderbot_conv_get_action'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("interpreta");
+    this.appendValueInput("query")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("in")
+        .appendField(new Blockly.FieldDropdown([["italiano","it"], ["inglese","en"], ["francese","fr"], ["tedesco","de"]]), "locale");
+    this.setInputsInline(true);
+    this.setOutput(true, "HashMap");
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['coderbot_conv_get_action'] = function(block) {
+  var value_query = Blockly.Python.valueToCode(block, 'query', Blockly.Python.ORDER_ATOMIC);
+  var dropdown_locale = block.getFieldValue('locale');
+  var code = 'get_conv().get_action(query=' + value_query + ', locale=\'' + dropdown_locale + '\')';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
 Blockly.Blocks['coderbot_audio_record'] = {
   /**
    * Block for findLogo function.
