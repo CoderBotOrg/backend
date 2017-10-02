@@ -5,7 +5,14 @@ $(document).on( "pageshow", '#page-program', function( event, ui ) {
         inject_once=false;
         Blockly.inject(document.getElementById('blocklyDiv'),
             {path: '../../', toolbox: document.getElementById('toolbox'),
-             scrollbars:CODERBOT_PROG_SCROLLBARS, maxBlocks:CODERBOT_PROG_MAXBLOCKS});
+             scrollbars:CODERBOT_PROG_SCROLLBARS, maxBlocks:CODERBOT_PROG_MAXBLOCKS,
+             zoom:
+              {controls: true,
+               wheel: true,
+               startScale: 1.0, //you can change this accorting to your needs.
+               maxScale: 1.5,
+               minScale: 0.2
+              }});
       }
 
       $('[href="#page-program"]').addClass( "ui-btn-active" );

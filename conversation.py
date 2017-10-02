@@ -55,9 +55,11 @@ class Conversation:
 
     data = json.load(response)
     retval = {}
-    retval["action"] = data["result"]["action"]
-    retval["parameters"] = data["result"]["parameters"]
-    retval["contexts"] = data["result"]["contexts"]
-    retval["response"] = data["result"]["fulfillment"]["speech"]
+    retval["action"] = data.get("result", {}).get("action")
+    retval["parameters"] = data.get("result", {}).get("parameters", {})
+    retval["contexts"] = data.get("result", {}).get("contexts", [])
+    retval["response"] = data.get("result", {}).get("fulfillment", {}).get("speech")
 
+    retval["action"] = retval["action"].encode("utf-8") if retval["action"] else None
+    retval["response"] = retval["response"].encode("utf-8") if retval["response"] else None
     return retval
