@@ -1,5 +1,5 @@
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from SocketServer import ThreadingMixIn, TCPServer
+from http.server import SimpleHTTPRequestHandler
+from socketserver import ThreadingMixIn, TCPServer
 import threading
 import time
 import re
@@ -71,24 +71,19 @@ class JpegStreamHandler(SimpleHTTPRequestHandler):
                         #_jpegstreamers[port]._lock.release()
                         self.wfile.write("\r\n")
                         lasttimeserved = time.time()
-                    except socket.error, e:
-			print "send_response socket.error: " + str(e)
+                    except socket.error as e:
+                        logging.warning("send_response socket.error: " + str(e))
                         return    
-                    except IOError, e:
-			print "send_response generic IOError: " + str(e)
+                    except IOError as  e:
+                        logging.error("send_response generic IOError: " + str(e))
                         return
                     count = count + 1
 
-
                 time.sleep(_jpegstreamers[port].sleeptime)
-
-
-
 
 class JpegTCPServer(ThreadingMixIn, TCPServer):
     allow_reuse_address = True
     daemon_threads = True
-
 
 #factory class for jpegtcpservers
 class JpegStreamer():

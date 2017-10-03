@@ -130,6 +130,9 @@ class Program:
       self._thread.start()
     except RuntimeError as re:
       logging.error("RuntimeError:" + str(re))
+    except Exception as e:
+      logging.error("Exception:" + str(e))
+
     return "ok"
 
   def end(self):

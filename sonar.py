@@ -59,7 +59,6 @@ class Sonar:
                   self._high = None
                   self._ping = True
                   self._triggered = False
-                  print "elapsed: " + str(self._time)
    def read(self):
       """
       Triggers a reading.  The returned reading is the number

@@ -24,7 +24,10 @@ import sys
 import math
 import json
 from PIL import Image as PILImage
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from threading import Thread, Lock
 import logging
 
@@ -58,7 +61,7 @@ class Camera(Thread):
 
   def __init__(self):
     logging.info("starting camera")
-    cam_props = {"width":640, "height":480, "cv_image_factor":config.Config.get().get("cv_image_factor", 4), "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
+    cam_props = {"width":640, "height":512, "cv_image_factor":config.Config.get().get("cv_image_factor", 4), "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
     self._camera = camera.Camera(props=cam_props)
     self.recording = False
     self.video_start_time = time.time() + 8640000
@@ -256,7 +259,7 @@ class Camera(Thread):
       blobs[idx] = slice.find_blobs(minsize=480/(self._cv_image_factor * self._cv_image_factor), maxsize=6400/(self._cv_image_factor * self._cv_image_factor))
       if len(blobs[idx]):
         coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
-	logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
+        logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
     
     self._image_lock.release()
     return coords[0]

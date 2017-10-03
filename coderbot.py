@@ -245,7 +245,7 @@ class CoderBot:
           self.pi.set_PWM_dutycycle(PIN_LEFT_BACKWARD, 100)
         else:
           self.pi.set_PWM_dutycycle(PIN_LEFT_FORWARD, 100) 
-	  self.pi.write(PIN_LEFT_BACKWARD, 0)
+          self.pi.write(PIN_LEFT_BACKWARD, 0)
       elif (self._encoder_motor_stopped_left == False and
             ((self._encoder_motor_stopping_left and 
              self._encoder_speed_left < self._encoder_k_v_1) or
@@ -255,7 +255,7 @@ class CoderBot:
         self.pi.write(PIN_LEFT_BACKWARD, 0)
         self._encoder_motor_stopped_left = True
         self._encoder_check_stopped_and_notify()
-        print "LEFT: " + str(self._encoder_cur_left) + " speed: " + str(self._encoder_speed_left) 
+        print( "LEFT: " + str(self._encoder_cur_left) + " speed: " + str(self._encoder_speed_left)) 
     elif gpio == PIN_ENCODER_RIGHT and self._encoder_target_right >= 0:
       self._encoder_cur_right += 1
       delta_ticks_right = tick - self._encoder_last_tick_time_right if tick > self._encoder_last_tick_time_right else tick - self._encoder_last_tick_time_right + 4294967295
@@ -280,7 +280,7 @@ class CoderBot:
         self.pi.write(PIN_RIGHT_BACKWARD, 0)
         self._encoder_motor_stopped_right = True
         self._encoder_check_stopped_and_notify()
-        print "RIGHT: " + str(self._encoder_cur_right) + " speed: " + str(self._encoder_speed_right)
+        print("RIGHT: " + str(self._encoder_cur_right) + " speed: " + str(self._encoder_speed_right))
     else:
       cb = self._cb.get(gpio)
       if cb:
@@ -289,7 +289,7 @@ class CoderBot:
           self._cb_last_tick[gpio] = tick
         elif tick - self._cb_last_tick[gpio] > elapse: 
           self._cb_last_tick[gpio] = tick
-          print "pushed: ", level, tick
+          print( "pushed: ", level, tick )
           cb()
  
   def _encoder_check_stopped_and_notify(self):

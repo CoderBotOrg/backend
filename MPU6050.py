@@ -256,15 +256,15 @@ class MPU6050:
 		return [accel, gyro, temp]
 
 if __name__ == "__main__":
-        z = 0.0
-        t = time.time()
+	z = 0.0
+	t = time.time()
 	mpu = MPU6050(0x68)
 	mpu.set_gyro_range(mpu.GYRO_RANGE_250DEG)
 	while True:
 		gyro_data = mpu.get_gyro_data()
-                dt = time.time() - t
-                t = time.time()
-                if abs(gyro_data['z']) > mpu.GYRO_THRESHOLD_Z:
-                	dz = gyro_data['z'] * dt
-                        z = z + dz
-                	print( "z: ", z, end="\r")
+		dt = time.time() - t
+		t = time.time()
+		if abs(gyro_data['z']) > mpu.GYRO_THRESHOLD_Z:
+			dz = gyro_data['z'] * dt
+			z = z + dz
+			print( "z: ", z, end="\r")

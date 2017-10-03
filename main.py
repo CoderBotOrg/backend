@@ -127,7 +127,7 @@ def handle_bot():
           pass
     elif cmd == "take_photo":
         try:
-	  cam.photo_take()
+          cam.photo_take()
           audio.say(app.bot_config.get("sound_shutter"))
         except:
           logging.warning("Camera not present")
@@ -148,12 +148,11 @@ def handle_bot():
           pass
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
-	audio.say(param1, get_locale())
-
+        audio.say(param1, get_locale())
     elif cmd == "halt":
         logging.info("shutting down")
         audio.say(app.bot_config.get("sound_stop"))
-	bot.halt()
+        bot.halt()
     elif cmd == "restart":
         logging.info("restarting bot")
         bot.restart()
@@ -356,7 +355,7 @@ def run_server():
       audio = Audio.get_instance()
       audio.say(app.bot_config.get("sound_start"))
       try:
-	cam = Camera.get_instance()
+        cam = Camera.get_instance()
         motion = Motion.get_instance()
       except picamera.exc.PiCameraError:
         logging.error("Camera not present")
@@ -373,7 +372,6 @@ def run_server():
       logging.error(e)
 
     bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-    print "run"
     app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False, threaded=True)
   finally:
     if cam:
