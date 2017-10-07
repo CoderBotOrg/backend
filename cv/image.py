@@ -21,7 +21,7 @@ import numpy as np
 import cv2
 import colorsys
 import copy
-import blob
+import cv.blob as blob
 import time
 import logging
 
@@ -165,10 +165,10 @@ class Image():
       for c in contours:
         area = cv2.contourArea(c)
         if area > minsize and area < maxsize:
-	  if len(blobs) and area > blobs[0].area:
+          if len(blobs) and area > blobs[0].area:
             blobs.insert(0, blob.Blob(c))
           else:  
-	    blobs.append(blob.Blob(c))
+            blobs.append(blob.Blob(c))
           
       return blobs
 

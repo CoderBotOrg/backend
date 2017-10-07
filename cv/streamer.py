@@ -7,7 +7,7 @@ import socket
 import numpy as np
 import cv2
 import colorsys
-import camera as cam
+import cv.camera as cam
 import copy
 
 _jpegstreamers = {}
