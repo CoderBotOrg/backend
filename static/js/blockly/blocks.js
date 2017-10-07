@@ -844,7 +844,10 @@ Blockly.Blocks['coderbot_conv_get_action'] = {
         .setCheck("String");
     this.appendDummyInput()
         .appendField("in")
-        .appendField(new Blockly.FieldDropdown([["italiano","it"], ["inglese","en"], ["francese","fr"], ["tedesco","de"]]), "locale");
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_LOCALE_EN, 'en'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_IT, 'it'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_FR, 'fr'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_ES, 'es']]), "locale");
     this.setInputsInline(true);
     this.setOutput(true, "HashMap");
     this.setColour(230);
@@ -954,9 +957,10 @@ Blockly.Blocks['coderbot_audio_listen'] = {
     this.setColour(220);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_AUDIO_LISTEN)
-        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE, 'model_simple'],
-                                                [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM, 'model_medium'],
-                                                [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_ADV, 'model_adv']]), 'MODEL');
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_LOCALE_EN, 'en-US'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_IT, 'it-IT'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_FR, 'fr-FR'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_ES, 'es-ES']]), 'MODEL');
     this.setInputsInline(true);
     this.setOutput(true, 'String');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
@@ -966,8 +970,7 @@ Blockly.Blocks['coderbot_audio_listen'] = {
 Blockly.Python['coderbot_audio_listen'] = function(block) {
   // Boolean values true and false.
   var model = block.getFieldValue('MODEL');
-  //var code = 'get_audio().speech_recog(model="' + model + '")';
-  var code = 'get_audio().speech_recog_google(locale="it_IT")';
+  var code = 'get_audio().speech_recog_google(locale=\'' + model + '\')';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
