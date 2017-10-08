@@ -78,3 +78,10 @@ Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE = "get distance with";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_1 = "sonar 1";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_2 = "sonar 2";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_3 = "sonar 3";
+Blockly.Msg.CODERBOT_EVENT_WHEN = "when";
+Blockly.Msg.CODERBOT_EVENT_WITH = "with";
+Blockly.Msg.CODERBOT_EVENT_PUBLISH = "publish";
+Blockly.Msg.CODERBOT_EVENT_ON_TOPIC = "on topic";
+Blockly.Msg.CODERBOT_EVENT_GENERATOR = "event generator";
+Blockly.Msg.CODERBOT_CONVERSATION_PARSE = "parse";
+

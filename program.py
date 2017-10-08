@@ -160,10 +160,15 @@ class Program:
       except:
         logging.error("Camera not available")
     
-      exec(self._code)
+      imports = "import json\n"
+      code = imports + self._code
+      exec(code)
       get_event().wait_event_generators()
     except RuntimeError as re:
       logging.info("quit: " + str(re))
+    except Exception as e:
+      logging.info("quit: " + str(e))
+
     finally:
       try:
         get_cam().video_stop() #if video is running, stop it

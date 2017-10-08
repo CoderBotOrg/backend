@@ -740,7 +740,7 @@ Blockly.Python['coderbot_adv_cnn_classify'] = function(block) {
 Blockly.Blocks['coderbot_event_generator'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("event generator");
+        .appendField(Blockly.Msg.CODERBOT_EVENT_GENERATOR);
     this.appendStatementInput("generator_statements")
         .setCheck(null);
     this.setColour(15);
@@ -766,9 +766,9 @@ Blockly.Python['coderbot_event_generator'] = function(block) {
 Blockly.Blocks['coderbot_event_listener'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("when:")
+        .appendField(Blockly.Msg.CODERBOT_EVENT_WHEN)
         .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic")
-        .appendField("with: event_data");
+        .appendField(Blockly.Msg.CODERBOT_EVENT_WITH + " event_data");
     this.appendStatementInput("event_statements")
         .setCheck(null);
     this.setInputsInline(true);
@@ -783,6 +783,7 @@ Blockly.Python['coderbot_event_listener'] = function(block) {
   var event_topic = block.getFieldValue('event_topic');
   var event_statements = Blockly.Python.statementToCode(block, 'event_statements');
   var code = 'def event_listener_' + coderbot_listener_id + '(event_data):\n' +
+             Blockly.Generator.prototype.INDENT + 'event_data = json.loads(event_data.data)\n' +
              event_statements + '\n' +
              'get_event().register_event_listener(\'' + event_topic + '\', event_listener_' + coderbot_listener_id + ')'
   coderbot_listener_id++; 
@@ -792,10 +793,10 @@ Blockly.Python['coderbot_event_listener'] = function(block) {
 Blockly.Blocks['coderbot_event_publisher'] = {
   init: function() {
     this.appendValueInput("event_data")
-        .appendField("publish")
+        .appendField(Blockly.Msg.CODERBOT_EVENT_PUBLISH)
         .setCheck(null);
     this.appendDummyInput()
-        .appendField("on topic:")
+        .appendField(Blockly.Msg.CODERBOT_EVENT_ON_TOPIC)
         .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic");
     this.setInputsInline(true);
     this.setPreviousStatement(true, null);
@@ -809,7 +810,7 @@ Blockly.Blocks['coderbot_event_publisher'] = {
 Blockly.Python['coderbot_event_publisher'] = function(block) {
   var event_topic = block.getFieldValue('event_topic');
   var event_data = Blockly.Python.valueToCode(block, 'event_data', Blockly.Python.ORDER_ATOMIC);
-  var code = 'get_event().get_publisher(\'' + event_topic + '\').publish(' + event_data + ')';
+  var code = 'get_event().publish(\'' + event_topic + '\', ' + event_data + ')\n';
   return code;
 };
 
@@ -839,7 +840,7 @@ Blockly.Python['hashmap_get_value'] = function(block) {
 Blockly.Blocks['coderbot_conv_get_action'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("interpreta");
+        .appendField(Blockly.Msg.CODERBOT_CONVERSATION_PARSE);
     this.appendValueInput("query")
         .setCheck("String");
     this.appendDummyInput()

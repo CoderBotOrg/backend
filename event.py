@@ -2,6 +2,7 @@ import logging
 import threading
 import rospy
 import std_msgs
+import json
 
 class EventManager:
   _instance = None
@@ -18,12 +19,12 @@ class EventManager:
     self._event_generators = []
     self._event_listeners = []
 
-  def get_publisher(self, topic):
+  def publish(self, topic, message):
     publisher = self._publishers.get(topic)
     if publisher is None:
       publisher = rospy.Publisher("/" + self._node_name + "/" + topic, std_msgs.msg.String, queue_size=10)
       self._publishers[topic] = publisher
-    return publisher 
+    publisher.publish(json.dumps(message)) 
     
   def register_event_listener(self, topic, callback):
     self._event_listeners.append(rospy.Subscriber("/" + self._node_name + "/" + topic, std_msgs.msg.String, callback))
