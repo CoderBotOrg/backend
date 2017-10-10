@@ -46,7 +46,7 @@ PHOTO_THUMB_SUFFIX = "_thumb"
 PHOTO_THUMB_SIZE = (240,180)
 VIDEO_ELAPSE_MAX = 900
 
-class Camera(Thread):
+class Camera(object):
 
   _instance = None
   _img_template = image.Image.load("coderdojo-logo.png")
@@ -56,19 +56,23 @@ class Camera(Thread):
   def get_instance(cls):
     if cls._instance is None:
       cls._instance = Camera()
-      cls._instance.start()
+      #cls._instance.start()
     return cls._instance
 
   def __init__(self):
     logging.info("starting camera")
-    cam_props = {"width":640, "height":512, "cv_image_factor":config.Config.get().get("cv_image_factor", 4), "exposure_mode": config.Config.get().get("camera_exposure_mode"), "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality", 20))}
+    cam_props = {"width":640, "height":512, 
+                 "cv_image_factor": config.Config.get().get("cv_image_factor"), 
+                 "exposure_mode": config.Config.get().get("camera_exposure_mode"), 
+                 "framerate": config.Config.get().get("camera_framerate"), 
+                 "bitrate": config.Config.get().get("camera_jpeg_bitrate"), 
+                 "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality"))}
     self._camera = camera.Camera(props=cam_props)
     self.recording = False
     self.video_start_time = time.time() + 8640000
-    self._run = True
     self._image_time = 0
     self._cv_image_factor = int(config.Config.get().get("cv_image_factor", 4))
-    self._image_lock = Lock()
+    #self._image_lock = Lock()
     self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
     self._color_object_size_min = int(config.Config.get().get("camera_color_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
     self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
@@ -89,45 +93,16 @@ class Camera(Thread):
     if cnn_model != "":
       self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
       self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
-   
+
+    self._camera.grab_start()
+     
     super(Camera, self).__init__()
 
-  def run(self):
-    try:
-      self._camera.grab_start()
-      while self._run:
-        sleep_time = self._image_refresh_timeout - (time.time() - self._image_time)
-        if sleep_time <= 0:
-          ts = time.time()
-          #print "run.1"
-          self._image_lock.acquire()
-          self._camera.grab_one()
-          self._image_lock.release()
-          #print "run.2: " + str(time.time()-ts)
-
-          #self.save_image(image.Image(self._camera.get_image_bgr()).filter_color((124,50,74)).to_jpeg())
-          self.save_image(self._camera.get_image_jpeg())
-          #print "run.3: " + str(time.time()-ts)
-        else:
-          time.sleep(sleep_time)
-
-        if self.recording and time.time() - self.video_start_time > VIDEO_ELAPSE_MAX:
-          self.video_stop()
-
-      self._camera.grab_stop()
-    except:
-      logging.error("Unexpected error:" + str(sys.exc_info()[0]))
-      raise
-
-  def get_image(self, maxage = MAX_IMAGE_AGE):
+  def get_image(self):
     return image.Image(self._camera.get_image_bgr())
 
-  def save_image(self, image_jpeg):
-    #self._streamer.set_image(image_jpeg)
-    self._image_time=time.time()
-
   def get_image_jpeg(self):
-    return copy.copy (self._camera.get_image_jpeg())
+    return self._camera.get_image_jpeg()
 
   def set_text(self, text):
     self._camera.set_overlay_text(str(text))
@@ -168,7 +143,7 @@ class Camera(Thread):
     filename_thumb = PHOTO_PREFIX + str(photo_index) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
     of = open(PHOTO_PATH + "/" + filename, "w+")
     oft = open(PHOTO_PATH + "/" + filename_thumb, "w+")
-    im_str = self._camera.get_image_jpeg()
+    im_str = self.get_image_jpeg()
     of.write(im_str)
     # thumb
     im_pil = PILImage.open(StringIO(im_str)) 
@@ -231,24 +206,20 @@ class Camera(Thread):
     self.save_photo_metadata()
 
   def exit(self):
-    #self._streamer.server.shutdown()
-    #self._streamer.server_thread.join()
-    self._run = False
-    self.join()
+    #self.join()
+    self.video_stop()
+    self._camera.grab_stop()
 
   def calibrate(self):
     img = self._camera.getImage()
     self._background = img.hueHistogram()[-1]
   
   def get_average(self):
-    self._image_lock.acquire()
-    avg = self.get_image(0).get_average()
-    self._image_lock.release()
+    avg = self.get_image().get_average()
     return avg
       
   def find_line(self):
-    self._image_lock.acquire()
-    img = self.get_image(0).binarize()
+    img = self.get_image().binarize()
     slices = [0,0,0]
     blobs = [0,0,0]
     slices[0] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.2), self._camera.out_rgb_resolution[0], self._camera.out_rgb_resolution[1])
@@ -261,33 +232,32 @@ class Camera(Thread):
         coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
         logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
     
-    self._image_lock.release()
     return coords[0]
 
   def find_signal(self):
     #print "signal"
     angle = None
     ts = time.time()
-    self._image_lock.acquire()
-    img = self.get_image(0)
+    #self._image_lock.acquire()
+    img = self.get_image()
     signals = img.find_template(self._img_template)
      
     logging.info("signal: " + str(time.time() - ts))
     if len(signals):
       angle = signals[0].angle
 
-    self._image_lock.release()
+    #self._image_lock.release()
 
     return angle
 
   def find_face(self):
     face_x = face_y = face_size = None
-    self._image_lock.acquire()
-    img = self.get_image(0)
+    #self._image_lock.acquire()
+    img = self.get_image()
     ts = time.time()
     faces = img.grayscale().find_faces()
     logging.info("face.detect: " + str(time.time() - ts))
-    self._image_lock.release()
+    #self._image_lock.release()
     if len(faces):
       # Get the largest face, face is a rectangle 
       x, y, w, h = faces[0]
@@ -301,14 +271,13 @@ class Camera(Thread):
     return [face_x, face_y, face_size]
 
   def path_ahead(self):
+    
     image_size = self._camera.out_rgb_resolution    
     ts = time.time()
-    self._image_lock.acquire()
-    img = self.get_image(0)
+    img = self.get_image()
 
     size_y = img._data.shape[0]
     size_x = img._data.shape[1]
-
     threshold = img.crop(0, size_y - (size_y/12), size_x, size_y)._data.mean() / 2
 
     blobs = img.binarize(threshold).dilate().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
@@ -323,7 +292,7 @@ class Camera(Thread):
       coordY = 60 - ((y * 48) / (480 / self._cv_image_factor)) 
       logging.info("x: " + str(x) + " y: " + str(y) + " coordY: " + str(coordY))
 
-    self._image_lock.release()
+    #self._image_lock.release()
     return coordY
 
   def find_color(self, s_color):
@@ -331,10 +300,10 @@ class Camera(Thread):
     color = (int(s_color[1:3],16), int(s_color[3:5],16), int(s_color[5:7],16))
     code_data = None
     ts = time.time()
-    self._image_lock.acquire()
-    img = self.get_image(0)
+    #self._image_lock.acquire()
+    img = self.get_image()
     bw = img.filter_color(color)
-    self._image_lock.release()
+    #self._image_lock.release()
     objects = bw.find_blobs(minsize=self._color_object_size_min, maxsize=self._color_object_size_max)
     logging.debug("objects: " + str(objects))
     dist = -1
@@ -361,9 +330,9 @@ class Camera(Thread):
   def find_text(self, accept, back_color):
     text = None
     color = (int(back_color[1:3],16), int(back_color[3:5],16), int(back_color[5:7],16))
-    self._image_lock.acquire()
-    img = self.get_image(0)
-    self._image_lock.release()
+    #self._image_lock.acquire()
+    img = self.get_image()
+    #self._image_lock.release()
     image = img.find_rect(color=color)
     if image:
       logging.info("image: " + str(image))
@@ -373,9 +342,9 @@ class Camera(Thread):
     return text    
 
   def find_code(self):
-    self._image_lock.acquire()
-    img = self.get_image(0)
-    self._image_lock.release()
+    #self._image_lock.acquire()
+    img = self.get_image()
+    #self._image_lock.release()
     return img.grayscale().find_code()
 
   def cnn_classify(self, model_name=None):
@@ -388,9 +357,9 @@ class Camera(Thread):
     else:
       classifier = self._cnn_classifier_default
 
-    self._image_lock.acquire()
-    img = self.get_image(0)
-    self._image_lock.release()
+    #self._image_lock.acquire()
+    img = self.get_image()
+    #self._image_lock.release()
     classes = classifier.classify_image(img.mat())
     s_classes = sorted(classes.items(), key=lambda x: x[1], reverse=True)
     return s_classes

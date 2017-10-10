@@ -130,8 +130,10 @@ class Program:
       self._thread.start()
     except RuntimeError as re:
       logging.error("RuntimeError:" + str(re))
+      print str(e)
     except Exception as e:
       logging.error("Exception:" + str(e))
+      print str(e)
 
     return "ok"
 

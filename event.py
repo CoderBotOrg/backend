@@ -14,7 +14,7 @@ class EventManager:
 
   def __init__(self, node_name):
     self._node_name = node_name
-    rospy.init_node(node_name)
+    rospy.init_node(node_name, disable_signals=True)
     self._publishers = {}
     self._event_generators = []
     self._event_listeners = []

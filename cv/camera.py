@@ -24,6 +24,8 @@ import os
 import time
 import copy
 import logging
+import numpy as np
+from threading import Condition
 
 class Camera():
 
@@ -32,140 +34,87 @@ class Camera():
   VIDEO_FILE_EXT = ".mp4"
   VIDEO_FILE_EXT_H264 = '.h264'
 
+  class StreamingOutputMJPEG(object):
+    def __init__(self):
+      self.frame = None
+      self.buffer = io.BytesIO()
+      self.condition = Condition()
+
+    def write(self, buf):
+      if buf.startswith(b'\xff\xd8'):
+        # New frame, copy the existing buffer's content and notify all
+        # clients it's available
+        self.buffer.truncate()
+        with self.condition:
+          self.frame = self.buffer.getvalue()
+          self.condition.notify_all()
+        self.buffer.seek(0)
+      return self.buffer.write(buf)
+
+  class StreamingOutputBGR(object):
+    def __init__(self, resolution):
+      self.frame = None
+      self.condition = Condition()
+      self.resolution = resolution
+      self.count = 0
+    
+    def write(self, buf):
+      with self.condition:
+        frame = np.frombuffer(buf, dtype=np.uint8)
+        self.frame = frame.reshape(self.resolution[1], self.resolution[0], 4)
+        self.frame = np.delete(self.frame, 3, 2)
+        self.condition.notify_all()
+      return len(buf)
+  
   def __init__(self, props):
     logging.info("camera init")
     self.camera = picamera.PiCamera()
     self.camera.resolution = (props.get('width', 640), props.get('height', 512))
     self.out_rgb_resolution = (self.camera.resolution[0] / int(props.get('cv_image_factor', 4)), self.camera.resolution[1] / int(props.get('cv_image_factor', 4)))
-    self.camera.framerate = 30
-    self.camera.exposure_mode = props.get('exposure_mode')
-    self.out_jpeg = io.BytesIO()
-    self.out_rgb = picamera.array.PiRGBArray(self.camera, size=self.out_rgb_resolution)
+    self.camera.framerate = float(props.get('framerate', 20))
+    self.camera.exposure_mode = props.get('exposure_mode', "auto")
+    self.output_mjpeg = self.StreamingOutputMJPEG()
+    self.output_bgr = self.StreamingOutputBGR(self.out_rgb_resolution)
     self.h264_encoder = None
     self.recording = None
     self.video_filename = None
     self._jpeg_quality = props.get('jpeg_quality', 20)
+    self._jpeg_bitrate = props.get('jpeg_bitrate', 5000000)
 
   def video_rec(self, filename):
     self.video_filename = filename[:filename.rfind(".")]
-
-    camera_port_2, output_port_2 = self.camera._get_ports(True, 2)
-    self.h264_encoder = self.camera._get_video_encoder(camera_port_2, output_port_2, 'h264', None)
-
-    with self.camera._encoders_lock:
-      self.camera._encoders[2] = self.h264_encoder
-
-    logging.debug( self.video_filename + self.VIDEO_FILE_EXT_H264 )
-
-    self.h264_encoder.start(self.video_filename + self.VIDEO_FILE_EXT_H264)
+    self.camera.start_recording(self.video_filename + self.VIDEO_FILE_EXT_H264, format="h264", quality=23, splitter_port=2)
 
   def video_stop(self):
     logging.debug("video_stop")
-    self.h264_encoder.stop()
-
-    with self.camera._encoders_lock:
-      del self.camera._encoders[2]
-
-    self.h264_encoder.close()
+    self.camera.stop_recording(2)
 
     # pack in mp4 container
-    params = " -fps 12 -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
+    params = " -fps " + str(self.camera.framerate) + " -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
     os.system(self.FFMPEG_CMD + params)
     # remove h264 file
     os.remove(self.video_filename + self.VIDEO_FILE_EXT_H264)
 
-  def grab(self):
-    ts = time.time()
-    camera_port_0, output_port_0 = self.camera._get_ports(True, 0)
-    self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=self._jpeg_quality)
-    camera_port_1, output_port_1 = self.camera._get_ports(True, 1)
-    self.rgb_encoder = self.camera._get_image_encoder(camera_port_1, output_port_1, 'bgr', self.out_rgb_resolution)
-    #print "g.1: " + str(ts - time.time())
-    #ts = time.time()
-
-    with self.camera._encoders_lock:
-      self.camera._encoders[0] = self.jpeg_encoder
-      self.camera._encoders[1] = self.rgb_encoder
-
-    self.out_jpeg.seek(0)
-    self.out_rgb.seek(0)
-
-    self.jpeg_encoder.start(self.out_jpeg)
-    self.rgb_encoder.start(self.out_rgb)
-
-    if not self.jpeg_encoder.wait(10):
-      raise picamera.PiCameraError('Timed out')
-    if not self.rgb_encoder.wait(10):
-      raise picamera.PiCameraError('Timed out')
-
-    with self.camera._encoders_lock:
-      del self.camera._encoders[0]
-      del self.camera._encoders[1]
-    self.jpeg_encoder.close()
-    self.rgb_encoder.close()
-
   def grab_start(self):
     logging.debug("grab_start")
-
-    #ts = time.time()
-    camera_port_0, output_port_0 = self.camera._get_ports(True, 0)
-    self.jpeg_encoder = self.camera._get_image_encoder(camera_port_0, output_port_0, 'jpeg', None, quality=self._jpeg_quality)
-    camera_port_1, output_port_1 = self.camera._get_ports(True, 1)
-    self.rgb_encoder = self.camera._get_image_encoder(camera_port_1, output_port_1, 'bgr', self.out_rgb_resolution)
-
-    with self.camera._encoders_lock:
-      self.camera._encoders[0] = self.jpeg_encoder
-      self.camera._encoders[1] = self.rgb_encoder
-
-  def grab_one(self):
-    self.out_jpeg.seek(0)
-    self.out_rgb.seek(0)
-
-    self.jpeg_encoder.start(self.out_jpeg)
-    self.rgb_encoder.start(self.out_rgb)
-
-    if not self.jpeg_encoder.wait(10):
-      raise picamera.PiCameraError('Timed out')
-    if not self.rgb_encoder.wait(10):
-      raise picamera.PiCameraError('Timed out')
+    self.camera.start_recording(self.output_mjpeg, format="mjpeg", splitter_port=0, bitrate=self._jpeg_bitrate)
+    self.camera.start_recording(self.output_bgr, format="bgra", splitter_port=1, resize=self.out_rgb_resolution)
 
   def grab_stop(self):
     logging.debug("grab_stop")
 
-    with self.camera._encoders_lock:
-      del self.camera._encoders[0]
-      del self.camera._encoders[1]
-
-    self.jpeg_encoder.close()
-    self.rgb_encoder.close()
+    self.camera.stop_recording(0)
+    self.camera.stop_recording(1)
 
   def get_image_jpeg(self):
-    return self.out_jpeg.getvalue()
+    with self.output_mjpeg.condition:
+      self.output_mjpeg.condition.wait()
+      return self.output_mjpeg.frame
 
   def get_image_bgr(self):
-    return self.out_rgb.array
-
-  def grab_jpeg(self):
-    ts = time.time()
-    self.out_jpeg.seek(0)
-
-    self.jpeg_encoder.start(self.out_jpeg)
-
-    if not self.jpeg_encoder.wait(10):
-      raise picamera.PiCameraError('Timed out')
-
-    #print time.time() - ts
-
-  def grab_bgr(self):
-    ts = time.time()
-    self.out_rgb.seek(0)
-
-    self.rgb_encoder.start(self.out_rgb)
-
-    if not self.rgb_encoder.wait(10):
-      raise picamera.PiCameraError('Timed out')
-   
-    #print time.time() - ts
+    with self.output_bgr.condition:
+      self.output_bgr.condition.wait()
+      return self.output_bgr.frame
 
   def set_overlay_text(self, text):
     try:

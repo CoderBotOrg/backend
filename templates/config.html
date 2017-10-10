@@ -108,10 +108,12 @@
        <option value="antishake"{%if config.camera_exposure_mode=='antishake'%} selected{%endif%}>Anti shake</option>
        <option value="verylong"{%if config.camera_exposure_mode=='verylong'%} selected{%endif%}>Very long</option>
      </select>
-    <label for="i_camera_refresh_timeout">{% trans %}Camera refresh timeout{% endtrans %}</label>
-    <input type="range" id="i_camera_refresh_timeout" name="camera_refresh_timeout" value="{{config.camera_refresh_timeout}}" min="0" max="1" step="0.1" value="0.1">
+    <label for="i_camera_framerate">{% trans %}Camera framerate{% endtrans %}</label>
+    <input type="range" id="i_camera_framerate" name="camera_framerate" value="{{config.camera_framerate}}" min="5" max="30" step="5" value="20">
     <label for="i_camera_jpeg_quality">{% trans %}Camera jpeg quality{% endtrans %}</label>
     <input type="range" id="i_camera_jpeg_quality" name="camera_jpeg_quality" value="{{config.camera_jpeg_quality}}" min="1" max="100" step="1" value="20">
+    <label for="i_camera_jpeg_bitstream">{% trans %}Camera video bitrate{% endtrans %}</label>
+    <input type="range" id="i_camera_jpeg_quality" name="camera_jpeg_bitrate" value="{{config.camera_jpeg_bitrate}}" min="1000000" max="10000000" step="1000000" value="3000000">
     <label for="i_cv_image_factor">{% trans %}CV image resize factor (1/x){% endtrans %}</label>
     <input type="range" id="i_cv_image_factor" name="cv_image_factor" value="{{config.cv_image_factor}}" min="1" max="4" step="1" value="4">
     <label for="i_camera_path_object_size_min">{% trans %}Path object min size{% endtrans %}</label>

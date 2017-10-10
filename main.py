@@ -37,6 +37,7 @@ from conversation import Conversation
 
 from flask import Flask, render_template, request, send_file, redirect, Response, jsonify
 from flask_babel import Babel
+from werkzeug.datastructures import Headers
 #from flask_sockets import Sockets
 
 logger = logging.getLogger()
@@ -168,17 +169,13 @@ def handle_bot_status():
     return json.dumps({'status': 'ok'}) 
 
 def video_stream(cam):
-    refresh_timeout = float(app.bot_config.get("camera_refresh_timeout", "0.1")) 
+
     while not app.shutdown_requested:
-        last_refresh_time = time.time()
         frame = cam.get_image_jpeg()
         yield ("--BOUNDARYSTRING\r\n" +
                "Content-type: image/jpeg\r\n" +
                "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
                frame + "\r\n")
-        now = time.time()
-        if now - last_refresh_time < refresh_timeout:
-            time.sleep(refresh_timeout - (now - last_refresh_time))
 
 @app.route("/video")
 def handle_video():
@@ -198,7 +195,11 @@ def handle_video():
 @app.route("/video/stream")
 def handle_video_stream():
     try:
-        return Response(video_stream(cam), mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
+        h = Headers()
+        h.add('Age', 0)
+        h.add('Cache-Control', 'no-cache, private')
+        h.add('Pragma', 'no-cache')
+        return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
     except: pass
 
 @app.route("/photos", methods=["GET"])

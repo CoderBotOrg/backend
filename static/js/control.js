@@ -313,17 +313,22 @@ Mousetrap.bind(['command+alt+h', 'ctrl+alt+h'], function(e) {
 });
  
 botStatus();
-
+var bot_status = true;
 function botStatus() {
   $.ajax({url:'/bot/status',dataType:'json'})
   .done(function (data) {
     if(data.status == 'ok') {
       $('.s_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+      if( bot_status == false ) {
+        window.location.reload(false);
+      }
     } else {
       $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+      bot_status = false;
     }})
   .error(function() {
     $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+    bot_status = false;
   });
   setTimeout(botStatus, 1000);
 }

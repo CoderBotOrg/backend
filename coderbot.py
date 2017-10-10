@@ -87,7 +87,10 @@ class CoderBot:
     self._encoder_k_v_1 = 80
     self._encoder_sem = threading.Condition()
    
-    #self._ag = mpu.AccelGyro()
+    try:
+      self._ag = mpu.AccelGyro()
+    except IOError:
+      logging.info("MPU not available")
 
   the_bot = None
 
