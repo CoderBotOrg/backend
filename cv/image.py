@@ -24,6 +24,7 @@ import copy
 import cv.blob as blob
 import time
 import logging
+import cv2.aruco as aruco
 
 tesseract_whitelists = {
   'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
@@ -48,6 +49,9 @@ except:
 class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
     r_dest   = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
+
+    _aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50) 
+    _aruco_parameters =  aruco.DetectorParameters_create()
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
     _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
@@ -250,15 +254,29 @@ class Image():
       logging.info("time: " + str(time.time() - t)  + " text: " +str(text))
       return text
 
-    def find_code(self):
+    def find_qr_code(self):
       text_found = None
       img_size = self._data.shape
-      image_code = zbar.Image(img_size[1], img_size[0], "Y800", self._data.tostring())
+      gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
+      image_code = zbar.Image(img_size[1], img_size[0], "Y800", gray.tostring())
       code_num = code_scanner.scan(image_code)
       for symbol in image_code:
         text_found = symbol.data
         break
       return text_found
+
+    def find_ar_code(self):
+      gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
+      corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, self._aruco_dict, parameters=self._aruco_parameters) 
+      codes = []
+      positions = []
+      if ids is not None:
+        for i in range(0, len(ids)):
+          codes.append(ids[i][0])
+          rect = corners[i][0]
+          positions.append([(rect[0][0]+rect[1][0]+rect[2][0]+rect[3][0])/4,
+                            (rect[0][1]+rect[1][1]+rect[2][1]+rect[3][1])/4])
+      return {"codes": codes, "positions": positions} 
 
     def to_jpeg(self):
       ret, jpeg_array = cv2.imencode('.jpeg', self._data)

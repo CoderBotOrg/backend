@@ -233,8 +233,8 @@ $(document).on( "pageshow", '#page-photos', function( event ) {
 		}
                 for(p in data) {
 			var media = data[p];
-			media.thumb = media.name.replace('.jpg', '_thumb.jpg');
 			media.type = media.name.indexOf('jpg') > 0 ? 'photo' : 'video';
+			media.thumb = media.name.replace(media.name.substring(media.name.length-4), '_thumb.jpg');
                         var tags_select = '<select class="s_media_tag" data-mini="true">';
 			tags_select += '<option value=""' + (media.tag ? '' : ' selected') + '></option>';
                         for(t in tags) {

@@ -297,7 +297,8 @@
           </block>
         </value>
       </block>
-      <block type="coderbot_adv_findCode"></block>
+      <block type="coderbot_adv_findQRCode"></block>
+      <block type="coderbot_adv_findARCode"></block>
       <block type="coderbot_adv_find_class"></block>
       <block type="coderbot_adv_cnn_classify"></block>
       <block type="coderbot_sonar_get_distance"></block>

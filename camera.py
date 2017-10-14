@@ -341,11 +341,13 @@ class Camera(object):
       text = bin_image.find_text(accept)
     return text    
 
-  def find_code(self):
-    #self._image_lock.acquire()
+  def find_qr_code(self):
     img = self.get_image()
-    #self._image_lock.release()
-    return img.grayscale().find_code()
+    return img.find_qr_code()
+
+  def find_ar_code(self):
+    img = self.get_image()
+    return img.find_ar_code()
 
   def cnn_classify(self, model_name=None):
     classifier = None

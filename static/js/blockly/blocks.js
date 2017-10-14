@@ -649,7 +649,7 @@ Blockly.Python['coderbot_adv_findText'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_adv_findCode'] = {
+Blockly.Blocks['coderbot_adv_findQRCode'] = {
   /**
    * Block for findText function.
    * @this Blockly.Block
@@ -658,16 +658,38 @@ Blockly.Blocks['coderbot_adv_findCode'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(250);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCODE);
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDQRCODE);
     this.setOutput(true, 'String');
     this.setInputsInline(true);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
 
-Blockly.Python['coderbot_adv_findCode'] = function(block) {
+Blockly.Python['coderbot_adv_findQRCode'] = function(block) {
   // Boolean values true and false.
-  var code = 'get_cam().find_code()';
+  var code = 'get_cam().find_qr_code()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findARCode'] = {
+  /**
+   * Block for findText function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(250);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDARCODE);
+    this.setOutput(true, 'String');
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_findARCode'] = function(block) {
+  // Boolean values true and false.
+  var code = 'get_cam().find_ar_code()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
