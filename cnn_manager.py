@@ -127,4 +127,6 @@ class CNNManager:
 
     def clear_filesystem(self):
       shutil.rmtree(MODEL_TMP_PATH + "/" + self.model_name)
+      #shutil.rmtree(MODEL_TMP_PATH + "/bottleneck")
+      #shutil.rmtree(MODEL_TMP_PATH + "/retrain_logs")
 

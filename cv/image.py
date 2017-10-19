@@ -50,7 +50,7 @@ class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
     r_dest   = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
 
-    _aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50) 
+    _aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL) 
     _aruco_parameters =  aruco.DetectorParameters_create()
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
@@ -271,6 +271,7 @@ class Image():
       codes = []
       positions = []
       if ids is not None:
+        print ids
         for i in range(0, len(ids)):
           codes.append(ids[i][0])
           rect = corners[i][0]

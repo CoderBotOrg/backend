@@ -138,6 +138,7 @@ class CNNTrainer:
     self.bottleneck_dir = "/tmp/bottleneck"
     self.model_dir = "/tmp/imagenet"
     self.final_tensor_name = "final_result"
+    self.write_logs = False 
 
     # Needed to make sure the logging output is visible.
     # See https://github.com/tensorflow/tensorflow/issues/3047
@@ -223,11 +224,12 @@ class CNNTrainer:
 
       # Merge all the summaries and write them out to the summaries_dir
       merged = tf.summary.merge_all()
-      train_writer = tf.summary.FileWriter(self.summaries_dir + '/train',
+      if self.write_logs:
+        train_writer = tf.summary.FileWriter(self.summaries_dir + '/train',
                                          sess.graph)
 
-      validation_writer = tf.summary.FileWriter(
-        self.summaries_dir + '/validation')
+      if self.write_logs:
+        validation_writer = tf.summary.FileWriter(self.summaries_dir + '/validation')
 
       # Set up all our weights to their initial default values.
       init = tf.global_variables_initializer()
@@ -256,7 +258,8 @@ class CNNTrainer:
             [merged, train_step],
             feed_dict={bottleneck_input: train_bottlenecks,
                        ground_truth_input: train_ground_truth})
-        train_writer.add_summary(train_summary, i)
+        if self.write_logs:
+          train_writer.add_summary(train_summary, i)
 
         # Every so often, print out how well the graph is training.
         is_last_step = (i + 1 == training_steps)
@@ -281,7 +284,8 @@ class CNNTrainer:
             [merged, evaluation_step],
             feed_dict={bottleneck_input: validation_bottlenecks,
                        ground_truth_input: validation_ground_truth})
-          validation_writer.add_summary(validation_summary, i)
+          if self.write_logs:
+            validation_writer.add_summary(validation_summary, i)
           tf.logging.info('%s: Step %d: Validation accuracy = %.1f%% (N=%d)' %
                         (datetime.now(), i, validation_accuracy * 100,
                          len(validation_bottlenecks)))
@@ -377,31 +381,23 @@ class CNNTrainer:
       training_images = []
       testing_images = []
       validation_images = []
+      testing_images_len = int(len(file_list) * testing_percentage / 100.0)
+      validation_images_len = int(len(file_list) * validation_percentage / 100.0)
+      while len(testing_images) <= testing_images_len:
+        file_name = random.choice(file_list)
+        file_list.remove(file_name)
+        base_name = os.path.basename(file_name)
+        testing_images.append(base_name)
+        print ("testing: " + base_name)
+      while len(validation_images) <= validation_images_len:
+        file_name = random.choice(file_list)
+        file_list.remove(file_name)
+        base_name = os.path.basename(file_name)
+        validation_images.append(base_name)
+        print ("validation: " + base_name)
       for file_name in file_list:
         base_name = os.path.basename(file_name)
-        # We want to ignore anything after '_nohash_' in the file name when
-        # deciding which set to put an image in, the data set creator has a way of
-        # grouping photos that are close variations of each other. For example
-        # this is used in the plant disease data set to group multiple pictures of
-        # the same leaf.
-        hash_name = re.sub(r'_nohash_.*$', '', file_name)
-        # This looks a bit magical, but we need to decide whether this file should
-        # go into the training, testing, or validation sets, and we want to keep
-        # existing files in the same set even if more files are subsequently
-        # added.
-        # To do that, we need a stable way of deciding based on just the file name
-        # itself, so we do a hash of that and then use that to generate a
-        # probability value that we use to assign it.
-        hash_name_hashed = hashlib.sha1(compat.as_bytes(hash_name)).hexdigest()
-        percentage_hash = ((int(hash_name_hashed, 16) %
-                            (MAX_NUM_IMAGES_PER_CLASS + 1)) *
-                           (100.0 / MAX_NUM_IMAGES_PER_CLASS))
-        if percentage_hash < validation_percentage:
-          validation_images.append(base_name)
-        elif percentage_hash < (testing_percentage + validation_percentage):
-          testing_images.append(base_name)
-        else:
-          training_images.append(base_name)
+        training_images.append(base_name)
       result[label_name] = {
           'dir': dir_name,
           'training': training_images,

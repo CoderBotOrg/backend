@@ -72,7 +72,6 @@ class Camera(object):
     self.video_start_time = time.time() + 8640000
     self._image_time = 0
     self._cv_image_factor = int(config.Config.get().get("cv_image_factor", 4))
-    #self._image_lock = Lock()
     self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
     self._color_object_size_min = int(config.Config.get().get("camera_color_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
     self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
@@ -235,10 +234,8 @@ class Camera(object):
     return coords[0]
 
   def find_signal(self):
-    #print "signal"
     angle = None
     ts = time.time()
-    #self._image_lock.acquire()
     img = self.get_image()
     signals = img.find_template(self._img_template)
      
@@ -246,18 +243,14 @@ class Camera(object):
     if len(signals):
       angle = signals[0].angle
 
-    #self._image_lock.release()
-
     return angle
 
   def find_face(self):
     face_x = face_y = face_size = None
-    #self._image_lock.acquire()
     img = self.get_image()
     ts = time.time()
     faces = img.grayscale().find_faces()
     logging.info("face.detect: " + str(time.time() - ts))
-    #self._image_lock.release()
     if len(faces):
       # Get the largest face, face is a rectangle 
       x, y, w, h = faces[0]
@@ -292,7 +285,6 @@ class Camera(object):
       coordY = 60 - ((y * 48) / (480 / self._cv_image_factor)) 
       logging.info("x: " + str(x) + " y: " + str(y) + " coordY: " + str(coordY))
 
-    #self._image_lock.release()
     return coordY
 
   def find_color(self, s_color):
@@ -300,10 +292,8 @@ class Camera(object):
     color = (int(s_color[1:3],16), int(s_color[3:5],16), int(s_color[5:7],16))
     code_data = None
     ts = time.time()
-    #self._image_lock.acquire()
     img = self.get_image()
     bw = img.filter_color(color)
-    #self._image_lock.release()
     objects = bw.find_blobs(minsize=self._color_object_size_min, maxsize=self._color_object_size_max)
     logging.debug("objects: " + str(objects))
     dist = -1
@@ -330,9 +320,7 @@ class Camera(object):
   def find_text(self, accept, back_color):
     text = None
     color = (int(back_color[1:3],16), int(back_color[3:5],16), int(back_color[5:7],16))
-    #self._image_lock.acquire()
     img = self.get_image()
-    #self._image_lock.release()
     image = img.find_rect(color=color)
     if image:
       logging.info("image: " + str(image))
@@ -359,9 +347,7 @@ class Camera(object):
     else:
       classifier = self._cnn_classifier_default
 
-    #self._image_lock.acquire()
     img = self.get_image()
-    #self._image_lock.release()
     classes = classifier.classify_image(img.mat())
     s_classes = sorted(classes.items(), key=lambda x: x[1], reverse=True)
     return s_classes
