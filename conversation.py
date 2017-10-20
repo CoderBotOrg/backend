@@ -32,34 +32,34 @@ CLIENT_ACCESS_TOKEN = 'a4c5990369cf4ce08b839abef0d2eac7'
 
 class Conversation:
 
-  _instance = None
-  
-  @classmethod
-  def get_instance(cls):
-    if not cls._instance:
-      cls._instance = Conversation()
-    return cls._instance
+    _instance = None
 
-  def __init__(self):
-    self._ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
-    self._session_id = str(int(random.random() * 1000000000000))
+    @classmethod
+    def get_instance(cls):
+        if not cls._instance:
+            cls._instance = Conversation()
+        return cls._instance
 
-  def get_action(self, query, locale):
-    request = self._ai.text_request()
+    def __init__(self):
+        self._ai = apiai.ApiAI(CLIENT_ACCESS_TOKEN)
+        self._session_id = str(int(random.random() * 1000000000000))
 
-    request.lang = locale 
+    def get_action(self, query, locale):
+        request = self._ai.text_request()
 
-    request.query = query
+        request.lang = locale
 
-    response = request.getresponse()
+        request.query = query
 
-    data = json.load(response)
-    retval = {}
-    retval["action"] = data.get("result", {}).get("action")
-    retval["parameters"] = data.get("result", {}).get("parameters", {})
-    retval["contexts"] = data.get("result", {}).get("contexts", [])
-    retval["response"] = data.get("result", {}).get("fulfillment", {}).get("speech")
+        response = request.getresponse()
 
-    retval["action"] = retval["action"].encode("utf-8") if retval["action"] else None
-    retval["response"] = retval["response"].encode("utf-8") if retval["response"] else None
-    return retval
+        data = json.load(response)
+        retval = {}
+        retval["action"] = data.get("result", {}).get("action")
+        retval["parameters"] = data.get("result", {}).get("parameters", {})
+        retval["contexts"] = data.get("result", {}).get("contexts", [])
+        retval["response"] = data.get("result", {}).get("fulfillment", {}).get("speech")
+
+        retval["action"] = retval["action"].encode("utf-8") if retval["action"] else None
+        retval["response"] = retval["response"].encode("utf-8") if retval["response"] else None
+        return retval

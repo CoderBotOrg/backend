@@ -52,4 +52,4 @@ class Blob():
 
     @classmethod
     def sort_distance(cls, point, blobs):
-      return sorted(blobs, key=lambda blob: (point[0] - blob.bottom))
+        return sorted(blobs, key=lambda blob: (point[0] - blob.bottom))

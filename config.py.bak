@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ############################################################################
 #    CoderBot, a didactical programmable robot.
 #    Copyright (C) 2014, 2015 Roberto Previtera <info@coderbot.org>
@@ -17,10 +16,29 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
-"""
-CoderBot init module
-"""
-import main
 
-if __name__ == "__main__":
-    main.run_server()
+import json
+
+CONFIG_FILE = "coderbot.cfg"
+
+class Config:
+
+  _config = {}
+
+  @classmethod
+  def get(cls):
+    return cls._config
+
+  @classmethod
+  def read(cls):
+    f = open(CONFIG_FILE, 'r')
+    cls._config = json.load(f)
+    return cls._config
+  
+  @classmethod
+  def write(cls, config):
+    cls._config = config
+    f = open(CONFIG_FILE, 'w')
+    json.dump(cls._config, f)
+    return cls._config
+

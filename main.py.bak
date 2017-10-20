@@ -16,10 +16,7 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
-"""
-This is mudule main, which provides the http web server that expose the
-CoderBot REST API and static resources (html, js, css, jpg).
-"""
+
 import os
 import json
 import logging
@@ -43,9 +40,9 @@ from flask_babel import Babel
 from werkzeug.datastructures import Headers
 #from flask_sockets import Sockets
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
+ 
 # add a rotating handler
 handler = logging.handlers.RotatingFileHandler('logs/coderbot.log', maxBytes=1000000, backupCount=5)
 logger.addHandler(handler)
@@ -74,12 +71,12 @@ def get_locale():
     # header the browser transmits.
     loc = request.accept_languages.best_match(['it', 'en', 'fr', 'es'])
     if loc is None:
-        loc = 'en'
+      loc = 'en'
     return loc
 
 @app.route("/")
 def handle_home():
-    stream_port = cam.stream_port if cam else ""
+    stream_port = cam.stream_port if cam else "" 
     return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"), cam=cam!=None, cnn_model_names=json.dumps([[name] for name in cnn.get_models().keys()]))
 
 @app.route("/config", methods=["POST"])
@@ -99,14 +96,14 @@ def handle_wifi():
     os.system("sudo python wifi.py updatecfg " + mode + client_params)
     os.system("sudo reboot")
     if mode == "ap":
-        return "http://coder.bot:8080";
+      return "http://coder.bot:8080";
     else:
-        return "http://coderbot.locali:8080"
+      return "http://coderbot.locali:8080"
 
 @app.route("/update", methods=["GET"])
 def handle_update():
-    logging.info("updating system.start")
-    return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
+   logging.info("updating system.start")
+   return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
@@ -125,31 +122,31 @@ def handle_bot():
     elif cmd == "stop":
         bot.stop()
         try:
-            motion.stop()
+          motion.stop()
         except:
-            logging.warning("Camera not present")
-            pass
+          logging.warning("Camera not present")
+          pass
     elif cmd == "take_photo":
         try:
-            cam.photo_take()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.photo_take()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
-            pass
+          logging.warning("Camera not present")
+          pass
     elif cmd == "video_rec":
         try:
-            cam.video_rec()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.video_rec()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
-            pass
+          logging.warning("Camera not present")
+          pass
     elif cmd == "video_stop":
         try:
-            cam.video_stop()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.video_stop()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
-            pass
+          logging.warning("Camera not present")
+          pass
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
         audio.say(param1, get_locale())
@@ -168,7 +165,7 @@ def handle_bot():
 
 @app.route("/bot/status", methods=["GET"])
 def handle_bot_status():
-    return json.dumps({'status': 'ok'})
+    return json.dumps({'status': 'ok'}) 
 
 def video_stream(cam):
 
@@ -215,9 +212,9 @@ def handle_photo_get(filename):
     mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
     video = None
     try:
-        video = cam.get_photo_file(filename)
+      video = cam.get_photo_file(filename)
     except picamera.exc.PiCameraError:
-        pass
+      pass
 
     return send_file(video, mimetype.get(filename[:-3],'image'), cache_timeout=0)
 
@@ -228,7 +225,7 @@ def handle_photo_put(filename):
     logging.info(data);
     data = json.loads(data)
     cam.update_photo({"name": filename, "tag":data["tag"]});
-    return jsonify({"res":"ok"})
+    return jsonify({"res":"ok"}) 
 
 @app.route("/photos/<filename>", methods=["DELETE"])
 def handle_photo_cmd(filename):
@@ -240,7 +237,7 @@ def handle_photo_cmd(filename):
 def handle_photo_thumb(filename):
     logging.debug("photo_thumb")
     return send_file(cam.get_photo_thumb_file(filename))
-
+   
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
     logging.debug("program_list")
@@ -283,7 +280,7 @@ def handle_program_end():
     logging.debug("program_end")
     if app.prog:
         app.prog.end()
-    app.prog = None
+    app.prog = None  
     return "ok"
 
 @app.route("/program/status", methods=["GET"])
@@ -291,8 +288,8 @@ def handle_program_status():
     logging.debug("program_status")
     prog = Program("")
     if app.prog:
-        prog = app.prog
-    return json.dumps({'name': prog.name, "running": prog.is_running()})
+      prog = app.prog
+    return json.dumps({'name': prog.name, "running": prog.is_running()}) 
 
 @app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():
@@ -328,57 +325,57 @@ def handle_cnn_models_delete(model_name):
 
 
 def execute(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    # Poll process for new output until finished
-    while True:
-        nextline = process.stdout.readline()
-        if nextline == '' and process.poll() != None:
-            break
-        logging.info(nextline)
-        yield nextline
+  # Poll process for new output until finished
+  while True:
+    nextline = process.stdout.readline()
+    if nextline == '' and process.poll() != None:
+      break
+    logging.info(nextline)
+    yield nextline
 
 def button_pushed():
-    if app.bot_config.get('button_func') == "startstop":
-        if app.prog and app.prog.is_running():
-            app.prog.end()
-        elif app.prog and not app.prog.is_running():
-            app.prog.execute()
+  if app.bot_config.get('button_func') == "startstop":
+    if app.prog and app.prog.is_running():
+      app.prog.end()
+    elif app.prog and not app.prog.is_running():
+      app.prog.execute()
 
 def run_server():
-    global bot
-    global cam
-    global motion
-    global audio
-    global cnn
+  global bot
+  global cam
+  global motion
+  global audio
+  global cnn
+  try:
     try:
-        try:
-            app.bot_config = Config.read()
-            bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
-            audio = Audio.get_instance()
-            audio.say(app.bot_config.get("sound_start"))
-            try:
-                cam = Camera.get_instance()
-                motion = Motion.get_instance()
-            except picamera.exc.PiCameraError:
-                logging.error("Camera not present")
+      app.bot_config = Config.read()
+      bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
+      audio = Audio.get_instance()
+      audio.say(app.bot_config.get("sound_start"))
+      try:
+        cam = Camera.get_instance()
+        motion = Motion.get_instance()
+      except picamera.exc.PiCameraError:
+        logging.error("Camera not present")
 
-            cnn = CNNManager.get_instance()
-            event = EventManager.get_instance("coderbot")
-            conv = Conversation.get_instance()
+      cnn = CNNManager.get_instance()
+      event = EventManager.get_instance("coderbot")
+      conv = Conversation.get_instance()
 
-            if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
-                app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
-                app.prog.execute()
-        except ValueError as e:
-            app.bot_config = {}
-            logging.error(e)
+      if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
+        app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
+        app.prog.execute()
+    except ValueError as e:
+      app.bot_config = {}
+      logging.error(e)
 
-        bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False, threaded=True)
-    finally:
-        if cam:
-            cam.exit()
-        if bot:
-            bot.exit()
-        app.shutdown_requested = True
+    bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
+    app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False, threaded=True)
+  finally:
+    if cam:
+      cam.exit()
+    if bot:
+      bot.exit()
+    app.shutdown_requested = True

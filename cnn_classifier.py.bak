@@ -1,25 +1,18 @@
-############################################################################
-#    CoderBot, a didactical programmable robot.
-#    Copyright (C) 2014, 2017 Roberto Previtera <info@coderbot.org>
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-#    You should have received a copy of the GNU General Public License along
-#    with this program; if not, write to the Free Software Foundation, Inc.,
-#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-############################################################################
-"""
-This module implements the CNNClassifier class, which is the interface for
-using an existing and trained CNN model.
-"""
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -30,9 +23,7 @@ import logging
 import numpy as np
 import tensorflow as tf
 
-logger = logging.getLogger(__name__)
-
-class CNNClassifier(object):
+class CNNClassifier:
     def __init__(self, model_file, label_file, input_layer="input", output_layer="final_result", input_height=128, input_width=128, input_mean=127.5, input_std=127.5):
         self._graph = self.load_graph(model_file)
         self._labels = self.load_labels(label_file)
@@ -42,7 +33,7 @@ class CNNClassifier(object):
         self._output_operation = self._graph.get_operation_by_name(output_name);
         self._session = tf.Session(graph=self._graph)
         self._graph_norm = tf.Graph()
-        with self._graph_norm.as_default():
+	with self._graph_norm.as_default():
             image_mat = tf.placeholder(tf.float32, None, name="image_rgb_in")
             float_caster = tf.cast(image_mat, tf.float32)
             dims_expander = tf.expand_dims(float_caster, 0);
@@ -50,11 +41,11 @@ class CNNClassifier(object):
             normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std], name="image_norm_out")
             self._input_operation_norm =  self._graph_norm.get_operation_by_name("image_rgb_in")
             self._output_operation_norm = self._graph_norm.get_operation_by_name("image_norm_out")
-        self._sess_norm = tf.Session(graph=self._graph_norm)
+	self._sess_norm = tf.Session(graph=self._graph_norm)
 
     def close(self):
         self._session.close()
-        self._sess_norm.close()
+	self._sess_norm.close()
 
     def load_graph(self, model_file):
         graph = tf.Graph()
@@ -114,19 +105,19 @@ class CNNClassifier(object):
                        input_mean=0,
                        input_std=255):
         s_t = time.time()
-        t = None
-        if type(image_file_or_mat) == str:
-            t = self.read_tensor_from_image_file(file_name=image_file_or_mat,
-                                  input_height=input_height,
-                                  input_width=input_width,
-                                  input_mean=input_mean,
-                                  input_std=input_std)
-        else:
-            t = self.read_tensor_from_image_mat(image_file_or_mat,
-                                  input_height=input_height,
-                                  input_width=input_width,
-                                  input_mean=input_mean,
-                                  input_std=input_std)
+	t = None
+	if type(image_file_or_mat) == str:
+        	t = self.read_tensor_from_image_file(file_name=image_file_or_mat,
+                	              input_height=input_height,
+                                      input_width=input_width,
+                                      input_mean=input_mean,
+                                      input_std=input_std)
+	else:
+ 		t = self.read_tensor_from_image_mat(image_file_or_mat,
+                                      input_height=input_height,
+                                      input_width=input_width,
+                                      input_mean=input_mean,
+                                      input_std=input_std)
 
         #logging.info( "time.norm: " + str(time.time() - s_t))
         s_t = time.time()
@@ -142,5 +133,5 @@ class CNNClassifier(object):
         for i in results.argsort():
             pairs[self._labels[i]] = results[i]
 
-        #logging.info(pairs)
+	#logging.info(pairs)
         return pairs

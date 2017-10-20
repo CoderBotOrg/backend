@@ -49,7 +49,7 @@ class Motion:
         self.track_len = 2
         self.detect_interval = 5
         self.tracks = []
-        self.frame_idx = 0
+	self.frame_idx = 0
         self.ts = time()
         self.frame_gray = None
         self.prev_gray = None
@@ -63,7 +63,7 @@ class Motion:
         self.power_angles = [[15, (int(cfg.get("move_power_angle_1")), -1)], [4, (int(cfg.get("move_power_angle_2")), 0.05)], [1, (int(cfg.get("move_power_angle_3")), 0.02)], [0, (0, 0)]]
         self.image_width = 640 / int(cfg.get("cv_image_factor"))
         self.image_heigth = 480 / int(cfg.get("cv_image_factor"))
-        self.transform = image.Image.get_transform(self.image_width)
+	self.transform = image.Image.get_transform(self.image_width)
     _motion = None
 
     @classmethod
@@ -73,20 +73,20 @@ class Motion:
         return cls._motion
 
     def move(self, dist):
-        self.delta_dist = 0.0
+        self.delta_dist = 0.0 
         self.delta_angle = 0.0
-        self.target_dist = dist
+        self.target_dist = dist 
         self.target_angle = 0.0
         self.delta_power = 0.0
         self.loop_move()
 
     def turn(self, angle):
-        self.delta_dist = 0.0
+        self.delta_dist = 0.0 
         self.delta_angle = 0.0
         self.target_dist = 0.0
         self.target_angle = angle
         self.loop_turn()
-
+ 
     def stop(self):
         self.running = False
 
@@ -100,9 +100,9 @@ class Motion:
                 self.find_keypoints(self.frame_gray, self.tracks)
 
             if len(self.tracks) > 0 and self.prev_gray is not None:
-                self.track_keypoints(self.prev_gray, self.frame_gray, self.tracks)
+                self.track_keypoints(self.prev_gray, self.frame_gray, self.tracks) 
 
-            if len(self.tracks) > 0:
+	    if len(self.tracks) > 0:
                 delta_angle, delta_dist = self.calc_motion()
                 self.running = self.running and self.bot_move(self.target_dist, delta_dist, delta_angle)
 
@@ -132,20 +132,20 @@ class Motion:
         self.bot.stop()
 
     def find_keypoints(self, image_gray, tracks):
-        #print "find_keypoints"
+        #print "find_keypoints"	
         ts = time()
         mask = np.zeros_like(image_gray._data)
-        mask[:] = 255
-        #for x, y in [np.int32(tr[-1]) for tr in tracks]:
-        #    cv2.circle(mask, (x, y), 5, 0, -1)
-        p = cv2.goodFeaturesToTrack(image_gray._data, mask = mask, **feature_params)
-        if p is not None:
-            for x, y in np.float32(p).reshape(-1, 2):
-                tracks.append([(x, y)])
+	mask[:] = 255
+	#for x, y in [np.int32(tr[-1]) for tr in tracks]:
+	#    cv2.circle(mask, (x, y), 5, 0, -1)
+	p = cv2.goodFeaturesToTrack(image_gray._data, mask = mask, **feature_params)
+	if p is not None:
+	    for x, y in np.float32(p).reshape(-1, 2):
+		tracks.append([(x, y)])
         #print "fk: ", str(time() - ts)
 
     def track_keypoints(self, prev_image, cur_image, tracks):
-        #print "track_keypoints"
+        #print "track_keypoints"	
         ts = time()
         img0, img1 = prev_image._data, cur_image._data
         p0 = np.float32([tr[-1] for tr in tracks]).reshape(-1, 1, 2)
@@ -158,7 +158,7 @@ class Motion:
         new_tracks = []
         for tr, (x, y), good_flag in zip(tracks, p1.reshape(-1, 2), good):
             if not good_flag:
-                continue
+	       continue
             tr.append((x, y))
             if len(tr) > self.track_len:
                 del tr[0]
@@ -172,7 +172,7 @@ class Motion:
             self.bot.stop()
             #exit(0)
         #cv2.polylines(self.vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
-
+ 
     def calc_motion(self):
         vectors = self.tracks
 
@@ -186,24 +186,24 @@ class Motion:
                 vectors_t.append(vect[-2])
                 vectors_t.append(vect[-1])
                 avg_delta_x += (vect[-1][0] - vect[-2][0])
-
+        
         vectors_t = vectors_t[:min(len(vectors_t), 20)] #max 10 keypoints
 
         #avg_delta_x_t = 0.0
         if len(vectors_t) > 0:
-            vectors_t = image.Image.transform(vectors_t, self.transform)
-            for v in vectors_t.reshape(-1, 2, 2):
+           vectors_t = image.Image.transform(vectors_t, self.transform)
+           for v in vectors_t.reshape(-1, 2, 2):
                 avg_delta_y += (v[1][1] - v[0][1])
                 #avg_delta_x_t += v[1][0] - v[0][0]
             #avg_delta_x_t = avg_delta_x_t / (vectors_t.shape[0] / 2)
             #for v in vectors_t.reshape(-1, 2, 2):
                 #if abs(v[1][0] - v[0][0] - avg_delta_x_t) > 2:
-                    #print "this is an obstacle: ", str(v[1]), " delta_x: ", v[1][0] - v[0][0]
-
-        if count > 0:
+                    #print "this is an obstacle: ", str(v[1]), " delta_x: ", v[1][0] - v[0][0] 
+        
+        if count > 0:        
             avg_delta_x = (avg_delta_x / count)
             avg_delta_y = (avg_delta_y / (vectors_t.shape[0] / 2))
-
+        
             self.delta_angle -= (avg_delta_x * PI_CAM_FOV_H_DEG ) / self.image_width
             self.delta_dist += (avg_delta_y * PI_CAM_FOV_V_CM) / self.image_heigth
             #print "count: ", count, "delta_a: ", self.delta_angle, " avg_delta_x: ", avg_delta_x, " delta_y: ", self.delta_dist, " avg_delta_y: ", avg_delta_y
@@ -217,14 +217,14 @@ class Motion:
         sign = (target_angle - delta_angle) / abs(target_angle - delta_angle)
         logging.info( "abs delta: " + str(abs(target_angle - delta_angle)) + " sign delta: " + str(sign) )
         for p_a in self.power_angles:
-            if abs(target_angle - delta_angle) > p_a[0] and self.running:
-                #print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
-                self.bot.motor_control(sign * p_a[1][0], -1 * sign * p_a[1][0], p_a[1][1])
-                run = p_a[1][0] > 0 #stopped
-                break
-
+           if abs(target_angle - delta_angle) > p_a[0] and self.running:
+               #print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
+               self.bot.motor_control(sign * p_a[1][0], -1 * sign * p_a[1][0], p_a[1][1])
+               run = p_a[1][0] > 0 #stopped
+               break
+        
         return run
-
+    
     def bot_move(self, target_dist, delta_dist, delta_angle):
         base_power = 100 * (target_dist/abs(target_dist))
         self.delta_power += (delta_angle * 0.01)
@@ -234,3 +234,4 @@ class Motion:
         else:
             self.bot.stop()
         return abs(delta_dist) < abs(target_dist)
+
