@@ -31,7 +31,7 @@ except ImportError:
 from threading import Thread, Lock
 import logging
 
-from cv import camera, streamer, image, blob
+from cv import camera, image, blob
 
 from cnn_manager import CNNManager
 
