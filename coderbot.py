@@ -298,11 +298,11 @@ class CoderBot(object):
                      self._encoder_dist >= self._encoder_dist_target))):
                     self.stop()
                     logging.info( "dist: " + str(self._encoder_dist) + " speed: " + str(self._encoder_speed))
-                else:
-                    self._parent._cb_encoder(self, gpio, level, tick)
+                #else:
             if self._encoder_dist_target >= 0 and not self._motor_stop_fast:
                 if self._encoder_dist >= self._encoder_dist_target:
                     self.stop()
+            self._parent._cb_encoder(self, gpio, level, tick)
             self._motor_lock.release()
             if not self._motor_running:
                 self._parent._check_complete()
