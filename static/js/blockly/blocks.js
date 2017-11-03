@@ -504,7 +504,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
     this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLINE);
-    this.setOutput(true, 'Number');
+    this.setOutput(true, 'Array');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };

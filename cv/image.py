@@ -273,11 +273,12 @@ class Image():
         if ids is not None:
             print ids
             for i in range(0, len(ids)):
-                codes.append(ids[i][0])
-                rect = corners[i][0]
-                positions.append([(rect[0][0]+rect[1][0]+rect[2][0]+rect[3][0])/4,
-                                  (rect[0][1]+rect[1][1]+rect[2][1]+rect[3][1])/4])
-        return {"codes": codes, "positions": positions}
+                if ids[i][0] != 1023:
+                    codes.append(ids[i][0])
+                    rect = corners[i][0]
+                    positions.append([(rect[0][0]+rect[1][0]+rect[2][0]+rect[3][0])/4,
+                                      (rect[0][1]+rect[1][1]+rect[2][1]+rect[3][1])/4])
+	return {"codes": codes, "positions": positions}
 
     def to_jpeg(self):
         ret, jpeg_array = cv2.imencode('.jpeg', self._data)

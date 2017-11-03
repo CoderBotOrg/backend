@@ -218,7 +218,8 @@ class Camera(object):
         return avg
 
     def find_line(self):
-        img = self.get_image().binarize()
+        img = self.get_image().binarize().invert()
+        img = img.erode().dilate()
         slices = [0,0,0]
         blobs = [0,0,0]
         slices[0] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.2), self._camera.out_rgb_resolution[0], self._camera.out_rgb_resolution[1])
@@ -226,12 +227,12 @@ class Camera(object):
         slices[2] = img.crop(0, int(self._camera.out_rgb_resolution[1]/2.0), self._camera.out_rgb_resolution[0], int(self._camera.out_rgb_resolution[1]/1.5))
         coords = [-1, -1, -1]
         for idx, slice in enumerate(slices):
-            blobs[idx] = slice.find_blobs(minsize=480/(self._cv_image_factor * self._cv_image_factor), maxsize=6400/(self._cv_image_factor * self._cv_image_factor))
+            blobs[idx] = slice.find_blobs(minsize=4000/(self._cv_image_factor * self._cv_image_factor), maxsize=8000/(self._cv_image_factor * self._cv_image_factor))
             if len(blobs[idx]):
                 coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
                 logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
 
-        return coords[0]
+        return coords
 
     def find_signal(self):
         angle = None
