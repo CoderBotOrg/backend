@@ -162,6 +162,8 @@
       </block>
       <block type="hashmap_get_value">
       </block>
+      <block type="hashmap_get_keys">
+      </block>
     </category>
     <category name="{% trans %}Variables{% endtrans %}" custom="VARIABLE" colour="330"></category>
     <category name="{% trans %}Functions{% endtrans %}" custom="PROCEDURE" colour="290"></category>

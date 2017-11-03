@@ -859,6 +859,28 @@ Blockly.Python['hashmap_get_value'] = function(block) {
   return [code, Blockly.Python.ORDER_NONE];
 };
 
+Blockly.Blocks['hashmap_get_keys'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("get keys");
+    this.appendValueInput("map")
+        .setCheck("HashMap")
+        .appendField("from ");
+    this.setInputsInline(true);
+    this.setOutput(true, "Array");
+    this.setColour(230);
+ this.setTooltip("get keys from an hashmap");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['hashmap_get_keys'] = function(block) {
+  var value_map = Blockly.Python.valueToCode(block, 'map', Blockly.Python.ORDER_ATOMIC);
+  var code = value_map + '.keys()';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
+
 Blockly.Blocks['coderbot_conv_get_action'] = {
   init: function() {
     this.appendDummyInput()
