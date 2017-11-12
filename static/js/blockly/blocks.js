@@ -681,7 +681,7 @@ Blockly.Blocks['coderbot_adv_findARCode'] = {
     this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDARCODE);
-    this.setOutput(true, 'String');
+    this.setOutput(true, 'HashMap');
     this.setInputsInline(true);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
