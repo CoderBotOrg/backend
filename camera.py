@@ -94,11 +94,18 @@ class Camera(object):
             self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
 
         self._camera.grab_start()
+        self._image_cv = self.get_image()
 
         super(Camera, self).__init__()
 
     def get_image(self):
         return image.Image(self._camera.get_image_bgr())
+
+    def get_image_cv_jpeg(self):
+        return self._image_cv.to_jpeg()
+
+    def set_image_cv(self, image):
+        self._image_cv = image
 
     def get_image_jpeg(self):
         return self._camera.get_image_jpeg()
@@ -218,20 +225,26 @@ class Camera(object):
         return avg
 
     def find_line(self):
-        img = self.get_image().binarize()
-        #img = img.erode().dilate()
+        avg = self.get_image().get_average()
+        img = self.get_image().binarize(int((avg[0]+avg[2])/2))
+        img = img.erode().dilate()
         slices = [0,0,0]
         blobs = [0,0,0]
         slices[0] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.2), self._camera.out_rgb_resolution[0], self._camera.out_rgb_resolution[1])
         slices[1] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.5), self._camera.out_rgb_resolution[0], int(self._camera.out_rgb_resolution[1]/1.2))
         slices[2] = img.crop(0, int(self._camera.out_rgb_resolution[1]/2.0), self._camera.out_rgb_resolution[0], int(self._camera.out_rgb_resolution[1]/1.5))
+        y_offset = [int(self._camera.out_rgb_resolution[1]/1.2),
+                    int(self._camera.out_rgb_resolution[1]/1.5),
+                    int(self._camera.out_rgb_resolution[1]/2.0)]
         coords = [-1, -1, -1]
         for idx, slice in enumerate(slices):
-            blobs[idx] = slice.find_blobs(minsize=300/(self._cv_image_factor * self._cv_image_factor), maxsize=8000/(self._cv_image_factor * self._cv_image_factor))
+            blobs[idx] = slice.find_blobs(minsize=2000/(self._cv_image_factor * self._cv_image_factor), maxsize=8000/(self._cv_image_factor * self._cv_image_factor))
             if len(blobs[idx]):
                 coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
-                logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
-
+                #logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
+                blob = blobs[idx][0]
+                img.draw_rect(blob.left, y_offset[idx] + blob.top, blob.right, y_offset[idx] + blob.bottom, (0,255,0), 5) 
+        self.set_image_cv(img)
         return coords
 
     def find_signal(self):

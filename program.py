@@ -168,8 +168,10 @@ class Program:
             get_event().wait_event_generators()
         except RuntimeError as re:
             logging.info("quit: " + str(re))
+            raise
         except Exception as e:
             logging.info("quit: " + str(e))
+            raise
 
         finally:
             try:

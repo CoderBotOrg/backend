@@ -137,13 +137,16 @@ class Image():
         data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
         return Image(data)
 
+    def blackwhite(self):
+        data = cv2.threshold(self._data, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        return Image(data)
+
     def invert(self):
         data = cv2.bitwise_not(self._data)
         return Image(data)
 
     def binarize(self, threshold = -1):
         data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
-        #data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 0)
         if threshold < 0:
             data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, max((self._kernel.shape[0]/2*2)+1, 3), 3)
         else:
@@ -161,10 +164,7 @@ class Image():
     def find_blobs(self, minsize=0, maxsize=10000000):
         blobs = []
         image = contours = hyerarchy = None
-        if "2.4" in cv2.__version__:
-            contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        else:
-            image, contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        image, contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         for c in contours:
             area = cv2.contourArea(c)
@@ -279,6 +279,12 @@ class Image():
                     positions.append([(rect[0][0]+rect[1][0]+rect[2][0]+rect[3][0])/4,
                                       (rect[0][1]+rect[1][1]+rect[2][1]+rect[3][1])/4])
 	return {"codes": codes, "positions": positions}
+
+    def draw_blob(self, blob):
+        cv2.drawContours(self._data, blob.contour(), -1, (0,255,0))
+ 
+    def draw_rect(self, x1, y1, x2, y2, color, thickness):
+        cv2.rectangle(self._data, (x1,y1), (x2,y2), color, thickness)
 
     def to_jpeg(self):
         ret, jpeg_array = cv2.imencode('.jpeg', self._data)
