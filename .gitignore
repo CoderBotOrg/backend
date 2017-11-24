@@ -36,6 +36,7 @@
 photos/*.jpg
 photos/*.mp4
 photos/*.h264
+photos/*.json
 
 # Sounds recorded
 sounds/*.wav
