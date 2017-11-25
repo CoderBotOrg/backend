@@ -251,7 +251,7 @@ def handle_program_load():
     logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
-    return app.prog.dom_code
+    return jsonify(app.prog.as_json())
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
@@ -292,7 +292,7 @@ def handle_program_status():
     prog = Program("")
     if app.prog:
         prog = app.prog
-    return json.dumps({'name': prog.name, "running": prog.is_running()})
+    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": prog.get_log()})
 
 @app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():

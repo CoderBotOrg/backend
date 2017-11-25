@@ -14,7 +14,7 @@ class EventManager:
 
     def __init__(self, node_name):
         self._node_name = node_name
-        rospy.init_node(node_name, disable_signals=True)
+        rospy.init_node(node_name, anonymous=True, disable_signals=True)
         self._publishers = {}
         self._event_generators = []
         self._event_listeners = []
@@ -22,12 +22,12 @@ class EventManager:
     def publish(self, topic, message):
         publisher = self._publishers.get(topic)
         if publisher is None:
-            publisher = rospy.Publisher("/" + self._node_name + "/" + topic, std_msgs.msg.String, queue_size=10)
+            publisher = rospy.Publisher("/" + topic, std_msgs.msg.String, queue_size=10)
             self._publishers[topic] = publisher
         publisher.publish(json.dumps(message))
 
     def register_event_listener(self, topic, callback):
-        self._event_listeners.append(rospy.Subscriber("/" + self._node_name + "/" + topic, std_msgs.msg.String, callback))
+        self._event_listeners.append(rospy.Subscriber("/" + topic, std_msgs.msg.String, callback))
 
     def register_event_generator(self, generator_func):
         generator = threading.Thread(target=generator_func)

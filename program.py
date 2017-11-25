@@ -118,6 +118,7 @@ class Program:
         self.name = name
         self._dom_code = dom_code
         self._code = code
+        self._log = ""
 
     def execute(self):
         if self._running:
@@ -147,6 +148,12 @@ class Program:
             raise RuntimeError('end requested')
         return None
 
+    def log(self, text):
+        self._log += text + "\n"
+
+    def get_log(self):
+        return self._log
+
     def is_running(self):
         return self._running
 
@@ -168,9 +175,10 @@ class Program:
             get_event().wait_event_generators()
         except RuntimeError as re:
             logging.info("quit: " + str(re))
+            self.log(str(re))
         except Exception as e:
             logging.info("quit: " + str(e))
-
+            self.log(str(e))
         finally:
             try:
                 get_cam().video_stop() #if video is running, stop it

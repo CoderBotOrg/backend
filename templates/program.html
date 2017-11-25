@@ -32,7 +32,7 @@
    <!--div class="ui-block-c"><button id="b_end_prog" class="ui-btn ui-btn-icon-left ui-icon-cb-stop" type="button">{% trans %}Stop{% endtrans %}</button></div-->
   </fieldset>
 {%endif%}
-  <div id="blocklyDiv" style="height: 480px; left:4px; right:4px;"></div>
+  <div id="editorDiv" style="height: 480px; left:4px; right:4px;"></div>
   {%include "blocks_"+program_level+".xml"%}
  </div>
  <div data-role="popup" id="dialogRunning" data-history="false" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:680px;">
@@ -43,6 +43,7 @@
    <div class="ui-content-stream-program" style="width:640px;height:480px;">
    <div class="ui-content-hud"></div>
    </div>
+   <div class="ui-content-log"><textarea id="t_logging"></textarea></div>
    <button href="#" id="b_end_prog_d" class="ui-btn ui-corner-all ui-shadow ui-btn-b" data-rel="back">End program</button>
   </div>
  </div>

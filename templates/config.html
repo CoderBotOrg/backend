@@ -56,6 +56,8 @@
       <label for="r_prog_level_c">{% trans %}Standard{% endtrans %}</label> 
       <input type="radio" name="prog_level" id="r_prog_level_d" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
       <label for="r_prog_level_d">{% trans %}Advanced{% endtrans %}</label>     
+      <input type="radio" name="prog_level" id="r_prog_level_e" value="py" {%if config.prog_level=='py'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_e">{% trans %}Python{% endtrans %}</label>     
      </fieldset>
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Program editor details{% endtrans %}</legend>
