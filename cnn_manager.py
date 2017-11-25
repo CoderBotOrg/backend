@@ -130,7 +130,7 @@ class CNNManager(object):
             self.manager.save_model_status(self.model_name, self.architecture, 0)
             image_dir = self.prepare_images()
             logging.info("retrain")
-            self.trainer.retrain(image_dir, MODEL_PATH + "/" + self.model_name, self.training_steps, self.learning_rate)
+            self.trainer.retrain(image_dir, MODEL_PATH + "/" + self.model_name, self.training_steps, self.learning_rate, flip_left_right=False, random_crop=0, random_scale=0)
             self.manager.save_model_status(self.model_name, self.architecture, 1)
             self.clear_filesystem()
             logging.info("finish")

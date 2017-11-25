@@ -204,6 +204,26 @@ def handle_video_stream():
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
     except: pass
 
+def video_stream_cv(cam):
+    while not app.shutdown_requested:
+        frame = cam.get_image_cv_jpeg()
+        yield ("--BOUNDARYSTRING\r\n" +
+               "Content-type: image/jpeg\r\n" +
+               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
+               frame + "\r\n")
+
+@app.route("/video/stream/cv")
+def handle_video_stream_cv():
+    try:
+        h = Headers()
+        h.add('Age', 0)
+        h.add('Cache-Control', 'no-cache, private')
+        h.add('Pragma', 'no-cache')
+        return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
+    except: pass
+
+
+
 @app.route("/photos", methods=["GET"])
 def handle_photos():
     logging.info("photos")

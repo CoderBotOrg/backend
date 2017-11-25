@@ -1,6 +1,7 @@
 var inject_once = true;
 var editor = null;
 if($('#page-program')) {
+<<<<<<< HEAD
     $(document).on( "pageshow", '#page-program', function( event, ui ) {
         $('[href="#page-program"]').addClass( "ui-btn-active" );
         $('[href="#page-control"]').removeClass( "ui-btn-active" );
@@ -34,6 +35,49 @@ if($('#page-program')) {
             $('#popup-video').find('video').attr('src', src);
             $('#popup-video').popup("open");
         });
+=======
+$(document).on( "pageshow", '#page-program', function( event, ui ) {
+      if(inject_once) {
+        inject_once=false;
+        Blockly.inject(document.getElementById('blocklyDiv'),
+            {path: '../../', toolbox: document.getElementById('toolbox'),
+             scrollbars:CODERBOT_PROG_SCROLLBARS, maxBlocks:CODERBOT_PROG_MAXBLOCKS,
+             zoom:
+              {controls: true,
+               wheel: false,
+               startScale: 1.0, //you can change this accorting to your needs.
+               maxScale: 1.5,
+               minScale: 0.2
+              }});
+      }
+
+      $('[href="#page-program"]').addClass( "ui-btn-active" );
+      $('[href="#page-control"]').removeClass( "ui-btn-active" );
+});
+
+$(document).on( "pagecreate", '#page-program', function( event ) {
+      $("#b_new_prog").on("click", newProg);
+      $("#b_load_prog").on("click", loadProg);
+      $("#b_save_prog").on("click", saveProg);
+      $("#b_save_prog_as").on("click", saveProgAs);
+      $("#b_save_prog_as_post").on("click", saveProgAsPost);
+      $("#b_show_prog").on("click", showProg);
+      $("#b_run_prog").on("click", runProg);
+      $("#b_end_prog").on("click", endProg);
+      $("#b_end_prog_d").on("click", endProg);
+      $("#b_new_prog_post").on("click", newProgPost);
+      $("#b_load_prog_post").on("click", loadProgPost);
+      loadProgList();
+      $('#popup-video').popup();
+      $('video').on('loadeddata', function( event, ui ) {
+        $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );}
+       );
+      $("#b_show_last").on("click", function( event ) {
+        var src = "/photos/" + "VID" + prog.name + ".mp4" + "?t=" + (new Date()).getTime();
+        $('#popup-video').find('video').attr('src', src);
+        $('#popup-video').popup("open");
+      });
+>>>>>>> fea4d8cfe9fecd3993fd6b42b684c382cbb54e43
     });
 
     $(document).on( "pagecreate", '#page-program', function( event ) {

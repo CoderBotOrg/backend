@@ -24,7 +24,6 @@ import pigpio
 import config
 import logging
 import sonar
-
 import mpu
 
 PIN_MOTOR_ENABLE = 22
@@ -47,17 +46,14 @@ PIN_ENCODER_RIGHT = 14
 PWM_FREQUENCY = 100 #Hz
 PWM_RANGE = 100 #0-100
 
-def coderbot_callback(gpio, level, tick):
-    return CoderBot.get_instance().callback(gpio, level, tick)
-
 class CoderBot(object):
     _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
 
     def __init__(self, servo=False, motor_trim_factor=1.0):
         self.pi = pigpio.pi('localhost')
         self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
-        self.pi.set_mode(PIN_ENCODER_LEFT, pigpio.INPUT)
-        self.pi.set_mode(PIN_ENCODER_RIGHT, pigpio.INPUT)
+        #self.pi.set_mode(PIN_ENCODER_LEFT, pigpio.INPUT)
+        #self.pi.set_mode(PIN_ENCODER_RIGHT, pigpio.INPUT)
         self._cb = dict()
         self._cb_last_tick = dict()
         self._cb_elapse = dict()
@@ -66,38 +62,40 @@ class CoderBot(object):
         if self._servo:
             self.motor_control = self._servo_motor
         else:
-            self.motor_control = self._dc_motor
-        self._cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, coderbot_callback)
-        self._cb2 = self.pi.callback(PIN_ENCODER_LEFT, pigpio.RISING_EDGE, coderbot_callback)
-        self._cb3 = self.pi.callback(PIN_ENCODER_RIGHT, pigpio.RISING_EDGE, coderbot_callback)
+            self.motor_control = self._dc_enc_motor
+        self._cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, self._cb_button)
+        #self._cb2 = self.pi.callback(PIN_ENCODER_LEFT, pigpio.RISING_EDGE, self._cb_enc_left)
+        #self._cb3 = self.pi.callback(PIN_ENCODER_RIGHT, pigpio.RISING_EDGE, self._cb_enc_right)
         for pin in self._pin_out:
             self.pi.set_PWM_frequency(pin, PWM_FREQUENCY)
             self.pi.set_PWM_range(pin, PWM_RANGE)
 
-        self.stop()
-        self._is_moving = False
         self.sonar = [sonar.Sonar(self.pi, PIN_SONAR_1_TRIGGER, PIN_SONAR_1_ECHO),
                       sonar.Sonar(self.pi, PIN_SONAR_2_TRIGGER, PIN_SONAR_2_ECHO),
                       sonar.Sonar(self.pi, PIN_SONAR_3_TRIGGER, PIN_SONAR_3_ECHO)]
-        self._encoder_cur_left = 0
-        self._encoder_cur_right = 0
-        self._encoder_target_left = -1
-        self._encoder_target_right = -1
-        self._encoder_k_s_1 = 20
-        self._encoder_k_v_1 = 80
-        self._encoder_sem = threading.Condition()
-
+       
+        self._twin_motors_enc = self.TwinMotorsEncoder(
+          self.pi, 
+          pin_enable=PIN_MOTOR_ENABLE, 
+          pin_forward_left=PIN_LEFT_FORWARD,
+          pin_backward_left=PIN_LEFT_BACKWARD,
+          pin_encoder_left=PIN_ENCODER_LEFT,
+          pin_forward_right=PIN_RIGHT_FORWARD,
+          pin_backward_right=PIN_RIGHT_BACKWARD,
+          pin_encoder_right=PIN_ENCODER_RIGHT)
         try:
             self._ag = mpu.AccelGyro()
         except IOError:
             logging.info("MPU not available")
+        
+        self.stop()
+        self._is_moving = False
 
     the_bot = None
 
     def exit(self):
         self._cb1.cancel()
-        self._cb2.cancel()
-        self._cb3.cancel()
+        self._twin_motors_enc.exit()
         for s in self.sonar:
             s.cancel()
 
@@ -148,7 +146,10 @@ class CoderBot(object):
     def get_sonar_distance(self, sonar_id=0):
         return self.sonar[sonar_id].get_distance()
 
-    def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1, steps_left=-1, steps_right=-1 ):
+    def _dc_enc_motor(self, speed_left=100, speed_right=100, elapse=-1, steps_left=-1, steps_right=-1):
+        self._twin_motors_enc.control(power_left=speed_left, power_right=speed_right, elapse=elapse, speed_left=speed_left, speed_right=speed_right, steps_left=steps_left, steps_right=steps_right)
+
+    def _dc_motor(self, speed_left=100, speed_right=100, elapse=-1, steps_left=-1, steps_right=-1):
         self._encoder_cur_left = 0
         self._encoder_cur_right = 0
         self._encoder_target_left = steps_left
@@ -221,8 +222,9 @@ class CoderBot(object):
         self.pi.set_PWM_dutycycle(pin, duty)
 
     def stop(self):
-        for pin in self._pin_out:
-            self.pi.write(pin, 0)
+        self._twin_motors_enc.stop()
+        #for pin in self._pin_out:
+        #    self.pi.write(pin, 0)
         self._is_moving = False
 
     def is_moving(self):
@@ -233,73 +235,181 @@ class CoderBot(object):
         self._cb[gpio] = callback
         self._cb_last_tick[gpio] = 0
 
-    def callback(self, gpio, level, tick):
-        if gpio == PIN_ENCODER_LEFT and self._encoder_target_left >= 0:
-            self._encoder_cur_left += 1
-            delta_ticks_left = tick - self._encoder_last_tick_time_left if tick > self._encoder_last_tick_time_left else tick - self._encoder_last_tick_time_left + 4294967295
-            self._encoder_last_tick_time_left = tick
-            self._encoder_speed_left = 1000000.0 / delta_ticks_left #convert speed in steps per second
-            delta_s = self._encoder_speed_left / self._encoder_k_s_1 #delta_s is the delta (in steps)before the target  to reverse the motor in order to arrive at target
-            if (self._encoder_cur_left >= self._encoder_target_left - delta_s and
-                not self._encoder_motor_stopping_left):
-                self._encoder_motor_stopping_left = True
-                if self._encoder_dir_left > 0:
-                    self.pi.write(PIN_LEFT_FORWARD, 0)
-                    self.pi.set_PWM_dutycycle(PIN_LEFT_BACKWARD, 100)
-                else:
-                    self.pi.set_PWM_dutycycle(PIN_LEFT_FORWARD, 100)
-                    self.pi.write(PIN_LEFT_BACKWARD, 0)
-            elif (self._encoder_motor_stopped_left == False and
-                  ((self._encoder_motor_stopping_left and
-                   self._encoder_speed_left < self._encoder_k_v_1) or
-                  (self._encoder_motor_stopping_left and
-                   self._encoder_cur_left >= self._encoder_target_left))):
-                self.pi.write(PIN_LEFT_FORWARD, 0)
-                self.pi.write(PIN_LEFT_BACKWARD, 0)
-                self._encoder_motor_stopped_left = True
-                self._encoder_check_stopped_and_notify()
-                logging.info( "LEFT: " + str(self._encoder_cur_left) + " speed: " + str(self._encoder_speed_left))
-        elif gpio == PIN_ENCODER_RIGHT and self._encoder_target_right >= 0:
-            self._encoder_cur_right += 1
-            delta_ticks_right = tick - self._encoder_last_tick_time_right if tick > self._encoder_last_tick_time_right else tick - self._encoder_last_tick_time_right + 4294967295
-            self._encoder_last_tick_time_right = tick
-            self._encoder_speed_right = 1000000.0 / delta_ticks_right #convert speed in steps per second
-            delta_s = self._encoder_speed_right / self._encoder_k_s_1 #delta_s is the delta (in steps)before the target  to reverse the motor in order to arrive at target
-            if (self._encoder_cur_right >= self._encoder_target_right - delta_s and
-                not self._encoder_motor_stopping_right):
-                self._encoder_motor_stopping_right = True
-                if self._encoder_dir_right > 0:
-                    self.pi.write(PIN_RIGHT_FORWARD, 0)
-                    self.pi.set_PWM_dutycycle(PIN_RIGHT_BACKWARD, 100)
-                else:
-                    self.pi.set_PWM_dutycycle(PIN_RIGHT_FORWARD, 100)
-                    self.pi.write(PIN_RIGHT_BACKWARD, 0)
-            elif (self._encoder_motor_stopped_right == False and
-                  ((self._encoder_motor_stopping_right and
-                   self._encoder_speed_right < self._encoder_k_v_1) or
-                  (self._encoder_motor_stopping_right and
-                   self._encoder_cur_right >= self._encoder_target_right))):
-                self.pi.write(PIN_RIGHT_FORWARD, 0)
-                self.pi.write(PIN_RIGHT_BACKWARD, 0)
-                self._encoder_motor_stopped_right = True
-                self._encoder_check_stopped_and_notify()
-                logging.info("RIGHT: " + str(self._encoder_cur_right) + " speed: " + str(self._encoder_speed_right))
-        else:
-            cb = self._cb.get(gpio)
-            if cb:
-                elapse = self._cb_elapse.get(gpio)
-                if level == 0:
-                    self._cb_last_tick[gpio] = tick
-                elif tick - self._cb_last_tick[gpio] > elapse:
-                    self._cb_last_tick[gpio] = tick
-                    logging.info( "pushed: ", level, tick )
-                    cb()
+    def _cb_button(self, gpio, level, tick):
+        cb = self._cb.get(gpio)
+        if cb:
+            elapse = self._cb_elapse.get(gpio)
+            if level == 0:
+                self._cb_last_tick[gpio] = tick
+            elif tick - self._cb_last_tick[gpio] > elapse:
+                self._cb_last_tick[gpio] = tick
+                logging.info( "pushed: ", level, tick )
+                cb()
 
-    def _encoder_check_stopped_and_notify(self):
-        if self._encoder_motor_stopped_left and self._encoder_motor_stopped_right:
-            self._encoder_sem.acquire()
-            self._encoder_sem.notify()
-            self._encoder_sem.release()
+    class MotorEncoder(object):
+        def __init__(self, parent, _pigpio, pin_enable, pin_forward, pin_backward, pin_encoder):
+            self._parent = parent
+            self._pigpio = _pigpio
+            self._pin_enable = pin_enable
+            self._pin_forward = pin_forward
+            self._pin_backward = pin_backward
+            self._pin_encoder = pin_encoder
+            self._direction = False
+            self._pin_duty = 0
+            self._pin_reverse = 0
+            self._power = 0.0
+            self._power_actual = 0.0
+            self._encoder_dist = 0
+            self._encoder_speed = 0.0
+            self._encoder_last_tick = 0
+            self._encoder_dist_target = 0
+            self._encoder_speed_target = 0.0
+            self._encoder_k_s_1 = 20 
+            self._encoder_k_v_1 = 80
+            self._motor_stopping = False
+            self._motor_running = False
+            self._motor_stop_fast = True 
+            self._pigpio.set_mode(self._pin_encoder, pigpio.INPUT)
+            self._cb = self._pigpio.callback(self._pin_encoder, pigpio.RISING_EDGE, self._cb_encoder)
+            self._motor_lock = threading.RLock()
+
+        def exit(self):
+            self._cb.cancel()
+
+        def _cb_encoder(self, gpio, level, tick):
+            self._motor_lock.acquire()
+            self._encoder_dist += 1
+            delta_ticks = tick - self._encoder_last_tick if tick > self._encoder_last_tick else tick - self._encoder_last_tick + 4294967295
+            self._encoder_last_tick = tick
+            self._encoder_speed = 1000000.0 / delta_ticks #convert speed in steps per second
+            #print "pin: " + str(self._pin_forward) + " dist: " + str(self._encoder_dist) + " target: " + str(self._encoder_dist_target)
+            if self._encoder_dist_target >= 0 and self._motor_stop_fast:
+                delta_s = max(min(self._encoder_speed / self._encoder_k_s_1, 100),0) #delta_s is the delta (in steps)before the target  to reverse the motor in order to arrive at target
+                #print "pin: " + str(self._pin_forward) + " dist: " + str(self._encoder_dist) + " target: " + str(self._encoder_dist_target) + " delta_s: " + str(delta_s)
+                if (self._encoder_dist >= self._encoder_dist_target - delta_s and
+                    not self._motor_stopping and self._motor_running):
+                    self._motor_stopping = True
+                    self._pigpio.write(self._pin_duty, 0)
+                    self._pigpio.set_PWM_dutycycle(self._pin_reverse, self._power)
+                elif (self._motor_running and
+                    ((self._motor_stopping and
+                     self._encoder_speed < self._encoder_k_v_1) or
+                     (self._motor_stopping and
+                     self._encoder_dist >= self._encoder_dist_target))):
+                    self.stop()
+                    logging.info( "dist: " + str(self._encoder_dist) + " speed: " + str(self._encoder_speed))
+                #else:
+            if self._encoder_dist_target >= 0 and not self._motor_stop_fast:
+                if self._encoder_dist >= self._encoder_dist_target:
+                    self.stop()
+            self._parent._cb_encoder(self, gpio, level, tick)
+            self._motor_lock.release()
+            if not self._motor_running:
+                self._parent._check_complete()
+
+        def control(self, power=100.0, elapse=-1, speed=100.0, steps=-1):
+            self._motor_lock.acquire()
+            self._direction = speed > 0
+            self._encoder_dist_target = steps
+            self._motor_stopping = False
+            self._motor_running = True
+            self._encoder_dist = 0
+            self._encoder_speed_target = abs(speed)
+            self._power = abs(power) #TODO: initial power must be a function of desired speed
+            self._power_actual = abs(power) #TODO: initial power must be a function of desired speed
+            self._pin_duty = self._pin_forward if self._direction else self._pin_backward
+            self._pin_reverse = self._pin_backward if self._direction else self._pin_forward
+            self._pigpio.write(self._pin_reverse, 0)
+            self._pigpio.set_PWM_dutycycle(self._pin_duty, self._power)
+            self._pigpio.write(self._pin_enable, True)
+            self._motor_lock.release()
+            if elapse > 0:
+                time.sleep(elapse)
+                self.stop()
+       
+        def stop(self):
+            self._motor_lock.acquire()
+            self._motor_stopping = False
+            self._motor_running = False 
+            self._pigpio.write(self._pin_forward, 0)     
+            self._pigpio.write(self._pin_backward, 0)
+            self._motor_lock.release()
+
+        def distance(self):
+            return self._encoder_dist
+
+        def speed(self):
+            return self._encoder_speed
+
+        def stopping(self):
+            return self._motor_stopping
+
+        def running(self):
+            return self._motor_running
+
+        def adjust_power(self, power_delta):
+            self._power_actual = min(max(self._power + power_delta, 0), 100)
+            self._pigpio.set_PWM_dutycycle(self._pin_duty, self._power_actual)
+
+    class TwinMotorsEncoder(object):
+        def __init__(self, pigpio, pin_enable, pin_forward_left, pin_backward_left, pin_encoder_left, pin_forward_right, pin_backward_right, pin_encoder_right):
+            self._straight = False
+            self._running = False
+            self._encoder_sem = threading.Condition()
+            self._motor_left = CoderBot.MotorEncoder(self, pigpio, pin_enable, pin_forward_left, pin_backward_left, pin_encoder_left)
+            self._motor_right = CoderBot.MotorEncoder(self, pigpio, pin_enable, pin_forward_right, pin_backward_right, pin_encoder_right) 
+
+        def exit(self):
+            self._motor_left.exit()
+            self._motor_right.exit()
+
+        def control(self, power_left=100.0, power_right=100.0, elapse=-1, speed_left=-1, speed_right=-1, steps_left=-1, steps_right=-1):
+            self._straight = power_left == power_right and speed_left == speed_right and steps_left == steps_right
+
+            if steps_left >= 0 or steps_right >= 0:
+                self._encoder_sem.acquire()
+
+            self._motor_left.control(power=power_left, elapse=-1, speed=speed_left, steps=steps_left)
+            self._motor_right.control(power=power_right, elapse=-1, speed=speed_right, steps=steps_right)
+            self._running = True
+
+            if elapse > 0:
+                time.sleep(elapse)
+                self.stop()
+
+            if steps_left >= 0 or steps_right >= 0:
+                self._encoder_sem.wait()
+                self._encoder_sem.release()
+                self.stop()
+
+        def stop(self):
+            self._motor_left.stop()
+            self._motor_right.stop()
+            self._running = False
+
+        def distance(self):
+            return (self._motor_left.distance() + self._motor_right.distance()) / 2
+
+        def speed(self):
+            return (self._motor_left.speed() + self._motor_right.speed()) / 2
+
+        def _cb_encoder(self, motor, gpio, level, tick):
+            if (self._straight and self._running and not self._motor_left.stopping() and not self._motor_right.stopping() and
+                abs(self._motor_left.distance() - self._motor_right.distance()) > 2):
+                distance_delta = self._motor_left.distance() - self._motor_right.distance()
+                speed_delta = self._motor_left.speed() - self._motor_right.speed()
+                power_delta = (distance_delta / 2.0) + (speed_delta / 10.0)
+                #print "power_delta: " + str(power_delta) + " distance_delta: " + str(distance_delta) + " speed_delta: " + str(speed_delta)
+                if self._motor_left == motor:
+                    self._motor_left.adjust_power(-power_delta)
+                if self._motor_right == motor:
+                    self._motor_right.adjust_power(power_delta)
+
+        def _check_complete(self):
+            if self._motor_left.running() == False and self._motor_right.running() == False:
+                self._encoder_sem.acquire()
+                self._encoder_sem.notify()
+                self._encoder_sem.release()
 
     def halt(self):
         os.system('sudo halt')

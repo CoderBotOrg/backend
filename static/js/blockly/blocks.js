@@ -504,7 +504,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
     this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLINE);
-    this.setOutput(true, 'Number');
+    this.setOutput(true, 'Array');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
@@ -681,7 +681,7 @@ Blockly.Blocks['coderbot_adv_findARCode'] = {
     this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDARCODE);
-    this.setOutput(true, 'String');
+    this.setOutput(true, 'HashMap');
     this.setInputsInline(true);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -858,6 +858,28 @@ Blockly.Python['hashmap_get_value'] = function(block) {
   var code = value_map + '.get(' + value_key + ')';
   return [code, Blockly.Python.ORDER_NONE];
 };
+
+Blockly.Blocks['hashmap_get_keys'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("get keys");
+    this.appendValueInput("map")
+        .setCheck("HashMap")
+        .appendField("from ");
+    this.setInputsInline(true);
+    this.setOutput(true, "Array");
+    this.setColour(230);
+ this.setTooltip("get keys from an hashmap");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['hashmap_get_keys'] = function(block) {
+  var value_map = Blockly.Python.valueToCode(block, 'map', Blockly.Python.ORDER_ATOMIC);
+  var code = value_map + '.keys()';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
 
 Blockly.Blocks['coderbot_conv_get_action'] = {
   init: function() {

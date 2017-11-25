@@ -50,6 +50,9 @@ class Blob():
     def minAreaRect(self):
         return cv2.minAreaRect(self._contour)
 
+    def contour(self):
+        return self._contour
+
     @classmethod
     def sort_distance(cls, point, blobs):
         return sorted(blobs, key=lambda blob: (point[0] - blob.bottom))
