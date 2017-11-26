@@ -175,18 +175,10 @@ class Program:
             get_event().wait_event_generators()
         except RuntimeError as re:
             logging.info("quit: " + str(re))
-<<<<<<< HEAD
             self.log(str(re))
         except Exception as e:
             logging.info("quit: " + str(e))
             self.log(str(e))
-=======
-            raise
-        except Exception as e:
-            logging.info("quit: " + str(e))
-            raise
-
->>>>>>> fea4d8cfe9fecd3993fd6b42b684c382cbb54e43
         finally:
             try:
                 get_cam().video_stop() #if video is running, stop it
