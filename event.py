@@ -33,6 +33,23 @@ class EventManager:
         generator = threading.Thread(target=generator_func)
         self._event_generators.append(generator)
         generator.start()
+    
+    def unregister_listeners(self):
+        for subscriber in self._event_listeners:
+            try:
+                subscriber.unregister()
+            except:
+                logging.error("unable to unregister subscriber")
+        self._event_listeners = []
+
+    def unregister_publishers(self):
+        for publisher in self._publishers:
+            try:
+                publisher.unregister()
+            except:
+                logging.error("unable to unregister publisher")
+        self._event_listeners = []
+
 
     def start_event_generators(self):
         for g in self._event_generators:
