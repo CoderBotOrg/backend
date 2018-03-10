@@ -225,9 +225,12 @@ class Camera(object):
         return avg
 
     def find_line(self):
-        avg = self.get_image().get_average()
-        img = self.get_image().binarize(int((avg[0]+avg[2])/2))
+        img = self.get_image()
+        avg = img.get_average()
+        img = img.binarize(int((avg[0]+avg[2])/2))
         img = img.erode().dilate()
+        if int(img._data.mean()) > 127:
+            img = img.invert()
         slices = [0,0,0]
         blobs = [0,0,0]
         slices[0] = img.crop(0, int(self._camera.out_rgb_resolution[1]/1.2), self._camera.out_rgb_resolution[0], self._camera.out_rgb_resolution[1])
@@ -238,10 +241,9 @@ class Camera(object):
                     int(self._camera.out_rgb_resolution[1]/2.0)]
         coords = [-1, -1, -1]
         for idx, slice in enumerate(slices):
-            blobs[idx] = slice.find_blobs(minsize=2000/(self._cv_image_factor * self._cv_image_factor), maxsize=8000/(self._cv_image_factor * self._cv_image_factor))
+            blobs[idx] = slice.find_blobs(minsize=2000/(self._cv_image_factor * self._cv_image_factor), maxsize=16000/(self._cv_image_factor * self._cv_image_factor))
             if len(blobs[idx]):
                 coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
-                #logging.info("line coord: " + str(idx) + " " +  str(coords[idx])+ " area: " + str(blobs[idx][0].area()))
                 blob = blobs[idx][0]
                 img.draw_rect(blob.left, y_offset[idx] + blob.top, blob.right, y_offset[idx] + blob.bottom, (0,255,0), 5) 
         self.set_image_cv(img)
