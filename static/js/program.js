@@ -12,9 +12,7 @@ if($('#page-program')) {
             } else {
                 editor = new ProgramEditorPython(editorDOMElement);
             }
-        }
-
-        $("#b_new_prog").on("click", function() {editor.newProgramDlg()});
+         $("#b_new_prog").on("click", function() {editor.newProgramDlg()});
         $("#b_load_prog").on("click", function() {editor.loadProgramDlg()});
         $("#b_save_prog").on("click", function() {editor.saveProgram()});
         $("#b_save_prog_as").on("click", function() {editor.saveProgramAsDlg()});
@@ -34,7 +32,9 @@ if($('#page-program')) {
             $('#popup-video').find('video').attr('src', src);
             $('#popup-video').popup("open");
         });
-   });
+        }
+
+  });
 
     $(document).on( "pagecreate", '#page-program', function( event ) {
    });

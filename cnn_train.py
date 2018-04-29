@@ -890,6 +890,7 @@ class CNNTrainer(object):
           The jpeg input layer and the distorted result tensor.
         """
 
+        tf.logging.info("distortion - crop: " + str(random_crop) + " scale: " + str(random_scale) + " flip: " + str(flip_left_right)) 
         jpeg_data = tf.placeholder(tf.string, name='DistortJPGInput')
         decoded_image = tf.image.decode_jpeg(jpeg_data, channels=input_depth)
         decoded_image_as_float = tf.cast(decoded_image, dtype=tf.float32)

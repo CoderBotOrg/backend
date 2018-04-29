@@ -312,7 +312,7 @@ def handle_program_status():
     prog = Program("")
     if app.prog:
         prog = app.prog
-    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": prog.get_log()})
+    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
 
 @app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():

@@ -23,6 +23,8 @@ import threading
 import json
 import logging
 
+import math #keep it for blockly math functions!
+ 
 import coderbot
 import camera
 import motion
@@ -63,6 +65,7 @@ class ProgramEngine:
     def __init__(self):
         self._program = None
         self._repository = {}
+        self._log = ""
         for dirname, dirnames, filenames,  in os.walk("./data"):
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
@@ -105,6 +108,13 @@ class ProgramEngine:
     def check_end(self):
         return self._program.check_end()
 
+    def log(self, text):
+        self._log += text + "\n"
+
+    def get_log(self):
+        return self._log
+
+ 
 class Program:
     _running = False
 
@@ -118,7 +128,6 @@ class Program:
         self.name = name
         self._dom_code = dom_code
         self._code = code
-        self._log = ""
 
     def execute(self):
         if self._running:
@@ -148,12 +157,6 @@ class Program:
             raise RuntimeError('end requested')
         return None
 
-    def log(self, text):
-        self._log += text + "\n"
-
-    def get_log(self):
-        return self._log
-
     def is_running(self):
         return self._running
 
@@ -172,7 +175,6 @@ class Program:
             imports = "import json\n"
             code = imports + self._code
             exec(code)
-            get_event().wait_event_generators()
         except RuntimeError as re:
             logging.info("quit: " + str(re))
             self.log(str(re))
@@ -180,6 +182,12 @@ class Program:
             logging.info("quit: " + str(e))
             self.log(str(e))
         finally:
+            try:
+                get_event().wait_event_generators()
+                get_event().unregister_listeners()
+                get_event().unregister_publishers()
+            except:
+                logging.error("error polishing event system")
             try:
                 get_cam().video_stop() #if video is running, stop it
                 get_motion().stop()
