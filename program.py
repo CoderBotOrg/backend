@@ -23,8 +23,7 @@ import threading
 import json
 import logging
 
-import math #keep it for blockly math functions!
- 
+import math
 import coderbot
 import camera
 import motion
@@ -174,13 +173,14 @@ class Program:
 
             imports = "import json\n"
             code = imports + self._code
-            exec(code)
+            env = globals()
+            exec(code, env, env)
         except RuntimeError as re:
             logging.info("quit: " + str(re))
-            self.log(str(re))
+            get_prog_eng().log(str(re))
         except Exception as e:
             logging.info("quit: " + str(e))
-            self.log(str(e))
+            get_prog_eng().log(str(e))
         finally:
             try:
                 get_event().wait_event_generators()
