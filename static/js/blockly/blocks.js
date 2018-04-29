@@ -804,8 +804,8 @@ var coderbot_listener_id = 1;
 Blockly.Python['coderbot_event_listener'] = function(block) {
   var event_topic = block.getFieldValue('event_topic');
   var event_statements = Blockly.Python.statementToCode(block, 'event_statements');
-  var code = 'def event_listener_' + coderbot_listener_id + '(event_data):\n' +
-             Blockly.Generator.prototype.INDENT + 'event_data = json.loads(event_data.data)\n' +
+  var code = 'def event_listener_' + coderbot_listener_id + '(message):\n' +
+             Blockly.Generator.prototype.INDENT + 'event_data = json.loads(message)\n' +
              event_statements + '\n' +
              'get_event().register_event_listener(\'' + event_topic + '\', event_listener_' + coderbot_listener_id + ')'
   coderbot_listener_id++; 
@@ -832,7 +832,7 @@ Blockly.Blocks['coderbot_event_publisher'] = {
 Blockly.Python['coderbot_event_publisher'] = function(block) {
   var event_topic = block.getFieldValue('event_topic');
   var event_data = Blockly.Python.valueToCode(block, 'event_data', Blockly.Python.ORDER_ATOMIC);
-  var code = 'get_event().publish(\'' + event_topic + '\', ' + event_data + ')\n';
+  var code = 'get_event().publish(\'' + event_topic + '\', json.dumps(' + event_data + '))\n';
   return code;
 };
 
