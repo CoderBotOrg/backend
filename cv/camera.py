@@ -73,7 +73,7 @@ class Camera(object):
         logging.info("camera init")
         self.camera = picamera.PiCamera()
         self.camera.resolution = (props.get('width', 640), props.get('height', 512))
-        self.out_rgb_resolution = (self.camera.resolution[0] / int(props.get('cv_image_factor', 4)), self.camera.resolution[1] / int(props.get('cv_image_factor', 4)))
+        self.out_rgb_resolution = (int(self.camera.resolution[0] / int(props.get('cv_image_factor', 4))), int(self.camera.resolution[1] / int(props.get('cv_image_factor', 4))))
         self.camera.framerate = float(props.get('framerate', 20))
         self.camera.exposure_mode = props.get('exposure_mode', "auto")
         self.output_mjpeg = self.StreamingOutputMJPEG()

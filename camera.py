@@ -25,9 +25,9 @@ import math
 import json
 from PIL import Image as PILImage
 try:
-    from StringIO import StringIO
+    from BytesIO import BytesIO
 except ImportError:
-    from io import StringIO
+    from io import BytesIO
 from threading import Thread, Lock
 import logging
 
@@ -115,14 +115,14 @@ class Camera(object):
 
     def load_photo_metadata(self):
         try:
-            f = open(PHOTO_METADATA_FILE)
+            f = open(PHOTO_METADATA_FILE, "rt")
             self._photos = json.load(f)
             f.close()
         except IOError:
             logging.warning("no metadata file")
 
     def save_photo_metadata(self):
-        f = open(PHOTO_METADATA_FILE, "w")
+        f = open(PHOTO_METADATA_FILE, "wt")
         json.dump(self._photos, f)
         f.close()
 
@@ -147,12 +147,12 @@ class Camera(object):
         photo_index = self.get_next_photo_index()
         filename = PHOTO_PREFIX + str(photo_index) + self._camera.PHOTO_FILE_EXT;
         filename_thumb = PHOTO_PREFIX + str(photo_index) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT;
-        of = open(PHOTO_PATH + "/" + filename, "w+")
-        oft = open(PHOTO_PATH + "/" + filename_thumb, "w+")
+        of = open(PHOTO_PATH + "/" + filename, "wb+")
+        oft = open(PHOTO_PATH + "/" + filename_thumb, "wb+")
         im_str = self.get_image_jpeg()
         of.write(im_str)
         # thumb
-        im_pil = PILImage.open(StringIO(im_str))
+        im_pil = PILImage.open(BytesIO(im_str))
         im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
         self._photos.append({"name":filename})
         self.save_photo_metadata()
@@ -179,9 +179,9 @@ class Camera(object):
             except:
                 pass
 
-        oft = open(PHOTO_PATH +  "/" + filename_thumb, "w")
+        oft = open(PHOTO_PATH +  "/" + filename_thumb, "wb")
         im_str = self._camera.get_image_jpeg()
-        im_pil = PILImage.open(StringIO(im_str))
+        im_pil = PILImage.open(BytesIO(im_str))
         im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
         self._photos.append({"name":filename})
         self.save_photo_metadata()
@@ -197,10 +197,10 @@ class Camera(object):
         return self._photos
 
     def get_photo_file(self, filename):
-        return open(PHOTO_PATH + "/" + filename)
+        return open(PHOTO_PATH + "/" + filename, "rb")
 
     def get_photo_thumb_file(self, filename):
-        return open(PHOTO_PATH + "/" + filename[:-len(PHOTO_FILE_EXT)] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT)
+        return open(PHOTO_PATH + "/" + filename[:-len(PHOTO_FILE_EXT)] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT, "rb")
 
     def delete_photo(self, filename):
         logging.info("delete photo: " + filename)

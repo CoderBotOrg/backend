@@ -59,7 +59,7 @@ class Image():
     def __init__(self, array):
         self._data = array
         img_size_y = self._data.shape[0]
-        kernel_size = img_size_y / 40
+        kernel_size = int(img_size_y / 40)
         self._kernel = np.ones((kernel_size, kernel_size),np.uint8)
 
     def size(self):
@@ -271,14 +271,13 @@ class Image():
         codes = []
         positions = []
         if ids is not None:
-            print ids
             for i in range(0, len(ids)):
                 if ids[i][0] != 1023:
                     codes.append(ids[i][0])
                     rect = corners[i][0]
                     positions.append([(rect[0][0]+rect[1][0]+rect[2][0]+rect[3][0])/4,
                                       (rect[0][1]+rect[1][1]+rect[2][1]+rect[3][1])/4])
-	return {"codes": codes, "positions": positions}
+        return {"codes": codes, "positions": positions}
 
     def draw_blob(self, blob):
         cv2.drawContours(self._data, blob.contour(), -1, (0,255,0))

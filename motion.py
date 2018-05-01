@@ -22,7 +22,7 @@ import math
 import numpy as np
 import logging
 from time import clock, time, sleep
-from cv import image, streamer
+from cv import image
 
 from coderbot import CoderBot
 from camera import Camera

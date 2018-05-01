@@ -77,7 +77,6 @@ class Audio:
             #self.stream_in.start_stream()
             self.stream_in = self.MicrophoneStream(FORMAT, RATE, CHUNK)
         except Exception as e:
-            print e
             logging.info("Audio: input stream not available")
 
         self._google_speech_client = speech.SpeechClient()
@@ -98,7 +97,6 @@ class Audio:
         "Average the volume out"
         MAXIMUM = 16384
         times = float(MAXIMUM)/max(abs(i) for i in snd_data)
-        print "times: " + str(times)
 
         r = array('h', snd_data)
         c = 0
@@ -197,7 +195,6 @@ class Audio:
                 decoder.process_raw(content, False, False)
                 if decoder.hyp() and decoder.hyp().hypstr != '':
                     recog_text += decoder.hyp().hypstr
-                    print "text: " + decoder.hyp().hypstr
                     tstamp = time.time()
                     if len(recog_text) > 1:
                         decoder.end_utt()

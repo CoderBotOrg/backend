@@ -43,12 +43,18 @@ from flask_babel import Babel
 from werkzeug.datastructures import Headers
 #from flask_sockets import Sockets
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
+sh = logging.StreamHandler()
 # add a rotating handler
-handler = logging.handlers.RotatingFileHandler('logs/coderbot.log', maxBytes=1000000, backupCount=5)
-logger.addHandler(handler)
+fh = logging.handlers.RotatingFileHandler('/home/pi/coderbot/logs/coderbot.log', maxBytes=1000000, backupCount=5)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+sh.setFormatter(formatter)
+fh.setFormatter(formatter)
+
+logger.addHandler(sh)
+logger.addHandler(fh)
 
 bot = None
 cam = None
@@ -176,8 +182,9 @@ def video_stream(cam):
         frame = cam.get_image_jpeg()
         yield ("--BOUNDARYSTRING\r\n" +
                "Content-type: image/jpeg\r\n" +
-               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
-               frame + "\r\n")
+               "Content-Length: " + str(len(frame)) + "\r\n\r\n")
+        yield(frame)
+        yield("\r\n")
 
 @app.route("/video")
 def handle_video():
@@ -231,21 +238,20 @@ def handle_photos():
 
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo_get(filename):
-    logging.info("photo")
-    mimetype = {'jpeg': 'image/jpeg', 'h264': 'video/mp4'}
+    logging.info("media filename: " + filename)
+    mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     video = None
     try:
-        video = cam.get_photo_file(filename)
+        media_file = cam.get_photo_file(filename)
     except picamera.exc.PiCameraError:
         pass
 
-    return send_file(video, mimetype.get(filename[:-3],'image'), cache_timeout=0)
+    return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
 
 @app.route("/photos/<filename>", methods=["PUT"])
 def handle_photo_put(filename):
     logging.info("photo update")
-    data = request.get_data()
-    logging.info(data);
+    data = request.get_data(as_text=True)
     data = json.loads(data)
     cam.update_photo({"name": filename, "tag":data["tag"]});
     return jsonify({"res":"ok"})
@@ -256,15 +262,10 @@ def handle_photo_cmd(filename):
     cam.delete_photo(filename)
     return "ok"
 
-@app.route("/photos/<filename>/thumb", methods=["GET"])
-def handle_photo_thumb(filename):
-    logging.debug("photo_thumb")
-    return send_file(cam.get_photo_thumb_file(filename))
-
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
     logging.debug("program_list")
-    return json.dumps(app.prog_engine.list())
+    return json.dumps(app.prog_engine.prog_list())
 
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
@@ -322,7 +323,7 @@ def handle_cnn_models_list():
 @app.route("/cnnmodels", methods=["POST"])
 def handle_cnn_models_new():
     logging.info("cnn_models_new")
-    data = json.loads(request.get_data())
+    data = json.loads(request.get_data(as_text=True))
     cnn.train_new_model(model_name=data["model_name"],
                         architecture=data["architecture"],
                         image_tags=data["image_tags"],
@@ -395,7 +396,7 @@ def run_server():
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False, threaded=True)
+        app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()

@@ -77,8 +77,8 @@ class ProgramEngine:
             cls._instance = ProgramEngine()
         return cls._instance
 
-    def list(self):
-        return self._repository.keys()
+    def prog_list(self):
+        return list(self._repository.keys())
 
     def save(self, program):
         self._program = self._repository[program.name] = program
@@ -139,10 +139,8 @@ class Program:
             self._thread.start()
         except RuntimeError as re:
             logging.error("RuntimeError:" + str(re))
-            print str(e)
         except Exception as e:
             logging.error("Exception:" + str(e))
-            print str(e)
 
         return "ok"
 
