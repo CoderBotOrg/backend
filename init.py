@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ############################################################################
 #    CoderBot, a didactical programmable robot.
 #    Copyright (C) 2014, 2015 Roberto Previtera <info@coderbot.org>

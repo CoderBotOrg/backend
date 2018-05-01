@@ -23,7 +23,6 @@ CoderBot REST API and static resources (html, js, css, jpg).
 import os
 import json
 import logging
-import time
 import logging.handlers
 import subprocess
 import picamera
@@ -38,7 +37,7 @@ from cnn_manager import CNNManager
 from event import EventManager
 from conversation import Conversation
 
-from flask import Flask, render_template, request, send_file, redirect, Response, jsonify
+from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
 from werkzeug.datastructures import Headers
 #from flask_sockets import Sockets
@@ -64,7 +63,7 @@ cnn = None
 event = None
 conv = None
 
-app = Flask(__name__,static_url_path="")
+app = Flask(__name__, static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
 app.debug = False
@@ -86,26 +85,33 @@ def get_locale():
 @app.route("/")
 def handle_home():
     stream_port = cam.stream_port if cam else ""
-    return render_template('main.html', host=request.host[:request.host.find(':')], stream_port=stream_port, locale = get_locale(), config=app.bot_config, program_level=app.bot_config.get("prog_level", "std"), cam=cam!=None, cnn_model_names=json.dumps([[name] for name in cnn.get_models().keys()]))
+    return render_template('main.html',
+                           host=request.host[:request.host.find(':')],
+                           stream_port=stream_port,
+                           locale=get_locale(),
+                           config=app.bot_config,
+                           program_level=app.bot_config.get("prog_level", "std"),
+                           cam=cam != None,
+                           cnn_model_names=json.dumps([[name] for name in cnn.get_models().keys()]))
 
 @app.route("/config", methods=["POST"])
 def handle_config():
     Config.write(request.form)
     app.bot_config = Config.get()
-    return "ok";
+    return "ok"
 
 @app.route("/wifi", methods=["POST"])
 def handle_wifi():
     mode = request.form.get("wifi_mode")
     ssid = request.form.get("wifi_ssid")
     psk = request.form.get("wifi_psk")
-    logging.info( "mode ", mode, " ssid: ", ssid, " psk: ", psk)
+    logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
     client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
     logging.info(client_params)
     os.system("sudo python wifi.py updatecfg " + mode + client_params)
     os.system("sudo reboot")
     if mode == "ap":
-        return "http://coder.bot:8080";
+        return "http://coder.bot:8080"
     else:
         return "http://coderbot.locali:8080"
 
@@ -134,28 +140,24 @@ def handle_bot():
             motion.stop()
         except:
             logging.warning("Camera not present")
-            pass
     elif cmd == "take_photo":
         try:
             cam.photo_take()
             audio.say(app.bot_config.get("sound_shutter"))
         except:
             logging.warning("Camera not present")
-            pass
     elif cmd == "video_rec":
         try:
             cam.video_rec()
             audio.say(app.bot_config.get("sound_shutter"))
         except:
             logging.warning("Camera not present")
-            pass
     elif cmd == "video_stop":
         try:
             cam.video_stop()
             audio.say(app.bot_config.get("sound_shutter"))
         except:
             logging.warning("Camera not present")
-            pass
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
         audio.say(param1, get_locale())
@@ -176,15 +178,14 @@ def handle_bot():
 def handle_bot_status():
     return json.dumps({'status': 'ok'})
 
-def video_stream(cam):
-
+def video_stream(a_cam):
     while not app.shutdown_requested:
-        frame = cam.get_image_jpeg()
+        frame = a_cam.get_image_jpeg()
         yield ("--BOUNDARYSTRING\r\n" +
                "Content-type: image/jpeg\r\n" +
                "Content-Length: " + str(len(frame)) + "\r\n\r\n")
-        yield(frame)
-        yield("\r\n")
+        yield frame
+        yield "\r\n"
 
 @app.route("/video")
 def handle_video():
@@ -209,11 +210,12 @@ def handle_video_stream():
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except: pass
+    except:
+        pass
 
-def video_stream_cv(cam):
+def video_stream_cv(a_cam):
     while not app.shutdown_requested:
-        frame = cam.get_image_cv_jpeg()
+        frame = a_cam.get_image_cv_jpeg()
         yield ("--BOUNDARYSTRING\r\n" +
                "Content-type: image/jpeg\r\n" +
                "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
@@ -227,9 +229,8 @@ def handle_video_stream_cv():
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except: pass
-
-
+    except:
+        pass
 
 @app.route("/photos", methods=["GET"])
 def handle_photos():
@@ -240,20 +241,18 @@ def handle_photos():
 def handle_photo_get(filename):
     logging.info("media filename: " + filename)
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
-    video = None
     try:
         media_file = cam.get_photo_file(filename)
-    except picamera.exc.PiCameraError:
-        pass
-
-    return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
+        return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
+    except picamera.exc.PiCameraError as e:
+        logging.error("Error: " + str(e))
 
 @app.route("/photos/<filename>", methods=["PUT"])
 def handle_photo_put(filename):
     logging.info("photo update")
     data = request.get_data(as_text=True)
     data = json.loads(data)
-    cam.update_photo({"name": filename, "tag":data["tag"]});
+    cam.update_photo({"name": filename, "tag":data["tag"]})
     return jsonify({"res":"ok"})
 
 @app.route("/photos/<filename>", methods=["DELETE"])
@@ -280,7 +279,7 @@ def handle_program_save():
     name = request.form.get('name')
     dom_code = request.form.get('dom_code')
     code = request.form.get('code')
-    prog = Program(name, dom_code = dom_code, code = code)
+    prog = Program(name, dom_code=dom_code, code=code)
     app.prog_engine.save(prog)
     return "ok"
 
@@ -336,7 +335,7 @@ def handle_cnn_models_new():
 @app.route("/cnnmodels/<model_name>", methods=["GET"])
 def handle_cnn_models_status(model_name):
     logging.info("cnn_models_status")
-    model_status = cnn.get_model(model_name=model_name)
+    model_status = cnn.get_models().get(model_name)
 
     return json.dumps(model_status)
 
@@ -372,10 +371,13 @@ def run_server():
     global motion
     global audio
     global cnn
+    global conv
+    global event
     try:
         try:
             app.bot_config = Config.read()
-            bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode")=="servo"), motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
+            bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode") == "servo"),
+                                        motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
             try:

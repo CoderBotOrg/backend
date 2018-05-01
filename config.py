@@ -21,7 +21,7 @@ import json
 
 CONFIG_FILE = "coderbot.cfg"
 
-class Config:
+class Config(object):
 
     _config = {}
 

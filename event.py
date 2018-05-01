@@ -1,8 +1,7 @@
-import logging
 import threading
-from pubsub import pub 
+from pubsub import pub
 
-class EventManager:
+class EventManager(object):
     _instance = None
     @classmethod
     def get_instance(cls, node_name=None):
@@ -24,7 +23,7 @@ class EventManager:
         generator = threading.Thread(target=generator_func)
         self._event_generators.append(generator)
         generator.start()
-    
+
     def unregister_listeners(self):
         pub.unsubAll()
 
