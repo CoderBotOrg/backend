@@ -187,21 +187,6 @@ def video_stream(a_cam):
         yield frame
         yield "\r\n"
 
-@app.route("/video")
-def handle_video():
-    return """
-<html>
-<head>
-<style type=text/css>
-    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
-</style>
-</head>
-<body>
-&nbsp;
-</body>
-</html>
-"""
-
 @app.route("/video/stream")
 def handle_video_stream():
     try:
@@ -210,25 +195,6 @@ def handle_video_stream():
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except:
-        pass
-
-def video_stream_cv(a_cam):
-    while not app.shutdown_requested:
-        frame = a_cam.get_image_cv_jpeg()
-        yield ("--BOUNDARYSTRING\r\n" +
-               "Content-type: image/jpeg\r\n" +
-               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
-               frame + "\r\n")
-
-@app.route("/video/stream/cv")
-def handle_video_stream_cv():
-    try:
-        h = Headers()
-        h.add('Age', 0)
-        h.add('Cache-Control', 'no-cache, private')
-        h.add('Pragma', 'no-cache')
-        return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
     except:
         pass
 
