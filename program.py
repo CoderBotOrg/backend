@@ -29,7 +29,7 @@ import camera
 import motion
 import config
 import audio
-import event
+#import event
 import conversation
 
 PROGRAM_PATH = "./data/"
@@ -51,8 +51,8 @@ def get_audio():
 def get_prog_eng():
     return ProgramEngine.get_instance()
 
-def get_event():
-    return event.EventManager.get_instance()
+#def get_event():
+#    return event.EventManager.get_instance()
 
 def get_conv():
     return conversation.Conversation.get_instance()
@@ -180,12 +180,12 @@ class Program:
             logging.info("quit: " + str(e))
             get_prog_eng().log(str(e))
         finally:
-            try:
-                get_event().wait_event_generators()
-                get_event().unregister_listeners()
-                get_event().unregister_publishers()
-            except:
-                logging.error("error polishing event system")
+            #try:
+            #    get_event().wait_event_generators()
+            #    get_event().unregister_listeners()
+            #    get_event().unregister_publishers()
+            #except:
+            #    logging.error("error polishing event system")
             try:
                 get_cam().video_stop() #if video is running, stop it
                 get_motion().stop()
