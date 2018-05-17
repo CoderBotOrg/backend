@@ -34,7 +34,7 @@ from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
-from event import EventManager
+#from event import EventManager
 from conversation import Conversation
 
 from flask import Flask, render_template, request, send_file, Response, jsonify
@@ -92,8 +92,7 @@ def handle_home():
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
-                           cnn_model_names=json.dumps([[name] for name in cnn.get_models().keys()]))
-
+                           cnn_model_names = json.dumps({}))
 @app.route("/config", methods=["POST"])
 def handle_config():
     Config.write(request.form)
@@ -187,6 +186,21 @@ def video_stream(a_cam):
         yield frame
         yield "\r\n"
 
+@app.route("/video")
+def handle_video():
+    return """
+<html>
+<head>
+<style type=text/css>
+    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
+</style>
+</head>
+<body>
+&nbsp;
+</body>
+</html>
+"""
+
 @app.route("/video/stream")
 def handle_video_stream():
     try:
@@ -195,6 +209,25 @@ def handle_video_stream():
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
+    except:
+        pass
+
+def video_stream_cv(a_cam):
+    while not app.shutdown_requested:
+        frame = a_cam.get_image_cv_jpeg()
+        yield ("--BOUNDARYSTRING\r\n" +
+               "Content-type: image/jpeg\r\n" +
+               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
+               frame + "\r\n")
+
+@app.route("/video/stream/cv")
+def handle_video_stream_cv():
+    try:
+        h = Headers()
+        h.add('Age', 0)
+        h.add('Cache-Control', 'no-cache, private')
+        h.add('Pragma', 'no-cache')
+        return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
     except:
         pass
 
@@ -280,37 +313,37 @@ def handle_program_status():
         prog = app.prog
     return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
 
-@app.route("/cnnmodels", methods=["GET"])
-def handle_cnn_models_list():
-    logging.info("cnn_models_list")
-    return json.dumps(cnn.get_models())
+#@app.route("/cnnmodels", methods=["GET"])
+#def handle_cnn_models_list():
+#    logging.info("cnn_models_list")
+#    return json.dumps(cnn.get_models())
 
-@app.route("/cnnmodels", methods=["POST"])
-def handle_cnn_models_new():
-    logging.info("cnn_models_new")
-    data = json.loads(request.get_data(as_text=True))
-    cnn.train_new_model(model_name=data["model_name"],
-                        architecture=data["architecture"],
-                        image_tags=data["image_tags"],
-                        photos_meta=cam.get_photo_list(),
-                        training_steps=data["training_steps"],
-                        learning_rate=data["learning_rate"])
+#@app.route("/cnnmodels", methods=["POST"])
+#def handle_cnn_models_new():
+#    logging.info("cnn_models_new")
+#    data = json.loads(request.get_data(as_text=True))
+#    cnn.train_new_model(model_name=data["model_name"],
+#                        architecture=data["architecture"],
+#                        image_tags=data["image_tags"],
+#                        photos_meta=cam.get_photo_list(),
+#                        training_steps=data["training_steps"],
+#                        learning_rate=data["learning_rate"])
+#
+#    return json.dumps({"name": data["model_name"], "status": 0})
 
-    return json.dumps({"name": data["model_name"], "status": 0})
+#@app.route("/cnnmodels/<model_name>", methods=["GET"])
+#def handle_cnn_models_status(model_name):
+#    logging.info("cnn_models_status")
+#   model_status = cnn.get_models().get(model_name)
+#
+#    return json.dumps(model_status)
 
-@app.route("/cnnmodels/<model_name>", methods=["GET"])
-def handle_cnn_models_status(model_name):
-    logging.info("cnn_models_status")
-    model_status = cnn.get_models().get(model_name)
+#@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
+#def handle_cnn_models_delete(model_name):
+#    logging.info("cnn_models_delete")
+#    model_status = cnn.delete_model(model_name=model_name)
 
-    return json.dumps(model_status)
-
-@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
-def handle_cnn_models_delete(model_name):
-    logging.info("cnn_models_delete")
-    model_status = cnn.delete_model(model_name=model_name)
-
-    return json.dumps(model_status)
+ #   return json.dumps(model_status)
 
 
 def execute(command):
@@ -352,8 +385,8 @@ def run_server():
             except picamera.exc.PiCameraError:
                 logging.error("Camera not present")
 
-            cnn = CNNManager.get_instance()
-            event = EventManager.get_instance("coderbot")
+            #cnn = CNNManager.get_instance()
+            #event = EventManager.get_instance("coderbot")
             conv = Conversation.get_instance()
 
             if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
