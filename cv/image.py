@@ -34,7 +34,7 @@ tesseract_whitelists = {
 }
 
 try:
-    ocr = cv2.text.OCRTesseract_create("/usr/share/tesseract-ocr/", "eng", tesseract_whitelists['unspec'], 0, cv2.text.OCR_LEVEL_TEXTLINE)
+    ocr = cv2.text.OCRTesseract_create(Null, "eng", tesseract_whitelists['unspec'], 0, cv2.text.OCR_LEVEL_TEXTLINE)
 except:
     logging.info("tesseract not availabe")
 
