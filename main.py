@@ -84,10 +84,8 @@ def get_locale():
 
 @app.route("/")
 def handle_home():
-    stream_port = cam.stream_port if cam else ""
     return render_template('main.html',
                            host=request.host[:request.host.find(':')],
-                           stream_port=stream_port,
                            locale=get_locale(),
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
@@ -113,7 +111,7 @@ def handle_wifi():
     if mode == "ap":
         return "http://coder.bot:8080"
     else:
-        return "http://coderbot.locali:8080"
+        return "http://coderbot.local:8080"
 
 @app.route("/update", methods=["GET"])
 def handle_update():

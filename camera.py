@@ -48,7 +48,6 @@ class Camera(object):
 
     _instance = None
     _img_template = image.Image.load("coderdojo-logo.png")
-    stream_port = 8080
 
     @classmethod
     def get_instance(cls):

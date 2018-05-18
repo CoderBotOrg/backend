@@ -5,7 +5,6 @@ var CODERBOT_MOV_TR_DEF_SPEED={{config.move_tr_speed}};
 var CODERBOT_MOV_TR_DEF_ELAPSE={{config.move_tr_elapse}};
 var CODERBOT_PROG_MOVE_MOTION="{{config.prog_move_motion}}"=="yes";
 var CODERBOT_PROG_MOVE_MPU="{{config.prog_move_mpu}}"=="yes";
-var CODERBOT_STREAM_URL="http://{{host}}:{{stream_port}}/stream"
 var CODERBOT_PROG_LEVEL="{{config.prog_level}}";
 var CODERBOT_PROG_SCROLLBARS="{{config.prog_scrollbars}}"=="true";
 var CODERBOT_PROG_MAXBLOCKS={{config.prog_maxblocks}}<=0?Infinity:{{config.prog_maxblocks}};
@@ -38,13 +37,13 @@ BotMessages.ModelTraining = "{%trans%}Model is training, check model lists to mo
 </script>
 <style>
 .ui-content-stream {
-background:url('http://{{host}}:{{stream_port}}/video/stream') no-repeat;
+background:url('/video/stream') no-repeat;
 background-size: auto 100% !important;
 background-position: center;
 padding:0px;
 }
 .ui-content-stream-program {
-background:url('http://{{host}}:{{stream_port}}/video/stream') no-repeat;
+background:url('/video/stream') no-repeat;
 background-size: auto auto !important;
 background-position: center;
 }
