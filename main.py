@@ -313,37 +313,37 @@ def handle_program_status():
         prog = app.prog
     return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
 
-#@app.route("/cnnmodels", methods=["GET"])
-#def handle_cnn_models_list():
-#    logging.info("cnn_models_list")
-#    return json.dumps(cnn.get_models())
+@app.route("/cnnmodels", methods=["GET"])
+def handle_cnn_models_list():
+    logging.info("cnn_models_list")
+    return json.dumps(cnn.get_models())
 
-#@app.route("/cnnmodels", methods=["POST"])
-#def handle_cnn_models_new():
-#    logging.info("cnn_models_new")
-#    data = json.loads(request.get_data(as_text=True))
-#    cnn.train_new_model(model_name=data["model_name"],
-#                        architecture=data["architecture"],
-#                        image_tags=data["image_tags"],
-#                        photos_meta=cam.get_photo_list(),
-#                        training_steps=data["training_steps"],
-#                        learning_rate=data["learning_rate"])
-#
-#    return json.dumps({"name": data["model_name"], "status": 0})
+@app.route("/cnnmodels", methods=["POST"])
+def handle_cnn_models_new():
+    logging.info("cnn_models_new")
+    data = json.loads(request.get_data(as_text=True))
+    cnn.train_new_model(model_name=data["model_name"],
+                        architecture=data["architecture"],
+                        image_tags=data["image_tags"],
+                        photos_meta=cam.get_photo_list(),
+                        training_steps=data["training_steps"],
+                        learning_rate=data["learning_rate"])
 
-#@app.route("/cnnmodels/<model_name>", methods=["GET"])
-#def handle_cnn_models_status(model_name):
-#    logging.info("cnn_models_status")
-#   model_status = cnn.get_models().get(model_name)
-#
-#    return json.dumps(model_status)
+    return json.dumps({"name": data["model_name"], "status": 0})
 
-#@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
-#def handle_cnn_models_delete(model_name):
-#    logging.info("cnn_models_delete")
-#    model_status = cnn.delete_model(model_name=model_name)
+@app.route("/cnnmodels/<model_name>", methods=["GET"])
+def handle_cnn_models_status(model_name):
+    logging.info("cnn_models_status")
+    model_status = cnn.get_models().get(model_name)
 
- #   return json.dumps(model_status)
+    return json.dumps(model_status)
+
+@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
+def handle_cnn_models_delete(model_name):
+    logging.info("cnn_models_delete")
+    model_status = cnn.delete_model(model_name=model_name)
+
+    return json.dumps(model_status)
 
 
 def execute(command):
