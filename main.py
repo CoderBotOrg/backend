@@ -47,7 +47,7 @@ logger.setLevel(logging.DEBUG)
 
 sh = logging.StreamHandler()
 # add a rotating handler
-fh = logging.handlers.RotatingFileHandler('/home/pi/coderbot/logs/coderbot.log', maxBytes=1000000, backupCount=5)
+fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 sh.setFormatter(formatter)
 fh.setFormatter(formatter)
