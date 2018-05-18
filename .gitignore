@@ -66,3 +66,11 @@ Thumbs.db
 
 # Swap files
 *.swp
+
+
+# Python3 Virtual Environment folders
+
+bin/
+lib/
+share/
+pyvenv.cfg

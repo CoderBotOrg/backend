@@ -47,7 +47,7 @@ logger.setLevel(logging.DEBUG)
 
 sh = logging.StreamHandler()
 # add a rotating handler
-fh = logging.handlers.RotatingFileHandler('/home/pi/coderbot/logs/coderbot.log', maxBytes=1000000, backupCount=5)
+fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 sh.setFormatter(formatter)
 fh.setFormatter(formatter)
@@ -90,8 +90,7 @@ def handle_home():
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
-                           cnn_model_names=json.dumps([[name] for name in cnn.get_models().keys()]))
-
+                           cnn_model_names = json.dumps({}))
 @app.route("/config", methods=["POST"])
 def handle_config():
     Config.write(request.form)
@@ -185,6 +184,21 @@ def video_stream(a_cam):
         yield frame
         yield "\r\n"
 
+@app.route("/video")
+def handle_video():
+    return """
+<html>
+<head>
+<style type=text/css>
+    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
+</style>
+</head>
+<body>
+&nbsp;
+</body>
+</html>
+"""
+
 @app.route("/video/stream")
 def handle_video_stream():
     try:
@@ -193,6 +207,25 @@ def handle_video_stream():
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
+    except:
+        pass
+
+def video_stream_cv(a_cam):
+    while not app.shutdown_requested:
+        frame = a_cam.get_image_cv_jpeg()
+        yield ("--BOUNDARYSTRING\r\n" +
+               "Content-type: image/jpeg\r\n" +
+               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
+               frame + "\r\n")
+
+@app.route("/video/stream/cv")
+def handle_video_stream_cv():
+    try:
+        h = Headers()
+        h.add('Age', 0)
+        h.add('Cache-Control', 'no-cache, private')
+        h.add('Pragma', 'no-cache')
+        return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
     except:
         pass
 
@@ -350,7 +383,7 @@ def run_server():
             except picamera.exc.PiCameraError:
                 logging.error("Camera not present")
 
-            cnn = CNNManager.get_instance()
+            #cnn = CNNManager.get_instance()
             event = EventManager.get_instance("coderbot")
             conv = Conversation.get_instance()
 
