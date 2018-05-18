@@ -39,6 +39,7 @@ from conversation import Conversation
 
 from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
+from flask_cors import CORS
 from werkzeug.datastructures import Headers
 #from flask_sockets import Sockets
 
@@ -64,6 +65,7 @@ event = None
 conv = None
 
 app = Flask(__name__, static_url_path="")
+CORS(app)
 #app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
 app.debug = False
