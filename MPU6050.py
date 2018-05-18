@@ -6,7 +6,7 @@ Released under the MIT License
 Copyright 2015
 """
 
-import smbus
+import smbus2 as smbus
 import time
 
 class MPU6050:

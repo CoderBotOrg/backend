@@ -47,7 +47,7 @@ VIDEO_ELAPSE_MAX = 900
 class Camera(object):
 
     _instance = None
-    _img_template = image.Image.load("coderdojo-logo.png")
+    _img_template = image.Image.load("static/media/coderdojo-logo.png")
 
     @classmethod
     def get_instance(cls):

@@ -63,3 +63,6 @@ static/blockly-tutorial
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Swap files
+*.swp
