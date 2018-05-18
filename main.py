@@ -34,7 +34,7 @@ from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
-#from event import EventManager
+from event import EventManager
 from conversation import Conversation
 
 from flask import Flask, render_template, request, send_file, Response, jsonify
@@ -386,7 +386,7 @@ def run_server():
                 logging.error("Camera not present")
 
             #cnn = CNNManager.get_instance()
-            #event = EventManager.get_instance("coderbot")
+            event = EventManager.get_instance("coderbot")
             conv = Conversation.get_instance()
 
             if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
