@@ -16,6 +16,7 @@ pkg-resources==0.0.0
 protobuf==3.0.0
 PyAudio==0.2.11
 pycairo==1.17.0
+Pypubsub==4.0.0
 pytz==2018.4
 six==1.11.0
 smbus2==0.2.0
