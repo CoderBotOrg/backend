@@ -91,7 +91,7 @@ class Audio:
         if what and "$" in what:
             os.system ('omxplayer sounds/' + what[1:])
         elif what and len(what):
-            os.system ('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay')
+            os.system ('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -D hw:1,0')
 
     def normalize(self, snd_data):
         "Average the volume out"
