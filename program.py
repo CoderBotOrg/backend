@@ -198,9 +198,12 @@ import signal\n\
 from program import Commands\n\
 \n\
 print("###### LIBRARIES IMPORTED")\n\
+with open("programToFlask_status.txt", "w") as fh:\n\
+ fh.write("running")\n\
 \n\
 def do_step(sig, stack):\n\
- pass\n\
+ with open("programToFlask_status.txt", "w") as fh:\n\
+  fh.write("running")\n\
 def do_execFull(sig, stack):\n\
  global is_execFull\n\
  is_execFull = True\n\
@@ -220,6 +223,8 @@ print("####### "+str(getpid()))\n\
 
 
             print("######## PREPARING THE FILE...")
+            with open("programToFlask_status.txt", "w") as fh:
+                fh.write("loading")
             with open("_coderbot_generated_program.tmp.py", "w") as fh:
                 mode = fh.write(code)
             print("######## THE FILE IS READY")
@@ -249,7 +254,8 @@ print("####### "+str(getpid()))\n\
                 logging.error("Camera not available")
             self._running = False
             print("######## SENSORS, MOTORS, CAMERA, GPIO RESETTED")
-
+            with open("programToFlask_status.txt", "w") as fh:
+                fh.write("notRunning")
 
         except RuntimeError as re:
             logging.info("quit: " + str(re))

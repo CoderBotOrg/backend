@@ -223,21 +223,25 @@ class ProgramEditorBlockly extends ProgramEditor {
         var xml_code = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
         var dom_code = Blockly.Xml.domToText(xml_code);
 
-        window.LoopTrap = 1000;
-        Blockly.Python.INFINITE_LOOP_TRAP = '  Commands.get_prog_eng().check_end()\n';
-        var code = Blockly.Python.workspaceToCode();
+        //window.LoopTrap = 1000;
+        //Blockly.Python.INFINITE_LOOP_TRAP = '  Commands.get_prog_eng().check_end()\n';
         Blockly.Python.INFINITE_LOOP_TRAP = null;
 
-        return {name: this.program.name, dom_code: dom_code, code: code, mode: mode};
+        //Magic Stuff
+        Blockly.Python.STATEMENT_PREFIX = 'if not is_execFull:\n with open("programToFlask_status.txt", "w") as fh:\n  fh.write("pause")\n signal.pause()\nwith open("programToFlask.txt", "w") as fh:\n fh.write(%1)\n';
+        Blockly.Python.addReservedWords('#highlightBlock');
+        var code_modified = Blockly.Python.workspaceToCode();
+
+
+        return {name: this.program.name, dom_code: dom_code, code: code_modified, mode: mode};
     }
 
     showProgramCode() {
 
-//Magic Stuff
-      Blockly.Python.STATEMENT_PREFIX = '#highlightBlock(%1)\nif not is_execFull:\n signal.pause()\nwith open("programToFlask.txt", "w") as fh:\n fh.write(%1)\n#time.sleep(2)\n';
-      Blockly.Python.addReservedWords('#highlightBlock');
-
         // Generate Python code and display it.
+        //Magic Stuff
+        Blockly.Python.STATEMENT_PREFIX = null;
+        Blockly.Python.addReservedWords();
         Blockly.Python.INFINITE_LOOP_TRAP = null;
         var code = Blockly.Python.workspaceToCode();
         alert(code);

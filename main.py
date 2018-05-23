@@ -181,12 +181,12 @@ def handle_bot_status():
     try:
         with open("programToFlask.txt", "r") as fh:
             blockId = fh.read()
-        with open("programToFlask_pid.txt", "r") as fh:
-            pid = fh.read()
+        with open("programToFlask_status.txt", "r") as fh:
+            progStatus = fh.read()
     except:
         blockId = None
-        pid = None
-    return json.dumps({'status': 'ok', 'blockId': blockId, 'pid': pid})
+        progStatus = "notRunning"
+    return json.dumps({'status': 'ok', 'blockId': blockId, 'progStatus': progStatus})
 
 def video_stream(a_cam):
     while not app.shutdown_requested:

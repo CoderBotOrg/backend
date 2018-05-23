@@ -84,3 +84,4 @@ _coderbot_generated_program.tmp.py
 programRunningFlag
 programToFlask.txt
 programToFlask_pid.txt
+programToFlask_status.txt
