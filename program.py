@@ -23,6 +23,10 @@ import threading
 import json
 import logging
 
+import time
+from pathlib import Path
+import pigpio
+
 import math
 import coderbot
 import camera
@@ -36,26 +40,27 @@ PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".data"
 
-def get_cam():
-    return camera.Camera.get_instance()
+class Commands:
+    def get_cam():
+        return camera.Camera.get_instance()
 
-def get_bot():
-    return coderbot.CoderBot.get_instance()
+    def get_bot():
+        return coderbot.CoderBot.get_instance()
 
-def get_motion():
-    return motion.Motion.get_instance()
+    def get_motion():
+        return motion.Motion.get_instance()
 
-def get_audio():
-    return audio.Audio.get_instance()
+    def get_audio():
+        return audio.Audio.get_instance()
 
-def get_prog_eng():
-    return ProgramEngine.get_instance()
+    def get_prog_eng():
+        return ProgramEngine.get_instance()
 
-def get_event():
-    return event.EventManager.get_instance()
+    def get_event():
+        return event.EventManager.get_instance()
 
-def get_conv():
-    return conversation.Conversation.get_instance()
+    def get_conv():
+        return conversation.Conversation.get_instance()
 
 class ProgramEngine:
 
@@ -164,31 +169,104 @@ class Program:
             try:
                 cam = camera.Camera.get_instance()
                 if config.Config.get().get("prog_video_rec") == "true":
-                    get_cam().video_rec(program.name)
+                    Commands.get_cam().video_rec(program.name)
                     logging.debug("starting video")
             except:
                 logging.error("Camera not available")
 
-            imports = "import json\n"
-            code = imports + self._code
-            env = globals()
-            exec(code, env, env)
-        except RuntimeError as re:
-            logging.info("quit: " + str(re))
-            get_prog_eng().log(str(re))
-        except Exception as e:
-            logging.info("quit: " + str(e))
-            get_prog_eng().log(str(e))
-        finally:
+
+            with open("FalskToProgram_mode.txt", "r") as fh:
+                mode = fh.read()
+
+            if mode == "fullExec":
+                is_execFull = "is_execFull = True\n"
+            else: # mode == stepByStep
+                is_execFull = "is_execFull = False\n"
+
+            headerFile = is_execFull + '\n\
+\n\
+with open("programRunningFlag", "w") as fh:\n\
+ fh.write("1")\n\
+\n\
+import json\n\
+print("###### LAUNCHED")\n\
+print("###### IMPORTING LIBRARIES...")\n\
+#import time\n\
+from os import getpid\n\
+import signal\n\
+\n\
+from program import Commands\n\
+\n\
+print("###### LIBRARIES IMPORTED")\n\
+\n\
+def do_step(sig, stack):\n\
+ pass\n\
+def do_execFull(sig, stack):\n\
+ global is_execFull\n\
+ is_execFull = True\n\
+signal.signal(signal.SIGUSR1, do_step)\n\
+signal.signal(signal.SIGUSR2, do_execFull)\n\
+with open("programToFlask_pid.txt", "w") as fh:\n\
+ fh.write(str(getpid()))\n\
+print("####### "+str(getpid()))\n\
+\n'
+
+
+            footerFile = 'with open("programRunningFlag", "w") as fh:\n fh.write("0")'
+
+            code = headerFile + self._code + footerFile
+            #env = globals()
+            #exec(code, env, env)
+
+
+            print("######## PREPARING THE FILE...")
+            with open("_coderbot_generated_program.tmp.py", "w") as fh:
+                mode = fh.write(code)
+            print("######## THE FILE IS READY")
+
+            print("######## LAUNCHING...")
+            os.system("python3 _coderbot_generated_program.tmp.py")
+
+            ProgramRunning = True
+            while ProgramRunning:
+                with open("programRunningFlag", "r") as fh:
+                    ProgramRunning = bool(int(fh.read()))
+                time.sleep(0.1)
+            print("######## PROGRAM FINISHED")
+            print("######## RESETTING SENSORS, MOTORS, CAMERA, GPIO...")
+            pi = pigpio.pi()
+            pi.stop()
             try:
-                get_event().wait_event_generators()
-                get_event().unregister_listeners()
-                get_event().unregister_publishers()
+                Commands.get_event().wait_event_generators()
+                Commands.get_event().unregister_listeners()
+                Commands.get_event().unregister_publishers()
             except:
                 logging.error("error polishing event system")
             try:
-                get_cam().video_stop() #if video is running, stop it
-                get_motion().stop()
+                Commands.get_cam().video_stop() #if video is running, stop it
+                Commands.get_motion().stop()
+            except:
+                logging.error("Camera not available")
+            self._running = False
+            print("######## SENSORS, MOTORS, CAMERA, GPIO RESETTED")
+
+
+        except RuntimeError as re:
+            logging.info("quit: " + str(re))
+            Commands.get_prog_eng().log(str(re))
+        except Exception as e:
+            logging.info("quit: " + str(e))
+            Commands.get_prog_eng().log(str(e))
+        finally:
+            try:
+                Commands.get_event().wait_event_generators()
+                Commands.get_event().unregister_listeners()
+                Commands.get_event().unregister_publishers()
+            except:
+                logging.error("error polishing event system")
+            try:
+                Commands.get_cam().video_stop() #if video is running, stop it
+                Commands.get_motion().stop()
             except:
                 logging.error("Camera not available")
             self._running = False

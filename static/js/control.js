@@ -319,6 +319,8 @@ function botStatus() {
   .done(function (data) {
     if(data.status == 'ok') {
       $('.s_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+    console.log(data.blockId);
+    Blockly.mainWorkspace.highlightBlock(data.blockId);
       if( bot_status == false ) {
         window.location.reload(false);
       }
@@ -326,6 +328,7 @@ function botStatus() {
       $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
       bot_status = false;
     }})
+
   .error(function() {
     $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
     bot_status = false;

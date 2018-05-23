@@ -39,9 +39,13 @@ from conversation import Conversation
 
 from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
-from flask_cors import CORS
 from werkzeug.datastructures import Headers
 #from flask_sockets import Sockets
+
+
+from pathlib import Path
+import signal
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -65,7 +69,6 @@ event = None
 conv = None
 
 app = Flask(__name__, static_url_path="")
-CORS(app)
 #app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
 app.debug = False
@@ -175,7 +178,15 @@ def handle_bot():
 
 @app.route("/bot/status", methods=["GET"])
 def handle_bot_status():
-    return json.dumps({'status': 'ok'})
+    try:
+        with open("programToFlask.txt", "r") as fh:
+            blockId = fh.read()
+        with open("programToFlask_pid.txt", "r") as fh:
+            pid = fh.read()
+    except:
+        blockId = None
+        pid = None
+    return json.dumps({'status': 'ok', 'blockId': blockId, 'pid': pid})
 
 def video_stream(a_cam):
     while not app.shutdown_requested:
@@ -294,8 +305,66 @@ def handle_program_exec():
     logging.debug("program_exec")
     name = request.form.get('name')
     code = request.form.get('code')
-    app.prog = app.prog_engine.create(name, code)
-    return json.dumps(app.prog.execute())
+    mode = request.form.get('mode')
+
+
+    my_file = Path("programRunningFlag")
+    if not my_file.is_file():
+        with open("programRunningFlag", "w") as fh:
+            fh.write("0")
+
+    my_file = Path("programToFlask_pid.txt")
+    if not my_file.is_file():
+        with open("programToFlask_pid.txt", "w") as fh:
+            fh.write("")
+
+    my_file = Path("FalskToProgram_mode.txt")
+    if not my_file.is_file():
+        with open("FalskToProgram_mode.txt", "w") as fh:
+            fh.write("unknwon")
+
+
+    programRunning_flag = False
+
+    processId = ""
+
+    with open("programRunningFlag", "r") as fh:
+        programRunning_flag = bool(int(fh.read()))
+    with open("FalskToProgram_mode.txt", "r") as fh:
+        program_mode = fh.read()
+    with open("programToFlask_pid.txt", "r") as fh:
+        processId = fh.read()
+    print("########### running: "+str(programRunning_flag))
+    if programRunning_flag:
+        if program_mode == "stepByStep":
+            if mode == "stepByStep":
+                signal_to_program = signal.SIGUSR1
+            else: # mode == "fullExec"
+                signal_to_program = signal.SIGUSR2
+        else: # program_mode == "fullExec"
+            signal_to_program = signal.SIGKILL
+            with open("programRunningFlag", "w") as fh:
+                fh.write("0")
+        try:
+            os.kill(int(processId), signal_to_program)
+        except Exception as err: #The process wasn't running
+            print("######### error: "+str(err))
+            with open("programRunningFlag", "w") as fh:
+                fh.write("0")
+            programRunning_flag = False
+    else:
+        program_mode = mode
+    print("\n#############\nprogramRunningFlag: "+str(programRunning_flag) + "\nFalskToProgram_mode.txt: "+ str(program_mode)+"\nprogramToFlask_pid.txt: "+str(processId)+"\nmode: "+str(mode)+"\n###########\n")
+
+    if not programRunning_flag: # Ho messo questo invece dell'else per via del try except
+        with open("FalskToProgram_mode.txt", "w") as fh:
+            if mode == "fullExec" or mode == "stepByStep":
+                fh.write(mode)
+            else:
+                fh.write("unknown")
+
+        app.prog = app.prog_engine.create(name, code)
+        return json.dumps(app.prog.execute())
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():

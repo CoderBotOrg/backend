@@ -26,7 +26,6 @@ from cv import image
 
 from coderbot import CoderBot
 from camera import Camera
-from program import get_prog_eng
 from config import Config
 
 lk_params = dict( winSize  = (15, 15),
