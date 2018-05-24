@@ -18,7 +18,8 @@ if($('#page-program')) {
         $("#b_save_prog_as").on("click", function() {editor.saveProgramAsDlg()});
         $("#b_save_prog_as_post").on("click", function() {editor.saveProgramAs()});
         $("#b_show_prog").on("click", function() {editor.showProgramCode()});
-        $("#b_run_prog").on("click", function() {editor.runProgram()});
+        $("#b_run_prog").on("click", function() {editor.runProgram("fullExec")});
+        $("#b_step_prog").on("click", function() {editor.runProgram("stepByStep")});
         $("#b_end_prog").on("click", function() {editor.stopProgram()});
         $("#b_end_prog_d").on("click", function() {editor.stopProgram()});
         $("#b_new_prog_post").on("click", function() {editor.newProgram()});
@@ -146,8 +147,8 @@ class ProgramEditor {
         }
     }
 
-    runProgram() {
-        var program_data = this.getProgramData()
+    runProgram(mode) {
+        var program_data = this.getProgramData(mode)
 
         if(CODERBOT_PROG_SAVEONRUN) {
             try {
@@ -160,7 +161,7 @@ class ProgramEditor {
         }
         try {
             $.ajax({url: '/program/exec', data: program_data, type: "POST"});
-            $("#dialogRunning").popup("open", {transition: "pop"});
+            //$("#dialogRunning").popup("open", {transition: "pop"});
             setTimeout(function() {editor.statusProgram()}, 1000);
         } catch (e) {
             alert(e);
@@ -181,7 +182,7 @@ class ProgramEditor {
             } else {
                 $('#b_end_prog_d').text(BotMessages.ProgramDialogStop);
                 $('#i_dialog_running_title').text('CoderBot ' + BotMessages.ProgramStatusRunning);
-                setTimeout(statusProg, 1000);
+                setTimeout(statusProgram, 1000);
             }  
         }});
     }
@@ -218,20 +219,29 @@ class ProgramEditorBlockly extends ProgramEditor {
         super.loadProgramCallback(data)
     }
 
-    getProgramData() {
+    getProgramData(mode) {
         var xml_code = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
         var dom_code = Blockly.Xml.domToText(xml_code);
 
-        window.LoopTrap = 1000;
-        Blockly.Python.INFINITE_LOOP_TRAP = '  get_prog_eng().check_end()\n';
-        var code = Blockly.Python.workspaceToCode();
+        //window.LoopTrap = 1000;
+        //Blockly.Python.INFINITE_LOOP_TRAP = '  Commands.get_prog_eng().check_end()\n';
         Blockly.Python.INFINITE_LOOP_TRAP = null;
 
-        return {name: this.program.name, dom_code: dom_code, code: code};
+        //Magic Stuff
+        Blockly.Python.STATEMENT_PREFIX = 'if not is_execFull:\n with open("programToFlask_status.txt", "w") as fh:\n  fh.write("pause")\n signal.pause()\nwith open("programToFlask.txt", "w") as fh:\n fh.write(%1)\n';
+        Blockly.Python.addReservedWords('#highlightBlock');
+        var code_modified = Blockly.Python.workspaceToCode();
+
+
+        return {name: this.program.name, dom_code: dom_code, code: code_modified, mode: mode};
     }
 
     showProgramCode() {
+
         // Generate Python code and display it.
+        //Magic Stuff
+        Blockly.Python.STATEMENT_PREFIX = null;
+        Blockly.Python.addReservedWords();
         Blockly.Python.INFINITE_LOOP_TRAP = null;
         var code = Blockly.Python.workspaceToCode();
         alert(code);

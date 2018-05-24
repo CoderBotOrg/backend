@@ -319,6 +319,26 @@ function botStatus() {
   .done(function (data) {
     if(data.status == 'ok') {
       $('.s_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+
+      //Highlight blocks with blockId
+      console.log("Block to highlight with id: " + data.blockId);
+      Blockly.mainWorkspace.highlightBlock(data.blockId);
+
+      //Print the actual status of the generated program
+      console.log("Program status: " + data.progStatus);
+      if(data.progStatus == "loading") {
+        $('#progStatus_bar').text(data.progStatus).removeClass('ui-btn-a ui-btn-b ui-icon-gear ui-icon-cb-run ui-icon-alert ui-icon-delete ui-icon-minus').addClass('ui-icon-gear ui-btn-b');
+      } else if (data.progStatus == "running") {
+        $('#progStatus_bar').text("Running").removeClass('ui-btn-a ui-btn-b ui-icon-gear ui-icon-cb-run ui-icon-alert ui-icon-delete ui-icon-minus').addClass('ui-icon-cb-run ui-btn-a');
+      } else if (data.progStatus == "paused") {
+        $('#progStatus_bar').text("Paused").removeClass('ui-btn-a ui-btn-b ui-icon-gear ui-icon-cb-run ui-icon-alert ui-icon-delete ui-icon-minus').addClass('ui-icon-alert ui-btn-b');
+      } else if (data.progStatus == "notRunning") {
+        $('#progStatus_bar').text("Not Running").removeClass('ui-btn-a ui-btn-b ui-icon-gear ui-icon-cb-run ui-icon-alert ui-icon-delete ui-icon-minus').addClass('ui-icon-delete ui-btn-b');
+      } else { //Unknown progStatus
+        $('#progStatus_bar').text(data.progStatus).removeClass('ui-btn-a ui-btn-b ui-icon-gear ui-icon-cb-run ui-icon-alert ui-icon-delete ui-icon-minus').addClass('ui-icon-minus ui-btn-a');
+      }
+
+
       if( bot_status == false ) {
         window.location.reload(false);
       }
@@ -326,6 +346,7 @@ function botStatus() {
       $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
       bot_status = false;
     }})
+
   .error(function() {
     $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
     bot_status = false;

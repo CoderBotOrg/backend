@@ -74,3 +74,14 @@ bin/
 lib/
 share/
 pyvenv.cfg
+
+
+
+# Generated Program Status Files
+
+FalskToProgram_mode.txt
+_coderbot_generated_program.tmp.py
+programRunningFlag
+programToFlask.txt
+programToFlask_pid.txt
+programToFlask_status.txt
