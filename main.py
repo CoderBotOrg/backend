@@ -40,6 +40,8 @@ from conversation import Conversation
 from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
 from werkzeug.datastructures import Headers
+from flask_cors import CORS
+CORS(app)
 #from flask_sockets import Sockets
 
 
