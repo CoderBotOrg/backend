@@ -423,9 +423,9 @@ def handle_program_exec():
         with open("programToFlask_pid.txt", "w") as fh:
             fh.write("")
 
-    my_file = Path("FalskToProgram_mode.txt")
+    my_file = Path("FlaskToProgram_mode.txt")
     if not my_file.is_file():
-        with open("FalskToProgram_mode.txt", "w") as fh:
+        with open("FlaskToProgram_mode.txt", "w") as fh:
             fh.write("unknwon")
 
 
@@ -435,7 +435,7 @@ def handle_program_exec():
 
     with open("programRunningFlag", "r") as fh:
         programRunning_flag = bool(int(fh.read()))
-    with open("FalskToProgram_mode.txt", "r") as fh:
+    with open("FlaskToProgram_mode.txt", "r") as fh:
         program_mode = fh.read()
     with open("programToFlask_pid.txt", "r") as fh:
         processId = fh.read()
@@ -459,10 +459,10 @@ def handle_program_exec():
             programRunning_flag = False
     else:
         program_mode = mode
-    print("\n#############\nprogramRunningFlag: "+str(programRunning_flag) + "\nFalskToProgram_mode.txt: "+ str(program_mode)+"\nprogramToFlask_pid.txt: "+str(processId)+"\nmode: "+str(mode)+"\n###########\n")
+    print("\n#############\nprogramRunningFlag: "+str(programRunning_flag) + "\nFlaskToProgram_mode.txt: "+ str(program_mode)+"\nprogramToFlask_pid.txt: "+str(processId)+"\nmode: "+str(mode)+"\n###########\n")
 
     if not programRunning_flag: # Ho messo questo invece dell'else per via del try except
-        with open("FalskToProgram_mode.txt", "w") as fh:
+        with open("FlaskToProgram_mode.txt", "w") as fh:
             if mode == "fullExec" or mode == "stepByStep":
                 fh.write(mode)
             else:

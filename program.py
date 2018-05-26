@@ -175,7 +175,7 @@ class Program:
                 logging.error("Camera not available")
 
 
-            with open("FalskToProgram_mode.txt", "r") as fh:
+            with open("FlaskToProgram_mode.txt", "r") as fh:
                 mode = fh.read()
 
             if mode == "fullExec":
