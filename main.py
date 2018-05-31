@@ -41,7 +41,8 @@ from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
 from werkzeug.datastructures import Headers
 from flask_cors import CORS
-CORS(app)
+from flask_socketio import SocketIO, send, emit
+
 #from flask_sockets import Sockets
 
 
@@ -50,7 +51,7 @@ import signal
 
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 
 sh = logging.StreamHandler()
 # add a rotating handler
@@ -71,8 +72,11 @@ event = None
 conv = None
 
 app = Flask(__name__, static_url_path="")
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 #app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
+CORS(app)
 app.debug = False
 #sockets = Sockets(app)
 
@@ -89,6 +93,7 @@ def get_locale():
         loc = 'en'
     return loc
 
+# Serve legacy web application templates
 @app.route("/")
 def handle_home():
     return render_template('main.html',
@@ -98,11 +103,22 @@ def handle_home():
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
                            cnn_model_names = json.dumps({}))
+
+@socketio.on('my event')
+def handle_my_custom_event(data):
+    emit('my response', data, broadcast=True)
+
+# Overwrite configuration and reload it
 @app.route("/config", methods=["POST"])
-def handle_config():
+def updateConfig():
     Config.write(request.form)
     app.bot_config = Config.get()
     return "ok"
+
+# Expose configuration as JSON
+@app.route("/config", methods=["GET"])
+def returnConfig():
+    return(jsonify(app.bot_config)) 
 
 @app.route("/wifi", methods=["POST"])
 def handle_wifi():
@@ -118,65 +134,97 @@ def handle_wifi():
         return "http://coder.bot:8080"
     else:
         return "http://coderbot.local:8080"
+    # Return something significative?
+    # Is reboot necessary?
 
 @app.route("/update", methods=["GET"])
 def handle_update():
     logging.info("updating system.start")
     return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
+    # Return something significative?
 
+# Execute Actions
+def executeCommand(cmd, param1, param2):
+   # 1: OK, 0: ERROR
+   response = {"status": 1, "detail":""}
+   if cmd == "move":
+      bot.move(speed=int(param1), elapse=float(param2))
+   elif cmd == "turn":
+        bot.turn(speed=int(param1), elapse=float(param2))
+   elif cmd == "move_motion":
+        motion.move(dist=float(param2))
+   elif cmd == "turn_motion":
+        motion.turn(angle=float(param2))
+   elif cmd == "stop":
+      bot.stop()
+      try:
+         motion.stop()
+      except:
+         logging.warning("Camera not present")
+         response = {"status": 0, "detail": "camera"}
+   elif cmd == "take_photo":
+      try:
+         cam.photo_take()
+         audio.say(app.bot_config.get("sound_shutter"))
+      except:
+         logging.warning("Camera not present")
+         response = {"status": 0, "detail": "camera"}
+   elif cmd == "video_rec":
+      try:
+         cam.video_rec()
+         audio.say(app.bot_config.get("sound_shutter"))
+      except:
+         logging.warning("Camera not present")
+         response = {"status": 0, "detail": "camera"}
+   elif cmd == "video_stop":
+      try:
+         cam.video_stop()
+         audio.say(app.bot_config.get("sound_shutter"))
+      except:
+         logging.warning("Camera not present")
+         response = {"status": 0, "detail": "camera"}
+   elif cmd == "say":
+      logging.info("say: " + str(param1) + " in: " + str(get_locale()))
+      audio.say(param1, get_locale())
+   elif cmd == "halt":
+      logging.info("shutting down")
+      audio.say(app.bot_config.get("sound_stop"))
+      bot.halt()
+   elif cmd == "restart":
+      logging.info("restarting bot")
+      bot.restart()
+   elif cmd == "reboot":
+      logging.info("rebooting")
+      bot.reboot()
+   return response
+
+
+# Send actions to the bot
+@app.route("/bot", methods=["POST"])
+def controlBot():
+   valid_commands=["move", "turn", "move_motion", "turn_motion", "stop", "take_photo", "video_rec", "video_stop", "say", "halt", "restart", "reboot"]
+   try:
+       data = json.loads(request.get_data().decode("utf-8"))
+       if (data["cmd"] not in valid_commands):
+           raise ValueError
+   except json.decoder.JSONDecodeError:
+       return 'JSON Decode Error', 400
+   except KeyError:
+       return 'Key Error', 400
+   except ValueError:
+       return 'Value Error', 400
+
+   response = executeCommand(data["cmd"], data["param1"], data["param2"])
+   return response, [400, 200][response["status"]]
+
+# Send actions to the bot (Legacy)
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
-
-    if cmd == "move":
-        bot.move(speed=int(param1), elapse=float(param2))
-    elif cmd == "turn":
-        bot.turn(speed=int(param1), elapse=float(param2))
-    elif cmd == "move_motion":
-        motion.move(dist=float(param2))
-    elif cmd == "turn_motion":
-        motion.turn(angle=float(param2))
-    elif cmd == "stop":
-        bot.stop()
-        try:
-            motion.stop()
-        except:
-            logging.warning("Camera not present")
-    elif cmd == "take_photo":
-        try:
-            cam.photo_take()
-            audio.say(app.bot_config.get("sound_shutter"))
-        except:
-            logging.warning("Camera not present")
-    elif cmd == "video_rec":
-        try:
-            cam.video_rec()
-            audio.say(app.bot_config.get("sound_shutter"))
-        except:
-            logging.warning("Camera not present")
-    elif cmd == "video_stop":
-        try:
-            cam.video_stop()
-            audio.say(app.bot_config.get("sound_shutter"))
-        except:
-            logging.warning("Camera not present")
-    elif cmd == "say":
-        logging.info("say: " + str(param1) + " in: " + str(get_locale()))
-        audio.say(param1, get_locale())
-    elif cmd == "halt":
-        logging.info("shutting down")
-        audio.say(app.bot_config.get("sound_stop"))
-        bot.halt()
-    elif cmd == "restart":
-        logging.info("restarting bot")
-        bot.restart()
-    elif cmd == "reboot":
-        logging.info("rebooting")
-        bot.reboot()
-
-    return "ok"
+    response = executeCommand(cmd, param1, param2)
+    return "OK"
 
 @app.route("/bot/status", methods=["GET"])
 def handle_bot_status():
@@ -468,7 +516,8 @@ def run_server():
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+        app.port = 8080
+        socketio.run(app, host="0.0.0.0", port=8080, debug=True, use_reloader=False)
     finally:
         if cam:
             cam.exit()

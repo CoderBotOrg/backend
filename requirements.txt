@@ -1,9 +1,12 @@
 apiai==1.2.3
 Babel==2.5.3
 click==6.7
+eventlet==0.23.0
 Flask==1.0.2
 Flask-Babel==0.11.2
 Flask-Cors==3.0.4
+Flask-SocketIO==3.0.0
+greenlet==0.4.13
 itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
@@ -17,6 +20,8 @@ protobuf==3.0.0
 PyAudio==0.2.11
 pycairo==1.17.0
 Pypubsub==4.0.0
+python-engineio==2.1.1
+python-socketio==1.9.0
 pytz==2018.4
 six==1.11.0
 smbus2==0.2.0
