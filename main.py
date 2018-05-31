@@ -143,79 +143,149 @@ def handle_update():
     return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
     # Return something significative?
 
+# TODO: Refactor the def below
 # Execute Actions
-def executeCommand(cmd, param1, param2):
-   # 1: OK, 0: ERROR
-   response = {"status": 1, "detail":""}
-   if cmd == "move":
-      bot.move(speed=int(param1), elapse=float(param2))
-   elif cmd == "turn":
-        bot.turn(speed=int(param1), elapse=float(param2))
-   elif cmd == "move_motion":
-        motion.move(dist=float(param2))
-   elif cmd == "turn_motion":
-        motion.turn(angle=float(param2))
-   elif cmd == "stop":
+def do_endpoint_bot(data):
+   response = {"ok":True,"description":""}
+   action = list(data["cmd"].keys())[0]
+   if action == "move":
+      bot.move(speed=data["cmd"][action]["param1"], elapse=data["cmd"][action]["param2"])
+   elif action == "turn":
+        bot.turn(speed=data["cmd"][action]["param1"], elapse=data["cmd"][action]["param2"])
+   elif action == "move_motion":
+        motion.move(dist=data["cmd"][action]["param2"])
+   elif action == "turn_motion":
+        motion.turn(angle=data["cmd"][action]["param2"])
+   elif action == "stop":
       bot.stop()
       try:
          motion.stop()
       except:
          logging.warning("Camera not present")
-         response = {"status": 0, "detail": "camera"}
-   elif cmd == "take_photo":
+         response = {"ok":False,"error_code":500,"description":"CameraNotPresent"}
+   elif action == "take_photo":
       try:
          cam.photo_take()
          audio.say(app.bot_config.get("sound_shutter"))
       except:
          logging.warning("Camera not present")
-         response = {"status": 0, "detail": "camera"}
-   elif cmd == "video_rec":
+         response = {"ok":False,"error_code":500,"description":"CameraNotPresent"}
+   elif action == "video_rec":
       try:
          cam.video_rec()
          audio.say(app.bot_config.get("sound_shutter"))
       except:
          logging.warning("Camera not present")
-         response = {"status": 0, "detail": "camera"}
-   elif cmd == "video_stop":
+         response = {"ok":False,"error_code":500,"description":"CameraNotPresent"}
+   elif data["cmd"] == "video_stop":
       try:
          cam.video_stop()
          audio.say(app.bot_config.get("sound_shutter"))
       except:
          logging.warning("Camera not present")
-         response = {"status": 0, "detail": "camera"}
-   elif cmd == "say":
-      logging.info("say: " + str(param1) + " in: " + str(get_locale()))
-      audio.say(param1, get_locale())
-   elif cmd == "halt":
+         response = {"ok":False,"error_code":500,"description":"CameraNotPresent"}
+   elif action == "say":
+      logging.info("say: " + data["cmd"][action]["param1"] + " in: " + str(get_locale()))
+      audio.say(data["cmd"][action]["param1"], get_locale())
+   elif action == "halt":
       logging.info("shutting down")
       audio.say(app.bot_config.get("sound_stop"))
       bot.halt()
-   elif cmd == "restart":
+   elif action == "restart":
       logging.info("restarting bot")
       bot.restart()
-   elif cmd == "reboot":
+   elif action == "reboot":
       logging.info("rebooting")
       bot.reboot()
+   else:
+      response = {"ok":False,"error_code":500,"description":"UnknownFrakingErrorBecauseThisDefNeedsToBeRefactorized"}
    return response
+
+# Evaluates if the datas sent to the /bot endpoint are valid
+def eval_endpoint_bot(data):
+
+    ## This dictionary defines how the JSON received should be in order to be considered a legal request.
+    ## The constraints defined are: the key names allowed and their respective values types.
+    # The constraints not explicitly defined or not defined at all are:
+    #  - "cmd" is the only key name allowed
+    #  - the dictionary contained in "cmd" must conain only ONE of the keys listed
+    #  - these listed keys contains an another dictionary that must contain EXACTLY all the keys listed
+    model_apis = {"cmd":{"move":{"param1":"int", "param2":"float"}, "turn":{"param1":"int", "param2":"float"}, "move_motion":{"param2":"float"}, "turn_motion":{"param2":"float"}, "stop":{}, "take_photo":{}, "video_rec":{}, "video_stop":{}, "say":{"param1":"str"}, "halt":{}, "restart":{}, "reboot":{}}}
+
+    ## Example JSONs client->server
+    # {"cmd":{"move":{"param1":2, "param2":4.5}}}
+    # {"cmd":{"move":{"param2":53.9}}}
+    # {"cmd":{"stop":{}}}
+
+    ## Example JSONs server->client
+    # {"ok":false,"error_code":400,"description":"JSONDecodeError"}
+    # {"ok":true,"description":""}
+
+    # Loading JSON
+    try:
+        data = json.loads(data)
+    except json.decoder.JSONDecodeError: # It's not a JSON
+        return {"ok":False,"error_code":400,"description":"JSONDecodeError"}
+    except: # Unknown error
+        return {"ok":False,"error_code":500,"description":"UnexpectedError on loading the JSON"}
+
+    # Check if there's exactly ONE key
+    if not (len(data) == 1):
+        return {"ok":False,"error_code":400,"description":"TooMuchParameters"}
+
+    # Check if ALL keys are legal
+    if not (set(data.keys()).issubset(model_apis.keys())):
+        return {"ok":False,"error_code":400,"description":"IllegalParameter"}
+    # Iterate all keys and their content (in this case only ONE)
+    for key_1, value_1 in data.items():
+        # Check if there's exactly ONE key contained in cmd dict
+        if not (len(data[key_1])):
+            return {"ok":False,"error_code":400,"description":"TooMuchParameters"}
+        # Check if ALL (in this case ONE) the key(s) contained in cmd are legal
+        if not (set(data[key_1].keys()).issubset(model_apis[key_1].keys())):
+            return {"ok":False,"error_code":400,"description":"IllegalParameter"}
+        # Iterate all key(s) (only ONE) and their content of the dict contained in cmd
+        for key_2, value_2 in value_1.items():
+            # Check if there's exactly ALL the keys (params) expected
+            if not (set(data[key_1][key_2].keys()) == set(model_apis[key_1][key_2].keys())):
+                return {"ok":False,"error_code":400,"description":"WrongParameters"}
+            # Iterate all parameters and their content
+            for key_3, value_3 in value_2.items():
+                # Check if all the parameters contains the expected types
+                type_expected = model_apis[key_1][key_2][key_3]
+                if type_expected == "int":
+                    is_correctType_flag = isinstance(value_3, int)
+                elif type_expected == "float":
+                    is_correctType_flag = isinstance(value_3, float)
+                elif type_expected == "str":
+                    is_correctType_flag = isinstance(value_3, str)
+                else: # It's impossible to enter in this else, but I'll put i'll define this case anyway
+                    is_correctType_flag = False
+                if not is_correctType_flag:
+                    return {"ok":False,"error_code":400,"description":"WrongType"}
+
+    # If the execution arrives until here it means that the JSON passed the test and the evaluation is positive
+    return {"ok":True,"description":""}
 
 
 # Send actions to the bot
 @app.route("/bot", methods=["POST"])
 def controlBot():
-   valid_commands=["move", "turn", "move_motion", "turn_motion", "stop", "take_photo", "video_rec", "video_stop", "say", "halt", "restart", "reboot"]
-   try:
-       data = json.loads(request.get_data().decode("utf-8"))
-       if (data["cmd"] not in valid_commands):
-           raise ValueError
-   except json.decoder.JSONDecodeError:
-       return 'JSON Decode Error', 400
-   except KeyError:
-       return 'Key Error', 400
-   except ValueError:
-       return 'Value Error', 400
 
-   response = executeCommand(data["cmd"], data["param1"], data["param2"])
-   return response, [400, 200][response["status"]]
+    data = request.get_data().decode("utf-8")
+
+    # Evaualte data received and if not legal returns an error response
+    evaulation = eval_endpoint_bot(data)
+    if not evaulation["ok"]:
+        return json.dumps(evaulation), evaulation["error_code"]
+
+    # Execute de validated data and return a positive or error response
+    evaulation = do_endpoint_bot(json.loads(data))
+    if evaulation["ok"]:
+        return json.dumps(evaulation), 200
+    else:
+        return json.dumps(evaulation), evaulation["error_code"]
+
 
 # Send actions to the bot (Legacy)
 @app.route("/bot", methods=["GET"])
@@ -223,7 +293,14 @@ def handle_bot():
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
-    response = executeCommand(cmd, param1, param2)
+    ## Compatibility layer for the new internal API of the function "executeCommand"
+    if not (param1 is None) and not (cmd == "say"):
+        param1 = int(param1)
+    if not (param2 is None):
+        param2 = float(param2)
+    data = {"cmd":{cmd:{"param1":param1, "param2":param2}}}
+    ####
+    do_endpoint_bot(data)
     return "OK"
 
 @app.route("/bot/status", methods=["GET"])
@@ -353,9 +430,9 @@ def handle_program_exec():
         with open("programToFlask_pid.txt", "w") as fh:
             fh.write("")
 
-    my_file = Path("FalskToProgram_mode.txt")
+    my_file = Path("FlaskToProgram_mode.txt")
     if not my_file.is_file():
-        with open("FalskToProgram_mode.txt", "w") as fh:
+        with open("FlaskToProgram_mode.txt", "w") as fh:
             fh.write("unknwon")
 
 
@@ -365,7 +442,7 @@ def handle_program_exec():
 
     with open("programRunningFlag", "r") as fh:
         programRunning_flag = bool(int(fh.read()))
-    with open("FalskToProgram_mode.txt", "r") as fh:
+    with open("FlaskToProgram_mode.txt", "r") as fh:
         program_mode = fh.read()
     with open("programToFlask_pid.txt", "r") as fh:
         processId = fh.read()
@@ -389,10 +466,10 @@ def handle_program_exec():
             programRunning_flag = False
     else:
         program_mode = mode
-    print("\n#############\nprogramRunningFlag: "+str(programRunning_flag) + "\nFalskToProgram_mode.txt: "+ str(program_mode)+"\nprogramToFlask_pid.txt: "+str(processId)+"\nmode: "+str(mode)+"\n###########\n")
+    print("\n#############\nprogramRunningFlag: "+str(programRunning_flag) + "\nFlaskToProgram_mode.txt: "+ str(program_mode)+"\nprogramToFlask_pid.txt: "+str(processId)+"\nmode: "+str(mode)+"\n###########\n")
 
     if not programRunning_flag: # Ho messo questo invece dell'else per via del try except
-        with open("FalskToProgram_mode.txt", "w") as fh:
+        with open("FlaskToProgram_mode.txt", "w") as fh:
             if mode == "fullExec" or mode == "stepByStep":
                 fh.write(mode)
             else:
