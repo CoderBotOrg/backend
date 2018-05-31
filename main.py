@@ -247,21 +247,6 @@ def video_stream(a_cam):
         yield frame
         yield "\r\n"
 
-@app.route("/video")
-def handle_video():
-    return """
-<html>
-<head>
-<style type=text/css>
-    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
-</style>
-</head>
-<body>
-&nbsp;
-</body>
-</html>
-"""
-
 @app.route("/video/stream")
 def handle_video_stream():
     try:
