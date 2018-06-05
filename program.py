@@ -40,6 +40,15 @@ PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".data"
 
+
+
+
+tmp_folder_path = "tmp/"
+status_fileName = "coderbotStatus_temp.json"
+
+
+
+
 class Commands:
     def get_cam():
         return camera.Camera.get_instance()
@@ -175,8 +184,9 @@ class Program:
                 logging.error("Camera not available")
 
 
-            with open("FlaskToProgram_mode.txt", "r") as fh:
-                mode = fh.read()
+            with open(tmp_folder_path + status_fileName, "r") as fh:
+                data_coderbotStatus = json.loads(fh.read())
+                mode = data_coderbotStatus["prog_handler"]["mode"]
 
             if mode == "fullExec":
                 is_execFull = "is_execFull = True\n"
@@ -185,37 +195,41 @@ class Program:
 
             headerFile = is_execFull + '\n\
 \n\
-with open("programRunningFlag", "w") as fh:\n\
- fh.write("1")\n\
-\n\
 import json\n\
-print("###### LAUNCHED")\n\
-print("###### IMPORTING LIBRARIES...")\n\
-#import time\n\
-from os import getpid\n\
+from os import getpid, rename\n\
 import signal\n\
+with open("' + tmp_folder_path + status_fileName + '", "r") as fh:\n\
+ data_coderbotStatus = json.loads(fh.read())\n\
+\n\
+def saveStatus():\n\
+ with open("' + tmp_folder_path + status_fileName + '.tmp", "w") as fh:\n\
+  fh.write(json.dumps(data_coderbotStatus))\n\
+  rename("' + tmp_folder_path + status_fileName + '.tmp", "' + tmp_folder_path + status_fileName + '")\n\
+\n\
+data_coderbotStatus["prog_gen"]["pid"] = getpid()\n\
+saveStatus()\n\
+print("####### "+str(data_coderbotStatus["prog_gen"]["pid"]))\n\
+print("###### LAUNCHED")\n\
+print("###### IMPORTING program.py MODULE...")\n\
 \n\
 from program import Commands\n\
 \n\
-print("###### LIBRARIES IMPORTED")\n\
-with open("programToFlask_status.txt", "w") as fh:\n\
- fh.write("running")\n\
+print("###### MODULE IMPORTED")\n\
+data_coderbotStatus["prog_gen"]["status"] = "running"\n\
+saveStatus()\n\
 \n\
 def do_step(sig, stack):\n\
- with open("programToFlask_status.txt", "w") as fh:\n\
-  fh.write("running")\n\
+ data_coderbotStatus["prog_gen"]["status"] = "running"\n\
+ saveStatus()\n\
 def do_execFull(sig, stack):\n\
  global is_execFull\n\
  is_execFull = True\n\
 signal.signal(signal.SIGUSR1, do_step)\n\
 signal.signal(signal.SIGUSR2, do_execFull)\n\
-with open("programToFlask_pid.txt", "w") as fh:\n\
- fh.write(str(getpid()))\n\
-print("####### "+str(getpid()))\n\
 \n'
 
 
-            footerFile = 'with open("programRunningFlag", "w") as fh:\n fh.write("0")'
+            footerFile = 'data_coderbotStatus["prog_gen"] = {}\nsaveStatus()'
 
             code = headerFile + self._code + footerFile
             #env = globals()
@@ -223,19 +237,30 @@ print("####### "+str(getpid()))\n\
 
 
             print("######## PREPARING THE FILE...")
-            with open("programToFlask_status.txt", "w") as fh:
-                fh.write("loading")
+            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
+                data_coderbotStatus["prog_gen"]["currentBlockId"] = None
+                data_coderbotStatus["prog_gen"]["status"] = "loading"
+                fh.write(json.dumps(data_coderbotStatus))
+                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
             with open("_coderbot_generated_program.tmp.py", "w") as fh:
-                mode = fh.write(code)
+                fh.write(code)
             print("######## THE FILE IS READY")
 
             print("######## LAUNCHING...")
             os.system("python3 _coderbot_generated_program.tmp.py")
 
+
+            print("######## STUFF")
+            # Just to be sure, in case the program generated porccess crashes or gets killed
+            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
+                data_coderbotStatus["prog_gen"] = {}
+                fh.write(json.dumps(data_coderbotStatus))
+                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
             ProgramRunning = True
             while ProgramRunning:
-                with open("programRunningFlag", "r") as fh:
-                    ProgramRunning = bool(int(fh.read()))
+                with open(tmp_folder_path + status_fileName, "r") as fh:
+                    data_coderbotStatus = json.loads(fh.read())
+                ProgramRunning = bool(data_coderbotStatus["prog_gen"])
                 time.sleep(0.1)
             print("######## PROGRAM FINISHED")
             print("######## RESETTING SENSORS, MOTORS, CAMERA, GPIO...")
@@ -254,8 +279,10 @@ print("####### "+str(getpid()))\n\
                 logging.error("Camera not available")
             self._running = False
             print("######## SENSORS, MOTORS, CAMERA, GPIO RESETTED")
-            with open("programToFlask_status.txt", "w") as fh:
-                fh.write("notRunning")
+            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
+                data_coderbotStatus["prog_gen"] = {}
+                fh.write(json.dumps(data_coderbotStatus))
+                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
 
         except RuntimeError as re:
             logging.info("quit: " + str(re))

@@ -21,6 +21,7 @@ This is mudule main, which provides the http web server that expose the
 CoderBot REST API and static resources (html, js, css, jpg).
 """
 import os
+import errno
 import json
 import logging
 import logging.handlers
@@ -41,7 +42,6 @@ from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
 from werkzeug.datastructures import Headers
 from flask_cors import CORS
-from flask_socketio import SocketIO, send, emit
 
 #from flask_sockets import Sockets
 
@@ -49,6 +49,29 @@ from flask_socketio import SocketIO, send, emit
 from pathlib import Path
 import signal
 
+
+
+# Initialize the status file
+def initialize_coderbotStatus(tmp_folder_path, status_fileName):
+    # The try-except has been used in order to avoid race conditions between the evaulation
+    # of the existence of the folder and its creation
+    try:
+        os.makedirs(tmp_folder_path)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+    # Initial JSON
+    default_status = {"ok":True, "prog_gen":{}, "prog_handler":{"mode": "unknown"}}
+    # Create the file and if already exists overwites it
+    with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
+        fh.write(json.dumps(default_status))
+        os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
+
+
+# Initialize the status file
+tmp_folder_path = "tmp/"
+status_fileName = "coderbotStatus_temp.json"
+initialize_coderbotStatus(tmp_folder_path, status_fileName)
 
 logger = logging.getLogger()
 logger.setLevel(logging.WARNING)
@@ -72,8 +95,6 @@ event = None
 conv = None
 
 app = Flask(__name__, static_url_path="")
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
 #app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
 CORS(app)
@@ -103,10 +124,6 @@ def handle_home():
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
                            cnn_model_names = json.dumps({}))
-
-@socketio.on('my event')
-def handle_my_custom_event(data):
-    emit('my response', data, broadcast=True)
 
 # Overwrite configuration and reload it
 @app.route("/config", methods=["POST"])
@@ -305,15 +322,26 @@ def handle_bot():
 
 @app.route("/bot/status", methods=["GET"])
 def handle_bot_status():
-    try:
-        with open("programToFlask.txt", "r") as fh:
-            blockId = fh.read()
-        with open("programToFlask_status.txt", "r") as fh:
-            progStatus = fh.read()
-    except:
-        blockId = None
+
+    # Load the status file
+    with open(tmp_folder_path + status_fileName, "r") as fh:
+        try:
+            data_coderbotStatus = json.loads(fh.read())
+        except Exception as e:
+            print("####### JSON ERROR: "+str(e))
+            print("####### FILE: "+str(fh.read()))
+            print("####### PATH: "+ tmp_folder_path + status_fileName)
+
+    # Check if the generated program is running
+    if data_coderbotStatus["prog_gen"]:
+        # Not guaranteed to get the currentBlockId, for example during the whole "loading" status and the early part of "running" status" it can be None
+        currentBlockId = data_coderbotStatus["prog_gen"]["currentBlockId"]
+        progStatus = data_coderbotStatus["prog_gen"]["status"]
+    else:
+        currentBlockId = None
         progStatus = "notRunning"
-    return json.dumps({'status': 'ok', 'blockId': blockId, 'progStatus': progStatus})
+    # TODO: Change the APIs below
+    return json.dumps({'status': 'ok', 'blockId': currentBlockId, 'progStatus': progStatus})
 
 def video_stream(a_cam):
     while not app.shutdown_requested:
@@ -420,63 +448,53 @@ def handle_program_exec():
     mode = request.form.get('mode')
 
 
-    my_file = Path("programRunningFlag")
-    if not my_file.is_file():
-        with open("programRunningFlag", "w") as fh:
-            fh.write("0")
-
-    my_file = Path("programToFlask_pid.txt")
-    if not my_file.is_file():
-        with open("programToFlask_pid.txt", "w") as fh:
-            fh.write("")
-
-    my_file = Path("FlaskToProgram_mode.txt")
-    if not my_file.is_file():
-        with open("FlaskToProgram_mode.txt", "w") as fh:
-            fh.write("unknwon")
+    # Load the status file
+    with open(tmp_folder_path + status_fileName, "r") as fh:
+        data_coderbotStatus = json.loads(fh.read())
 
 
-    programRunning_flag = False
-
-    processId = ""
-
-    with open("programRunningFlag", "r") as fh:
-        programRunning_flag = bool(int(fh.read()))
-    with open("FlaskToProgram_mode.txt", "r") as fh:
-        program_mode = fh.read()
-    with open("programToFlask_pid.txt", "r") as fh:
-        processId = fh.read()
-    print("########### running: "+str(programRunning_flag))
-    if programRunning_flag:
-        if program_mode == "stepByStep":
+    print("########### running: "+str(bool(data_coderbotStatus["prog_gen"])))
+    if data_coderbotStatus["prog_gen"]: # The generated program is running
+        programRunningFlag = True
+        if data_coderbotStatus["prog_handler"]["mode"] == "stepByStep":
             if mode == "stepByStep":
                 signal_to_program = signal.SIGUSR1
             else: # mode == "fullExec"
                 signal_to_program = signal.SIGUSR2
-        else: # program_mode == "fullExec"
+        else: # data_coderbotStatus["prog_gen"]["mode"] == "fullExec"
             signal_to_program = signal.SIGKILL
-            with open("programRunningFlag", "w") as fh:
-                fh.write("0")
+            programRunningFlag = False
         try:
-            os.kill(int(processId), signal_to_program)
-        except Exception as err: #The process wasn't running
+            os.kill(int(data_coderbotStatus["prog_gen"]["pid"]), signal_to_program)
+        except Exception as err:
+            # The process in reality was already terminated, probably because of some crash or the previous program terminated after the "data_coderbotStatus" dict
+            # has been retrieved from the file (this last case is really unlikely to happen).
             print("######### error: "+str(err))
-            with open("programRunningFlag", "w") as fh:
-                fh.write("0")
-            programRunning_flag = False
-    else:
-        program_mode = mode
-    print("\n#############\nprogramRunningFlag: "+str(programRunning_flag) + "\nFlaskToProgram_mode.txt: "+ str(program_mode)+"\nprogramToFlask_pid.txt: "+str(processId)+"\nmode: "+str(mode)+"\n###########\n")
+            programRunningFlag = False
 
-    if not programRunning_flag: # Ho messo questo invece dell'else per via del try except
-        with open("FlaskToProgram_mode.txt", "w") as fh:
+        # If the generated program has been terminated, killed or unexpectedly detected to no longer running, the dict in "prog_gen" will be emptied, meaning that
+        # the program is not longer running
+        if not programRunningFlag:
+            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
+                data_coderbotStatus["prog_gen"] = {}
+                fh.write(json.dumps(data_coderbotStatus))
+                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
+
+        print("\n############# "+json.dumps(data_coderbotStatus))
+
+    else: # The generated program is NOT running
+        print("\n############# "+json.dumps(data_coderbotStatus))
+
+        with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
             if mode == "fullExec" or mode == "stepByStep":
-                fh.write(mode)
+                data_coderbotStatus["prog_handler"]["mode"] = mode
             else:
-                fh.write("unknown")
-
+                data_coderbotStatus["prog_handler"]["mode"] = "unknown"
+            fh.write(json.dumps(data_coderbotStatus))
+            os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
         app.prog = app.prog_engine.create(name, code)
-        return json.dumps(app.prog.execute())
+        app.prog.execute()
+    return json.dumps({"ok":True,"description":""})
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
@@ -578,8 +596,7 @@ def run_server():
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.port = 8080
-        socketio.run(app, host="0.0.0.0", port=8080, debug=True, use_reloader=False)
+        app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()

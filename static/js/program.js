@@ -228,7 +228,7 @@ class ProgramEditorBlockly extends ProgramEditor {
         Blockly.Python.INFINITE_LOOP_TRAP = null;
 
         //Magic Stuff
-        Blockly.Python.STATEMENT_PREFIX = 'if not is_execFull:\n with open("programToFlask_status.txt", "w") as fh:\n  fh.write("pause")\n signal.pause()\nwith open("programToFlask.txt", "w") as fh:\n fh.write(%1)\n';
+        Blockly.Python.STATEMENT_PREFIX = 'if not is_execFull:\n data_coderbotStatus["prog_gen"]["status"] = "pause"\n saveStatus()\n signal.pause()\ndata_coderbotStatus["prog_gen"]["currentBlockId"] = str(%1)\nsaveStatus()\n';
         Blockly.Python.addReservedWords('#highlightBlock');
         var code_modified = Blockly.Python.workspaceToCode();
 
