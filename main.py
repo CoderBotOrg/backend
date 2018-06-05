@@ -256,7 +256,7 @@ def eval_endpoint_bot(data):
     # Iterate all keys and their content (in this case only ONE)
     for key_1, value_1 in data.items():
         # Check if there's exactly ONE key contained in cmd dict
-        if not (len(data[key_1])):
+        if not (len(data[key_1]) == 1):
             return {"ok":False,"error_code":400,"description":"TooMuchParameters"}
         # Check if ALL (in this case ONE) the key(s) contained in cmd are legal
         if not (set(data[key_1].keys()).issubset(model_apis[key_1].keys())):
