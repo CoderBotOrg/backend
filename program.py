@@ -36,6 +36,8 @@ import audio
 import event
 import conversation
 
+import subprocess
+
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".data"
@@ -171,22 +173,9 @@ class Program:
     def is_running(self):
         return self._running
 
-    def run(self):
+    def run(name, code, mode):
+
         try:
-            bot = coderbot.CoderBot.get_instance()
-            program = self
-            try:
-                cam = camera.Camera.get_instance()
-                if config.Config.get().get("prog_video_rec") == "true":
-                    Commands.get_cam().video_rec(program.name)
-                    logging.debug("starting video")
-            except:
-                logging.error("Camera not available")
-
-
-            with open(tmp_folder_path + status_fileName, "r") as fh:
-                data_coderbotStatus = json.loads(fh.read())
-                mode = data_coderbotStatus["prog_handler"]["mode"]
 
             if mode == "fullExec":
                 is_execFull = "is_execFull = True\n"
@@ -206,6 +195,8 @@ def saveStatus():\n\
   fh.write(json.dumps(data_coderbotStatus))\n\
   rename("' + tmp_folder_path + status_fileName + '.tmp", "' + tmp_folder_path + status_fileName + '")\n\
 \n\
+data_coderbotStatus["prog_gen"]["currentBlockId"] = None\n\
+data_coderbotStatus["prog_gen"]["status"] = "loading"\n\
 data_coderbotStatus["prog_gen"]["pid"] = getpid()\n\
 saveStatus()\n\
 print("####### "+str(data_coderbotStatus["prog_gen"]["pid"]))\n\
@@ -228,81 +219,21 @@ signal.signal(signal.SIGUSR1, do_step)\n\
 signal.signal(signal.SIGUSR2, do_execFull)\n\
 \n'
 
+            footerFile = 'data_coderbotStatus["prog_gen"] = {}\nsaveStatus()\nprint(######### PROGRAM TERMINATED)'
 
-            footerFile = 'data_coderbotStatus["prog_gen"] = {}\nsaveStatus()'
-
-            code = headerFile + self._code + footerFile
-            #env = globals()
-            #exec(code, env, env)
-
+            code = headerFile + code + footerFile
 
             print("######## PREPARING THE FILE...")
-            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
-                data_coderbotStatus["prog_gen"]["currentBlockId"] = None
-                data_coderbotStatus["prog_gen"]["status"] = "loading"
-                fh.write(json.dumps(data_coderbotStatus))
-                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
             with open("_coderbot_generated_program.tmp.py", "w") as fh:
                 fh.write(code)
             print("######## THE FILE IS READY")
-
             print("######## LAUNCHING...")
-            os.system("python3 _coderbot_generated_program.tmp.py")
+            subprocess.Popen(["python3", "_coderbot_generated_program.tmp.py"])
 
-
-            print("######## STUFF")
-            # Just to be sure, in case the program generated porccess crashes or gets killed
-            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
-                data_coderbotStatus["prog_gen"] = {}
-                fh.write(json.dumps(data_coderbotStatus))
-                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
-            ProgramRunning = True
-            while ProgramRunning:
-                with open(tmp_folder_path + status_fileName, "r") as fh:
-                    data_coderbotStatus = json.loads(fh.read())
-                ProgramRunning = bool(data_coderbotStatus["prog_gen"])
-                time.sleep(0.1)
-            print("######## PROGRAM FINISHED")
-            print("######## RESETTING SENSORS, MOTORS, CAMERA, GPIO...")
-            pi = pigpio.pi()
-            pi.stop()
-            try:
-                Commands.get_event().wait_event_generators()
-                Commands.get_event().unregister_listeners()
-                Commands.get_event().unregister_publishers()
-            except:
-                logging.error("error polishing event system")
-            try:
-                Commands.get_cam().video_stop() #if video is running, stop it
-                Commands.get_motion().stop()
-            except:
-                logging.error("Camera not available")
-            self._running = False
-            print("######## SENSORS, MOTORS, CAMERA, GPIO RESETTED")
-            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
-                data_coderbotStatus["prog_gen"] = {}
-                fh.write(json.dumps(data_coderbotStatus))
-                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
-
-        except RuntimeError as re:
-            logging.info("quit: " + str(re))
-            Commands.get_prog_eng().log(str(re))
+            return {"ok":True,"description":""}
         except Exception as e:
-            logging.info("quit: " + str(e))
-            Commands.get_prog_eng().log(str(e))
-        finally:
-            try:
-                Commands.get_event().wait_event_generators()
-                Commands.get_event().unregister_listeners()
-                Commands.get_event().unregister_publishers()
-            except:
-                logging.error("error polishing event system")
-            try:
-                Commands.get_cam().video_stop() #if video is running, stop it
-                Commands.get_motion().stop()
-            except:
-                logging.error("Camera not available")
-            self._running = False
+            return {"ok":False,"error_code":500,"description":"ProblemOnLauchingTheGeneratedProgram"}
+
 
 
     def as_json(self):

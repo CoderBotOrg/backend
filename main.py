@@ -341,6 +341,7 @@ def handle_bot_status():
         currentBlockId = None
         progStatus = "notRunning"
     # TODO: Change the APIs below
+    # Proposed new API response: {'ok': True, "result":{'blockId': currentBlockId, 'progStatus': progStatus}}
     return json.dumps({'status': 'ok', 'blockId': currentBlockId, 'progStatus': progStatus})
 
 def video_stream(a_cam):
@@ -482,6 +483,8 @@ def handle_program_exec():
 
         print("\n############# "+json.dumps(data_coderbotStatus))
 
+        evaulation = {"ok":True,"description":""}
+
     else: # The generated program is NOT running
         print("\n############# "+json.dumps(data_coderbotStatus))
 
@@ -492,9 +495,13 @@ def handle_program_exec():
                 data_coderbotStatus["prog_handler"]["mode"] = "unknown"
             fh.write(json.dumps(data_coderbotStatus))
             os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
-        app.prog = app.prog_engine.create(name, code)
-        app.prog.execute()
-    return json.dumps({"ok":True,"description":""})
+        evaulation = Program.run(name, code, mode)
+
+    # Returns a positive or error response
+    if evaulation["ok"]:
+        return json.dumps(evaulation), 200
+    else:
+        return json.dumps(evaulation), evaulation["error_code"]
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
