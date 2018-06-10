@@ -385,7 +385,7 @@ def run_server():
             except picamera.exc.PiCameraError:
                 logging.error("Camera not present")
 
-            #cnn = CNNManager.get_instance()
+            cnn = CNNManager.get_instance()
             event = EventManager.get_instance("coderbot")
             conv = Conversation.get_instance()
 
