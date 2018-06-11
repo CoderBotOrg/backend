@@ -41,7 +41,7 @@ from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
-#from flask_sockets import Sockets
+from flask_sockets import Sockets
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

@@ -82,7 +82,7 @@ class Audio:
         #self._google_speech_client = speech.SpeechClient()
 
     def exit(self):
-        pass
+       pass
         # cleanup stuff.
         #self.stream_in.close()
         #self.pyaudio.terminate()
@@ -200,33 +200,6 @@ class Audio:
                         decoder.end_utt()
                         logging.info("recog text: " + recog_text)
                         return recog_text
-
- #   def speech_recog_google(self, locale):
- #       config = types.RecognitionConfig(
- #           encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
- #           sample_rate_hertz=RATE,
- #           language_code=locale)
- #       streaming_config = types.StreamingRecognitionConfig(
- #           config=config,
- #           interim_results=False,
- #           single_utterance=True)
-#
- #       t1 = time.time()
-  #      with self.stream_in as stream:
-   #         audio_generator = stream.generator()
-    #        requests = (types.StreamingRecognizeRequest(audio_content=content)
-     #                   for content in audio_generator)
-#
- #           responses = self._google_speech_client.streaming_recognize(streaming_config, requests)
-
-            # Now, put the transcription responses to use.
-  #          for response in responses:
-   #             if time.time() - t1 > 10:
-    #                return ""
-     #           if response.results:
-      #              result = response.results[0]
-       #             if result.is_final:
-        #                return result.alternatives[0].transcript
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""

@@ -202,6 +202,7 @@ class Camera(object):
     def delete_photo(self, filename):
         logging.info("delete photo: " + filename)
         os.remove(PHOTO_PATH + "/" + filename)
+<<<<<<< HEAD
         os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
         for photo in self._photos:
             if photo["name"] == filename:
@@ -371,3 +372,4 @@ class Camera(object):
     def sleep(self, elapse):
         logging.debug("sleep: " + str(elapse))
         time.sleep(elapse)
+
