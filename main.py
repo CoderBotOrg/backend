@@ -62,7 +62,7 @@ def get_locale():
         loc = 'en'
     return loc
 
-# Serve legacy web application templates
+# Serve web application templates
 @app.route("/")
 def handle_home():
     return render_template('main.html',
@@ -107,7 +107,7 @@ def handle_update():
     logging.info("updating system.start")
     return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
 
-# Control the bot
+# Execute single command
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
@@ -125,30 +125,35 @@ def handle_bot():
     elif cmd == "stop":
         bot.stop()
         try:
-            motion.stop()
+          motion.stop()
         except:
-            logging.warning("Camera not present")
+          logging.warning("Camera not present")
+          pass
     elif cmd == "take_photo":
         try:
             cam.photo_take()
             audio.say(app.bot_config.get("sound_shutter"))
         except:
             logging.warning("Camera not present")
+            pass
     elif cmd == "video_rec":
         try:
-            cam.video_rec()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.video_rec()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
+          logging.warning("Camera not present")
+          pass
     elif cmd == "video_stop":
         try:
-            cam.video_stop()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.video_stop()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
+          logging.warning("Camera not present")
+          pass
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
         audio.say(param1, get_locale())
+
     elif cmd == "halt":
         logging.info("shutting down")
         audio.say(app.bot_config.get("sound_stop"))
@@ -159,7 +164,6 @@ def handle_bot():
     elif cmd == "reboot":
         logging.info("rebooting")
         bot.reboot()
-
     return "ok"
 
 @app.route("/bot/status", methods=["GET"])
