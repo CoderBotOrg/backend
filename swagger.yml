@@ -1,0 +1,24 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: Swagger ReST Article
+
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/v2"
+
+# Paths supported by the server application
+paths:
+  /stop:
+    get:
+      operationId: "api2.stop"
+      tags:
+        - "People"
+      summary: "Summary"
+      description: "Description"
+      responses:
+        200:
+          description: "Successful read people list operation"

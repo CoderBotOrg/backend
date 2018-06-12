@@ -24,11 +24,8 @@ from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
 
-# Import the new API v2 defined as flask blueprint
-from api import api
-
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 
 sh = logging.StreamHandler()
 # add a rotating handler
@@ -49,15 +46,13 @@ event = None
 conv = None
 
 app = Flask(__name__, static_url_path="")
+
 CORS(app)
 babel = Babel(app)
 app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
-
-# Register the new API and let it coexist with the existing one
-app.register_blueprint(api)
 
 @babel.localeselector
 def get_locale():
@@ -119,7 +114,7 @@ def handle_bot():
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
-
+    print(request.args)
     if cmd == "move":
         bot.move(speed=int(param1), elapse=float(param2))
     elif cmd == "turn":
