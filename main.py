@@ -25,7 +25,8 @@ from flask import (Flask,
                     request, 
                     send_file, 
                     Response, 
-                    jsonify)
+                    jsonify,
+                    send_from_directory)
 from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
@@ -42,6 +43,7 @@ logger.addHandler(sh)
 logger.addHandler(fh)
 
 # Initialisation
+global bot
 bot = None
 cam = None
 motion = None
@@ -50,17 +52,21 @@ cnn = None
 event = None
 conv = None
 
-# Flask app configuration
+# (Connexion) Flask app configuration
 app = connexion.App(__name__, static_url_path="", specification_dir='./')
+# New API is defined in swagger.yml and api.py
 app.add_api('swagger.yml')
 
+
 # Connexion wraps FlaskApp, so app becomes app.app
-CORS(app.app)
+CORS(app.app) # Access-Control-Allow-Origin
 babel = Babel(app.app)
 app.app.debug = False
 app.app.prog_engine = ProgramEngine.get_instance()
 app.app.prog = None
 app.app.shutdown_requested = False
+
+## Legacy Routes
 
 @babel.localeselector
 def get_locale():
@@ -71,7 +77,36 @@ def get_locale():
         loc = 'en'
     return loc
 
-# Serve web app.application templates
+"""
+Integrating Connexion, deleting 'index.html' brake the 
+serving of static assets from 'static' folder.
+This is problably related to the fact that Connexion adds a 
+Swagger UI route (v2/ui) since it was rendering index.html 
+prior to removing it.
+
+Workound: serve the 'static' subfolders with 'send_from_directory'
+"""
+@app.app.route('/css/<filename>')
+def render_static_assets0(filename):
+    return send_from_directory('static/css', filename)
+
+@app.app.route('/fonts/<filename>')
+def render_static_assets1(filename):
+    return send_from_directory('static/fonts', filename)
+
+@app.app.route('/images/<filename>')
+def render_static_assets2(filename):
+    return send_from_directory('static/images', filename)
+
+@app.app.route('/js/<filename>')
+def render_static_assets3(filename):
+    return send_from_directory('static/js', filename)
+
+@app.app.route('/media/<filename>')
+def render_static_assets4(filename):
+    return send_from_directory('static/media', filename)
+
+# Serve web app application templates
 @app.app.route("/")
 def handle_home():
     return render_template('main.html',
@@ -122,7 +157,7 @@ def handle_bot():
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
-    print(request.args)
+    print('/bot',json.dumps(request.args))
     if cmd == "move":
         bot.move(speed=int(param1), elapse=float(param2))
     elif cmd == "turn":

@@ -13,10 +13,8 @@ basePath: "/v2"
 # Paths supported by the server application
 paths:
   /stop:
-    get:
+    post:
       operationId: "api.stop"
-      tags:
-        - "People"
       summary: "Summary"
       description: "Description"
       responses:
