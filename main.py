@@ -19,10 +19,12 @@ from cnn_manager import CNNManager
 from event import EventManager
 from conversation import Conversation
 
-from flask import Flask, render_template, request, send_file, Response, jsonify
+from flask import Flask, render_template, request, send_file, Response, jsonify, Blueprint
 from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
+
+from api import api
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -52,6 +54,7 @@ app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
+app.register_blueprint(api)
 
 @babel.localeselector
 def get_locale():
