@@ -12,11 +12,39 @@ basePath: "/v2"
 
 # Paths supported by the server application
 paths:
+  /status:
+    get:
+      operationId: "api.status"
+      summary: "Bot general informations and execution status"
+      responses:
+        200:
+          description: "Bot status"
   /stop:
     post:
       operationId: "api.stop"
-      summary: "Summary"
-      description: "Description"
+      summary: Stops the bot movements
       responses:
         200:
-          description: "Successful read people list operation"
+          description: "Successfully stopped the motors"
+  /move:
+    post:
+      summary: Moves the bot
+      operationId: "api.move"
+      parameters:
+        - in: body
+          name: data
+          description: Movements details
+          schema:
+            type: object
+            default: {'param1': 100, 'param2':-1}
+            required:
+              - param1
+              - param2
+            properties:
+              param1:
+                type: number
+              param2:
+                type: number
+      responses:
+        201:
+          description: Created
