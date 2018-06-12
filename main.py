@@ -1,24 +1,6 @@
-############################################################################
-#    CoderBot, a didactical programmable robot.
-#    Copyright (C) 2014, 2015 Roberto Previtera <info@coderbot.org>
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License along
-#    with this program; if not, write to the Free Software Foundation, Inc.,
-#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-############################################################################
 """
-This is mudule main, which provides the http web server that expose the
-CoderBot REST API and static resources (html, js, css, jpg).
+This module provides the http web server exposing the
+CoderBot REST API and static resources
 """
 import os
 import json
@@ -41,7 +23,6 @@ from flask import Flask, render_template, request, send_file, Response, jsonify
 from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
-#from flask_sockets import Sockets
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -66,11 +47,8 @@ conv = None
 
 app = Flask(__name__, static_url_path="")
 CORS(app)
-#app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
 app.debug = False
-#sockets = Sockets(app)
-
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
@@ -84,6 +62,7 @@ def get_locale():
         loc = 'en'
     return loc
 
+# Serve web application templates
 @app.route("/")
 def handle_home():
     return render_template('main.html',
@@ -93,12 +72,20 @@ def handle_home():
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
                            cnn_model_names = json.dumps({}))
+
+# Overwrite configuration file on disk and reload it
 @app.route("/config", methods=["POST"])
 def handle_config():
     Config.write(request.form)
     app.bot_config = Config.get()
     return "ok"
 
+# Expose configuration as JSON
+@app.route("/config", methods=["GET"])
+def returnConfig():
+    return(jsonify(app.bot_config)) 
+
+# Changes wi-fi configuration and reboot
 @app.route("/wifi", methods=["POST"])
 def handle_wifi():
     mode = request.form.get("wifi_mode")
@@ -114,11 +101,13 @@ def handle_wifi():
     else:
         return "http://coderbot.local:8080"
 
+# Update the system
 @app.route("/update", methods=["GET"])
 def handle_update():
     logging.info("updating system.start")
     return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
 
+# Execute single command
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
@@ -136,30 +125,35 @@ def handle_bot():
     elif cmd == "stop":
         bot.stop()
         try:
-            motion.stop()
+          motion.stop()
         except:
-            logging.warning("Camera not present")
+          logging.warning("Camera not present")
+          pass
     elif cmd == "take_photo":
         try:
             cam.photo_take()
             audio.say(app.bot_config.get("sound_shutter"))
         except:
             logging.warning("Camera not present")
+            pass
     elif cmd == "video_rec":
         try:
-            cam.video_rec()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.video_rec()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
+          logging.warning("Camera not present")
+          pass
     elif cmd == "video_stop":
         try:
-            cam.video_stop()
-            audio.say(app.bot_config.get("sound_shutter"))
+          cam.video_stop()
+          audio.say(app.bot_config.get("sound_shutter"))
         except:
-            logging.warning("Camera not present")
+          logging.warning("Camera not present")
+          pass
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
         audio.say(param1, get_locale())
+
     elif cmd == "halt":
         logging.info("shutting down")
         audio.say(app.bot_config.get("sound_stop"))
@@ -170,7 +164,6 @@ def handle_bot():
     elif cmd == "reboot":
         logging.info("rebooting")
         bot.reboot()
-
     return "ok"
 
 @app.route("/bot/status", methods=["GET"])
@@ -186,21 +179,7 @@ def video_stream(a_cam):
         yield frame
         yield "\r\n"
 
-@app.route("/video")
-def handle_video():
-    return """
-<html>
-<head>
-<style type=text/css>
-    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
-</style>
-</head>
-<body>
-&nbsp;
-</body>
-</html>
-"""
-
+# Render cam stream
 @app.route("/video/stream")
 def handle_video_stream():
     try:
@@ -212,25 +191,7 @@ def handle_video_stream():
     except:
         pass
 
-def video_stream_cv(a_cam):
-    while not app.shutdown_requested:
-        frame = a_cam.get_image_cv_jpeg()
-        yield ("--BOUNDARYSTRING\r\n" +
-               "Content-type: image/jpeg\r\n" +
-               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
-               frame + "\r\n")
-
-@app.route("/video/stream/cv")
-def handle_video_stream_cv():
-    try:
-        h = Headers()
-        h.add('Age', 0)
-        h.add('Cache-Control', 'no-cache, private')
-        h.add('Pragma', 'no-cache')
-        return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except:
-        pass
-
+# Photos
 @app.route("/photos", methods=["GET"])
 def handle_photos():
     logging.info("photos")
@@ -260,11 +221,13 @@ def handle_photo_cmd(filename):
     cam.delete_photo(filename)
     return "ok"
 
+# Programs list
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
     logging.debug("program_list")
     return json.dumps(app.prog_engine.prog_list())
 
+# Get saved program as JSON
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
     logging.debug("program_load")
@@ -272,6 +235,7 @@ def handle_program_load():
     app.prog = app.prog_engine.load(name)
     return jsonify(app.prog.as_json())
 
+# Save new program
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
     logging.debug("program_save")
@@ -282,6 +246,7 @@ def handle_program_save():
     app.prog_engine.save(prog)
     return "ok"
 
+# Delete saved program
 @app.route("/program/delete", methods=["POST"])
 def handle_program_delete():
     logging.debug("program_delete")
@@ -289,6 +254,7 @@ def handle_program_delete():
     app.prog_engine.delete(name)
     return "ok"
 
+# Execute the given code
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
     logging.debug("program_exec")
@@ -297,6 +263,7 @@ def handle_program_exec():
     app.prog = app.prog_engine.create(name, code)
     return json.dumps(app.prog.execute())
 
+# Stop the execution
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
     logging.debug("program_end")
@@ -305,6 +272,7 @@ def handle_program_end():
     app.prog = None
     return "ok"
 
+# Program status
 @app.route("/program/status", methods=["GET"])
 def handle_program_status():
     logging.debug("program_status")
@@ -345,7 +313,7 @@ def handle_cnn_models_delete(model_name):
 
     return json.dumps(model_status)
 
-
+# Spawn a sub-process and execute things there
 def execute(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -364,6 +332,7 @@ def button_pushed():
         elif app.prog and not app.prog.is_running():
             app.prog.execute()
 
+# Finally, get the server running
 def run_server():
     global bot
     global cam
