@@ -8,6 +8,7 @@ import logging
 import logging.handlers
 import subprocess
 import picamera
+import connexion
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
@@ -19,24 +20,28 @@ from cnn_manager import CNNManager
 from event import EventManager
 from conversation import Conversation
 
-from flask import Flask, render_template, request, send_file, Response, jsonify, Blueprint
+from flask import (Flask, 
+                    render_template, 
+                    request, 
+                    send_file, 
+                    Response, 
+                    jsonify)
 from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
 
+# Logging configuration
 logger = logging.getLogger()
 logger.setLevel(logging.WARNING)
-
 sh = logging.StreamHandler()
-# add a rotating handler
 fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 sh.setFormatter(formatter)
 fh.setFormatter(formatter)
-
 logger.addHandler(sh)
 logger.addHandler(fh)
 
+# Initialisation
 bot = None
 cam = None
 motion = None
@@ -45,14 +50,17 @@ cnn = None
 event = None
 conv = None
 
-app = Flask(__name__, static_url_path="")
+# Flask app configuration
+app = connexion.App(__name__, static_url_path="", specification_dir='./')
+app.add_api('swagger.yml')
 
-CORS(app)
-babel = Babel(app)
-app.debug = False
-app.prog_engine = ProgramEngine.get_instance()
-app.prog = None
-app.shutdown_requested = False
+# Connexion wraps FlaskApp, so app becomes app.app
+CORS(app.app)
+babel = Babel(app.app)
+app.app.debug = False
+app.app.prog_engine = ProgramEngine.get_instance()
+app.app.prog = None
+app.app.shutdown_requested = False
 
 @babel.localeselector
 def get_locale():
@@ -63,31 +71,31 @@ def get_locale():
         loc = 'en'
     return loc
 
-# Serve web application templates
-@app.route("/")
+# Serve web app.application templates
+@app.app.route("/")
 def handle_home():
     return render_template('main.html',
                            host=request.host[:request.host.find(':')],
                            locale=get_locale(),
-                           config=app.bot_config,
-                           program_level=app.bot_config.get("prog_level", "std"),
+                           config=app.app.bot_config,
+                           program_level=app.app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
                            cnn_model_names = json.dumps({}))
 
 # Overwrite configuration file on disk and reload it
-@app.route("/config", methods=["POST"])
+@app.app.route("/config", methods=["POST"])
 def handle_config():
     Config.write(request.form)
-    app.bot_config = Config.get()
+    app.app.bot_config = Config.get()
     return "ok"
 
 # Expose configuration as JSON
-@app.route("/config", methods=["GET"])
+@app.app.route("/config", methods=["GET"])
 def returnConfig():
-    return(jsonify(app.bot_config)) 
+    return(jsonify(app.app.bot_config)) 
 
 # Changes wi-fi configuration and reboot
-@app.route("/wifi", methods=["POST"])
+@app.app.route("/wifi", methods=["POST"])
 def handle_wifi():
     mode = request.form.get("wifi_mode")
     ssid = request.form.get("wifi_ssid")
@@ -103,13 +111,13 @@ def handle_wifi():
         return "http://coderbot.local:8080"
 
 # Update the system
-@app.route("/update", methods=["GET"])
+@app.app.route("/update", methods=["GET"])
 def handle_update():
     logging.info("updating system.start")
     return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
 
 # Execute single command
-@app.route("/bot", methods=["GET"])
+@app.app.route("/bot", methods=["GET"])
 def handle_bot():
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
@@ -133,21 +141,21 @@ def handle_bot():
     elif cmd == "take_photo":
         try:
             cam.photo_take()
-            audio.say(app.bot_config.get("sound_shutter"))
+            audio.say(app.app.bot_config.get("sound_shutter"))
         except:
             logging.warning("Camera not present")
             pass
     elif cmd == "video_rec":
         try:
           cam.video_rec()
-          audio.say(app.bot_config.get("sound_shutter"))
+          audio.say(app.app.bot_config.get("sound_shutter"))
         except:
           logging.warning("Camera not present")
           pass
     elif cmd == "video_stop":
         try:
           cam.video_stop()
-          audio.say(app.bot_config.get("sound_shutter"))
+          audio.say(app.app.bot_config.get("sound_shutter"))
         except:
           logging.warning("Camera not present")
           pass
@@ -157,7 +165,7 @@ def handle_bot():
 
     elif cmd == "halt":
         logging.info("shutting down")
-        audio.say(app.bot_config.get("sound_stop"))
+        audio.say(app.app.bot_config.get("sound_stop"))
         bot.halt()
     elif cmd == "restart":
         logging.info("restarting bot")
@@ -167,12 +175,12 @@ def handle_bot():
         bot.reboot()
     return "ok"
 
-@app.route("/bot/status", methods=["GET"])
+@app.app.route("/bot/status", methods=["GET"])
 def handle_bot_status():
     return json.dumps({'status': 'ok'})
 
 def video_stream(a_cam):
-    while not app.shutdown_requested:
+    while not app.app.shutdown_requested:
         frame = a_cam.get_image_jpeg()
         yield ("--BOUNDARYSTRING\r\n" +
                "Content-type: image/jpeg\r\n" +
@@ -181,7 +189,7 @@ def video_stream(a_cam):
         yield "\r\n"
 
 # Render cam stream
-@app.route("/video/stream")
+@app.app.route("/video/stream")
 def handle_video_stream():
     try:
         h = Headers()
@@ -193,12 +201,12 @@ def handle_video_stream():
         pass
 
 # Photos
-@app.route("/photos", methods=["GET"])
+@app.app.route("/photos", methods=["GET"])
 def handle_photos():
     logging.info("photos")
     return json.dumps(cam.get_photo_list())
 
-@app.route("/photos/<filename>", methods=["GET"])
+@app.app.route("/photos/<filename>", methods=["GET"])
 def handle_photo_get(filename):
     logging.info("media filename: " + filename)
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
@@ -208,7 +216,7 @@ def handle_photo_get(filename):
     except picamera.exc.PiCameraError as e:
         logging.error("Error: " + str(e))
 
-@app.route("/photos/<filename>", methods=["PUT"])
+@app.app.route("/photos/<filename>", methods=["PUT"])
 def handle_photo_put(filename):
     logging.info("photo update")
     data = request.get_data(as_text=True)
@@ -216,78 +224,78 @@ def handle_photo_put(filename):
     cam.update_photo({"name": filename, "tag":data["tag"]})
     return jsonify({"res":"ok"})
 
-@app.route("/photos/<filename>", methods=["DELETE"])
+@app.app.route("/photos/<filename>", methods=["DELETE"])
 def handle_photo_cmd(filename):
     logging.debug("photo delete")
     cam.delete_photo(filename)
     return "ok"
 
 # Programs list
-@app.route("/program/list", methods=["GET"])
+@app.app.route("/program/list", methods=["GET"])
 def handle_program_list():
     logging.debug("program_list")
-    return json.dumps(app.prog_engine.prog_list())
+    return json.dumps(app.app.prog_engine.prog_list())
 
 # Get saved program as JSON
-@app.route("/program/load", methods=["GET"])
+@app.app.route("/program/load", methods=["GET"])
 def handle_program_load():
     logging.debug("program_load")
     name = request.args.get('name')
-    app.prog = app.prog_engine.load(name)
-    return jsonify(app.prog.as_json())
+    app.app.prog = app.app.prog_engine.load(name)
+    return jsonify(app.app.prog.as_json())
 
 # Save new program
-@app.route("/program/save", methods=["POST"])
+@app.app.route("/program/save", methods=["POST"])
 def handle_program_save():
     logging.debug("program_save")
     name = request.form.get('name')
     dom_code = request.form.get('dom_code')
     code = request.form.get('code')
     prog = Program(name, dom_code=dom_code, code=code)
-    app.prog_engine.save(prog)
+    app.app.prog_engine.save(prog)
     return "ok"
 
 # Delete saved program
-@app.route("/program/delete", methods=["POST"])
+@app.app.route("/program/delete", methods=["POST"])
 def handle_program_delete():
     logging.debug("program_delete")
     name = request.form.get('name')
-    app.prog_engine.delete(name)
+    app.app.prog_engine.delete(name)
     return "ok"
 
 # Execute the given code
-@app.route("/program/exec", methods=["POST"])
+@app.app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
     logging.debug("program_exec")
     name = request.form.get('name')
     code = request.form.get('code')
-    app.prog = app.prog_engine.create(name, code)
-    return json.dumps(app.prog.execute())
+    app.app.prog = app.app.prog_engine.create(name, code)
+    return json.dumps(app.app.prog.execute())
 
 # Stop the execution
-@app.route("/program/end", methods=["POST"])
+@app.app.route("/program/end", methods=["POST"])
 def handle_program_end():
     logging.debug("program_end")
-    if app.prog:
-        app.prog.end()
-    app.prog = None
+    if app.app.prog:
+        app.app.prog.end()
+    app.app.prog = None
     return "ok"
 
 # Program status
-@app.route("/program/status", methods=["GET"])
+@app.app.route("/program/status", methods=["GET"])
 def handle_program_status():
     logging.debug("program_status")
     prog = Program("")
-    if app.prog:
-        prog = app.prog
-    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
+    if app.app.prog:
+        prog = app.app.prog
+    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.app.prog_engine.get_log()})
 
-@app.route("/cnnmodels", methods=["GET"])
+@app.app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():
     logging.info("cnn_models_list")
     return json.dumps(cnn.get_models())
 
-@app.route("/cnnmodels", methods=["POST"])
+@app.app.route("/cnnmodels", methods=["POST"])
 def handle_cnn_models_new():
     logging.info("cnn_models_new")
     data = json.loads(request.get_data(as_text=True))
@@ -300,14 +308,14 @@ def handle_cnn_models_new():
 
     return json.dumps({"name": data["model_name"], "status": 0})
 
-@app.route("/cnnmodels/<model_name>", methods=["GET"])
+@app.app.route("/cnnmodels/<model_name>", methods=["GET"])
 def handle_cnn_models_status(model_name):
     logging.info("cnn_models_status")
     model_status = cnn.get_models().get(model_name)
 
     return json.dumps(model_status)
 
-@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
+@app.app.route("/cnnmodels/<model_name>", methods=["DELETE"])
 def handle_cnn_models_delete(model_name):
     logging.info("cnn_models_delete")
     model_status = cnn.delete_model(model_name=model_name)
@@ -327,11 +335,11 @@ def execute(command):
         yield nextline
 
 def button_pushed():
-    if app.bot_config.get('button_func') == "startstop":
-        if app.prog and app.prog.is_running():
-            app.prog.end()
-        elif app.prog and not app.prog.is_running():
-            app.prog.execute()
+    if app.app.bot_config.get('button_func') == "startstop":
+        if app.app.prog and app.app.prog.is_running():
+            app.app.prog.end()
+        elif app.app.prog and not app.app.prog.is_running():
+            app.app.prog.execute()
 
 # Finally, get the server running
 def run_server():
@@ -344,11 +352,11 @@ def run_server():
     global event
     try:
         try:
-            app.bot_config = Config.read()
-            bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode") == "servo"),
-                                        motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
+            app.app.bot_config = Config.read()
+            bot = CoderBot.get_instance(servo=(app.app.bot_config.get("move_motor_mode") == "servo"),
+                                        motor_trim_factor=float(app.app.bot_config.get('move_motor_trim', 1.0)))
             audio = Audio.get_instance()
-            audio.say(app.bot_config.get("sound_start"))
+            audio.say(app.app.bot_config.get("sound_start"))
             try:
                 cam = Camera.get_instance()
                 motion = Motion.get_instance()
@@ -359,18 +367,18 @@ def run_server():
             event = EventManager.get_instance("coderbot")
             conv = Conversation.get_instance()
 
-            if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
-                app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
-                app.prog.execute()
+            if app.app.bot_config.get('load_at_start') and len(app.app.bot_config.get('load_at_start')):
+                app.app.prog = app.app.prog_engine.load(app.app.bot_config.get('load_at_start'))
+                app.app.prog.execute()
         except ValueError as e:
-            app.bot_config = {}
+            app.app.bot_config = {}
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+        app.app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()
         if bot:
             bot.exit()
-        app.shutdown_requested = True
+        app.app.shutdown_requested = True

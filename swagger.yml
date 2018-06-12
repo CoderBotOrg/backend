@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
-  version: "1.0.0"
-  title: Swagger ReST Article
+  version: "0.2"
+  title: Swagger definition of Coderbot API v2
 
 consumes:
   - "application/json"
@@ -14,7 +14,7 @@ basePath: "/v2"
 paths:
   /stop:
     get:
-      operationId: "api2.stop"
+      operationId: "api.stop"
       tags:
         - "People"
       summary: "Summary"
