@@ -24,6 +24,7 @@ from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
 
+# Import the new API v2 defined as flask blueprint
 from api import api
 
 logger = logging.getLogger()
@@ -54,6 +55,8 @@ app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
+
+# Register the new API and let it coexist with the existing one
 app.register_blueprint(api)
 
 @babel.localeselector
