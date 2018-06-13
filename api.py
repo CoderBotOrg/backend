@@ -16,7 +16,12 @@ def stop():
 
 def move(data):
 	print(data)
-	bot.move(speed=data['param1'], elapse=data['param2'])
+	bot.move(speed=data['speed'], elapse=data['elapse'])
+	return "ok"
+
+def turn(data):
+	print(data)
+	bot.turn(speed=data['speed'], elapse=data['elapse'])
 	return "ok"
 
 def status():

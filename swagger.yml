@@ -16,35 +16,69 @@ paths:
     get:
       operationId: "api.status"
       summary: "Bot general informations and execution status"
+      tags:
+        - Status informations
       responses:
         200:
           description: "Bot status"
   /stop:
     post:
       operationId: "api.stop"
-      summary: Stops the bot movements
+      summary: Stops the bot motors
+      tags:
+        - Direct control
       responses:
         200:
           description: "Successfully stopped the motors"
   /move:
     post:
-      summary: Moves the bot
+      summary: Moves the bot forward or backward.
       operationId: "api.move"
+      tags:
+        - Direct control
       parameters:
         - in: body
           name: data
-          description: Movements details
+          description: Movement speed and duration
           schema:
             type: object
-            default: {'param1': 100, 'param2':-1}
+            default: {'speed': 100, 'elapse':-1}
             required:
-              - param1
-              - param2
+              - speed
+              - elapse
             properties:
-              param1:
+              speed:
                 type: number
-              param2:
+                description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+              elapse:
                 type: number
+                description: Duration of the movement. -1 moves the bot until a /stop command is received.
+      responses:
+        200:
+          description: Sent command to the bot GPIO.
+  /turn:
+    post:
+      summary: Make a turn with the motors
+      operationId: "api.turn"
+      tags:
+        - Direct control
+      parameters:
+        - in: body
+          name: data
+          description: Turn
+          schema:
+            type: object
+            default: {'speed': -80, 'elapse':-1}
+            required:
+              - speed
+              - elapse
+            properties:
+              speed:
+                type: number
+                description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+              elapse:
+                type: number
+                description: Duration of the movement. -1 moves the bot until a /stop command is received.
       responses:
         201:
-          description: Created
+          description: Sent command to the bot GPIO.
