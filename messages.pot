@@ -1,21 +1,21 @@
 # Translations template for PROJECT.
-# Copyright (C) 2016 ORGANIZATION
+# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-03 21:39+0000\n"
+"POT-Creation-Date: 2017-10-08 19:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.3.4\n"
 
 #: templates/blocks_adv.xml:2 templates/blocks_std.xml:13
 msgid "Logic"
@@ -47,33 +47,36 @@ msgstr ""
 msgid "list"
 msgstr ""
 
-#: templates/blocks_adv.xml:164
-msgid "Colour"
-msgstr ""
-
-#: templates/blocks_adv.xml:170 templates/blocks_std.xml:19
+#: templates/blocks_adv.xml:166 templates/blocks_std.xml:19
 msgid "Variables"
 msgstr ""
 
-#: templates/blocks_adv.xml:171
+#: templates/blocks_adv.xml:167
 msgid "Functions"
 msgstr ""
 
-#: templates/blocks_adv.xml:172 templates/blocks_std.xml:35
+#: templates/blocks_adv.xml:168
+msgid "Event"
+msgstr ""
+
+#: templates/blocks_adv.xml:200 templates/blocks_adv.xml:207
+msgid "event_data"
+msgstr ""
+
+#: templates/blocks_adv.xml:210 templates/blocks_std.xml:35
 #: templates/config.html:15
 msgid "Movement"
 msgstr ""
 
-#: templates/blocks_adv.xml:229
+#: templates/blocks_adv.xml:277 templates/config.html:14
 msgid "Camera"
 msgstr ""
 
-#: templates/blocks_adv.xml:234 templates/blocks_std.xml:61
-#: templates/config.html:14
+#: templates/blocks_adv.xml:282 templates/blocks_std.xml:61
 msgid "Sensor"
 msgstr ""
 
-#: templates/blocks_adv.xml:255 templates/blocks_std.xml:73
+#: templates/blocks_adv.xml:305 templates/blocks_std.xml:73
 msgid "Sound"
 msgstr ""
 
@@ -102,7 +105,7 @@ msgstr ""
 msgid "Button"
 msgstr ""
 
-#: templates/config.html:18 templates/config.html:144
+#: templates/config.html:18 templates/config.html:157
 msgid "User Interface"
 msgstr ""
 
@@ -114,330 +117,327 @@ msgstr ""
 msgid "Restart, Halt"
 msgstr ""
 
-#: templates/config.html:25 templates/config.html:64
+#: templates/config.html:25 templates/config.html:68
 msgid "Movement assisted by vision"
 msgstr ""
 
-#: templates/config.html:28
+#: templates/config.html:29 templates/config.html:72
+msgid "Movement assisted by Gyroscope"
+msgstr ""
+
+#: templates/config.html:32
 msgid "Step timing | distance / angle"
 msgstr ""
 
-#: templates/config.html:29 templates/config.html:67
+#: templates/config.html:33 templates/config.html:76
 msgid "Forward speed"
 msgstr ""
 
-#: templates/config.html:31 templates/config.html:69
+#: templates/config.html:35 templates/config.html:78
 msgid "Forward elapse / distance"
 msgstr ""
 
-#: templates/config.html:33 templates/config.html:71
+#: templates/config.html:37 templates/config.html:80
 msgid "Turn speed"
 msgstr ""
 
-#: templates/config.html:35 templates/config.html:73
+#: templates/config.html:39 templates/config.html:82
 msgid "Turn elapse / angle"
 msgstr ""
 
-#: templates/config.html:38
+#: templates/config.html:42
 msgid "Show control counter"
 msgstr ""
 
-#: templates/config.html:41
+#: templates/config.html:45
 msgid "HUD image name"
 msgstr ""
 
-#: templates/config.html:46
+#: templates/config.html:50
 msgid "Editor level"
 msgstr ""
 
-#: templates/config.html:48
+#: templates/config.html:52
 msgid "Move"
 msgstr ""
 
-#: templates/config.html:50
+#: templates/config.html:54
 msgid "Basic"
 msgstr ""
 
-#: templates/config.html:52
+#: templates/config.html:56
 msgid "Standard"
 msgstr ""
 
-#: templates/config.html:54
+#: templates/config.html:58
 msgid "Advanced"
 msgstr ""
 
-#: templates/config.html:57
+#: templates/config.html:61
 msgid "Program editor details"
 msgstr ""
 
-#: templates/config.html:58
+#: templates/config.html:62
 msgid "Shows Editor scrollbars"
 msgstr ""
 
-#: templates/config.html:60
+#: templates/config.html:64
 msgid "Save program before every run"
 msgstr ""
 
-#: templates/config.html:76
+#: templates/config.html:85
 msgid "Other program parameters"
 msgstr ""
 
-#: templates/config.html:77
+#: templates/config.html:86
 msgid "Auto record video on program run"
 msgstr ""
 
-#: templates/config.html:80
+#: templates/config.html:89
 msgid "Max number of blocks allowed"
 msgstr ""
 
-#: templates/config.html:84
+#: templates/config.html:93
 msgid "Start sound"
 msgstr ""
 
-#: templates/config.html:86
+#: templates/config.html:95
 msgid "Stop sound"
 msgstr ""
 
-#: templates/config.html:88
+#: templates/config.html:97
 msgid "Shutter sound"
 msgstr ""
 
-#: templates/config.html:92
+#: templates/config.html:101
 msgid "Camera parameters"
 msgstr ""
 
-#: templates/config.html:93
+#: templates/config.html:102
 msgid "Exposure mode"
 msgstr ""
 
-#: templates/config.html:102
+#: templates/config.html:111
 msgid "Camera refresh timeout"
 msgstr ""
 
-#: templates/config.html:104
+#: templates/config.html:113
 msgid "Camera jpeg quality"
 msgstr ""
 
-#: templates/config.html:106
+#: templates/config.html:115
 msgid "CV image resize factor (1/x)"
 msgstr ""
 
-#: templates/config.html:108
+#: templates/config.html:117
 msgid "Path object min size"
 msgstr ""
 
-#: templates/config.html:110
+#: templates/config.html:119
 msgid "Path object max size"
 msgstr ""
 
-#: templates/config.html:112
+#: templates/config.html:121
 msgid "Color object min size"
 msgstr ""
 
-#: templates/config.html:114
+#: templates/config.html:123
 msgid "Color object max size"
 msgstr ""
 
-#: templates/config.html:118
-msgid "Motor control mode"
-msgstr ""
-
-#: templates/config.html:120
-msgid "Trim factor (1.0 = center)"
-msgstr ""
-
-#: templates/config.html:122
-msgid "Power (target angle -15)"
-msgstr ""
-
-#: templates/config.html:124
-msgid "Power (target angle -4)"
+#: templates/config.html:125
+msgid "Manage CNN Models"
 msgstr ""
 
 #: templates/config.html:126
-msgid "Power (target angle -1)"
+msgid "Default CNN Model"
 msgstr ""
 
-#: templates/config.html:130
-msgid "Load at start"
+#: templates/config.html:131
+msgid "Motor control mode"
+msgstr ""
+
+#: templates/config.html:133
+msgid "Trim factor (1.0 = center)"
 msgstr ""
 
 #: templates/config.html:135
+msgid "Power (target angle -15)"
+msgstr ""
+
+#: templates/config.html:137
+msgid "Power (target angle -4)"
+msgstr ""
+
+#: templates/config.html:139
+msgid "Power (target angle -1)"
+msgstr ""
+
+#: templates/config.html:143
+msgid "Load at start"
+msgstr ""
+
+#: templates/config.html:148
 msgid "Button function"
 msgstr ""
 
-#: templates/config.html:136
+#: templates/config.html:149
 msgid "None"
 msgstr ""
 
-#: templates/config.html:138
+#: templates/config.html:151
 msgid "Start/Stop current program"
 msgstr ""
 
-#: templates/config.html:145
+#: templates/config.html:158
 msgid "Show Control page"
 msgstr ""
 
-#: templates/config.html:147
+#: templates/config.html:160
 msgid "Show Control movement commands"
 msgstr ""
 
-#: templates/config.html:149
+#: templates/config.html:162
 msgid "Show Program page"
 msgstr ""
 
-#: templates/config.html:151
+#: templates/config.html:164
 msgid "Show Preferences button"
 msgstr ""
 
-#: templates/config.html:156
+#: templates/config.html:169
 msgid "WiFi Client access mode"
 msgstr ""
 
-#: templates/config.html:159
+#: templates/config.html:172
 msgid "Halt"
 msgstr ""
 
-#: templates/config.html:160
+#: templates/config.html:173
 msgid "Restart"
 msgstr ""
 
-#: templates/config.html:161
+#: templates/config.html:174
 msgid "Reboot"
 msgstr ""
 
-#: templates/config.html:162
+#: templates/config.html:175
 msgid "Update System"
 msgstr ""
 
-#: templates/config.html:165 templates/config.html:186
+#: templates/config.html:178 templates/config.html:199
 msgid "Cancel"
 msgstr ""
 
-#: templates/config.html:166 templates/program.html:18
+#: templates/config.html:179 templates/program.html:18
 #: templates/program.html:26
 msgid "Save"
 msgstr ""
 
-#: templates/config.html:173
+#: templates/config.html:186
 msgid "WiFi Client mode access data"
 msgstr ""
 
-#: templates/config.html:175
+#: templates/config.html:188
 msgid "WiFi mode"
 msgstr ""
 
-#: templates/config.html:177
+#: templates/config.html:190
 msgid "Access Point"
 msgstr ""
 
-#: templates/config.html:179
+#: templates/config.html:192
 msgid "Client"
 msgstr ""
 
-#: templates/config.html:181
+#: templates/config.html:194
 msgid "WiFi name"
 msgstr ""
 
-#: templates/config.html:183
+#: templates/config.html:196
 msgid "WiFi password"
 msgstr ""
 
-#: templates/config.html:187
+#: templates/config.html:200
 msgid "Apply Wifi config"
 msgstr ""
 
-#: templates/config.html:194
+#: templates/config.html:207
 msgid "WiFi AP mode access"
 msgstr ""
 
-#: templates/config.html:195
+#: templates/config.html:208
 msgid "Access Point mode is being set"
 msgstr ""
 
-#: templates/config.html:197 templates/config.html:209
+#: templates/config.html:210 templates/config.html:222
 msgid "Wait 30 seconds"
 msgstr ""
 
-#: templates/config.html:198
+#: templates/config.html:211
 msgid "Connect your device to the \"coderbot\" named wifi"
 msgstr ""
 
-#: templates/config.html:199 templates/config.html:211
+#: templates/config.html:212 templates/config.html:224
 msgid "Click on the following link"
 msgstr ""
 
-#: templates/config.html:206
+#: templates/config.html:219
 msgid "WiFi Client mode access"
 msgstr ""
 
-#: templates/config.html:207
+#: templates/config.html:220
 msgid "Client mode is being set"
 msgstr ""
 
-#: templates/config.html:210
+#: templates/config.html:223
 msgid ""
 "Connect your device to your own wifi (wifi network must be connected to "
 "internet)"
 msgstr ""
 
-#: templates/config.html:218
+#: templates/config.html:231
 msgid "System update"
 msgstr ""
 
-#: templates/config.html:219
+#: templates/config.html:232
 msgid "Update log (it may require several minutes)"
 msgstr ""
 
-#: templates/config.html:221 templates/config_params.html:30
+#: templates/config.html:234
 msgid "Close"
 msgstr ""
 
-#: templates/config_params.html:20
-msgid "Say what:"
+#: templates/config.html:239
+msgid "CNN Models"
 msgstr ""
 
-#: templates/config_params.html:21
-msgid "Saved"
+#: templates/config.html:242
+msgid "Train new CNN Model"
 msgstr ""
 
-#: templates/config_params.html:22
-msgid "Program saved"
+#: templates/config.html:244
+msgid "Model name"
 msgstr ""
 
-#: templates/config_params.html:23
-msgid "Program name already in use, overwrite?"
+#: templates/config.html:246
+msgid "Image tags"
 msgstr ""
 
-#: templates/config_params.html:24
-msgid "Delete"
+#: templates/config.html:248
+msgid "Model architecture"
 msgstr ""
 
-#: templates/config_params.html:25
-msgid "Delete photo"
+#: templates/config.html:255
+msgid "Training steps"
 msgstr ""
 
-#: templates/config_params.html:26
-msgid "Reset move counter?"
+#: templates/config.html:257
+msgid "Learning rate"
 msgstr ""
 
-#: templates/config_params.html:27 templates/program.html:40
-msgid "is running"
-msgstr ""
-
-#: templates/config_params.html:28
-msgid "stopped"
-msgstr ""
-
-#: templates/config_params.html:29 templates/control.html:48
-#: templates/program.html:32
-msgid "Stop"
-msgstr ""
-
-#: templates/config_params.html:31
-msgid ""
-"Update System? (this requires that CoderBot is connected to the internet "
-"(via wifi or lan cable, the operation will take a few minutes)."
+#: templates/config.html:259
+msgid "Train new Model"
 msgstr ""
 
 #: templates/control.html:5 templates/program.html:5
@@ -476,6 +476,10 @@ msgstr ""
 msgid "Rec"
 msgstr ""
 
+#: templates/control.html:48 templates/program.html:32
+msgid "Stop"
+msgstr ""
+
 #: templates/control.html:51
 msgid "Photos"
 msgstr ""
@@ -506,6 +510,10 @@ msgstr ""
 
 #: templates/program.html:30
 msgid "Show"
+msgstr ""
+
+#: templates/program.html:40
+msgid "is running"
 msgstr ""
 
 #: templates/program.html:51

@@ -35,6 +35,8 @@
 # Pictures taken
 photos/*.jpg
 photos/*.mp4
+photos/*.h264
+photos/*.json
 
 # Sounds recorded
 sounds/*.wav
@@ -45,6 +47,9 @@ logs/*.log.*
 
 # User programs
 data/*.data
+
+# CNN Models
+cnn_models/*
 
 # Tutorial
 static/blockly-tutorial
@@ -58,3 +63,14 @@ static/blockly-tutorial
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Swap files
+*.swp
+
+
+# Python3 Virtual Environment folders
+
+bin/
+lib/
+share/
+pyvenv.cfg

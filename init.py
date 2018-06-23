@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ############################################################################
 #    CoderBot, a didactical programmable robot.
 #    Copyright (C) 2014, 2015 Roberto Previtera <info@coderbot.org>
@@ -17,9 +17,10 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
-
-import coderbot
+"""
+CoderBot init module
+"""
 import main
 
-if __name__=="__main__":
-  main.run_server()
+if __name__ == "__main__":
+    main.run_server()

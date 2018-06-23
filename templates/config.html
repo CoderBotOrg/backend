@@ -11,7 +11,7 @@
       <li><a href="#t_control" class="ui-btn-active" data-ajax="true">{% trans %}Control{% endtrans %}</a></li>
       <li><a href="#t_programming" data-ajax="true">{% trans %}Programming{% endtrans %}</a></li>
       <li><a href="#t_sound" data-ajax="true">{% trans %}Sounds{% endtrans %}</a></li>
-      <li><a href="#t_sensor" data-ajax="true">{% trans %}Sensor{% endtrans %}</a></li>
+      <li><a href="#t_sensor" data-ajax="true">{% trans %}Camera{% endtrans %}</a></li>
       <li><a href="#t_movement" data-ajax="true">{% trans %}Movement{% endtrans %}</a></li>
       <li><a href="#t_start" data-ajax="true">{% trans %}Start{% endtrans %}</a></li>
       <li><a href="#t_button" data-ajax="true">{% trans %}Button{% endtrans %}</a></li>
@@ -24,6 +24,10 @@
      <div class="ui-field-contain">
       <label for="i_ctrl_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
       <input type="checkbox" data-role="flipswitch" id="i_ctrl_move_mode" name="ctrl_move_motion" value="yes"{%if config.ctrl_move_motion%} checked{%endif%}>
+     </div>
+     <div class="ui-field-contain">
+      <label for="i_ctrl_move_mode_mpu">{% trans %}Movement assisted by Gyroscope{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_ctrl_move_mode_mpu" name="ctrl_move_mpu" value="yes"{%if config.ctrl_move_mpu%} checked{%endif%}>
      </div>
      <legend>{% trans %}Step timing | distance / angle{% endtrans %}</legend>
      <label for="i_ctrl_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
@@ -52,6 +56,8 @@
       <label for="r_prog_level_c">{% trans %}Standard{% endtrans %}</label> 
       <input type="radio" name="prog_level" id="r_prog_level_d" value="adv" {%if config.prog_level=='adv'%}checked="checked"{%endif%}>
       <label for="r_prog_level_d">{% trans %}Advanced{% endtrans %}</label>     
+      <input type="radio" name="prog_level" id="r_prog_level_e" value="py" {%if config.prog_level=='py'%}checked="checked"{%endif%}>
+      <label for="r_prog_level_e">{% trans %}Python{% endtrans %}</label>     
      </fieldset>
      <fieldset data-role="controlgroup" data-mini="true">
       <legend>{% trans %}Program editor details{% endtrans %}</legend>
@@ -63,6 +69,11 @@
      <div class="ui-field-contain">
       <label for="i_prog_move_mode">{% trans %}Movement assisted by vision{% endtrans %}</label>
       <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode" name="prog_move_motion" value="yes"{%if config.prog_move_motion%} checked{%endif%}>
+     </div>
+     <div class="ui-field-contain">
+      <label for="i_prog_move_mode_mpu">{% trans %}Movement assisted by Gyroscope{% endtrans %}</label>
+      <input type="checkbox" data-role="flipswitch" id="i_prog_move_mode_mpu" name="prog_move_mpu" value="yes"{%if config.prog_move_mpu%} checked{%endif%}>
+
      </div>
      <label for="i_move_fw_speed">{% trans %}Forward speed{% endtrans %}</label>
      <input type="text" id="i_move_fw_speed" name="move_fw_speed" value="{{config.move_fw_speed}}">
@@ -99,12 +110,14 @@
        <option value="antishake"{%if config.camera_exposure_mode=='antishake'%} selected{%endif%}>Anti shake</option>
        <option value="verylong"{%if config.camera_exposure_mode=='verylong'%} selected{%endif%}>Very long</option>
      </select>
-    <label for="i_camera_refresh_timeout">{% trans %}Camera refresh timeout{% endtrans %}</label>
-    <input type="text" id="i_camera_refresh_timeout" name="camera_refresh_timeout" value="{{config.camera_refresh_timeout}}">
+    <label for="i_camera_framerate">{% trans %}Camera framerate{% endtrans %}</label>
+    <input type="range" id="i_camera_framerate" name="camera_framerate" value="{{config.camera_framerate}}" min="5" max="30" step="5" value="20">
     <label for="i_camera_jpeg_quality">{% trans %}Camera jpeg quality{% endtrans %}</label>
-    <input type="text" id="i_camera_jpeg_quality" name="camera_jpeg_quality" value="{{config.camera_jpeg_quality}}">
+    <input type="range" id="i_camera_jpeg_quality" name="camera_jpeg_quality" value="{{config.camera_jpeg_quality}}" min="1" max="100" step="1" value="20">
+    <label for="i_camera_jpeg_bitstream">{% trans %}Camera video bitrate{% endtrans %}</label>
+    <input type="range" id="i_camera_jpeg_quality" name="camera_jpeg_bitrate" value="{{config.camera_jpeg_bitrate}}" min="1000000" max="10000000" step="1000000" value="3000000">
     <label for="i_cv_image_factor">{% trans %}CV image resize factor (1/x){% endtrans %}</label>
-    <input type="text" id="i_cv_image_factor" name="cv_image_factor" value="{{config.cv_image_factor}}">
+    <input type="range" id="i_cv_image_factor" name="cv_image_factor" value="{{config.cv_image_factor}}" min="1" max="4" step="1" value="4">
     <label for="i_camera_path_object_size_min">{% trans %}Path object min size{% endtrans %}</label>
     <input type="text" id="i_camera_path_object_size_min" name="camera_path_object_size_min" value="{{config.camera_path_object_size_min}}">
     <label for="i_camera_path_object_size_max">{% trans %}Path object max size{% endtrans %}</label>
@@ -113,18 +126,22 @@
     <input type="text" id="i_camera_color_object_size_min" name="camera_color_object_size_min" value="{{config.camera_color_object_size_min}}">
     <label for="i_camera_color_object_size_max">{% trans %}Color object max size{% endtrans %}</label>
     <input type="text" id="i_camera_color_object_size_max" name="camera_color_object_size_max" value="{{config.camera_color_object_size_max}}">
+    <a href="#popup-cnn-models" data-rel="popup" id="b_cnn_model_manage" class="ui-btn ui-shadow ui-corner-all ui-btn-a ui-mini">{% trans %}Manage CNN Models{% endtrans %}</a>
+     <label for="i_cnn_default_model">{% trans %}Default CNN Model{% endtrans %}</label>
+     <select name="cnn_default_model" id="i_cnn_default_model" value="{{config.cnn_default_model}}">
+     </select>
     </div>
     <div id="t_movement" class="ui-body-d ui-content">
      <label for="i_move_motor_mode">{% trans %}Motor control mode{% endtrans %}</label>
      <input type="text" id="i_move_motor_mode" name="move_motor_mode" value="{{config.move_motor_mode}}">
      <label for="i_move_motor_trim">{% trans %}Trim factor (1.0 = center){% endtrans %}</label>
-     <input type="text" id="i_move_motor_trim" name="move_motor_trim" value="{{config.move_motor_trim}}">
+     <input type="text" id="i_move_motor_trim" name="move_motor_trim" value="{{config.move_motor_trim}}" min="0.8" max="1.2" step="0.01" value="1.0">
      <label for="i_move_power_angle_1">{% trans %}Power (target angle -15){% endtrans %}</label>
-     <input type="text" id="i_move_power_angle_1" name="move_power_angle_1" value="{{config.move_power_angle_1}}"> 
+     <input type="text" id="i_move_power_angle_1" name="move_power_angle_1" value="{{config.move_power_angle_1}}" min="0" max="100" step="1" value="45"> 
      <label for="i_move_power_angle_2">{% trans %}Power (target angle -4){% endtrans %}</label>
-     <input type="text" id="i_move_power_angle_2" name="move_power_angle_2" value="{{config.move_power_angle_2}}">
+     <input type="text" id="i_move_power_angle_2" name="move_power_angle_2" value="{{config.move_power_angle_2}}" min="0" max="100" step="1" value="60">
      <label for="i_move_power_angle_3">{% trans %}Power (target angle -1){% endtrans %}</label>
-     <input type="text" id="i_move_power_angle_3" name="move_power_angle_3" value="{{config.move_power_angle_3}}">
+     <input type="text" id="i_move_power_angle_3" name="move_power_angle_3" value="{{config.move_power_angle_3}}" min="0" max="100" step="1" value="60">
     </div>
     <div id="t_start" class="ui-body-d ui-content">
      <label for="i_load_at_start">{% trans %}Load at start{% endtrans %}</label>
@@ -219,6 +236,36 @@
    <p>{% trans %}Update log (it may require several minutes){% endtrans %}:</p>
    <textarea readonly=true cols="80" rows="20" style="overflow-y: scroll; height: 100px; resize: none; " id="i_update_system_log"></textarea>
    <a href="#" id="b_update_system_close" data-rel="back" data-role="button" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-mini ui-disabled">{% trans %}Close{% endtrans %}</a>
+  </div>
+ </div>
+ <div data-role="popup" id="popup-cnn-models" data-history="false" data-theme="a" class="ui-corner-all" data-dismissible="true" data-position-to="window">
+  <div style="padding:10px 20px;">
+   <h3>{% trans %}CNN Models{% endtrans %}</h3>
+   <ul data-role="listview" data-inset="true" id="cnn-model-list">
+   </ul>
+   <h3>{% trans %}Train new CNN Model{% endtrans %}</h3>
+    <form id="f_cnn_train" action="#">
+     <label for="i_cnn_model_name">{% trans %}Model name{% endtrans %}</label>
+     <input type="text" id="i_cnn_model_name" name="cnn_model_name" value="">
+     <label for="i_cnn_image_tags">{% trans %}Image tags{% endtrans %}</label>
+     <input type="text" id="i_cnn_image_tags" name="cnn_image_tags" value="">
+     <label for="i_cnn_model_arch">{% trans %}Model architecture{% endtrans %}</label>
+     <select name="cnn_model_arch" id="i_cnn_model_arch" value="">
+       <option value="mobilenet_1.0_128">MobileNet 1.0 128</option>
+       <option value="mobilenet_0.75_128">MobileNet 0.75 128</option>
+       <option value="mobilenet_0.50_128">MobileNet 0.50 128</option>
+       <option value="mobilenet_0.25_128">MobileNet 0.25 128</option>
+       <option value="mobilenet_1.0_224">MobileNet 1.0 224</option>
+       <option value="mobilenet_0.75_224">MobileNet 0.75 224</option>
+       <option value="mobilenet_0.50_224">MobileNet 0.50 224</option>
+       <option value="mobilenet_0.25_224">MobileNet 0.25 224</option>
+     </select>
+     <label for="i_cnn_model_train_steps">{% trans %}Training steps{% endtrans %}</label>
+     <input type="range" id="i_cnn_train_steps" name="cnn_train_steps" min="10" max="100" step="10" value="50">
+     <label for="i_cnn_learn_rate">{% trans %}Learning rate{% endtrans %}</label>
+     <input type="range" id="i_cnn_learn_rate" name="cnn_learn_rate" value="0.01" min="0.001" max="0.1" step="0.001">
+     <button class="ui-btn b_train_new_cnn_model">{% trans %}Train new Model{% endtrans %}</button>
+   </form>
   </div>
  </div>
 </div>

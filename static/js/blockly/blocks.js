@@ -147,7 +147,8 @@ Blockly.Python['coderbot_turnLeft'] = function(block) {
   // Generate Python for turning left.
   if(CODERBOT_PROG_MOVE_MOTION) {
     return 'get_motion().turn(angle=' + (-CODERBOT_MOV_TR_DEF_ELAPSE) + ')\n';
-
+  } else if(CODERBOT_PROG_MOVE_MPU) {
+    return 'get_bot().turn_angle(speed=' + (-CODERBOT_MOV_TR_DEF_SPEED) + ', angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   } else {
     return 'get_bot().left(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   }
@@ -174,7 +175,8 @@ Blockly.Python['coderbot_turnRight'] = function(block) {
   // Generate Python for turning left or right.
   if(CODERBOT_PROG_MOVE_MOTION) {
     return 'get_motion().turn(angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
-
+  } else if(CODERBOT_PROG_MOVE_MPU) {
+    return 'get_bot().turn_angle(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', angle=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   } else {
     return 'get_bot().right(speed=' + CODERBOT_MOV_TR_DEF_SPEED + ', elapse=' + CODERBOT_MOV_TR_DEF_ELAPSE + ')\n';
   } 
@@ -355,6 +357,12 @@ Blockly.Blocks['coderbot_adv_motor'] = {
     this.appendValueInput('ELAPSE')
         .setCheck('Number')
         .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_ELAPSE);
+    this.appendValueInput('STEPS_LEFT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_STEPS_LEFT);
+    this.appendValueInput('STEPS_RIGHT')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_STEPS_RIGHT);
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -372,7 +380,9 @@ Blockly.Python['coderbot_adv_motor'] = function(block) {
   var speed_left = Blockly.Python.valueToCode(block, 'SPEED_LEFT', Blockly.Python.ORDER_NONE);
   var speed_right = Blockly.Python.valueToCode(block, 'SPEED_RIGHT', Blockly.Python.ORDER_NONE);
   var elapse = Blockly.Python.valueToCode(block, 'ELAPSE', Blockly.Python.ORDER_NONE);
-  var code = "get_bot().motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", elapse=" + elapse + ")\n";
+  var steps_left = Blockly.Python.valueToCode(block, 'STEPS_LEFT', Blockly.Python.ORDER_NONE);
+  var steps_right = Blockly.Python.valueToCode(block, 'STEPS_RIGHT', Blockly.Python.ORDER_NONE);
+  var code = "get_bot().motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", elapse=" + elapse + ", steps_left=" + steps_left + ", steps_right=" + steps_right + ")\n";
   return code;
 };
 
@@ -494,7 +504,7 @@ Blockly.Blocks['coderbot_adv_findLine'] = {
     this.setColour(250);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDLINE);
-    this.setOutput(true, 'Number');
+    this.setOutput(true, 'Array');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
@@ -639,7 +649,7 @@ Blockly.Python['coderbot_adv_findText'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_adv_findCode'] = {
+Blockly.Blocks['coderbot_adv_findQRCode'] = {
   /**
    * Block for findText function.
    * @this Blockly.Block
@@ -648,16 +658,38 @@ Blockly.Blocks['coderbot_adv_findCode'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(250);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCODE);
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDQRCODE);
     this.setOutput(true, 'String');
     this.setInputsInline(true);
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
 
-Blockly.Python['coderbot_adv_findCode'] = function(block) {
+Blockly.Python['coderbot_adv_findQRCode'] = function(block) {
   // Boolean values true and false.
-  var code = 'get_cam().find_code()';
+  var code = 'get_cam().find_qr_code()';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_findARCode'] = {
+  /**
+   * Block for findText function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(250);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDARCODE);
+    this.setOutput(true, 'HashMap');
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_findARCode'] = function(block) {
+  // Boolean values true and false.
+  var code = 'get_cam().find_ar_code()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
@@ -680,6 +712,200 @@ Blockly.Python['coderbot_adv_findLogo'] = function(block) {
   // Boolean values true and false.
   var code = 'get_cam().find_logo()';
   return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_find_class'] = {
+  /**
+   * Block for find_class function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(250);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCLASS);
+    this.setOutput(true, 'String');
+    this.setInputsInline(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_find_class'] = function(block) {
+  // Boolean values true and false.
+  var name = 'get_cam().find_class()';
+  return [name, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_adv_cnn_classify'] = {
+  /**
+   * Block for find_class function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(250);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDCLASS)
+        .appendField(new Blockly.FieldDropdown(CODERBOT_CNN_MODEL_LIST), 'MODEL');
+    this.setInputsInline(true);
+    this.setOutput(true, ['Array']);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_adv_cnn_classify'] = function(block) {
+  var model = block.getFieldValue('MODEL');
+  var class_scores = 'get_cam().cnn_classify("'+ model +'")';
+  return [class_scores, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_event_generator'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_EVENT_GENERATOR);
+    this.appendStatementInput("generator_statements")
+        .setCheck(null);
+    this.setColour(15);
+ this.setTooltip("event generator");
+ this.setHelpUrl("");
+  }
+};
+
+var coderbot_generator_id = 1;
+Blockly.Python['coderbot_event_generator'] = function(block) {
+  Blockly.Generator.prototype.INDENT = '    ';
+  var statements_event_generator = Blockly.Python.statementToCode(block, 'generator_statements');
+  Blockly.Generator.prototype.INDENT = '  ';
+  var code = 'def event_generator_' + coderbot_generator_id + '():\n' +
+             '  while True:\n' +
+             '    get_prog_eng().check_end()\n' +
+             statements_event_generator + '\n' + 
+             'get_event().register_event_generator(event_generator_' + coderbot_generator_id + ')'
+  coderbot_generator_id++;
+  return code;
+};
+
+Blockly.Blocks['coderbot_event_listener'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_EVENT_WHEN)
+        .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic")
+        .appendField(Blockly.Msg.CODERBOT_EVENT_WITH + " event_data");
+    this.appendStatementInput("event_statements")
+        .setCheck(null);
+    this.setInputsInline(true);
+    this.setColour(15);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+var coderbot_listener_id = 1;
+Blockly.Python['coderbot_event_listener'] = function(block) {
+  var event_topic = block.getFieldValue('event_topic');
+  var event_statements = Blockly.Python.statementToCode(block, 'event_statements');
+  var code = 'def event_listener_' + coderbot_listener_id + '(message):\n' +
+             Blockly.Generator.prototype.INDENT + 'event_data = json.loads(message)\n' +
+             event_statements + '\n' +
+             'get_event().register_event_listener(\'' + event_topic + '\', event_listener_' + coderbot_listener_id + ')'
+  coderbot_listener_id++; 
+  return code;
+};
+
+Blockly.Blocks['coderbot_event_publisher'] = {
+  init: function() {
+    this.appendValueInput("event_data")
+        .appendField(Blockly.Msg.CODERBOT_EVENT_PUBLISH)
+        .setCheck(null);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_EVENT_ON_TOPIC)
+        .appendField(new Blockly.FieldTextInput("event_topic"), "event_topic");
+    this.setInputsInline(true);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(15);
+ this.setTooltip("event publisher");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['coderbot_event_publisher'] = function(block) {
+  var event_topic = block.getFieldValue('event_topic');
+  var event_data = Blockly.Python.valueToCode(block, 'event_data', Blockly.Python.ORDER_ATOMIC);
+  var code = 'get_event().publish(\'' + event_topic + '\', json.dumps(' + event_data + '))\n';
+  return code;
+};
+
+Blockly.Blocks['hashmap_get_value'] = {
+  init: function() {
+    this.appendValueInput("key")
+        .setCheck("String")
+        .appendField("get");
+    this.appendValueInput("map")
+        .setCheck("HashMap")
+        .appendField("from ");
+    this.setInputsInline(true);
+    this.setOutput(true, null);
+    this.setColour(230);
+ this.setTooltip("get an item from an hashmap");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['hashmap_get_value'] = function(block) {
+  var value_key = Blockly.Python.valueToCode(block, 'key', Blockly.Python.ORDER_ATOMIC);
+  var value_map = Blockly.Python.valueToCode(block, 'map', Blockly.Python.ORDER_ATOMIC);
+  var code = value_map + '.get(' + value_key + ')';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
+Blockly.Blocks['hashmap_get_keys'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("get keys");
+    this.appendValueInput("map")
+        .setCheck("HashMap")
+        .appendField("from ");
+    this.setInputsInline(true);
+    this.setOutput(true, "Array");
+    this.setColour(230);
+ this.setTooltip("get keys from an hashmap");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['hashmap_get_keys'] = function(block) {
+  var value_map = Blockly.Python.valueToCode(block, 'map', Blockly.Python.ORDER_ATOMIC);
+  var code = value_map + '.keys()';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
+
+Blockly.Blocks['coderbot_conv_get_action'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_CONVERSATION_PARSE);
+    this.appendValueInput("query")
+        .setCheck("String");
+    this.appendDummyInput()
+        .appendField("in")
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_LOCALE_EN, 'en'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_IT, 'it'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_FR, 'fr'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_ES, 'es']]), "locale");
+    this.setInputsInline(true);
+    this.setOutput(true, "HashMap");
+    this.setColour(230);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Python['coderbot_conv_get_action'] = function(block) {
+  var value_query = Blockly.Python.valueToCode(block, 'query', Blockly.Python.ORDER_ATOMIC);
+  var dropdown_locale = block.getFieldValue('locale');
+  var code = 'get_conv().get_action(query=' + value_query + ', locale=\'' + dropdown_locale + '\')';
+  return [code, Blockly.Python.ORDER_NONE];
 };
 
 Blockly.Blocks['coderbot_audio_record'] = {
@@ -776,11 +1002,12 @@ Blockly.Blocks['coderbot_audio_listen'] = {
     this.setColour(220);
     this.appendDummyInput()
         .appendField(Blockly.Msg.CODERBOT_AUDIO_LISTEN)
-        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_SIMPLE, 'model_simple'],
-                                                [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_MEDIUM, 'model_medium'],
-                                                [Blockly.Msg.CODERBOT_AUDIO_LISTEN_MODEL_ADV, 'model_adv']]), 'MODEL');
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_LOCALE_EN, 'en-US'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_IT, 'it-IT'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_FR, 'fr-FR'],
+                                                [Blockly.Msg.CODERBOT_LOCALE_ES, 'es-ES']]), 'MODEL');
     this.setInputsInline(true);
-    this.setOutput(true, ['Number', 'Array']);
+    this.setOutput(true, 'String');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
@@ -788,7 +1015,7 @@ Blockly.Blocks['coderbot_audio_listen'] = {
 Blockly.Python['coderbot_audio_listen'] = function(block) {
   // Boolean values true and false.
   var model = block.getFieldValue('MODEL');
-  var code = 'get_audio().speech_recog(model="' + model + '")';
+  var code = 'get_audio().speech_recog_google(locale=\'' + model + '\')';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 

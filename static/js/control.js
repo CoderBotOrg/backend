@@ -98,7 +98,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
                 canvas.getContext('2d').drawImage(img.get(0), 0, 0, img.width(), img.height());
                 var pixelData = canvas.getContext('2d').getImageData(x, y, 1, 1).data;
                 var colorHex = "#" + paddedHexString(pixelData[0]) + paddedHexString(pixelData[1]) + paddedHexString(pixelData[2]);
-		alert("Color at point: " + colorHex); 
+		alert(BotMessages.ColorAtPoint + colorHex); 
         });
 	$( ".photopopup" ).on({
         	popupbeforeposition: function() {
@@ -136,6 +136,53 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
                 });
                 return false;
 	});
+        $.get(url='/cnnmodels', success= function(data) {
+        	$('#i_cnn_default_model').empty();
+		$('#i_cnn_default_model').append('<option></option>');
+		var def_model = $('#i_cnn_default_model').attr("value");
+		for(m in data) {
+			if(Math.trunc(parseInt(data[m].status))==1){
+				$('#i_cnn_default_model').append('<option value="'+m+'">'+m+'</option>');
+			}
+		}
+		$('#i_cnn_default_model').val(def_model).selectmenu("refresh");
+
+	}, dataType="json");
+	$( "#popup-cnn-models" ).bind({
+   		popupbeforeposition: function(event, ui) {
+			$.get(url='/cnnmodels', success= function(data) {
+				$('#cnn-model-list').empty();
+				for(m in data) {
+					$('#cnn-model-list').append('<li data-icon="delete"><a href="#" data-name="'+m+'" class="b_cnn_model_delete">'+m+' [' + Math.trunc(parseFloat(data[m].status) * 100) +'%]</a></li>');
+				}
+				$('#cnn-model-list').listview('refresh');
+                                $('.b_cnn_model_delete').on('click', function(event, ui) {
+					var model_name = $(event.target).attr("data-name");
+					if(confirm("Delete model " + model_name + "?")) {
+						$.ajax({url:'/cnnmodels/'+model_name, method: "DELETE", success: function(data) {
+							console.log("model_name: " + model_name);
+							$('#cnn-model-list a[data-name="' + model_name + '"]').parent().remove();
+ 							$('#cnn-model-list').listview('refresh');
+							}
+						});
+					}
+				});
+			}, dataType='json')
+		}
+	});
+        $( "#f_cnn_train" ).submit(function (){
+			var form = $(event.target);
+                        var data = {architecture: form.find("#i_cnn_model_arch").val(),
+				model_name: form.find("#i_cnn_model_name").val(),
+				training_steps: parseInt(form.find("#i_cnn_train_steps").val()),
+				learning_rate: parseFloat(form.find("#i_cnn_learn_rate").val()),
+				image_tags: form.find("#i_cnn_image_tags").val().split(",")};
+			console.log(data);
+                        $.post(url='/cnnmodels', data=JSON.stringify(data), success=function(data) {
+					alert(BotMessages.ModelTraining);
+                                }, dataType='json');
+			return false;
+        });
         $('#b_wifi_apply').on("click", function (){
                 var form_data = $(this).parents("form").serialize();
                 $.post(url='/wifi', form_data);
@@ -172,17 +219,31 @@ $(document).on( "pagecreate", '#page-preferences', function( event ) {
 		}
         });
 });
+var tags = [];
 
 $(document).on( "pageshow", '#page-photos', function( event ) {
 	var media_list = $('#media').empty();
 	$.get(url='/photos', success=function(data){
-                for( p in data) {
+		tags = [];
+		for(p in data) {
 			var media = data[p];
-			var media_name = media.substring(0, media.indexOf('.'));
-			var media_thumb = media_name + '_thumb.jpg';
-			var media_type = media.indexOf('jpg') > 0 ? 'photo' : 'video';
-			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media_type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline"><img class="ui-li-thumb" data-src="' + media + '" src="/photos/' + media_thumb + '"><div class="ui-content-hud" style="position:absolute;"></div><p class="p_photo_cmd" style="display:none;"><span>' + media_name + '</span><br/><button class="ui-btn ui-btn-inline ui-mini ui-icon-delete ui-btn-icon-left b_photo_delete">' + BotMessages.DeletePhoto + '</button></p></a></li>');
+			if(media.tag && tags.indexOf(media.tag)<0) {
+				tags.push(media.tag);
+			}
 		}
+                for(p in data) {
+			var media = data[p];
+			media.type = media.name.indexOf('jpg') > 0 ? 'photo' : 'video';
+			media.thumb = media.name.replace(media.name.substring(media.name.length-4), '_thumb.jpg');
+                        var tags_select = '<select class="s_media_tag" data-mini="true">';
+			tags_select += '<option value=""' + (media.tag ? '' : ' selected') + '></option>';
+                        for(t in tags) {
+                          tags_select += ('<option value="' + tags[t] + '"'  + (media.tag == tags[t] ? " selected" : "") + '>'+tags[t]+'</option>');
+			}
+			tags_select += '<option value="new" class="o_new">new...</option></select>';
+			media_list.append('<li class="ui-li-has-thumb"><a href="#popup-' + media.type + '" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline a_media_thumb"><img class="ui-li-thumb" data-src="' + media.name + '" src="/photos/' + media.thumb + '"></a><div class="ui-content-hud" style=""><p class="p_photo_cmd" style="display:none;"><span>' + media.name + '</span><br/><button class="ui-btn ui-btn-inline ui-mini ui-icon-delete ui-btn-icon-left ui-corner-all b_photo_delete">' + BotMessages.DeletePhoto + '</button>' + tags_select + '</p></div></li>');
+		}
+
 $('li.ui-li-has-thumb').hover( function( event ) {
 	$(this).find('.p_photo_cmd').show();
 }, function( event ) {
@@ -191,10 +252,30 @@ $('li.ui-li-has-thumb').hover( function( event ) {
 $('video').on('loadeddata', function( event, ui ) {
         $( '#popup-video' ).popup( 'reposition', 'positionTo: window' );
 });
+$('select.s_media_tag').change(function (e) {
+	var select = $(e.target);
+	var image = select.parents('li').find('img').attr('data-src');
+	var tag_name = select.find('option:selected').text();
+        if(tag_name == "new...") {
+		while(true) {
+			tag_name = prompt("Enter a new tag:", "");
+			if(tags.indexOf(tag_name)>=0) {
+				alert(BotMessages.TagAlreadyExists);
+			} else {
+				$('<option value="' + tag_name + '">' + tag_name +'</option>').insertBefore('option.o_new');
+				select.find('option').removeAttr('selected');
+				select.find('option[value="'+tag_name+'"]').attr('selected', true);
+				break;
+			}
+		}
+	}
+	var data = {tag: tag_name};
+	$.ajax(url="/photos/"+image, {method:"PUT", data:JSON.stringify(data), dataType:'json'});
+});
         }, dataType="json");       
 });
 
-$(document).on( "click", 'a[data-rel="popup"]', function( event ) {
+$(document).on( "click", 'a.a_media_thumb[data-rel="popup"]', function( event ) {
 	var src = "/photos/" + $(this).find('img').attr('data-src');
         $('#popup-photo').find('img').attr('src', src);
         $('#popup-video').find('video').attr('src', src);
@@ -205,13 +286,20 @@ $(document).on( "click", '.b_photo_delete', function( event ) {
         var li = $(this).parents('li');
 	var src = "/photos/" + li.find('img').attr('data-src');
 	if(confirm(BotMessages.DeletePhotoConfirm + src + " ?")) {
-        	$.post(url=src, data={'cmd':'delete'}, success=function(data){
+        	$.ajax({url:src, method:"DELETE", success:function(data){
 			li.remove();
                         ul.listview('refresh');
-        	});
+        	}});
 	}
         event.preventDefault();
 });
+
+$(document).on( "click", '.b_photo_prop', function( event ) {
+        var li = $(this).parents('li');
+        $('popup-picprop').popup("open");
+        event.preventDefault();
+});
+
 
 Mousetrap.bind(['command+alt+s', 'ctrl+alt+k'], function(e) {
 	$.mobile.pageContainer.pagecontainer('change', '#page-preferences');
@@ -225,17 +313,22 @@ Mousetrap.bind(['command+alt+h', 'ctrl+alt+h'], function(e) {
 });
  
 botStatus();
-
+var bot_status = true;
 function botStatus() {
   $.ajax({url:'/bot/status',dataType:'json'})
   .done(function (data) {
     if(data.status == 'ok') {
       $('.s_bot_status').text('Online').removeClass('ui-icon-alert ui-btn-b').addClass('ui-icon-check ui-btn-a');
+      if( bot_status == false ) {
+        window.location.reload(false);
+      }
     } else {
       $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+      bot_status = false;
     }})
   .error(function() {
     $('.s_bot_status').text('Offline').removeClass('ui-icon-check ui-btn-a').addClass('ui-icon-alert ui-btn-b');
+    bot_status = false;
   });
   setTimeout(botStatus, 1000);
 }
