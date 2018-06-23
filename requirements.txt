@@ -20,5 +20,5 @@ Pypubsub==4.0.0
 pytz==2018.4
 six==1.11.0
 smbus2==0.2.0
-tensorflow==0.11.0
 Werkzeug==0.14.1
+pylint==1.9.2

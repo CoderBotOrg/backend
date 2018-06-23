@@ -11,4 +11,4 @@ classifier = cnn_classifier.CNNClassifier("models/applekiwi.pb", "models/appleki
 while True:
     i = cam.get_image().resize(128, 128).mat()
     results = classifier.classify_image(i, 128, 128)
-    print "results: " + str(results)
+    print("results: " + str(results))
