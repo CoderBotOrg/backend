@@ -219,7 +219,7 @@ signal.signal(signal.SIGUSR1, do_step)\n\
 signal.signal(signal.SIGUSR2, do_execFull)\n\
 \n'
 
-            footerFile = 'data_coderbotStatus["prog_gen"] = {}\nsaveStatus()\nprint(######### PROGRAM TERMINATED)'
+            footerFile = 'data_coderbotStatus["prog_gen"] = {}\nsaveStatus()\nprint("######### PROGRAM TERMINATED")'
 
             code = headerFile + code + footerFile
 

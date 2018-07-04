@@ -50,6 +50,25 @@ from pathlib import Path
 import signal
 
 
+# Status File
+def read_statusFile():
+    # Load the status file
+    with open(tmp_folder_path + status_fileName, "r") as fh:
+        try:
+            data_coderbotStatus = json.loads(fh.read())
+        except Exception as e:
+            print("####### JSON ERROR: "+str(e))
+            print("####### FILE: "+str(fh.read()))
+            print("####### PATH: "+ tmp_folder_path + status_fileName)
+            data_coderbotStatus = None
+    return data_coderbotStatus
+
+def write_statusFile(data_coderbotStatus):
+    # Create the file and if already exists overwites it
+    with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
+        fh.write(json.dumps(data_coderbotStatus))
+        os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
+
 
 # Initialize the status file
 def initialize_coderbotStatus(tmp_folder_path, status_fileName):
@@ -62,10 +81,7 @@ def initialize_coderbotStatus(tmp_folder_path, status_fileName):
             raise
     # Initial JSON
     default_status = {"ok":True, "prog_gen":{}, "prog_handler":{"mode": "unknown"}}
-    # Create the file and if already exists overwites it
-    with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
-        fh.write(json.dumps(default_status))
-        os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
+    write_statusFile(default_status)
 
 
 # Initialize the status file
@@ -324,13 +340,7 @@ def handle_bot():
 def handle_bot_status():
 
     # Load the status file
-    with open(tmp_folder_path + status_fileName, "r") as fh:
-        try:
-            data_coderbotStatus = json.loads(fh.read())
-        except Exception as e:
-            print("####### JSON ERROR: "+str(e))
-            print("####### FILE: "+str(fh.read()))
-            print("####### PATH: "+ tmp_folder_path + status_fileName)
+    data_coderbotStatus = read_statusFile()
 
     # Check if the generated program is running
     if data_coderbotStatus["prog_gen"]:
@@ -450,8 +460,7 @@ def handle_program_exec():
 
 
     # Load the status file
-    with open(tmp_folder_path + status_fileName, "r") as fh:
-        data_coderbotStatus = json.loads(fh.read())
+    data_coderbotStatus = read_statusFile()
 
 
     print("########### running: "+str(bool(data_coderbotStatus["prog_gen"])))
@@ -468,18 +477,15 @@ def handle_program_exec():
         try:
             os.kill(int(data_coderbotStatus["prog_gen"]["pid"]), signal_to_program)
         except Exception as err:
-            # The process in reality was already terminated, probably because of some crash or the previous program terminated after the "data_coderbotStatus" dict
+            # The process in reality was already terminated, probably because of some crash or the previous program unexpectedly terminated after the "data_coderbotStatus" dict
             # has been retrieved from the file (this last case is really unlikely to happen).
             print("######### error: "+str(err))
             programRunningFlag = False
 
-        # If the generated program has been terminated, killed or unexpectedly detected to no longer running, the dict in "prog_gen" will be emptied, meaning that
-        # the program is not longer running
+        # If the program isn't running the dict "prog_gen" contains useless and forviant data, so it needs to be emptied
         if not programRunningFlag:
-            with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
-                data_coderbotStatus["prog_gen"] = {}
-                fh.write(json.dumps(data_coderbotStatus))
-                os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
+            data_coderbotStatus["prog_gen"] = {}
+            write_statusFile(data_coderbotStatus)
 
         print("\n############# "+json.dumps(data_coderbotStatus))
 
@@ -488,13 +494,12 @@ def handle_program_exec():
     else: # The generated program is NOT running
         print("\n############# "+json.dumps(data_coderbotStatus))
 
-        with open(tmp_folder_path + status_fileName + ".tmp", "w") as fh:
-            if mode == "fullExec" or mode == "stepByStep":
-                data_coderbotStatus["prog_handler"]["mode"] = mode
-            else:
-                data_coderbotStatus["prog_handler"]["mode"] = "unknown"
-            fh.write(json.dumps(data_coderbotStatus))
-            os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
+        if mode == "fullExec" or mode == "stepByStep":
+            data_coderbotStatus["prog_handler"]["mode"] = mode
+        else:
+            data_coderbotStatus["prog_handler"]["mode"] = "unknown"
+        write_statusFile(data_coderbotStatus)
+
         evaulation = Program.run(name, code, mode)
 
     # Returns a positive or error response
