@@ -47,6 +47,7 @@ PROGRAM_SUFFIX = ".data"
 
 tmp_folder_path = "tmp/"
 status_fileName = "coderbotStatus_temp.json"
+prog_gen_commands_fileName = "coderbotProg_gen_commands_temp.json"
 
 
 
@@ -186,6 +187,7 @@ class Program:
 \n\
 import json\n\
 from os import getpid, rename\n\
+import sys\n\
 import signal\n\
 with open("' + tmp_folder_path + status_fileName + '", "r") as fh:\n\
  data_coderbotStatus = json.loads(fh.read())\n\
@@ -209,17 +211,34 @@ print("###### MODULE IMPORTED")\n\
 data_coderbotStatus["prog_gen"]["status"] = "running"\n\
 saveStatus()\n\
 \n\
-def do_step(sig, stack):\n\
- data_coderbotStatus["prog_gen"]["status"] = "running"\n\
- saveStatus()\n\
-def do_execFull(sig, stack):\n\
+def do_command(sig, stack):\n\
  global is_execFull\n\
- is_execFull = True\n\
-signal.signal(signal.SIGUSR1, do_step)\n\
-signal.signal(signal.SIGUSR2, do_execFull)\n\
+ with open("' + tmp_folder_path + prog_gen_commands_fileName + '", "r") as fh:\n\
+  data_prog_gen_commands = json.loads(fh.read())\n\
+\n\
+ if data_prog_gen_commands["command"] == "change_mode":\n\
+  if data_prog_gen_commands["argument"] == "fullExec":\n\
+   is_execFull = True\n\
+   data_coderbotStatus["prog_gen"]["status"] = "running"\n\
+  elif data_prog_gen_commands["argument"] == "stepByStep":\n\
+   is_execFull = False\n\
+   data_coderbotStatus["prog_gen"]["status"] = "running"\n\
+  else:\n\
+   pass # Ignore if the argument is unknown\n\
+ else:\n\
+  pass # Ignore if the command is unknown\n\
+ saveStatus()\n\
+def do_terminate(sig, stack):\n\
+ data_coderbotStatus["prog_gen"] = {}\n\
+ data_coderbotStatus["prog_handler"]["mode"] = "stop"\n\
+ saveStatus()\n\
+ print("######### PROGRAM TERMINATED")\n\
+ sys.exit(0)\n\
+signal.signal(signal.SIGUSR1, do_command)\n\
+signal.signal(signal.SIGTERM, do_terminate)\n\
 \n'
 
-            footerFile = 'data_coderbotStatus["prog_gen"] = {}\nsaveStatus()\nprint("######### PROGRAM TERMINATED")'
+            footerFile = 'data_coderbotStatus["prog_gen"] = {}\ndata_coderbotStatus["prog_handler"]["mode"] = "stop"\nsaveStatus()\nprint("######### PROGRAM TERMINATED")'
 
             code = headerFile + code + footerFile
 

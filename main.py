@@ -69,6 +69,14 @@ def write_statusFile(data_coderbotStatus):
         fh.write(json.dumps(data_coderbotStatus))
         os.rename(tmp_folder_path + status_fileName + ".tmp", tmp_folder_path + status_fileName)
 
+def write_prog_gen_commands(command, mode):
+    data_prog_gen_commands = {}
+    data_prog_gen_commands["command"] = command
+    data_prog_gen_commands["argument"] = mode
+    # Create the file and if already exists overwites it
+    with open(tmp_folder_path + prog_gen_commands_fileName + ".tmp", "w") as fh:
+        fh.write(json.dumps(data_prog_gen_commands))
+        os.rename(tmp_folder_path + prog_gen_commands_fileName + ".tmp", tmp_folder_path + prog_gen_commands_fileName)
 
 # Initialize the status file
 def initialize_coderbotStatus(tmp_folder_path, status_fileName):
@@ -80,13 +88,14 @@ def initialize_coderbotStatus(tmp_folder_path, status_fileName):
         if e.errno != errno.EEXIST:
             raise
     # Initial JSON
-    default_status = {"ok":True, "prog_gen":{}, "prog_handler":{"mode": "unknown"}}
+    default_status = {"ok":True, "prog_gen":{}, "prog_handler":{"mode": "stop"}}
     write_statusFile(default_status)
 
 
 # Initialize the status file
 tmp_folder_path = "tmp/"
 status_fileName = "coderbotStatus_temp.json"
+prog_gen_commands_fileName = "coderbotProg_gen_commands_temp.json"
 initialize_coderbotStatus(tmp_folder_path, status_fileName)
 
 logger = logging.getLogger()
@@ -463,50 +472,46 @@ def handle_program_exec():
     data_coderbotStatus = read_statusFile()
 
 
-    print("########### running: "+str(bool(data_coderbotStatus["prog_gen"])))
-    if data_coderbotStatus["prog_gen"]: # The generated program is running
-        programRunningFlag = True
-        if data_coderbotStatus["prog_handler"]["mode"] == "stepByStep":
-            if mode == "stepByStep":
-                signal_to_program = signal.SIGUSR1
-            else: # mode == "fullExec"
-                signal_to_program = signal.SIGUSR2
-        else: # data_coderbotStatus["prog_gen"]["mode"] == "fullExec"
-            signal_to_program = signal.SIGKILL
-            programRunningFlag = False
+    if data_coderbotStatus["prog_handler"]["mode"] != "stop":
+        prog_gen_pid = int(data_coderbotStatus["prog_gen"]["pid"])
         try:
-            os.kill(int(data_coderbotStatus["prog_gen"]["pid"]), signal_to_program)
+            os.kill(prog_gen_pid, 0)
+        except OSError:
+            prog_gen_is_up = False
+        else:
+            prog_gen_is_up = True
+        if not prog_gen_is_up:
+            data_coderbotStatus["prog_gen"] = {}
+            data_coderbotStatus["prog_handler"]["mode"] = "stop"
+            write_statusFile(data_coderbotStatus)
+
+    if data_coderbotStatus["prog_handler"]["mode"] == "stop":
+        data_coderbotStatus["prog_handler"]["mode"] = mode
+        write_statusFile(data_coderbotStatus)
+        evaulation = Program.run(name, code, mode)
+    else: # data_coderbotStatus["prog_handler"]["mode"] == "stepByStep" or "fullExec"
+        if mode == "stop":
+            signal_to_program = signal.SIGTERM
+        else: #else mode == "fullExec" or mode == stepByStep"
+            write_prog_gen_commands("change_mode", mode)
+            signal_to_program = signal.SIGUSR1
+
+        try:
+            os.kill(prog_gen_pid, signal_to_program)
         except Exception as err:
             # The process in reality was already terminated, probably because of some crash or the previous program unexpectedly terminated after the "data_coderbotStatus" dict
             # has been retrieved from the file (this last case is really unlikely to happen).
             print("######### error: "+str(err))
-            programRunningFlag = False
-
-        # If the program isn't running the dict "prog_gen" contains useless and forviant data, so it needs to be emptied
-        if not programRunningFlag:
-            data_coderbotStatus["prog_gen"] = {}
-            write_statusFile(data_coderbotStatus)
-
-        print("\n############# "+json.dumps(data_coderbotStatus))
 
         evaulation = {"ok":True,"description":""}
-
-    else: # The generated program is NOT running
-        print("\n############# "+json.dumps(data_coderbotStatus))
-
-        if mode == "fullExec" or mode == "stepByStep":
-            data_coderbotStatus["prog_handler"]["mode"] = mode
-        else:
-            data_coderbotStatus["prog_handler"]["mode"] = "unknown"
-        write_statusFile(data_coderbotStatus)
-
-        evaulation = Program.run(name, code, mode)
 
     # Returns a positive or error response
     if evaulation["ok"]:
         return json.dumps(evaulation), 200
     else:
         return json.dumps(evaulation), evaulation["error_code"]
+
+
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
