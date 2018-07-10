@@ -20,8 +20,8 @@ if($('#page-program')) {
         $("#b_show_prog").on("click", function() {editor.showProgramCode()});
         $("#b_run_prog").on("click", function() {editor.runProgram("fullExec")});
         $("#b_step_prog").on("click", function() {editor.runProgram("stepByStep")});
-        $("#b_end_prog").on("click", function() {editor.stopProgram()});
-        $("#b_end_prog_d").on("click", function() {editor.stopProgram()});
+        $("#b_end_prog").on("click", function() {editor.runProgram("stop")});
+        $("#b_end_prog_d").on("click", function() {editor.runProgram("stop")});
         $("#b_new_prog_post").on("click", function() {editor.newProgram()});
         editor.loadProgramList();
         $('#popup-video').popup();
