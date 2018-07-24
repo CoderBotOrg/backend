@@ -36,7 +36,7 @@ data_coderbotStatus["prog_gen"]["pid"] = getpid()\n\
 saveStatus()\n\
 print("####### "+str(data_coderbotStatus["prog_gen"]["pid"]))\n\
 print("###### LAUNCHED")\n\
-print("###### IMPORTING program.py MODULE...")\n\
+print("###### IMPORTING prog_gen_commands.py MODULE...")\n\
 \n\
 from prog_gen_commands import Commands\n\
 \n\

@@ -15,10 +15,8 @@ from motion import Motion
 from audio import Audio
 from program import Program
 from config import Config
-from event import EventManager
-from conversation import Conversation
 
-from flask import Flask, render_template, request, send_file, Response, jsonify
+from flask import Flask, render_template, request, Response
 from flask_babel import Babel
 from werkzeug.datastructures import Headers
 from flask_cors import CORS
@@ -173,9 +171,6 @@ bot = None
 cam = None
 motion = None
 audio = None
-cnn = None
-event = None
-conv = None
 
 app = Flask(__name__, static_url_path="")
 #app.config.from_pyfile('coderbot.cfg')
@@ -395,21 +390,12 @@ def handle_program_exec():
         return json.dumps(evaulation), evaulation["error_code"]
 
 
-#def button_pushed():
-#    if app.bot_config.get('button_func') == "startstop":
-#        if app.prog and app.prog.is_running():
-#            app.prog.end()
-#        elif app.prog and not app.prog.is_running():
-#            app.prog.execute()
 
 def run_server():
     global bot
     global cam
     global motion
     global audio
-    global cnn
-    global conv
-    global event
     try:
         try:
             app.bot_config = Config.read()
@@ -423,14 +409,11 @@ def run_server():
             except picamera.exc.PiCameraError:
                 logging.error("Camera not present")
 
-            event = EventManager.get_instance("coderbot")
-            conv = Conversation.get_instance()
 
         except ValueError as e:
             app.bot_config = {}
             logging.error(e)
 
-        #bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
         app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
