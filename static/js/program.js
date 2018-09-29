@@ -130,7 +130,7 @@ class ProgramEditor {
         }
         this.program.name = name;
         $('#id_prog_name').text("[ " + this.program.name + " ]");
-        this.save();
+        this.saveProgram();
     }
 
     deleteProgram() {
@@ -181,7 +181,7 @@ class ProgramEditor {
             } else {
                 $('#b_end_prog_d').text(BotMessages.ProgramDialogStop);
                 $('#i_dialog_running_title').text('CoderBot ' + BotMessages.ProgramStatusRunning);
-                setTimeout(statusProg, 1000);
+                setTimeout(statusProgram, 1000);
             }  
         }});
     }

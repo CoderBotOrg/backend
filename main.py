@@ -53,7 +53,7 @@ event = None
 conv = None
 
 # (Connexion) Flask app configuration
-app = connexion.App(__name__, static_url_path="", specification_dir='./')
+app = connexion.App(__name__, swagger_ui=False)
 # New API is defined in swagger.yml and api.py
 app.add_api('swagger.yml')
 
@@ -78,31 +78,27 @@ def get_locale():
     return loc
 
 """
-Integrating Connexion, deleting 'index.html' brake the 
-serving of static assets from 'static' folder.
-This is problably related to the fact that Connexion adds a 
-Swagger UI route (v2/ui) since it was rendering index.html 
-prior to removing it.
-
-Workound: serve the 'static' subfolders with 'send_from_directory'
+Workaround: serve the 'static' subfolders with 'send_from_directory'
+(connexion wrapper ignores `static_url_path`)
 """
-@app.app.route('/css/<filename>')
+
+@app.app.route('/css/<path:filename>')
 def render_static_assets0(filename):
     return send_from_directory('static/css', filename)
 
-@app.app.route('/fonts/<filename>')
+@app.app.route('/fonts/<path:filename>')
 def render_static_assets1(filename):
     return send_from_directory('static/fonts', filename)
 
-@app.app.route('/images/<filename>')
+@app.app.route('/images/<path:filename>')
 def render_static_assets2(filename):
     return send_from_directory('static/images', filename)
 
-@app.app.route('/js/<filename>')
+@app.app.route('/js/<path:filename>')
 def render_static_assets3(filename):
     return send_from_directory('static/js', filename)
 
-@app.app.route('/media/<filename>')
+@app.app.route('/media/<path:filename>')
 def render_static_assets4(filename):
     return send_from_directory('static/media', filename)
 
