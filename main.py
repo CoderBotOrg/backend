@@ -53,7 +53,7 @@ event = None
 conv = None
 
 # (Connexion) Flask app configuration
-app = connexion.App(__name__, swagger_ui=False)
+app = connexion.App(__name__, swagger_ui=True)
 # New API is defined in swagger.yml and api.py
 app.add_api('swagger.yml')
 
