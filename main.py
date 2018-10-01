@@ -102,6 +102,13 @@ def render_static_assets3(filename):
 def render_static_assets4(filename):
     return send_from_directory('static/media', filename)
 
+# Serve the new Vue application (build)
+#  "dist" is the output of `npm run build` from the vue-app repository
+
+@app.app.route('/vue/<path:filename>')
+def render_static_assets5(filename):
+    return send_from_directory('dist', filename)
+
 # Serve web app application templates
 @app.app.route("/")
 def handle_home():
