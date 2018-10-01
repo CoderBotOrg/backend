@@ -413,7 +413,7 @@ def run_server():
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+        app.app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()
