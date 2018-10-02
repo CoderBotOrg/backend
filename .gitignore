@@ -69,5 +69,10 @@ Thumbs.db
 
 bin/
 lib/
+lib64/
+lib64
 share/
 pyvenv.cfg
+
+# Vue build
+dist/

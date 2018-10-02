@@ -21,7 +21,6 @@ The Camera module implements the Camera class, which is the abstraction
 from the lower lever PiCamera (RPI specific)
 """
 import picamera
-import picamera.array
 import io
 import os
 import time
