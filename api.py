@@ -33,7 +33,7 @@ def status():
 	return "ok"
 
 def exec(data):
-	prog = prog_engine.create(data["name"], data["code"]
+	prog = prog_engine.create(data["name"], data["code"])
 	return json.dumps(prog.execute())
 
 def save(data):
