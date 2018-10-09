@@ -7,6 +7,7 @@ from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
 import connexion
+import time
 bot_config = Config.get()
 bot = CoderBot.get_instance(servo=(bot_config.get("move_motor_mode") == "servo"),
 									 motor_trim_factor=float(bot_config.get('move_motor_trim', 1.0)))
@@ -32,5 +33,10 @@ def status():
 	return "ok"
 
 def exec(data):
-	prog = prog_engine.create(data["name"], data["code"])
+	prog = prog_engine.create(data["name"], data["code"]
 	return json.dumps(prog.execute())
+
+def save(data):
+	prog = Program(data["name"], data["code"], data["dom_code"])
+	prog_engine.save(prog)
+	return "ok"

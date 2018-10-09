@@ -12,6 +12,18 @@ basePath: "/v2"
 
 # Paths supported by the server application
 paths:
+  /save:
+    post:
+      operationId: "api.save"
+      summary: "Save a new program"
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
   /exec:
     post:
       operationId: "api.exec"
