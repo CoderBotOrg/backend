@@ -25,6 +25,6 @@ The legacy API and frontend application is available at `localhost:5000`.
 
 The new API is at `localhost:5000/v2`, while the new application is served at `localhost:5000/vue` (assuming the [vue-app](https://github.com/coderbotorg/vue-app) build is placed in the `dist/` folder).
 
-To see the dynamic documentation of the new API, clone the [swagger-ui](https://github.com/coderbotorg/swagger-ui) repository inside the `coderbot/` folder.
+To see the dynamic documentation of the new API, clone the [swagger-ui](https://github.com/coderbotorg/swagger-ui) repository inside the `coderbot/` folder and it's served under `localhost:5000/v2/ui/index.html`.
 
-For further development and techical documentation, see the [Wiki](https://github.com/CoderBotOrg/coderbot/wiki).
+For further development and technical documentation, see the [Wiki](https://github.com/CoderBotOrg/coderbot/wiki).
