@@ -56,8 +56,8 @@ conv = None
 connexionApp = connexion.App(__name__, swagger_ui=True, swagger_path='swagger-ui/')
 # We serve a custom version of the swagger ui (Jinja2 templates) based on the default one
 
-# New API is defined in swagger.yml and api.py
-connexionApp.add_api('swagger.yml')
+# New API is defined in v2.yml and its methods are in api.py
+connexionApp.add_api('v2.yml')
 
 
 # Connexion wraps FlaskApp, so app becomes app
