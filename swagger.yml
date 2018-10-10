@@ -12,10 +12,30 @@ basePath: "/v2"
 
 # Paths supported by the server application
 paths:
+  /list:
+    get:
+      operationId: "api.list"
+      summary: "Get the list of all the saved programs"
+      tags:
+        - Program management
+      responses:
+        200:
+          description: "ok"
+  /load:
+    get:
+      operationId: "api.load"
+      summary: "Get the program with the specified ID"
+      tags:
+        - Program management
+      responses:
+        200:
+          description: "ok"
   /save:
     post:
       operationId: "api.save"
       summary: "Save a new program"
+      tags:
+        - Program management
       parameters:
         - in: body
           name: data
@@ -28,6 +48,8 @@ paths:
     post:
       operationId: "api.exec"
       summary: "Execute the given program"
+      tags:
+        - Program management
       parameters:
         - in: body
           name: data

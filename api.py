@@ -32,6 +32,9 @@ def turn(data):
 def status():
 	return "ok"
 
+def list(data):
+	return json.dumps(prog_engine.prog_list())
+
 def exec(data):
 	prog = prog_engine.create(data["name"], data["code"])
 	return json.dumps(prog.execute())
@@ -40,3 +43,8 @@ def save(data):
 	prog = Program(data["name"], data["code"], data["dom_code"])
 	prog_engine.save(prog)
 	return "ok"
+
+def load(data):
+    prog = prog_engine.load(data["id"])
+    return jsonify(prog.as_json())
+
