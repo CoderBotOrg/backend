@@ -12,6 +12,18 @@ basePath: "/v2"
 
 # Paths supported by the server application
 paths:
+  /delete:
+    post:
+      operationId: "api.delete"
+      summary: "Delete a program"
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
   /list:
     get:
       operationId: "api.list"

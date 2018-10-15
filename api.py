@@ -48,3 +48,6 @@ def load(data):
     prog = prog_engine.load(data["id"])
     return jsonify(prog.as_json())
 
+def delete(data):
+	prog_engine.delete(data["name"])
+	return "ok"
