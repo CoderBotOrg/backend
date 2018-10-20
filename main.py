@@ -123,10 +123,20 @@ def handle_home():
                            cam=cam != None,
                            cnn_model_names = json.dumps({}))
 
+"""
+Update the keys of oldDict appearing in updatedValues with the values in 
+updatedValues
+"""
+def updateDict(oldDict, updatedValues):
+    result = oldDict
+    for key, value in updatedValues.items():
+        result[key] = value
+    return result
+
 # Overwrite configuration file on disk and reload it
 @app.route("/config", methods=["POST"])
 def handle_config():
-    Config.write(request.form)
+    Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
 
@@ -141,6 +151,9 @@ def handle_wifi():
     mode = request.form.get("wifi_mode")
     ssid = request.form.get("wifi_ssid")
     psk = request.form.get("wifi_psk")
+
+    print(mode, ssid, psk)
+    return "ok"
     logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
     client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
     logging.info(client_params)
