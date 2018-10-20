@@ -8,6 +8,8 @@ from program import ProgramEngine, Program
 from config import Config
 import connexion
 import time
+import sqlite3
+
 bot_config = Config.get()
 bot = CoderBot.get_instance(servo=(bot_config.get("move_motor_mode") == "servo"),
 									 motor_trim_factor=float(bot_config.get('move_motor_trim', 1.0)))
@@ -22,15 +24,31 @@ def stop():
 def move(data):
 	print(data)
 	bot.move(speed=data['speed'], elapse=data['elapse'])
-	return "ok"
+	return 200
 
 def turn(data):
 	print(data)
 	bot.turn(speed=data['speed'], elapse=data['elapse'])
-	return "ok"
+	return 200
 
 def status():
-	return "ok"
+	return {
+		'status' : 'ok',
+		'internetConnectivity': True,
+		'temp' : '40',
+		'uptime' : '5h',		
+	}
+
+# Hardware and software information
+def info():
+	return {
+		'model': 1,
+		'serial': 2,
+		'cbVersion': 3,
+		'backendVersion': 4,
+		'vueVersion':  5,
+		'kernel': 6,
+	}
 
 def list(data):
 	return json.dumps(prog_engine.prog_list())
@@ -50,4 +68,7 @@ def load(data):
 
 def delete(data):
 	prog_engine.delete(data["name"])
+	return "ok"
+
+def editSettings(data):
 	return "ok"
