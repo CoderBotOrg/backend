@@ -12,6 +12,18 @@ basePath: "/v2"
 
 # Paths supported by the server application
 paths:
+  /editSettings:
+    post:
+      operationId: "api.editSettings"
+      summary: "Change coderbot settings"
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"  
   /delete:
     post:
       operationId: "api.delete"
@@ -79,6 +91,15 @@ paths:
       responses:
         200:
           description: "Bot status"
+  /info:
+    get:
+      operationId: "api.info"
+      summary: "Bot general informations and execution status"
+      tags:
+        - Status informations
+      responses:
+        200:
+          description: "Bot status"
   /stop:
     post:
       operationId: "api.stop"
@@ -138,5 +159,5 @@ paths:
                 type: number
                 description: Duration of the movement. -1 moves the bot until a /stop command is received.
       responses:
-        201:
+        200:
           description: Sent command to the bot GPIO.
