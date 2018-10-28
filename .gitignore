@@ -76,3 +76,5 @@ pyvenv.cfg
 
 # Vue build
 dist/
+
+coderbot.cfg
