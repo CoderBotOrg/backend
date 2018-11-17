@@ -12,6 +12,13 @@ basePath: "/v2"
 
 # Paths supported by the server application
 paths:
+  /restoreSettings:
+    post:
+      operationId: "api.restoreSettings"
+      summary: "Restore settings to default"
+      responses:
+        200:
+          description: "ok"
   /editSettings:
     post:
       operationId: "api.editSettings"

@@ -143,6 +143,7 @@ def handle_config():
 # Expose configuration as JSON
 @app.route("/config", methods=["GET"])
 def returnConfig():
+    app.bot_config = Config.get()
     return(jsonify(app.bot_config)) 
 
 # Changes wi-fi configuration and reboot
