@@ -33,6 +33,7 @@ class Config(object):
     def read(cls):
         f = open(CONFIG_FILE, 'r')
         cls._config = json.load(f)
+        f.close()
         return cls._config
 
     @classmethod

@@ -50,7 +50,7 @@ class CNNManager(object):
         try:
             f = open(MODEL_METADATA, "r")
             self._models = json.load(f)
-            f.close
+            f.close()
         except IOError:
             self._models = {}
             self._save_model_meta()
@@ -66,7 +66,7 @@ class CNNManager(object):
     def _save_model_meta(self):
         f = open(MODEL_METADATA, "w")
         json.dump(self._models, f)
-        f.close
+        f.close()
 
     def delete_model(self, model_name):
         if self._models.get(model_name):

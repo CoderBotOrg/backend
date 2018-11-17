@@ -908,7 +908,7 @@ class CNNTrainer(object):
         precrop_shape_as_int = tf.cast(precrop_shape, dtype=tf.int32)
         precropped_image = tf.image.resize_bilinear(decoded_image_4d,
                                                     precrop_shape_as_int)
-        precropped_image_3d = tf.squeeze(precropped_image, squeeze_dims=[0])
+        precropped_image_3d = tf.squeeze(precropped_image, axis=[0])
         cropped_image = tf.random_crop(precropped_image_3d,
                                        [input_height, input_width, input_depth])
         if flip_left_right:
@@ -994,7 +994,7 @@ class CNNTrainer(object):
         tf.summary.histogram('activations', final_tensor)
 
         with tf.name_scope('cross_entropy'):
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(
                 labels=ground_truth_input, logits=logits)
             with tf.name_scope('total'):
                 cross_entropy_mean = tf.reduce_mean(cross_entropy)

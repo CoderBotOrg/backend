@@ -153,6 +153,8 @@ class Camera(object):
         im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
         self._photos.append({"name":filename})
         self.save_photo_metadata()
+        of.close()
+        oft.close()
 
     def is_recording(self):
         return self.recording
@@ -184,6 +186,7 @@ class Camera(object):
         self.save_photo_metadata()
         self._camera.video_rec(PHOTO_PATH + "/" + filename)
         self.video_start_time = time.time()
+        oft.close()
 
     def video_stop(self):
         if self.recording:

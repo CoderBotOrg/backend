@@ -24,6 +24,7 @@ opencv-contrib-python==3.4.0.12
 pigpio==1.40.post1
 Pillow==5.1.0
 protobuf==3.6.1
+picamera==1.13
 PyAudio==0.2.11
 pycairo==1.17.0
 Pypubsub==4.0.0
@@ -33,8 +34,8 @@ requests==2.18.4
 six==1.11.0
 smbus2==0.2.0
 swagger-spec-validator==2.3.1
-tensorboard==1.10.0
-tensorflow==1.10.1
+tensorboard==1.11.0
+tensorflow==1.11.0
 termcolor==1.1.0
 urllib3==1.22
 Werkzeug==0.14.1
