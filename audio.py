@@ -126,7 +126,7 @@ class Audio:
 
         wf = wave.open(SOUNDDIR + filename, 'wb')
         wf.setnchannels(1)
-        wf.setsampwidth(self.pyaudio.get_sample_size(FORMAT))
+        wf.setsampwidth(self.stream_in.get_sample_size(FORMAT))
         wf.setframerate(RATE)
         wf.writeframes(data)
         wf.close()
@@ -272,6 +272,9 @@ class Audio:
             """Continuously collect data from the audio stream, into the buffer."""
             self._buff.put(in_data)
             return None, pyaudio.paContinue
+
+        def get_sample_size(self, fmt):
+            return self._audio_interface.get_sample_size(fmt)
 
         def generator(self):
             while not self.closed:
