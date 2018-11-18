@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import socket
 import subprocess
@@ -6,16 +6,16 @@ import shutil
 import sys
 import os
 import time
-import urllib2
+import urllib
 import fcntl
 import struct
 import json
 
 class WiFi():
 
-    CONFIG_FILE = "/etc/coderbot_wifi.conf"
+    CONFIG_FILE = "/etc/coderbot/wifi.conf"
     adapters = ["default", "RT5370", "RTL8188CUS"]
-    hostapds = {"default": "hostapd", "RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"}
+    hostapds = {"default": "hostapd", "RT5370": "hostapd-RT5370.conf", "RTL8188CUS": "hostapd-RTL8188.conf"}
     web_url = "http://my.coderbot.org/api/coderbot/1.0/bot/"
     wifi_client_conf_file = "/etc/wpa_supplicant/wpa_supplicant.conf"
     _config = {}
@@ -38,7 +38,7 @@ class WiFi():
 
     @classmethod
     def get_adapter_type(cls):
-        lsusb_out = subprocess.check_output("lsusb")
+        lsusb_out = str(subprocess.check_output("lsusb"))
         for a in cls.adapters:
             if a in lsusb_out:
                 return a
@@ -49,40 +49,40 @@ class WiFi():
         adapter = cls.get_adapter_type()
         hostapd_type = cls.hostapds.get(adapter)
         try:
-            print "starting hostapd..."
+            print("starting hostapd...")
             out = os.system("/usr/sbin/" + hostapd_type + " -B /etc/hostapd/" + hostapd_type + ".conf")
-            print "hostapd out: " + str(out)
+            print("hostapd out: " + str(out))
 
         except subprocess.CalledProcessError as e:
-            print e.output
+            print(e.output)
 
     @classmethod
     def start_dnsmasq(cls):
         try:
-            print "starting dnsmasq..."
+            print("starting dnsmasq...")
             out = os.system("systemctl start dnsmasq")
-            print "dnsmasq out: " + str(out)
+            print("dnsmasq out: " + str(out))
 
         except subprocess.CalledProcessError as e:
-            print e.output
+            print(e.output)
 
     @classmethod
     def stop_hostapd(cls):
         try:
-            print "stopping hostapd..."
+            print("stopping hostapd...")
             out = subprocess.check_output(["sudo", "pkill", "-9", "hostapd"])
-            print "hostapd out: " + str(out)
+            print("hostapd out: " + str(out))
         except subprocess.CalledProcessError as e:
-            print e.output
+            print(e.output)
 
     @classmethod
     def stop_dnsmasq(cls):
         try:
-            print "stopping dnsmasq..."
+            print("stopping dnsmasq...")
             out = subprocess.check_output(["systemctl", "stop", "dnsmasq"])
-            print "dnsmasq out: " + str(out)
+            print("dnsmasq out: " + str(out))
         except subprocess.CalledProcessError as e:
-            print e.output
+            print(e.output)
 
     @classmethod
     def get_ipaddr(cls, ifname):
@@ -107,12 +107,12 @@ class WiFi():
                     "bot_ip": bot_ipaddr,
                     "bot_version": "1.0",
                     "user_email": user_email}
-            req = urllib2.Request(cls.web_url + bot_uid, json.dumps(data), headers={"Authorization": "CoderBot 123456"})
-            ret = urllib2.urlopen(req)
+            req = urllib.Request(cls.web_url + bot_uid, json.dumps(data), headers={"Authorization": "CoderBot 123456"})
+            ret = urllib.urlopen(req)
             if ret.getcode() != 200:
                 raise Exception()
         except Exception as e:
-            print "except: " + str(e)
+            print("except: " + str(e))
             raise
 
     @classmethod
@@ -149,14 +149,14 @@ class WiFi():
             time.sleep(1.0)
             out = os.system("wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null 2>&1")
             out += os.system("dhclient -1 wlan0")
-            print out
+            print(out)
             try:
                 cls.register_ipaddr(cls.get_macaddr("wlan0"), cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"), "roberto.previtera@gmail.com")
-                print "registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot'))
+                print("registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot')))
             except:
                 pass
         except subprocess.CalledProcessError as e:
-            print e.output
+            print(e.output)
             raise
 
     @classmethod
@@ -167,11 +167,11 @@ class WiFi():
     @classmethod
     def start_as_ap(cls):
         time.sleep(1.0)
-        out = subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"])
-        out += subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"])
-        out += subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"])
-        out += subprocess.check_output(["ifconfig"])
-        print out
+        out = str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"]))
+        out += str(subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"]))
+        out += str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"]))
+        out += str(subprocess.check_output(["ifconfig"]))
+        print(out)
         cls.start_hostapd()
         cls.start_dnsmasq()
 
@@ -179,14 +179,14 @@ class WiFi():
     def start_service(cls):
         config = cls.load_config()
         if config["wifi_mode"] == "ap":
-            print "starting as ap..."
+            print("starting as ap...")
             cls.start_as_ap()
         elif config["wifi_mode"] == "client":
-            print "starting as client..."
+            print("starting as client...")
             try:
                 cls.start_as_client()
             except:
-                print "Unable to register ip, revert to ap mode"
+                print("Unable to register ip, revert to ap mode")
                 cls.start_as_ap()
 
 def main():
