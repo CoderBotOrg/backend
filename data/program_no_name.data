@@ -1,1 +1,1 @@
-{"dom_code": "", "code": "get_cam().set_text(\"pluto\")", "name": "no_name"}
+{"dom_code": "", "code": "get_cam().set_text(\"pluto\")", "name": "no_name", "default": "True"}

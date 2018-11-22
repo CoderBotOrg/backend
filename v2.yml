@@ -56,6 +56,11 @@ paths:
     get:
       operationId: "api.load"
       summary: "Get the program with the specified ID"
+      parameters:
+        - name: name
+          in: query
+          type: string
+          required: true
       tags:
         - Program management
       responses:
