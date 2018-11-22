@@ -76,7 +76,7 @@ def exec(data):
 
 
 def restoreSettings():
-    with open("defaultConfig.json") as f:
+    with open("data/defaults/config.json") as f:
         Config.write(json.loads(f.read()))
     bot_config = Config.get()
     return "ok"
@@ -136,8 +136,8 @@ def listActivities():
 # Delete everything but the defaults programs
 def resetDefaultPrograms():
     programs.purge()
-    for filename in os.listdir("data"):
-        if filename.endswith(".data"):
+    for filename in os.listdir("data/defaults/programs"):
+        if filename.endswith(".json"):
             with open("data/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
