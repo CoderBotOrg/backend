@@ -19,18 +19,6 @@ paths:
       responses:
         200:
           description: "ok"
-  /editSettings:
-    post:
-      operationId: "api.editSettings"
-      summary: "Change coderbot settings"
-      parameters:
-        - in: body
-          name: data
-          schema:
-            type: object
-      responses:
-        200:
-          description: "ok"  
   /delete:
     post:
       operationId: "api.delete"
@@ -45,7 +33,7 @@ paths:
           description: "ok"
   /list:
     get:
-      operationId: "api.list"
+      operationId: "api.listPrograms"
       summary: "Get the list of all the saved programs"
       tags:
         - Program management
@@ -54,8 +42,8 @@ paths:
           description: "ok"
   /load:
     get:
-      operationId: "api.load"
-      summary: "Get the program with the specified ID"
+      operationId: "api.loadProgram"
+      summary: "Get the program with the specified name"
       parameters:
         - name: name
           in: query
@@ -68,7 +56,7 @@ paths:
           description: "ok"
   /save:
     post:
-      operationId: "api.save"
+      operationId: "api.saveProgram"
       summary: "Save a new program"
       tags:
         - Program management
@@ -80,6 +68,8 @@ paths:
       responses:
         200:
           description: "ok"
+        400:
+          description: "Failed to save the program"
   /exec:
     post:
       operationId: "api.exec"

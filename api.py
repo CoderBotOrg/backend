@@ -25,6 +25,7 @@ prog_engine = ProgramEngine.get_instance()
 programs = TinyDB("data/programs.json")
 activities = TinyDB("data/activities.json")
 
+query = Query()
 
 def stop():
     bot.stop()
