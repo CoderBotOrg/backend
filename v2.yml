@@ -21,7 +21,7 @@ paths:
           description: "ok"
   /delete:
     post:
-      operationId: "api.delete"
+      operationId: "api.deleteProgram"
       summary: "Delete a program"
       parameters:
         - in: body
@@ -54,12 +54,12 @@ paths:
       responses:
         200:
           description: "ok"
-  /save:
+  /saveActivity:
     post:
-      operationId: "api.saveProgram"
-      summary: "Save a new program"
+      operationId: "api.saveActivity"
+      summary: "Save a new activity"
       tags:
-        - Program management
+        - Activity management
       parameters:
         - in: body
           name: data
@@ -69,7 +69,62 @@ paths:
         200:
           description: "ok"
         400:
-          description: "Failed to save the program"
+          description: "Failed to save the activity"
+
+  /deleteActivity:
+    post:
+      operationId: "api.deleteActivity"
+      summary: "Delete an activity"
+      tags:
+        - Activity management
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+  /listActivities:
+    get:
+      operationId: "api.listActivities"
+      summary: "Get the list of all the saved activities"
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+  /loadActivity:
+    get:
+      operationId: "api.loadActivity"
+      summary: "Get the activity with the specified name"
+      parameters:
+        - name: name
+          in: query
+          type: string
+          required: true
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+  /saveActivity:
+    post:
+      operationId: "api.saveProgram"
+      summary: "Save a new program"
+      tags:
+        - Activity management
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "Failed to save the activity"
+
   /exec:
     post:
       operationId: "api.exec"

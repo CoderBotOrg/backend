@@ -90,8 +90,10 @@ def saveProgram(data):
         programs.insert(data)
         return 200
     else:
+        # Disallow overwriting a default program
         if programs.search((query.name == data["name"]) & (query.default == "True")):
             return "defaultOverwrite", 400
+        # Overwrite existing program with the same name
         else:
             programs.update(data, query.name == data["name"])
             return 200
@@ -102,12 +104,34 @@ def loadProgram(name):
 
 
 def deleteProgram(data):
-    programs.remove(query.name == data["name"]), 200
+    programs.remove(query.name == data["name"])
 
 
 def listPrograms():
     return programs.all()
 
+
+## Activities
+
+def saveActivity(data):
+    if activities.search(query.name == data["name"]) == []:
+        activities.insert(data)
+        return 200
+    else:
+        activities.update(data, query.name == data["name"])
+        return 200
+
+
+def loadActivity(name):
+    return activities.search(query.name == name)[0], 200
+
+
+def deleteActivity(data):
+    activities.remove(query.name == data["name"])
+
+
+def listActivities():
+    return activities.all()
 
 # Delete everything but the defaults programs
 def resetDefaultPrograms():
