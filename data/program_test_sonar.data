@@ -1,1 +1,1 @@
-{"dom_code": "", "code": "while True:\n  get_prog_eng().check_end()\n  get_cam().set_text(get_bot().get_sonar_distance(0))\n", "name": "test_sonar"}
+{"dom_code": "", "code": "while True:\n  get_prog_eng().check_end()\n  get_cam().set_text(get_bot().get_sonar_distance(0))\n", "name": "test_sonar", "default": "True"}

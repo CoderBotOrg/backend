@@ -70,28 +70,37 @@ def restoreSettings():
     return "ok"
 
 
-db = TinyDB("db.json")
+programs = TinyDB("programs.json")
 query = Query()
 
 def save(data):
-    if(db.search(query.name == data["name"]) == []):
-        db.insert(data)
+    if(programs.search(query.name == data["name"]) == []):
+        programs.insert(data)
     else:
-        db.update(data, query.name == data["name"])
+        if(programs.search((query.name == data["name"]) & (query.default == "True"))):
+            return "defaultOverwrite"
+        else:
+            programs.update(data, query.name == data["name"])
 
 def load(name):
-    return db.search(query.name == name)[0]
+    return programs.search(query.name == name)[0]
 
 def delete(data):
-    db.remove(query.name == data["name"])
+    programs.remove(query.name == data["name"])
 
 def list():
-    return db.all()
+    return programs.all()
 
 def resetDefaultPrograms():
-    db.purge()
+    programs.purge()
     for filename in os.listdir("data"):
         if filename.endswith(".data"):
             with open("data/" + filename) as p:
                 q = p.read()
-                db.insert(json.loads(q))
+                programs.insert(json.loads(q))
+resetDefaultPrograms()
+#return programs.search(query.default == "True")
+
+
+settings = TinyDB("settings.json")
+settings.insert({"yessa": "okiz"})
