@@ -138,6 +138,6 @@ def resetDefaultPrograms():
     programs.purge()
     for filename in os.listdir("data/defaults/programs"):
         if filename.endswith(".json"):
-            with open("data/" + filename) as p:
+            with open("data/defaults/programs" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
