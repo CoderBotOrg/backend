@@ -108,13 +108,17 @@ paths:
       responses:
         200:
           description: "ok"
-  /saveActivity:
+  /saveProgram:
     post:
       operationId: "api.saveProgram"
       summary: "Save a new program"
       tags:
         - Activity management
       parameters:
+        - name: overwrite
+          in: query
+          type: string
+          required: false
         - in: body
           name: data
           schema:
