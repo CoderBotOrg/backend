@@ -13,6 +13,10 @@ git clone https://github.com/CoderBotOrg/coderbot.git
 cd coderbot
 python3 -m venv .
 source bin/activate
+
+# Install the basic requirements
+pip3 install -r requirements_stub.txt
+# Additional packages if you are running the real thing
 pip3 install -r requirements.txt
 
 # Start the backend in stub mode
