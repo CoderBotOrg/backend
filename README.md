@@ -8,6 +8,16 @@ This repository contains the backend, along with some configuration applied on t
 
 ### Quickstart
 
+Prerequisites:
+
+```bash
+sudo apt install python3 python3-venv
+```
+
+Be sure you have Python **3.6**. You may need to use `python3.6` and `python3.6-venv` packages on some repositories with python3 already pointing to **3.7** (e.g. debian unstable/sid).
+
+
+
 ```bash
 git clone https://github.com/CoderBotOrg/coderbot.git
 cd coderbot
