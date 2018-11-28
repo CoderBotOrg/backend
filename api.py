@@ -85,20 +85,22 @@ def restoreSettings():
 ## Programs
 
 
-def saveProgram(data, overwrite=0):
+def saveProgram(data, overwrite):
     print(overwrite)
-
     if programs.search(query.name == data["name"]) == []:
         programs.insert(data)
         return 200
     else:
         # Disallow overwriting a default program
         if programs.search((query.name == data["name"]) & (query.default == "True")):
-            return "defaultOverwrite", 400
+            return "defaultOverwrite"
         # Overwrite existing program with the same name
         else:
-            programs.update(data, query.name == data["name"])
-            return 200
+            if (overwrite == "1"):
+                programs.update(data, query.name == data["name"])
+                return 200
+            else:
+                return "askOverwrite"
 
 
 def loadProgram(name):
@@ -138,8 +140,8 @@ def listActivities():
 # Delete everything but the defaults programs
 def resetDefaultPrograms():
     programs.purge()
-    for filename in os.listdir("data/defaults/programs"):
+    for filename in os.listdir("data/defaults/programs/"):
         if filename.endswith(".json"):
-            with open("data/defaults/programs" + filename) as p:
+            with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
