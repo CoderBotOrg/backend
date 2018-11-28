@@ -117,8 +117,8 @@ paths:
       parameters:
         - name: overwrite
           in: query
-          type: string
           required: false
+          type: string
         - in: body
           name: data
           schema:
@@ -127,7 +127,7 @@ paths:
         200:
           description: "ok"
         400:
-          description: "Failed to save the activity"
+          description: "Failed to save the program"
 
   /exec:
     post:
