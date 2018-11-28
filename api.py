@@ -140,8 +140,8 @@ def listActivities():
 # Delete everything but the defaults programs
 def resetDefaultPrograms():
     programs.purge()
-    for filename in os.listdir("data/defaults/programs"):
+    for filename in os.listdir("data/defaults/programs/"):
         if filename.endswith(".json"):
-            with open("data/defaults/programs" + filename) as p:
+            with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
