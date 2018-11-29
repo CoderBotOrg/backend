@@ -118,6 +118,7 @@ def listPrograms():
 ## Activities
 
 def saveActivity(data):
+    data = data["activity"]
     if activities.search(query.name == data["name"]) == []:
         activities.insert(data)
         return 200
