@@ -153,17 +153,15 @@ def handle_wifi():
     ssid = request.form.get("wifi_ssid")
     psk = request.form.get("wifi_psk")
 
-    print(mode, ssid, psk)
-    return "ok"
     logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
     client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
     logging.info(client_params)
-    os.system("sudo python wifi.py updatecfg " + mode + client_params)
+    os.system("sudo ./wifi.py updatecfg " + mode + client_params)
     os.system("sudo reboot")
     if mode == "ap":
-        return "http://coder.bot:8080"
+        return "http://coder.bot"
     else:
-        return "http://coderbot.local:8080"
+        return "http://coderbot.local"
 
 # Update the system
 @app.route("/update", methods=["GET"])
