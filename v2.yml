@@ -74,7 +74,19 @@ paths:
           description: "ok"
         400:
           description: "Failed to save the activity"
-
+  /uploadFile:
+    post:
+      operationId: "api.uploadFile"
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "upload failed"
   /deleteActivity:
     post:
       operationId: "api.deleteActivity"

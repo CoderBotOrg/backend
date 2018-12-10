@@ -146,3 +146,17 @@ def resetDefaultPrograms():
             with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
+
+def uploadFile():
+    if 'file' not in request.files:
+       	return 'Bad request', 400
+    file = request.files['file']
+    if file.filename == '':
+        return 'Bad request', 400
+    if file:
+        filename = file.filename
+        folderPath = 'uploads'
+        file.save(os.path.join(folderPath, filename))
+        return 200
+    else:
+        return 400
