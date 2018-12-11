@@ -12,6 +12,7 @@ import sqlite3
 from tinydb import TinyDB, Query
 from tinydb.operations import delete
 import os
+import subprocess
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
@@ -60,11 +61,13 @@ def status():
 
 # Hardware and software information (STUB)
 def info():
+    backend_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])[0:7].decode('utf-8')
     return {
         "model": 1,
         "serial": 2,
         "cbVersion": 3,
         "backendVersion": 4,
+        "backend commit build": backend_commit,
         "vueVersion": 5,
         "kernel": 6,
     }
