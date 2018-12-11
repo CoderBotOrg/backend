@@ -80,3 +80,9 @@ dist/
 coderbot.cfg
 
 swagger-ui/
+
+# Photos
+photos/metadata.json
+
+# Uploaded updates folder
+updatePackages/
