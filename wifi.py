@@ -121,13 +121,8 @@ class WiFi():
 
     @classmethod
     def set_client_params(cls, wssid, wpsk):
-        f = open (cls.wifi_client_conf_file, "w+")
-        f.write("""ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-    update_config=1
-    network={\n""")
-        f.write("  ssid=\""+wssid+"\"\n")
-        f.write("  psk=\""+wpsk+"\"\n")
-        f.write("}")
+        os.system("sudo sed -i s/ssid=.*$/ssid='\"" + wssid + "\"'/ " + cls.wifi_client_conf_file)
+        os.system("sudo sed -i s/psk=.*$/psk='\"" + wpsk + "\"'/ " + cls.wifi_client_conf_file)
 
     @classmethod
     def set_ap_params(cls, wssid, wpsk):
