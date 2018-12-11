@@ -77,11 +77,13 @@ paths:
   /uploadFile:
     post:
       operationId: "api.uploadFile"
+      consumes:
+        - multipart/form-data
       parameters:
-        - in: body
-          name: data
-          schema:
-            type: object
+        - name: file_to_upload
+          in: formData
+          type: file
+          required: true
       responses:
         200:
           description: "ok"
