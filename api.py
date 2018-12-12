@@ -20,6 +20,20 @@ bot = CoderBot.get_instance(
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
 )
 
+def getserial():
+  # Extract serial from cpuinfo file
+  cpuserial = "0000000000000000"
+  try:
+    f = open('/proc/cpuinfo','r')
+    for line in f:
+      if line[0:6]=='Serial':
+        cpuserial = line[10:26]
+    f.close()
+  except:
+    cpuserial = "ERROR000000000"
+
+  return cpuserial
+
 prog = None
 prog_engine = ProgramEngine.get_instance()
 
@@ -62,16 +76,16 @@ def info():
     except:
         backend_commit = 'undefined'
     try:
-        coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8')[:-2]
+        coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8').replace('\n', '')
     except:
         coderbot_version  = 'undefined'
     try:
-        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8')[:-2]
+        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
     except:
         kernel = 'undefined'
 
     try:
-        update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8')[:-2]
+        update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
     except:
         update_status = 'undefined'
     
@@ -82,6 +96,7 @@ def info():
         "backend commit build": backend_commit,
         "kernel" : kernel,
         "update status": update_status,
+        "serial": getserial()
     }
 
 
