@@ -52,24 +52,36 @@ def status():
         "internetConnectivity": True,
         "temp": "40",
         "uptime": "5h",
-        "status": "ok",
-        "internetConnectivity": True,
-        "temp": "40",
-        "uptime": "5h",
     }
-
 
 # Hardware and software information (STUB)
 def info():
-    backend_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])[0:7].decode('utf-8')
+    # [:-2] strips out '\n' (cat)
+    try:
+        backend_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])[0:7].decode('utf-8')
+    except:
+        backend_commit = 'undefined'
+    try:
+        coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8')[:-2]
+    except:
+        coderbot_version  = 'undefined'
+    try:
+        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8')[:-2]
+    except:
+        kernel = 'undefined'
+
+    try:
+        update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8')[:-2]
+    except:
+        update_status = 'undefined'
+    
     return {
         "model": 1,
         "serial": 2,
-        "cbVersion": 3,
-        "backendVersion": 4,
+        "version": coderbot_version,
         "backend commit build": backend_commit,
-        "vueVersion": 5,
-        "kernel": 6,
+        "kernel" : kernel,
+        "update status": update_status,
     }
 
 
