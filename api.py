@@ -177,8 +177,9 @@ def resetDefaultPrograms():
                 q = p.read()
                 programs.insert(json.loads(q))
 
-def uploadFile():
+def updateFromPackage():
+    os.system('sudo bash /home/pi/clean-update.sh')
     file_to_upload = connexion.request.files['file_to_upload']
-    file_to_upload.save(os.path.join('updatePackages', file_to_upload.filename))
-    os.system('sudo coderbot_update updatePackages/' + file_to_upload.filename)
+    file_to_upload.save(os.path.join('/home/pi/', 'update.tar'))
+    os.system('sudo coderbot_update /home/pi/update.tar && sudo reboot')
     return 200

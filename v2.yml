@@ -74,9 +74,9 @@ paths:
           description: "ok"
         400:
           description: "Failed to save the activity"
-  /uploadFile:
+  /updateFromPackage:
     post:
-      operationId: "api.uploadFile"
+      operationId: "api.updateFromPackage"
       consumes:
         - multipart/form-data
       parameters:
