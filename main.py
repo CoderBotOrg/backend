@@ -394,6 +394,12 @@ def button_pushed():
         elif app.prog and not app.prog.is_running():
             app.prog.execute()
 
+def remove_doreset_file():
+    try:
+        os.remove("/home/pi/doreset")
+    except OSError:
+        pass
+
 # Finally, get the server running
 def run_server():
     global bot
@@ -428,6 +434,9 @@ def run_server():
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
+
+        remove_doreset_file()
+
         app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
