@@ -26,7 +26,8 @@ from flask import (Flask,
                     send_file, 
                     Response, 
                     jsonify,
-                    send_from_directory)
+                    send_from_directory,
+                    redirect)
 from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
@@ -112,8 +113,12 @@ def render_static_assets4(filename):
 def render_static_assets5(filename):
     return send_from_directory('dist', filename)
 
+@app.route('/')
+def render_static_assets6():
+    return redirect('/vue/index.html', code=302)
+
 # Serve web app application templates
-@app.route("/")
+@app.route("/2")
 def handle_home():
     return render_template('main.html',
                            host=request.host[:request.host.find(':')],
