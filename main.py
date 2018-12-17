@@ -53,24 +53,50 @@ cnn = None
 event = None
 conv = None
 
-# (Connexion) Flask app configuration
+## (Connexion) Flask app configuration
+
+# Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
+#  from the folder 'swagger-ui'. Clone the 'swagger-ui' repository inside the backend folder
 connexionApp = connexion.App(__name__, swagger_ui=True, swagger_path='swagger-ui/')
-# We serve a custom version of the swagger ui (Jinja2 templates) based on the default one
 
-# New API is defined in v2.yml and its methods are in api.py
-connexionApp.add_api('v2.yml')
-
-
-# Connexion wraps FlaskApp, so app becomes app
+# Connexion wraps FlaskApp, so app becomes connexionApp.app
 app = connexionApp.app
-CORS(app) # Access-Control-Allow-Origin
+# Access-Control-Allow-Origin
+CORS(app)
 babel = Babel(app)
 app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
 
-## Legacy Routes
+## New API and web application
+
+# API v2 is defined in v2.yml and its methods are in api.py
+connexionApp.add_api('v2.yml')
+
+# Serve (a build of) the new Vue application
+#  "dist" is the output of `npm run build` from the 'vue-app 'repository
+
+@app.route('/vue/<path:filename>')
+def serve_vue_app(filename):
+    return send_from_directory('dist', filename)
+
+@app.route('/')
+def redirect_vue_app():
+    return redirect('/vue/index.html', code=302)
+
+## Legacy API and web application
+
+# Serve the legacy web application templates
+@app.route("/old")
+def handle_home():
+    return render_template('main.html',
+                           host=request.host[:request.host.find(':')],
+                           locale=get_locale(),
+                           config=app.bot_config,
+                           program_level=app.bot_config.get("prog_level", "std"),
+                           cam=cam != None,
+                           cnn_model_names = json.dumps({}))
 
 @babel.localeselector
 def get_locale():
@@ -105,28 +131,6 @@ def render_static_assets3(filename):
 @app.route('/media/<path:filename>')
 def render_static_assets4(filename):
     return send_from_directory('static/media', filename)
-
-# Serve the new Vue application (build)
-#  "dist" is the output of `npm run build` from the vue-app repository
-
-@app.route('/vue/<path:filename>')
-def render_static_assets5(filename):
-    return send_from_directory('dist', filename)
-
-@app.route('/')
-def render_static_assets6():
-    return redirect('/vue/index.html', code=302)
-
-# Serve web app application templates
-@app.route("/2")
-def handle_home():
-    return render_template('main.html',
-                           host=request.host[:request.host.find(':')],
-                           locale=get_locale(),
-                           config=app.bot_config,
-                           program_level=app.bot_config.get("prog_level", "std"),
-                           cam=cam != None,
-                           cnn_model_names = json.dumps({}))
 
 """
 Update the keys of oldDict appearing in updatedValues with the values in 
