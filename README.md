@@ -4,7 +4,7 @@ A RaspberryPI-based programmable robot for educational purposes. Check the [proj
 
 For further information about development and technical documentation, see the [Wiki](https://github.com/CoderBotOrg/coderbot/wiki).
 
-This repository contains the backend, along with some configuration applied on the base system image.
+This repository contains the backend, exposing the [CoderBot API](https://github.com/CoderBotOrg/backend/wiki/API-v2).
 
 ### Quickstart
 
