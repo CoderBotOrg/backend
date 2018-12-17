@@ -36,9 +36,11 @@ PYTHONPATH=stub python3 init.py
 python3 init.py
 ```
 
-The legacy API and frontend application is available at `localhost:5000`.
+Once started, the backend will expose a number of endpoints:
 
-The new API is at `localhost:5000/v2`, while the new application is served at `localhost:5000/vue` (assuming the [vue-app](https://github.com/coderbotorg/vue-app) build is placed in the `dist/` folder).
-
-To see the dynamic documentation of the new API, clone the [swagger-ui](https://github.com/coderbotorg/swagger-ui) repository inside the `coderbot/` folder and it'll be live at `localhost:5000/v2/ui/index.html`.
+- Legacy API: [localhost:5000/](http://localhost:5000/);
+- Legacy JQuery web application: [localhost:5000:/old](http://localhost:5000/old);
+- API v2: [localhost:5000/v2](http://localhost:5000/v2);
+- New Vue web application: [localhost:5000/](http://localhost:5000/) (assuming the [vue-app](https://github.com/coderbotorg/vue-app) build is placed in the `dist/` folder);
+- Swagger UI dynamic documentation of the API v2: [localhost:5000:/v2/ui/index.html](http://localhost:5000/v2/ui/index.html) (once you cloned the [swagger-ui](https://github.com/coderbotorg/swagger-ui) repository inside the backend folder.
 
