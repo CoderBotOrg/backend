@@ -13,6 +13,7 @@ from tinydb import TinyDB, Query
 from tinydb.operations import delete
 import os
 import subprocess
+from cachetools import cached, TTLCache
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
@@ -20,7 +21,7 @@ bot = CoderBot.get_instance(
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
 )
 
-def getserial():
+def get_serial():
   # Extract serial from cpuinfo file
   cpuserial = "0000000000000000"
   try:
@@ -33,6 +34,37 @@ def getserial():
     cpuserial = "ERROR000000000"
 
   return cpuserial
+
+@cached(cache=TTLCache(maxsize=1, ttl=10))
+def get_internet_status():
+    return subprocess.check_output(["./scripts/check_conn.sh"]).decode('utf-8').replace('\n', '')
+
+@cached(cache=TTLCache(maxsize=1, ttl=60))
+def get_info():
+    # [:-2] strips out '\n' (cat)
+    try:
+        backend_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])[0:7].decode('utf-8')
+    except:
+        backend_commit = 'undefined'
+    try:
+        coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8').replace('\n', '')
+    except:
+        coderbot_version  = 'undefined'
+    try:
+        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
+    except:
+        kernel = 'undefined'
+    try:
+        update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
+    except:
+        update_status = 'undefined'
+
+    serial = get_serial();
+    return {'backend_commit':backend_commit,
+            'coderbot_version':coderbot_version,
+            'update_status': update_status,
+            'kernel':kernel,
+            'serial':serial}
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -58,10 +90,9 @@ def turn(data):
     bot.turn(speed=data["speed"], elapse=data["elapse"])
     return 200
 
-
 # Bot status (STUB)
 def status():
-    internet_status = subprocess.check_output(["./scripts/check_conn.sh"]).decode('utf-8').replace('\n', '')
+    internet_status = get_internet_status()
 
     return {
         "status": "ok",
@@ -72,33 +103,14 @@ def status():
 
 # Hardware and software information (STUB)
 def info():
-    # [:-2] strips out '\n' (cat)
-    try:
-        backend_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])[0:7].decode('utf-8')
-    except:
-        backend_commit = 'undefined'
-    try:
-        coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8').replace('\n', '')
-    except:
-        coderbot_version  = 'undefined'
-    try:
-        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
-    except:
-        kernel = 'undefined'
-
-    try:
-        update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
-    except:
-        update_status = 'undefined'
-    
+    info = get_info()
     return {
         "model": 1,
-        "serial": 2,
-        "version": coderbot_version,
-        "backend commit build": backend_commit,
-        "kernel" : kernel,
-        "update status": update_status,
-        "serial": getserial()
+        "version": info["coderbot_version"],
+        "backend commit build": info["backend_commit"],
+        "kernel" : info["kernel"],
+        "update status": info["update_status"],
+        "serial": info["serial"]
     }
 
 
