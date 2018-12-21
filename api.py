@@ -61,9 +61,11 @@ def turn(data):
 
 # Bot status (STUB)
 def status():
+    internet_status = subprocess.check_output(["./scripts/check_conn.sh"]).decode('utf-8').replace('\n', '')
+
     return {
         "status": "ok",
-        "internetConnectivity": True,
+        "internetConnectivity": internet_status,
         "temp": "40",
         "uptime": "5h",
     }
