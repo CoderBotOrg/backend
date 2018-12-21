@@ -36,8 +36,17 @@ def get_serial():
   return cpuserial
 
 @cached(cache=TTLCache(maxsize=1, ttl=10))
-def get_internet_status():
-    return subprocess.check_output(["./scripts/check_conn.sh"]).decode('utf-8').replace('\n', '')
+def get_status():
+    try:
+        temp = os.popen("vcgencmd measure_temp").readline().replace("temp=","")
+    except:
+        temp = "undefined"
+    
+    uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
+    internet_status = subprocess.check_output(["./scripts/check_conn.sh"]).decode('utf-8').replace('\n', '')
+    return {'internet_status': internet_status,
+            'temp': temp,
+            'uptime': uptime}
 
 @cached(cache=TTLCache(maxsize=1, ttl=60))
 def get_info():
@@ -90,18 +99,16 @@ def turn(data):
     bot.turn(speed=data["speed"], elapse=data["elapse"])
     return 200
 
-# Bot status (STUB)
 def status():
-    internet_status = get_internet_status()
+    status = get_status()
 
     return {
         "status": "ok",
-        "internetConnectivity": internet_status,
-        "temp": "40",
-        "uptime": "5h",
+        "internetConnectivity": status["internet_status"],
+        "temp": status["temp"],
+        "uptime": status["uptime"],
     }
 
-# Hardware and software information (STUB)
 def info():
     info = get_info()
     return {
