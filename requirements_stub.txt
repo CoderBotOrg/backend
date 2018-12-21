@@ -40,3 +40,4 @@ tinydb==3.12.1
 urllib3==1.23
 Werkzeug==0.14.1
 setuptools==39.1.0
+cachetools==3.0.0
