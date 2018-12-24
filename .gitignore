@@ -38,6 +38,10 @@ photos/*.mp4
 photos/*.h264
 photos/*.json
 
+#cnn models
+cnn_models/*
+cnn_models/cache/*
+
 # Sounds recorded
 sounds/*.wav
 

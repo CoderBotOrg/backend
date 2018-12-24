@@ -84,11 +84,11 @@ class Camera(object):
                         self._photos.append({'name': filename})
             self.save_photo_metadata()
 
-        #self._cnn_classifiers = {}
-        #cnn_model = config.Config.get().get("cnn_default_model", "")
-        #if cnn_model != "":
-        #    self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
-        #    self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
+        self._cnn_classifiers = {}
+        cnn_model = config.Config.get().get("cnn_default_model", "")
+        if cnn_model != "":
+            self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
+            self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
 
         self._camera.grab_start()
         self._image_cv = self.get_image()

@@ -34,7 +34,7 @@ from werkzeug.datastructures import Headers
 
 # Logging configuration
 logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 sh = logging.StreamHandler()
 fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -96,7 +96,7 @@ def handle_home():
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=cam != None,
-                           cnn_model_names = json.dumps({}))
+                           cnn_model_names = json.dumps([[name] for name in cnn.get_models().keys()]))
 
 @babel.localeselector
 def get_locale():

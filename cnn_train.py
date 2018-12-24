@@ -142,7 +142,7 @@ class CNNTrainer(object):
         self.validation_batch_size = 100
         self.print_misclassified_test_images = False
         self.bottleneck_dir = "/tmp/bottleneck"
-        self.model_dir = "/tmp/imagenet"
+        self.model_dir = "./cnn_models/cache"
         self.final_tensor_name = "final_result"
         self.write_logs = False
 
@@ -160,7 +160,7 @@ class CNNTrainer(object):
             raise Exception("Did not recognize architecture flag'")
 
         # Set up the pre-trained graph.
-        self.maybe_download_and_extract(self.model_info['data_url'])
+        self.maybe_download_and_extract(self.model_info['data_url'], self.model_info['model_dir_name'])
         self.graph, self.bottleneck_tensor, self.resized_image_tensor = (
           self.create_model_graph(self.model_info))
 
@@ -517,7 +517,7 @@ class CNNTrainer(object):
         return bottleneck_values
 
 
-    def maybe_download_and_extract(self, data_url):
+    def maybe_download_and_extract(self, data_url, model_dir_name):
         """Download and extract model tar file.
 
         If the pretrained model we're using doesn't already exist, this function
@@ -526,7 +526,7 @@ class CNNTrainer(object):
         Args:
           data_url: Web location of the tar file containing the pretrained model.
         """
-        dest_directory = self.model_dir
+        dest_directory = os.path.join(self.model_dir, model_dir_name)
         if not os.path.exists(dest_directory):
             os.makedirs(dest_directory)
         filename = data_url.split('/')[-1]
@@ -538,11 +538,10 @@ class CNNTrainer(object):
                                  (filename,
                                   float(count * block_size) / float(total_size) * 100.0))
                 sys.stdout.flush()
-
             filepath, _ = urllib.request.urlretrieve(data_url, filepath, _progress)
             print()
             statinfo = os.stat(filepath)
-            tf.logging.info('Successfully downloaded', filename, statinfo.st_size,
+            tf.logging.info('Successfully downloaded %s %d', filename, statinfo.st_size,
                             'bytes.')
         tarfile.open(filepath, 'r:gz').extractall(dest_directory)
 
@@ -1084,15 +1083,17 @@ class CNNTrainer(object):
                 tf.logging.error("Couldn't understand architecture name '%s'",
                                  architecture)
                 return None
-            version_string = parts[1]
+            v_string = parts[1]
+            version_string = parts[2]
             if (version_string != '1.0' and version_string != '0.75' and
-                version_string != '0.50' and version_string != '0.25'):
+                version_string != '0.50' and version_string != '0.5' and 
+                version_string != '0.35' and version_string != '0.25'):
                 tf.logging.error(
-                    """"The Mobilenet version should be '1.0', '0.75', '0.50', or '0.25',
+                    """"The Mobilenet version should be '1.0', '0.75', '0.50', '0.35', or '0.25',
             but found '%s' for architecture '%s'""",
                     version_string, architecture)
                 return None
-            size_string = parts[2]
+            size_string = parts[3]
             if (size_string != '224' and size_string != '192' and
                 size_string != '160' and size_string != '128'):
                 tf.logging.error(
@@ -1100,31 +1101,46 @@ class CNNTrainer(object):
            but found '%s' for architecture '%s'""",
                     size_string, architecture)
                 return None
-            if len(parts) == 3:
+            if len(parts) == 4:
                 is_quantized = False
             else:
-                if parts[3] != 'quantized':
+                if parts[4] != 'quantized':
                     tf.logging.error(
                         "Couldn't understand architecture suffix '%s' for '%s'", parts[3],
                         architecture)
                     return None
                 is_quantized = True
-            data_url = 'http://download.tensorflow.org/models/mobilenet_v1_'
-            data_url += version_string + '_' + size_string + '_frozen.tgz'
-            bottleneck_tensor_name = 'MobilenetV1/Predictions/Reshape:0'
+            data_url = 'http://'
+            model_file_name = None
+            bottleneck_tensor_name = None 
+            if architecture.startswith('mobilenet_v1'): 
+               data_url += 'download.tensorflow.org/models/mobilenet_v1_'
+               data_url += version_string + '_' + size_string + '_frozen.tgz'
+               bottleneck_tensor_name = 'MobilenetV1/Predictions/Reshape:0'
+               if is_quantized:
+                   model_base_name = 'quantized_graph.pb'
+               else:
+                   model_base_name = 'frozen_graph.pb'
+               model_dir_name = 'mobilenet_v1_'
+               model_dir_name += version_string + '_' + size_string
+               model_file_name = os.path.join(model_dir_name, model_base_name)
+               model_dir_name = '' 
+            else:
+               data_url += 'storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_'
+               data_url += version_string + '_' + size_string + '.tgz'
+               bottleneck_tensor_name = 'MobilenetV2/Predictions/Reshape:0' 
+               model_dir_name = 'mobilenet_v2_'
+               model_dir_name += version_string + '_' + size_string
+               model_base_name = model_dir_name + '_frozen.pb'
+               model_file_name = os.path.join(model_dir_name, model_base_name)
             bottleneck_tensor_size = 1001
             input_width = int(size_string)
             input_height = int(size_string)
             input_depth = 3
             resized_input_tensor_name = 'input:0'
-            if is_quantized:
-                model_base_name = 'quantized_graph.pb'
-            else:
-                model_base_name = 'frozen_graph.pb'
-            model_dir_name = 'mobilenet_v1_' + version_string + '_' + size_string
-            model_file_name = os.path.join(model_dir_name, model_base_name)
             input_mean = 127.5
             input_std = 127.5
+            print(data_url)
         else:
             tf.logging.error("Couldn't understand architecture name '%s'", architecture)
             raise ValueError('Unknown architecture', architecture)
@@ -1138,6 +1154,7 @@ class CNNTrainer(object):
             'input_depth': input_depth,
             'resized_input_tensor_name': resized_input_tensor_name,
             'model_file_name': model_file_name,
+            'model_dir_name': model_dir_name,
             'input_mean': input_mean,
             'input_std': input_std,
         }
@@ -1170,11 +1187,3 @@ class CNNTrainer(object):
         mul_image = tf.multiply(offset_image, 1.0 / input_std)
         return jpeg_data, mul_image
 
-
-if __name__ == '__main__':
-    cnn_trainer = CNNTrainer("mobilenet_0.50_128")
-    cnn_trainer.retrain(
-                image_dir="/home/pi/tensorflow/data/applekiwi",
-                output_graph="./cnn_models/applewiki_0_5_128.pb",
-                training_steps=10,
-                learning_rate=0.1)

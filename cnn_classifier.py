@@ -27,6 +27,7 @@ from __future__ import print_function
 import time
 import logging
 
+import operator
 import numpy as np
 import tensorflow as tf
 
@@ -137,10 +138,7 @@ class CNNClassifier(object):
         #logging.info( "time.cls: " + str(time.time() - s_t))
 
         results = np.squeeze(results)
-
-        pairs = {}
-        for i in results.argsort():
-            pairs[self._labels[i]] = results[i]
-
-        #logging.info(pairs)
+        result = results.argmax()
+        pairs = {self._labels[result]: results[result]}
+        logging.info(pairs)
         return pairs

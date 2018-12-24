@@ -93,7 +93,7 @@ class CNNManager(object):
 
     def save_model_status(self, model_name, architecture, status):
         model_info = architecture.split("_")
-        self._models[model_name] = {"status": status, "image_height": model_info[2], "image_width": model_info[2]}
+        self._models[model_name] = {"status": status, "image_height": model_info[3], "image_width": model_info[3], "output_layer": "final_result"}
         self._save_model_meta()
 
     def wait_train_jobs(self):
@@ -105,6 +105,7 @@ class CNNManager(object):
         if model_info:
             return CNNClassifier(model_file = MODEL_PATH + "/" + model_name + ".pb",
                                  label_file = MODEL_PATH + "/" + model_name + ".txt",
+                                 output_layer=model_info["output_layer"],
                                  input_height = int(model_info["image_height"]),
                                  input_width = int(model_info["image_width"]))
 

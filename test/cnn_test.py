@@ -23,7 +23,7 @@ class CNNTest(unittest.TestCase):
         cam = camera.Camera.get_instance()
         cnn = cnn_manager.CNNManager.get_instance()
         cnn.train_new_model(model_name=name,
-                            architecture="mobilenet_0.25_128",
+                            architecture="mobilenet_v1_0.50_128",
                             image_tags=["other","tomato","apple","kiwi"],
                             photos_meta=cam.get_photo_list(),
                             training_steps=20,
@@ -31,7 +31,7 @@ class CNNTest(unittest.TestCase):
         start = time.time()
         while True:
             model_status = cnn.get_models().get(name, {"status": 0})
-            if model_status.get("status") == 1 or time.time() - start > 600:
+            if model_status.get("status") == 1 or time.time() - start > 6000:
                 break
             print("status: " + str(model_status["status"]))
             time.sleep(1)
@@ -45,6 +45,35 @@ class CNNTest(unittest.TestCase):
         self.assertTrue(result["kiwi"] == 1.0)
 
         name="test_model_1"
+        cnn = cnn_manager.CNNManager.get_instance()
+        cnn.delete_model(name)
+        self.assertTrue(cnn.get_models().get(name) is None)
+
+    def test_train_set_2(self):
+        name="test_model_2"
+        cam = camera.Camera.get_instance()
+        cnn = cnn_manager.CNNManager.get_instance()
+        cnn.train_new_model(model_name=name,
+                            architecture="mobilenet_v2_0.5_128",
+                            image_tags=["other","tomato","apple","kiwi"],
+                            photos_meta=cam.get_photo_list(),
+                            training_steps=20,
+                            learning_rate=0.1)
+        start = time.time()
+        while True:
+            model_status = cnn.get_models().get(name, {"status": 0})
+            if model_status.get("status") == 1 or time.time() - start > 6000:
+                break
+            print("status: " + str(model_status["status"]))
+            time.sleep(1)
+        self.assertTrue(cnn.get_models().get(name).get("status") == 1.0)
+
+        cnn = cnn_manager.CNNManager.get_instance()
+        mod = cnn.load_model(name)
+        result = mod.classify_image("photos/DSC86.jpg")
+        print("result: " + str(result))
+        self.assertTrue(result["kiwi"] >= 0.9)
+
         cnn = cnn_manager.CNNManager.get_instance()
         cnn.delete_model(name)
         self.assertTrue(cnn.get_models().get(name) is None)
