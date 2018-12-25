@@ -20,11 +20,11 @@ from cnn_manager import CNNManager
 from event import EventManager
 from conversation import Conversation
 
-from flask import (Flask, 
-                    render_template, 
-                    request, 
-                    send_file, 
-                    Response, 
+from flask import (Flask,
+                    render_template,
+                    request,
+                    send_file,
+                    Response,
                     jsonify,
                     send_from_directory,
                     redirect)
@@ -34,7 +34,7 @@ from werkzeug.datastructures import Headers
 
 # Logging configuration
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 sh = logging.StreamHandler()
 fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

@@ -541,7 +541,7 @@ class CNNTrainer(object):
             filepath, _ = urllib.request.urlretrieve(data_url, filepath, _progress)
             print()
             statinfo = os.stat(filepath)
-            tf.logging.info('Successfully downloaded %s %d', filename, statinfo.st_size,
+            tf.logging.info('Successfully downloaded %s %d %s', filename, statinfo.st_size,
                             'bytes.')
         tarfile.open(filepath, 'r:gz').extractall(dest_directory)
 
