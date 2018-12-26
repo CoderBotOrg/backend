@@ -43,7 +43,7 @@ def get_status():
         temp = "undefined"
     
     uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
-    internet_status = subprocess.check_output(["./scripts/check_conn.sh"]).decode('utf-8').replace('\n', '')
+    internet_status = subprocess.check_output(["./utils/check_conn.sh"]).decode('utf-8').replace('\n', '')
     return {'internet_status': internet_status,
             'temp': temp,
             'uptime': uptime}
@@ -52,9 +52,12 @@ def get_status():
 def get_info():
     # [:-2] strips out '\n' (cat)
     try:
-        backend_commit = subprocess.check_output(["git", "rev-parse", "HEAD"])[0:7].decode('utf-8')
+        with open('manifest.json', 'r') as f:
+            metadata = json.load(f)
+        backend_commit = metadata["backendCommit"][0:7]
     except:
-        backend_commit = 'undefined'
+        backend_commit = "undefined"
+
     try:
         coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8').replace('\n', '')
     except:
