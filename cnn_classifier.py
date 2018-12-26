@@ -139,6 +139,5 @@ class CNNClassifier(object):
 
         results = np.squeeze(results)
         result = results.argmax()
-        pairs = {self._labels[result]: results[result]}
-        logging.info(pairs)
+        pairs = (self._labels[result], results[result])
         return pairs

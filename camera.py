@@ -89,6 +89,7 @@ class Camera(object):
         if cnn_model != "":
             self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
             self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
+            logging.info("loaded: " + cnn_model + " " + str(self._cnn_classifier_default))
 
         self._camera.grab_start()
         self._image_cv = self.get_image()
@@ -365,11 +366,10 @@ class Camera(object):
 
         img = self.get_image()
         classes = classifier.classify_image(img.mat())
-        s_classes = sorted(classes.items(), key=lambda x: x[1], reverse=True)
-        return s_classes
+        return classes
 
     def find_class(self):
-        return self.cnn_classify()[0][0]
+        return self.cnn_classify()[0]
 
     def sleep(self, elapse):
         logging.debug("sleep: " + str(elapse))
