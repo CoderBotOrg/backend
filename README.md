@@ -38,8 +38,8 @@ python3 init.py
 
 Once started, the backend will expose a number of endpoints:
 
-- Legacy API: [localhost:5000/<LEGACY_METHOD>](http://localhost:5000/);
-- Legacy JQuery web application: [localhost:5000:/old](http://localhost:5000/old);
+- Legacy API: [localhost:5000/`<LEGACY_METHOD>`](http://localhost:5000/);
+- Legacy JQuery web application: [localhost:5000/old](http://localhost:5000/old);
 - API v2: [localhost:5000/v2](http://localhost:5000/v2);
 - New Vue web application: [localhost:5000/](http://localhost:5000/) (assuming a [vue-app](https://github.com/coderbotorg/vue-app) build is placed in the `dist/` folder);
 - Swagger UI dynamic documentation of the API v2: [localhost:5000/v2/ui/index.html](http://localhost:5000/v2/ui/index.html) (once you cloned the [swagger-ui](https://github.com/coderbotorg/swagger-ui) repository inside the backend folder).
