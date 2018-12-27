@@ -117,7 +117,8 @@ class Camera(object):
             self._photos = json.load(f)
             f.close()
         except IOError:
-            logging.warning("no metadata file")
+            logging.warning("no metadata file, starting from empty")
+            self._photos = []
 
     def save_photo_metadata(self):
         f = open(PHOTO_METADATA_FILE, "wt")
