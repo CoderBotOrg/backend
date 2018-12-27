@@ -87,9 +87,12 @@ class Camera(object):
         self._cnn_classifiers = {}
         cnn_model = config.Config.get().get("cnn_default_model", "")
         if cnn_model != "":
-            self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
-            self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
-            logging.info("loaded: " + cnn_model + " " + str(self._cnn_classifier_default))
+            try:
+                self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
+                self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
+                logging.info("loaded: " + cnn_model + " " + str(self._cnn_classifier_default))
+            except:
+                logging.warning("model not found: " + cnn_model)
 
         self._camera.grab_start()
         self._image_cv = self.get_image()
@@ -354,7 +357,7 @@ class Camera(object):
         img = self.get_image()
         return img.find_ar_code()
 
-    def cnn_classify(self, model_name=None):
+    def cnn_classify(self, model_name=None, top_results=3):
         classifier = None
         if model_name:
             classifier = self._cnn_classifiers.get(model_name)
@@ -364,12 +367,17 @@ class Camera(object):
         else:
             classifier = self._cnn_classifier_default
 
-        img = self.get_image()
-        classes = classifier.classify_image(img.mat())
+        classes = None
+        try:
+            img = self.get_image()
+            classes = classifier.classify_image(img.mat(), top_results=top_results) 
+        except:
+            logging.warning("classifier not available")
+            classes = [("None", 1.0)]
         return classes
 
     def find_class(self):
-        return self.cnn_classify()[0]
+        return self.cnn_classify(top_results=1)[0][0]
 
     def sleep(self, elapse):
         logging.debug("sleep: " + str(elapse))

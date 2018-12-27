@@ -34,7 +34,7 @@ from werkzeug.datastructures import Headers
 
 # Logging configuration
 logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
 sh = logging.StreamHandler()
 fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
