@@ -110,24 +110,13 @@ class CNNClassifier(object):
 
     def classify_image(self,
                        image_file_or_mat,
-                       input_height=128,
-                       input_width=128,
-                       input_mean=0,
-                       input_std=255):
+                       top_results=3):
         s_t = time.time()
         t = None
         if type(image_file_or_mat) == str:
-            t = self.read_tensor_from_image_file(file_name=image_file_or_mat,
-                                  input_height=input_height,
-                                  input_width=input_width,
-                                  input_mean=input_mean,
-                                  input_std=input_std)
+            t = self.read_tensor_from_image_file(file_name=image_file_or_mat)
         else:
-            t = self.read_tensor_from_image_mat(image_file_or_mat,
-                                  input_height=input_height,
-                                  input_width=input_width,
-                                  input_mean=input_mean,
-                                  input_std=input_std)
+            t = self.read_tensor_from_image_mat(image_file_or_mat)
 
         #logging.info( "time.norm: " + str(time.time() - s_t))
         s_t = time.time()
@@ -137,7 +126,9 @@ class CNNClassifier(object):
 
         #logging.info( "time.cls: " + str(time.time() - s_t))
 
+        top_results = min(top_results, len(self._labels))
         results = np.squeeze(results)
-        result = results.argmax()
-        pairs = (self._labels[result], results[result])
+        results_idx = np.argpartition(results, -top_results)[-top_results:]
+        results_idx = np.flip(results_idx[np.argsort(results[results_idx])], axis=0)
+        pairs = [(self._labels[i], results[i]) for i in results_idx]
         return pairs
