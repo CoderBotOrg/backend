@@ -74,22 +74,26 @@ app.shutdown_requested = False
 # API v2 is defined in v2.yml and its methods are in api.py
 connexionApp.add_api('v2.yml')
 
-# Serve (a build of) the new Vue application
-#  "dist" is the output of `npm run build` from the 'vue-app 'repository
-
 @app.route('/vue/<path:filename>')
 def serve_vue_app(filename):
+    """
+    Serve (a build of) the new Vue application
+    "dist" is the output of `npm run build` from the 'vue-app 'repository
+    """
     return send_from_directory('dist', filename)
 
 @app.route('/')
 def redirect_vue_app():
+
     return redirect('/vue/index.html', code=302)
 
 ## Legacy API and web application
 
-# Serve the legacy web application templates
 @app.route("/old")
-def handle_home():
+def serve_legacy():
+    """
+    Serve the the legacy web application
+    """
     return render_template('main.html',
                            host=request.host[:request.host.find(':')],
                            locale=get_locale(),
@@ -132,32 +136,39 @@ def render_static_assets3(filename):
 def render_static_assets4(filename):
     return send_from_directory('static/media', filename)
 
-"""
-Update the keys of oldDict appearing in updatedValues with the values in 
-updatedValues
-"""
 def updateDict(oldDict, updatedValues):
+    """
+    Update the keys of oldDict appearing in updatedValues with the values in 
+    updatedValues
+    """
     result = oldDict
     for key, value in updatedValues.items():
         result[key] = value
     return result
 
-# Overwrite configuration file on disk and reload it
 @app.route("/config", methods=["POST"])
 def handle_config():
+    """
+    Overwrite configuration file on disk and reload it
+    """
     Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
 
-# Expose configuration as JSON
 @app.route("/config", methods=["GET"])
 def returnConfig():
+    """
+    Expose configuration as JSON
+    """
     app.bot_config = Config.get()
     return(jsonify(app.bot_config)) 
 
-# Changes wi-fi configuration and reboot
 @app.route("/wifi", methods=["POST"])
 def handle_wifi():
+    """
+    Passes the received Wi-Fi configuration to the wifi.py script, applying it.
+    Then reboots
+    """
     mode = request.form.get("wifi_mode")
     ssid = request.form.get("wifi_ssid")
     psk = request.form.get("wifi_psk")
@@ -171,12 +182,6 @@ def handle_wifi():
         return "http://coder.bot"
     else:
         return "http://coderbot.local"
-
-# Update the system
-@app.route("/update", methods=["GET"])
-def handle_update():
-    logging.info("updating system.start")
-    return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
 
 # Execute single command
 @app.route("/bot", methods=["GET"])
