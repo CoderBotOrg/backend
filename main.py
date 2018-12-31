@@ -183,9 +183,11 @@ def handle_wifi():
     else:
         return "http://coderbot.local"
 
-# Execute single command
 @app.route("/bot", methods=["GET"])
 def handle_bot():
+    """
+    Execute a bot command
+    """
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
@@ -267,9 +269,11 @@ def handle_video_stream():
     except:
         pass
 
-# Photos
 @app.route("/photos", methods=["GET"])
 def handle_photos():
+    """
+    Expose the list of taken photos
+    """
     logging.info("photos")
     return json.dumps(cam.get_photo_list())
 
@@ -297,23 +301,29 @@ def handle_photo_cmd(filename):
     cam.delete_photo(filename)
     return "ok"
 
-# Programs list
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
+    """
+    Expose the list of saved programs
+    """
     logging.debug("program_list")
     return json.dumps(app.prog_engine.prog_list())
 
-# Get saved program as JSON
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
+    """
+    Expose a saved program as JSON
+    """
     logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
     return jsonify(app.prog.as_json())
 
-# Save new program
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
+    """
+    Save the given program
+    """
     logging.debug("program_save")
     name = request.form.get('name')
     dom_code = request.form.get('dom_code')
@@ -322,35 +332,43 @@ def handle_program_save():
     app.prog_engine.save(prog)
     return "ok"
 
-# Delete saved program
 @app.route("/program/delete", methods=["POST"])
 def handle_program_delete():
+    """
+    Delete the given saved program
+    """
     logging.debug("program_delete")
     name = request.form.get('name')
     app.prog_engine.delete(name)
     return "ok"
 
-# Execute the given code
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
+    """
+    Execute the given program
+    """
     logging.debug("program_exec")
     name = request.form.get('name')
     code = request.form.get('code')
     app.prog = app.prog_engine.create(name, code)
     return json.dumps(app.prog.execute())
 
-# Stop the execution
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
+    """
+    Stop the program execution
+    """
     logging.debug("program_end")
     if app.prog:
         app.prog.end()
     app.prog = None
     return "ok"
 
-# Program status
 @app.route("/program/status", methods=["GET"])
 def handle_program_status():
+    """
+    Expose the program status
+    """
     logging.debug("program_status")
     prog = Program("")
     if app.prog:
@@ -391,9 +409,12 @@ def handle_cnn_models_delete(model_name):
 
 # Spawn a sub-process and execute things there
 def execute(command):
+    """
+    Spawn a sub-process and execute the program there, then poll it until
+    it has finished
+    """
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    # Poll process for new output until finished
     while True:
         nextline = process.stdout.readline()
         if nextline == '' and process.poll() != None:
