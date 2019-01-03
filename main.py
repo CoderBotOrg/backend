@@ -37,10 +37,10 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 sh = logging.StreamHandler()
 fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(message)s')
 sh.setFormatter(formatter)
 fh.setFormatter(formatter)
-logger.addHandler(sh)
+#logger.addHandler(sh)
 logger.addHandler(fh)
 
 # Initialisation
