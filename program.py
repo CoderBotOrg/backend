@@ -32,9 +32,13 @@ import audio
 import event
 import conversation
 
+from tinydb import TinyDB, Query
+from tinydb.operations import delete
+
+
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
-PROGRAM_SUFFIX = ".data"
+PROGRAM_SUFFIX = ".json"
 
 def get_cam():
     return camera.Camera.get_instance()
@@ -65,11 +69,12 @@ class ProgramEngine:
         self._program = None
         self._repository = {}
         self._log = ""
-        for dirname, dirnames, filenames,  in os.walk("./data"):
+        self._programs = TinyDB("data/programs.json")
+        for dirname, dirnames, filenames, in os.walk(PROGRAM_PATH):
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
-                    self._repository[program_name] = filename
+                    self._repository[program_name] = os.path.join(dirname, filename)
 
     @classmethod
     def get_instance(cls):
@@ -82,19 +87,22 @@ class ProgramEngine:
 
     def save(self, program):
         self._program = self._repository[program.name] = program
-        f = open(PROGRAM_PATH + PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX, 'w')
+        file_name = self._repository[program.name]
+        f = open(file_name, 'w')
         json.dump(program.as_json(), f)
         f.close()
 
     def load(self, name):
         #return self._repository[name]
-        f = open(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX, 'r')
+        file_name = self._repository[name]
+        f = open(file_name, 'r')
         self._program = Program.from_json(json.load(f))
         return self._program
 
     def delete(self, name):
+        file_name = self._repository[name]
         del self._repository[name]
-        os.remove(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX)
+        os.remove(file_name)
         return "ok"
 
     def create(self, name, code):
@@ -113,7 +121,7 @@ class ProgramEngine:
     def get_log(self):
         return self._log
 
- 
+
 class Program:
     _running = False
 
