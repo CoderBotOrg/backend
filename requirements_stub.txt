@@ -1,4 +1,5 @@
-# Basic set of required packages. If you need to run on a real system (NOT in STUB mode), install the packages in `requirements.txt` too.
+# Basic set of required packages. If you need to run on a real system (NOT in STUB mode)
+#  install the packages in `requirements.txt` too.
 
 absl-py==0.4.1
 apiai==1.2.3
@@ -28,7 +29,7 @@ Pillow==5.1.0
 protobuf==3.6.1
 Pypubsub==4.0.0
 pytz==2018.4
-PyYAML==3.12
+pyyaml>=4.2b1
 requests==2.20.0
 six==1.11.0
 smbus2==0.2.0
