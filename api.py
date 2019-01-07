@@ -153,7 +153,7 @@ def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')
     file_to_upload = connexion.request.files['file_to_upload']
     file_to_upload.save(os.path.join('/home/pi/', 'update.tar'))
-    os.system('sudo coderbot_update /home/pi/update.tar && sudo reboot')
+    os.system('sudo reboot')
     return 200
 
 
