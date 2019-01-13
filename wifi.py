@@ -184,6 +184,45 @@ class WiFi():
                 print("Unable to register ip, revert to ap mode")
                 cls.start_as_ap()
 
+    @classmethod
+    def get_hostapd_config_file(cls):
+        adapter = cls.get_adapter_type()
+        hostapd_type = cls.hostapds.get(adapter)
+        return "/etc/hostapd/" + hostapd_type + ".conf"
+
+    @classmethod
+    def set_unique_ssid(cls):
+        """
+        See if ssid is already a unique id based on CPU serial number.
+        If not, set it in hostapd.conf
+        """
+        try:
+            inconfig = None
+            with open(cls.get_hostapd_config_file()) as infile:
+                inconfig = infile.read()
+            inconfig = inconfig.replace("CHANGEMEATFIRSTRUN", str(abs(hash(cls.get_serial())))[0:4])
+            with open(cls.get_hostapd_config_file(), "w") as outfile:
+                outfile.write(inconfig)
+        except:
+            print("Unexpected error: ", sys.exc_info()[0])
+            raise
+
+    @classmethod
+    def get_serial(cls):
+        """
+        Extract serial from cpuinfo file
+        """
+        cpuserial = "0000000000000000"
+        try:
+            f = open('/proc/cpuinfo','r')
+            for line in f:
+                if line[0:6]=='Serial':
+                    cpuserial = line[10:26]
+            f.close()
+        except:
+            cpuserial = "ERROR000000000"
+        return cpuserial
+
 def main():
     w = WiFi()
     if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
@@ -199,6 +238,7 @@ def main():
             WiFi.get_config()['bot_name'] = sys.argv[3]
             WiFi.save_config()
     else:
+        w.set_unique_ssid()
         w.start_service()
 
 if __name__ == "__main__":
