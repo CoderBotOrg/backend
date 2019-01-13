@@ -3,19 +3,16 @@ API methods implementation
 This file contains every method called by the API defined in v2.yml
 """
 
-from flask import jsonify
-import json
-from coderbot import CoderBot
-from program import ProgramEngine, Program
-from config import Config
-import connexion
-import time
-import sqlite3
-from tinydb import TinyDB, Query
-from tinydb.operations import delete
 import os
 import subprocess
+import json
+import connexion
+from tinydb import TinyDB, Query
+from tinydb.operations import delete
 from cachetools import cached, TTLCache
+from coderbot import CoderBot
+from program import ProgramEngine
+from config import Config
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
@@ -24,20 +21,20 @@ bot = CoderBot.get_instance(
 )
 
 def get_serial():
-  """
-  Extract serial from cpuinfo file
-  """
-  cpuserial = "0000000000000000"
-  try:
-    f = open('/proc/cpuinfo','r')
-    for line in f:
-      if line[0:6]=='Serial':
-        cpuserial = line[10:26]
-    f.close()
-  except:
-    cpuserial = "ERROR000000000"
+    """
+    Extract serial from cpuinfo file
+    """
+    cpuserial = "0000000000000000"
+    try:
+        f = open('/proc/cpuinfo', 'r')
+        for line in f:
+            if line[0:6] == 'Serial':
+                cpuserial = line[10:26]
+        f.close()
+    except Exception:
+        cpuserial = "ERROR000000000"
 
-  return cpuserial
+    return cpuserial
 
 @cached(cache=TTLCache(maxsize=1, ttl=10))
 def get_status():
@@ -47,10 +44,10 @@ def get_status():
     (Cached method)
     """
     try:
-        temp = os.popen("vcgencmd measure_temp").readline().replace("temp=","")
-    except:
+        temp = os.popen("vcgencmd measure_temp").readline().replace("temp=", "")
+    except Exception:
         temp = "undefined"
-    
+
     uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
     internet_status = subprocess.check_output(["./utils/check_conn.sh"]).decode('utf-8').replace('\n', '')
     return {'internet_status': internet_status,
@@ -68,28 +65,28 @@ def get_info():
         with open('manifest.json', 'r') as f:
             metadata = json.load(f)
         backend_commit = metadata["backendCommit"][0:7]
-    except:
+    except Exception:
         backend_commit = "undefined"
 
     try:
         coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8').replace('\n', '')
-    except:
-        coderbot_version  = 'undefined'
+    except Exception:
+        coderbot_version = 'undefined'
     try:
         kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
-    except:
+    except Exception:
         kernel = 'undefined'
     try:
         update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
-    except:
+    except Exception:
         update_status = 'undefined'
 
-    serial = get_serial();
-    return {'backend_commit':backend_commit,
-            'coderbot_version':coderbot_version,
+    serial = get_serial()
+    return {'backend_commit': backend_commit,
+            'coderbot_version': coderbot_version,
             'update_status': update_status,
-            'kernel':kernel,
-            'serial':serial}
+            'kernel': kernel,
+            'serial': serial}
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -100,7 +97,7 @@ activities = TinyDB("data/activities.json")
 
 query = Query()
 
-## Robot control 
+## Robot control
 
 def stop():
     bot.stop()
@@ -117,36 +114,36 @@ def turn(data):
     return 200
 
 def exec(data):
-    prog = prog_engine.create(data["name"], data["code"])
-    return json.dumps(prog.execute())
+    program = prog_engine.create(data["name"], data["code"])
+    return json.dumps(program.execute())
 
 ## System
 
 def status():
-    status = get_status()
+    sts = get_status()
 
     return {
         "status": "ok",
-        "internetConnectivity": status["internet_status"],
-        "temp": status["temp"],
-        "uptime": status["uptime"],
+        "internetConnectivity": sts["internet_status"],
+        "temp": sts["temp"],
+        "uptime": sts["uptime"],
     }
 
 def info():
-    info = get_info()
+    inf = get_info()
     return {
         "model": 1,
-        "version": info["coderbot_version"],
-        "backend commit build": info["backend_commit"],
-        "kernel" : info["kernel"],
-        "update status": info["update_status"],
-        "serial": info["serial"]
+        "version": inf["coderbot_version"],
+        "backend commit build": inf["backend_commit"],
+        "kernel" : inf["kernel"],
+        "update status": inf["update_status"],
+        "serial": inf["serial"]
     }
 
 def restoreSettings():
     with open("data/defaults/config.json") as f:
         Config.write(json.loads(f.read()))
-    bot_config = Config.get()
+    Config.get()
     return "ok"
 
 def updateFromPackage():
@@ -171,7 +168,7 @@ def saveProgram(data, overwrite):
             return "defaultOverwrite"
         # Overwrite existing program with the same name
         else:
-            if (overwrite == "1"):
+            if overwrite == "1":
                 programs.update(data, query.name == data["name"])
                 return 200
             else:

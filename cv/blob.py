@@ -26,19 +26,19 @@ class Blob():
 
     @property
     def bottom(self):
-        return self._contour[self._contour[:,:,1].argmax()][0][1]
+        return self._contour[self._contour[:, :, 1].argmax()][0][1]
 
     @property
     def top(self):
-        return self._contour[self._contour[:,:,1].argmin()][0][1]
+        return self._contour[self._contour[:, :, 1].argmin()][0][1]
 
     @property
     def left(self):
-        return self._contour[self._contour[:,:,0].argmin()][0][0]
+        return self._contour[self._contour[:, :, 0].argmin()][0][0]
 
     @property
     def right(self):
-        return self._contour[self._contour[:,:,0].argmax()][0][0]
+        return self._contour[self._contour[:, :, 0].argmax()][0][0]
 
     @property
     def center(self):

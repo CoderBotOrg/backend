@@ -21,13 +21,12 @@ import time
 import os
 import math
 import json
+import logging
 from PIL import Image as PILImage
 try:
     from BytesIO import BytesIO
 except ImportError:
     from io import BytesIO
-from threading import Thread
-import logging
 
 from cv import camera, image, blob
 
@@ -41,10 +40,13 @@ PHOTO_METADATA_FILE = "./photos/metadata.json"
 PHOTO_PREFIX = "DSC"
 VIDEO_PREFIX = "VID"
 PHOTO_THUMB_SUFFIX = "_thumb"
-PHOTO_THUMB_SIZE = (240,180)
+PHOTO_THUMB_SIZE = (240, 180)
 VIDEO_ELAPSE_MAX = 900
 
 class Camera(object):
+
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
 
     _instance = None
     _img_template = image.Image.load("static/media/coderdojo-logo.png")
@@ -76,10 +78,10 @@ class Camera(object):
         self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
         self._photos = []
         self.load_photo_metadata()
-        if len(self._photos) == 0:
+        if not self._photos:
             self._photos = []
-            for dirname, dirnames, filenames,  in os.walk(PHOTO_PATH):
-                for filename in filenames:
+            for filenames in os.walk(PHOTO_PATH):
+                for filename in filenames[2]:
                     if (PHOTO_PREFIX in filename or VIDEO_PREFIX in filename) and PHOTO_THUMB_SUFFIX not in filename:
                         self._photos.append({'name': filename})
             self.save_photo_metadata()
@@ -91,8 +93,8 @@ class Camera(object):
                 self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)
                 self._cnn_classifier_default = self._cnn_classifiers[cnn_model]
                 logging.info("loaded: " + cnn_model + " " + str(self._cnn_classifier_default))
-            except:
-                logging.warning("model not found: " + cnn_model)
+            except Exception:
+                logging.warning("model not found: %s", cnn_model)
 
         self._camera.grab_start()
         self._image_cv = self.get_image()
@@ -105,8 +107,8 @@ class Camera(object):
     def get_image_cv_jpeg(self):
         return self._image_cv.to_jpeg()
 
-    def set_image_cv(self, image):
-        self._image_cv = image
+    def set_image_cv(self, an_image):
+        self._image_cv = an_image
 
     def get_image_jpeg(self):
         return self._camera.get_image_jpeg()
@@ -141,7 +143,7 @@ class Camera(object):
                 index = int(p["name"][len(PHOTO_PREFIX):-len(self._camera.PHOTO_FILE_EXT)])
                 if index > last_photo_index:
                     last_photo_index = index
-            except:
+            except Exception:
                 pass
         return last_photo_index + 1
 
@@ -171,7 +173,7 @@ class Camera(object):
 
         if video_name is None:
             video_index = self.get_next_photo_index()
-            filename = VIDEO_PREFIX + str(video_index) + self._camera.VIDEO_FILE_EXT;
+            filename = VIDEO_PREFIX + str(video_index) + self._camera.VIDEO_FILE_EXT
             filename_thumb = VIDEO_PREFIX + str(video_index) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT
         else:
             filename = VIDEO_PREFIX + video_name + self._camera.VIDEO_FILE_EXT
@@ -180,7 +182,7 @@ class Camera(object):
                 #remove previous file and reference in album
                 os.remove(PHOTO_PATH + "/" + filename)
                 self._photos.remove({"name":filename})
-            except:
+            except Exception:
                 pass
 
         oft = open(PHOTO_PATH +  "/" + filename_thumb, "wb")
@@ -205,10 +207,10 @@ class Camera(object):
         return open(PHOTO_PATH + "/" + filename, "rb")
 
     def get_photo_thumb_file(self, filename):
-        return open(PHOTO_PATH + "/" + filename[:-len(PHOTO_FILE_EXT)] + PHOTO_THUMB_SUFFIX + PHOTO_FILE_EXT, "rb")
+        return open(PHOTO_PATH + "/" + filename[:-len(self._camera.PHOTO_FILE_EXT)] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT, "rb")
 
     def delete_photo(self, filename):
-        logging.info("delete photo: " + filename)
+        logging.info("delete photo: %s", filename)
         os.remove(PHOTO_PATH + "/" + filename)
         os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
         for photo in self._photos:
@@ -220,10 +222,6 @@ class Camera(object):
         #self.join()
         self.video_stop()
         self._camera.grab_stop()
-
-    def calibrate(self):
-        img = self._camera.getImage()
-        self._background = img.hueHistogram()[-1]
 
     def get_average(self):
         avg = self.get_image().get_average()
@@ -245,12 +243,12 @@ class Camera(object):
                     int(self._camera.out_rgb_resolution[1]/1.5),
                     int(self._camera.out_rgb_resolution[1]/2.0)]
         coords = [-1, -1, -1]
-        for idx, slice in enumerate(slices):
-            blobs[idx] = slice.find_blobs(minsize=2000/(self._cv_image_factor * self._cv_image_factor), maxsize=16000/(self._cv_image_factor * self._cv_image_factor))
-            if len(blobs[idx]):
+        for idx, slc in enumerate(slices):
+            blobs[idx] = slc.find_blobs(minsize=2000/(self._cv_image_factor * self._cv_image_factor), maxsize=16000/(self._cv_image_factor * self._cv_image_factor))
+            if blobs[idx]:
                 coords[idx] = (blobs[idx][0].center[0] * 100) / self._camera.out_rgb_resolution[0]
-                blob = blobs[idx][0]
-                img.draw_rect(blob.left, y_offset[idx] + blob.top, blob.right, y_offset[idx] + blob.bottom, (0, 255, 0), 5) 
+                blb = blobs[idx][0]
+                img.draw_rect(blb.left, y_offset[idx] + blb.top, blb.right, y_offset[idx] + blb.bottom, (0, 255, 0), 5)
         self.set_image_cv(img)
         return coords
 
@@ -260,8 +258,8 @@ class Camera(object):
         img = self.get_image()
         signals = img.find_template(self._img_template)
 
-        logging.info("signal: " + str(time.time() - ts))
-        if len(signals):
+        logging.info("signal: %s", str(time.time() - ts))
+        if signals:
             angle = signals[0].angle
 
         return angle
@@ -271,8 +269,8 @@ class Camera(object):
         img = self.get_image()
         ts = time.time()
         faces = img.grayscale().find_faces()
-        logging.info("face.detect: " + str(time.time() - ts))
-        if len(faces):
+        logging.info("face.detect: %s", str(time.time() - ts))
+        if faces:
             # Get the largest face, face is a rectangle
             x, y, w, h = faces[0]
             center_x = x + (w/2)
@@ -287,7 +285,7 @@ class Camera(object):
     def path_ahead(self):
 
         image_size = self._camera.out_rgb_resolution
-        ts = time.time()
+        #ts = time.time()
         img = self.get_image()
 
         size_y = img._data.shape[0]
@@ -296,10 +294,10 @@ class Camera(object):
 
         blobs = img.binarize(threshold).dilate().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
         coordY = 60
-        if len(blobs):
+        if blobs:
             obstacle = blob.Blob.sort_distance((image_size[0]/2, image_size[1]), blobs)[0]
 
-            logging.info("obstacle:" + str(obstacle.bottom))
+            logging.info("obstacle: %s", str(obstacle.bottom))
             coords = img.transform([(obstacle.center[0], obstacle.bottom)], img.get_transform(img.size()[1]))
             x = coords[0][0]
             y = coords[0][1]
@@ -311,24 +309,22 @@ class Camera(object):
     def find_color(self, s_color):
         image_size = self._camera.out_rgb_resolution
         color = (int(s_color[1:3], 16), int(s_color[3:5], 16), int(s_color[5:7], 16))
-        code_data = None
-        ts = time.time()
+        #ts = time.time()
         img = self.get_image()
         bw = img.filter_color(color)
         objects = bw.find_blobs(minsize=self._color_object_size_min, maxsize=self._color_object_size_max)
-        logging.debug("objects: " + str(objects))
+        logging.debug("objects: %s", str(objects))
         dist = -1
         angle = 180
         fov_offset = 12 #cm
         fov_total_y = 68 #cm
         fov_total_x = 60 #cm
 
-        if objects and len(objects):
+        if objects and objects:
             obj = objects[-1]
-            bottom = obj.bottom
             logging.info("bottom: " + str(obj.center[0]) + " " + str(obj.bottom))
             coords = bw.transform([(obj.center[0], obj.bottom)], bw.get_transform(bw.size()[1]))
-            logging.info("coordinates: " + str(coords))
+            logging.info("coordinates: %s", str(coords))
             x = coords[0][0]
             y = coords[0][1]
             dist = math.sqrt(math.pow(fov_offset + (fov_total_y * (image_size[1] - y) / (image_size[1]/1.2)), 2) + (math.pow((x-(image_size[0]/2)) * fov_total_x / image_size[0], 2)))
@@ -342,11 +338,10 @@ class Camera(object):
         text = None
         color = (int(back_color[1:3], 16), int(back_color[3:5], 16), int(back_color[5:7], 16))
         img = self.get_image()
-        image = img.find_rect(color=color)
-        if image:
-            logging.info("image: " + str(image))
-            bin_image = image.binarize().invert()
-            #self.save_image(bin_image.to_jpeg())
+        rec_image = img.find_rect(color=color)
+        if rec_image:
+            logging.info("image: %s", str(rec_image))
+            bin_image = rec_image.binarize().invert()
             text = bin_image.find_text(accept)
         return text
 
@@ -371,8 +366,8 @@ class Camera(object):
         classes = None
         try:
             img = self.get_image()
-            classes = classifier.classify_image(img.mat(), top_results=top_results) 
-        except:
+            classes = classifier.classify_image(img.mat(), top_results=top_results)
+        except Exception:
             logging.warning("classifier not available")
             classes = [("None", 1.0)]
         return classes
@@ -381,5 +376,5 @@ class Camera(object):
         return self.cnn_classify(top_results=1)[0][0]
 
     def sleep(self, elapse):
-        logging.debug("sleep: " + str(elapse))
+        logging.debug("sleep: %s", str(elapse))
         time.sleep(elapse)

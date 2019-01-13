@@ -17,20 +17,18 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
 
+import logging
+import colorsys
 import numpy as np
 import cv2
-import colorsys
-import copy
+import cv2.aruco
 import cv.blob as blob
-import time
-import logging
-import cv2.aruco as aruco
 
 tesseract_whitelists = {
-  'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
-  'num': "1234567890 ",
-  'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-  'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
+    'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
+    'num': "1234567890 ",
+    'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
+    'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
 }
 
 try:
@@ -48,10 +46,10 @@ except:
 
 class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
-    r_dest   = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
+    r_dest = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
 
-    _aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
-    _aruco_parameters =  aruco.DetectorParameters_create()
+    _aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_ARUCO_ORIGINAL)
+    _aruco_parameters = cv2.aruco.DetectorParameters_create()
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
     _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
@@ -60,7 +58,7 @@ class Image():
         self._data = array
         img_size_y = self._data.shape[0]
         kernel_size = int(img_size_y / 40)
-        self._kernel = np.ones((kernel_size, kernel_size),np.uint8)
+        self._kernel = np.ones((kernel_size, kernel_size), np.uint8)
 
     def size(self):
         return self._data.shape
@@ -76,11 +74,11 @@ class Image():
         return Image(cv2.resize(self._data, (width, heigth)))
 
     def crop(self, x1, y1, x2, y2):
-        return Image(self._data[y1:y2,x1:x2])
+        return Image(self._data[y1:y2, x1:x2])
 
     def warp(self, r_from, r_dest):
         tx = cv2.getPerspectiveTransform(r_from, r_dest)
-        dest = cv2.warpPerspective(self._data, tx, (640,480))
+        dest = cv2.warpPerspective(self._data, tx, (640, 480))
         return Image(dest)
 
     @classmethod
@@ -145,7 +143,7 @@ class Image():
         data = cv2.bitwise_not(self._data)
         return Image(data)
 
-    def binarize(self, threshold = -1):
+    def binarize(self, threshold=-1):
         data = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
         if threshold < 0:
             data = cv2.adaptiveThreshold(data, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, max((self._kernel.shape[0]/2*2)+1, 3), 3)
@@ -156,9 +154,9 @@ class Image():
     def get_average(self):
         data = cv2.cvtColor(self._data, cv2.COLOR_BGR2HSV)
         logging.info("shape: " + str(data.shape))
-        h = np.average(data[:,:,0])
-        s = np.average(data[:,:,1])
-        v = np.average(data[:,:,2])
+        h = np.average(data[:, :, 0])
+        s = np.average(data[:, :, 1])
+        v = np.average(data[:, :, 2])
         return [h, s, v]
 
     def find_blobs(self, minsize=0, maxsize=10000000):
@@ -181,39 +179,39 @@ class Image():
         sift = cv2.SIFT()
 
         # find the keypoints and descriptors with SIFT
-        kp1, des1 = sift.detectAndCompute(img_template._data,None)
-        kp2, des2 = sift.detectAndCompute(self._data,None)
+        kp1, des1 = sift.detectAndCompute(img_template._data, None)
+        kp2, des2 = sift.detectAndCompute(self._data, None)
 
         FLANN_INDEX_KDTREE = 0
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        search_params = dict(checks = 50)
+        index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+        search_params = dict(checks=50)
 
         flann = cv2.FlannBasedMatcher(index_params, search_params)
 
-        matches = flann.knnMatch(des1,des2,k=2)
+        matches = flann.knnMatch(des1, des2, k=2)
 
         # store all the good matches as per Lowe's ratio test.
         good = []
         templates = []
-        for m,n in matches:
-            if m.distance < 0.7*n.distance:
+        for m, n in matches:
+            if m.distance < 0.7 * n.distance:
                 good.append(m)
 
         if len(good) > MIN_MATCH_COUNT:
-            src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
-            dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+            src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
+            dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
 
-            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
             matchesMask = mask.ravel().tolist()
 
-            h,w = img_template.shape
-            pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-            dst = cv2.perspectiveTransform(pts,M)
-            logging.info("found template: " + dst)
+            h, w = img_template.shape
+            pts = np.float32([[0, 0], [0, h-1], [w-1, h-1], [w-1, 0]]).reshape(-1, 1, 2)
+            dst = cv2.perspectiveTransform(pts, M)
+            logging.info("found template: %s", dst)
             templates[0] = dst
 
         else:
-            logging.info( "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
+            logging.info("Not enough matches are found - %d/%d", len(good), MIN_MATCH_COUNT)
             matchesMask = None
 
         return templates
@@ -243,7 +241,10 @@ class Image():
             logging.info("center: " + str(center) + " size: " + str(size) + " angle: " + str(angle))
             rect_image = Image(cv2.warpAffine(self._data, rot_matrix, (image_size[1], image_size[0])))
             border = 5
-            rect_image = rect_image.crop(int(max(0,border+center[0]-(size[0])/2)), int(max(0,border+center[1]-(size[1]+5)/2)), int(min(image_size[1],-border+center[0]+(size[0])/2)), int(min(image_size[0],-border+center[1]+(size[1]-5)/2)))
+            rect_image = rect_image.crop(int(max(0, border+center[0]-(size[0])/2)),
+                                         int(max(0, border+center[1]-(size[1]+5)/2)),
+                                         int(min(image_size[1], -border+center[0]+(size[0])/2)),
+                                         int(min(image_size[0], -border+center[1]+(size[1]-5)/2)))
         return rect_image
 
     def find_text(self, accept):
@@ -251,7 +252,7 @@ class Image():
         t = time.time()
         ocr.setWhiteList(wlist)
         text = ocr.run(self._data, 60)
-        logging.info("time: " + str(time.time() - t)  + " text: " +str(text))
+        logging.info("time: " + str(time.time() - t) + " text: " +str(text))
         return text
 
     def find_qr_code(self):
@@ -267,7 +268,7 @@ class Image():
 
     def find_ar_code(self):
         gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
-        corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, self._aruco_dict, parameters=self._aruco_parameters)
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, self._aruco_dict, parameters=self._aruco_parameters)
         codes = []
         positions = []
         if ids is not None:
@@ -280,10 +281,10 @@ class Image():
         return {"codes": codes, "positions": positions}
 
     def draw_blob(self, blob):
-        cv2.drawContours(self._data, blob.contour(), -1, (0,255,0))
- 
+        cv2.drawContours(self._data, blob.contour(), -1, (0, 255, 0))
+
     def draw_rect(self, x1, y1, x2, y2, color, thickness):
-        cv2.rectangle(self._data, (x1,y1), (x2,y2), color, thickness)
+        cv2.rectangle(self._data, (x1, y1), (x2, y2), color, thickness)
 
     def to_jpeg(self):
         ret, jpeg_array = cv2.imencode('.jpeg', self._data)
