@@ -241,6 +241,10 @@ class CoderBot(object):
         self._cb[gpio] = callback
         self._cb_last_tick[gpio] = 0
 
+    def sleep(self, elapse):
+        logging.debug("sleep: %s", str(elapse))
+        time.sleep(elapse)
+
     def _cb_button(self, gpio, level, tick):
         cb = self._cb.get(gpio)
         if cb:

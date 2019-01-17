@@ -182,6 +182,7 @@ class Program:
                 logging.error("error polishing event system")
             try:
                 get_cam().video_stop() #if video is running, stop it
+                get_cam().set_text("") #clear overlay text (if any)
                 get_motion().stop()
             except Exception:
                 logging.error("Camera not available")

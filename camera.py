@@ -375,6 +375,3 @@ class Camera(object):
     def find_class(self):
         return self.cnn_classify(top_results=1)[0][0]
 
-    def sleep(self, elapse):
-        logging.debug("sleep: %s", str(elapse))
-        time.sleep(elapse)
