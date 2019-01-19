@@ -31,6 +31,8 @@ class CNNClassifier(object):
     def __init__(self, model_file, label_file, input_layer="input", output_layer="final_result", input_height=128, input_width=128, input_mean=127.5, input_std=127.5):
         self._graph = self.load_graph(model_file)
         self._labels = self.load_labels(label_file)
+        self.input_height=input_height
+        self.input_width=input_width
         input_name = "import/" + input_layer
         output_name = "import/" + output_layer
         self._input_operation = self._graph.get_operation_by_name(input_name)
@@ -78,8 +80,8 @@ class CNNClassifier(object):
             image_reader = tf.image.decode_jpeg(file_reader, channels=3, name='jpeg_reader')
 
         float_caster = tf.cast(image_reader, tf.float32)
-        dims_expander = tf.expand_dims(float_caster, 0)
-        resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
+        dims_expander = tf.expand_dims(float_caster, 0);
+        resized = tf.image.resize_bilinear(dims_expander, [self.input_height, self.input_width])
         normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
         sess = tf.Session()
 
@@ -107,7 +109,6 @@ class CNNClassifier(object):
             t = self.read_tensor_from_image_file(file_name=image_file_or_mat)
         else:
             t = self.read_tensor_from_image_mat(image_file_or_mat)
-
 
         results = self._session.run(self._output_operation.outputs[0],
                                     {self._input_operation.outputs[0]: t})

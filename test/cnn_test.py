@@ -37,14 +37,12 @@ class CNNTest(unittest.TestCase):
             time.sleep(1)
         self.assertTrue(cnn.get_models().get(name).get("status") == 1.0)
 
-        name="test_model_1"
         cnn = cnn_manager.CNNManager.get_instance()
         mod = cnn.load_model(name)
         result = mod.classify_image("photos/DSC86.jpg")
         print("result: " + str(result))
-        self.assertTrue(result["kiwi"] == 1.0)
+        self.assertTrue(result[0][0] == "kiwi" and result[0][1] == 1.0)
 
-        name="test_model_1"
         cnn = cnn_manager.CNNManager.get_instance()
         cnn.delete_model(name)
         self.assertTrue(cnn.get_models().get(name) is None)
@@ -72,7 +70,7 @@ class CNNTest(unittest.TestCase):
         mod = cnn.load_model(name)
         result = mod.classify_image("photos/DSC86.jpg")
         print("result: " + str(result))
-        self.assertTrue(result["kiwi"] >= 0.9)
+        self.assertTrue(result[0][0] == "kiwi" and result[0][1] > 0.9)
 
         cnn = cnn_manager.CNNManager.get_instance()
         cnn.delete_model(name)
