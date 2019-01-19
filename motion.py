@@ -17,32 +17,32 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
 
-import cv2
-import math
-import numpy as np
+from time import time
 import logging
-from time import clock, time, sleep
+import numpy as np
+import cv2
 from cv import image
 
 from coderbot import CoderBot
 from camera import Camera
-from program import get_prog_eng
 from config import Config
 
-lk_params = dict( winSize  = (15, 15),
-                  maxLevel = 2,
-                  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+lk_params = dict(winSize=(15, 15),
+                 maxLevel=2,
+                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
-feature_params = dict( maxCorners = 500,
-                       qualityLevel = 0.3,
-                       minDistance = 7,
-                       blockSize = 7 )
+feature_params = dict(maxCorners=500,
+                      qualityLevel=0.3,
+                      minDistance=7,
+                      blockSize=7)
 
 
 PI_CAM_FOV_H_DEG = 53.0
 PI_CAM_FOV_V_CM = 100.0
 
 class Motion:
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self):
         self.bot = CoderBot.get_instance()
         self.cam = Camera.get_instance()
@@ -60,7 +60,10 @@ class Motion:
         self.delta_angle = 0.0
         self.target_angle = 0.0
         cfg = Config.get()
-        self.power_angles = [[15, (int(cfg.get("move_power_angle_1")), -1)], [4, (int(cfg.get("move_power_angle_2")), 0.05)], [1, (int(cfg.get("move_power_angle_3")), 0.02)], [0, (0, 0)]]
+        self.power_angles = [[15, (int(cfg.get("move_power_angle_1")), -1)],
+                             [4, (int(cfg.get("move_power_angle_2")), 0.05)],
+                             [1, (int(cfg.get("move_power_angle_3")), 0.02)],
+                             [0, (0, 0)]]
         self.image_width = 640 / int(cfg.get("cv_image_factor"))
         self.image_heigth = 480 / int(cfg.get("cv_image_factor"))
         self.transform = image.Image.get_transform(self.image_width)
@@ -99,10 +102,10 @@ class Motion:
             if len(self.tracks) < 2 or self.frame_idx % self.detect_interval == 0:
                 self.find_keypoints(self.frame_gray, self.tracks)
 
-            if len(self.tracks) > 0 and self.prev_gray is not None:
+            if self.tracks and self.prev_gray is not None:
                 self.track_keypoints(self.prev_gray, self.frame_gray, self.tracks)
 
-            if len(self.tracks) > 0:
+            if self.tracks:
                 delta_angle, delta_dist = self.calc_motion()
                 self.running = self.running and self.bot_move(self.target_dist, delta_dist, delta_angle)
 
@@ -119,10 +122,10 @@ class Motion:
             if len(self.tracks) < 2 or self.frame_idx % self.detect_interval == 0:
                 self.find_keypoints(self.frame_gray, self.tracks)
 
-            if len(self.tracks) > 0 and self.prev_gray is not None:
+            if self.tracks and self.prev_gray is not None:
                 self.track_keypoints(self.prev_gray, self.frame_gray, self.tracks)
 
-            if len(self.tracks) > 0:
+            if self.tracks:
                 delta_angle, delta_dist = self.calc_motion()
                 self.running = self.running and self.bot_turn(self.target_angle, delta_angle)
 
@@ -138,7 +141,7 @@ class Motion:
         mask[:] = 255
         #for x, y in [np.int32(tr[-1]) for tr in tracks]:
         #    cv2.circle(mask, (x, y), 5, 0, -1)
-        p = cv2.goodFeaturesToTrack(image_gray._data, mask = mask, **feature_params)
+        p = cv2.goodFeaturesToTrack(image_gray._data, mask=mask, **feature_params)
         if p is not None:
             for x, y in np.float32(p).reshape(-1, 2):
                 tracks.append([(x, y)])
@@ -146,7 +149,7 @@ class Motion:
 
     def track_keypoints(self, prev_image, cur_image, tracks):
         #print "track_keypoints"
-        ts = time()
+        #ts = time()
         img0, img1 = prev_image._data, cur_image._data
         p0 = np.float32([tr[-1] for tr in tracks]).reshape(-1, 1, 2)
         p1, st, err = cv2.calcOpticalFlowPyrLK(img0, img1, p0, None, **lk_params)
@@ -167,8 +170,8 @@ class Motion:
         #print "initial tp: ", len(self.tracks), " current tp: ", len(new_tracks)
         #print len(new_tracks), len(tracks)
         tracks[:] = new_tracks[:]
-        if len(tracks) == 0:
-            logging.warn("lost ALL tp!")
+        if tracks is False:
+            logging.warning("lost ALL tp!")
             self.bot.stop()
             #exit(0)
         #cv2.polylines(self.vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
@@ -190,7 +193,7 @@ class Motion:
         vectors_t = vectors_t[:min(len(vectors_t), 20)] #max 10 keypoints
 
         #avg_delta_x_t = 0.0
-        if len(vectors_t) > 0:
+        if vectors_t:
             vectors_t = image.Image.transform(vectors_t, self.transform)
             for v in vectors_t.reshape(-1, 2, 2):
                 avg_delta_y += (v[1][1] - v[0][1])
@@ -204,18 +207,20 @@ class Motion:
             avg_delta_x = (avg_delta_x / count)
             avg_delta_y = (avg_delta_y / (vectors_t.shape[0] / 2))
 
-            self.delta_angle -= (avg_delta_x * PI_CAM_FOV_H_DEG ) / self.image_width
+            self.delta_angle -= (avg_delta_x * PI_CAM_FOV_H_DEG) / self.image_width
             self.delta_dist += (avg_delta_y * PI_CAM_FOV_V_CM) / self.image_heigth
             #print "count: ", count, "delta_a: ", self.delta_angle, " avg_delta_x: ", avg_delta_x, " delta_y: ", self.delta_dist, " avg_delta_y: ", avg_delta_y
 
         #cv2.line(self.vis, (int(80+deltaAngle),20), (80,20), (0, 0, 255))
-        #cv2.putText(self.vis, "delta: " + str(int((self.deltaAngle*53.0)/160.0)) + " avg_delta: " + str(int(((avg_delta_x*53.0)/160.0))), (0,20), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255))
+        #cv2.putText(self.vis, "delta: " + str(int((self.deltaAngle*53.0)/160.0)) + " avg_delta: " + str(int(((avg_delta_x*53.0)/160.0))),
+                     #(0,20), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 255))
+
         return self.delta_angle, self.delta_dist
 
     def bot_turn(self, target_angle, delta_angle):
         run = True
         sign = (target_angle - delta_angle) / abs(target_angle - delta_angle)
-        logging.info( "abs delta: " + str(abs(target_angle - delta_angle)) + " sign delta: " + str(sign) )
+        logging.info("abs delta: %s sign delta: %s", str(abs(target_angle - delta_angle)), str(sign))
         for p_a in self.power_angles:
             if abs(target_angle - delta_angle) > p_a[0] and self.running:
                 #print "pow: ", p_a[1][0], " duration: ", p_a[1][1]
@@ -228,9 +233,9 @@ class Motion:
     def bot_move(self, target_dist, delta_dist, delta_angle):
         base_power = 100 * (target_dist/abs(target_dist))
         self.delta_power += (delta_angle * 0.01)
-        logging.info("base power: " + str(base_power) + " delta power: " + str(self.delta_power) + " delta_dist: " + str(delta_dist) + " target_dist: " + str(target_dist))
+        logging.info("base power: %s delta power: %s delta_dist: %s target_dist: %s", str(base_power), str(self.delta_power), str(delta_dist), str(target_dist))
         if abs(delta_dist) < abs(target_dist):
-            self.bot.motor_control(min(max(base_power-self.delta_power,-100),100), min(max(base_power+self.delta_power,-100),100), -1)
+            self.bot.motor_control(min(max(base_power - self.delta_power, -100), 100), min(max(base_power + self.delta_power, -100), 100), -1)
         else:
             self.bot.stop()
         return abs(delta_dist) < abs(target_dist)

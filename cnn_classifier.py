@@ -20,14 +20,8 @@
 This module implements the CNNClassifier class, which is the interface for
 using an existing and trained CNN model.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-import time
 import logging
 
-import operator
 import numpy as np
 import tensorflow as tf
 
@@ -39,17 +33,17 @@ class CNNClassifier(object):
         self._labels = self.load_labels(label_file)
         input_name = "import/" + input_layer
         output_name = "import/" + output_layer
-        self._input_operation = self._graph.get_operation_by_name(input_name);
-        self._output_operation = self._graph.get_operation_by_name(output_name);
+        self._input_operation = self._graph.get_operation_by_name(input_name)
+        self._output_operation = self._graph.get_operation_by_name(output_name)
         self._session = tf.Session(graph=self._graph)
         self._graph_norm = tf.Graph()
         with self._graph_norm.as_default():
             image_mat = tf.placeholder(tf.float32, None, name="image_rgb_in")
             float_caster = tf.cast(image_mat, tf.float32)
-            dims_expander = tf.expand_dims(float_caster, 0);
+            dims_expander = tf.expand_dims(float_caster, 0)
             resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
             normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std], name="image_norm_out")
-            self._input_operation_norm =  self._graph_norm.get_operation_by_name("image_rgb_in")
+            self._input_operation_norm = self._graph_norm.get_operation_by_name("image_rgb_in")
             self._output_operation_norm = self._graph_norm.get_operation_by_name("image_norm_out")
         self._sess_norm = tf.Session(graph=self._graph_norm)
 
@@ -75,19 +69,16 @@ class CNNClassifier(object):
         file_reader = tf.read_file(file_name, input_name)
 
         if file_name.endswith(".png"):
-            image_reader = tf.image.decode_png(file_reader, channels = 3,
-                                       name='png_reader')
+            image_reader = tf.image.decode_png(file_reader, channels=3, name='png_reader')
         elif file_name.endswith(".gif"):
-            image_reader = tf.squeeze(tf.image.decode_gif(file_reader,
-                                                  name='gif_reader'))
+            image_reader = tf.squeeze(tf.image.decode_gif(file_reader, name='gif_reader'))
         elif file_name.endswith(".bmp"):
             image_reader = tf.image.decode_bmp(file_reader, name='bmp_reader')
         else:
-            image_reader = tf.image.decode_jpeg(file_reader, channels = 3,
-                                        name='jpeg_reader')
+            image_reader = tf.image.decode_jpeg(file_reader, channels=3, name='jpeg_reader')
 
         float_caster = tf.cast(image_reader, tf.float32)
-        dims_expander = tf.expand_dims(float_caster, 0);
+        dims_expander = tf.expand_dims(float_caster, 0)
         resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
         normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
         sess = tf.Session()
@@ -111,20 +102,15 @@ class CNNClassifier(object):
     def classify_image(self,
                        image_file_or_mat,
                        top_results=3):
-        s_t = time.time()
         t = None
-        if type(image_file_or_mat) == str:
+        if isinstance(image_file_or_mat, str):
             t = self.read_tensor_from_image_file(file_name=image_file_or_mat)
         else:
             t = self.read_tensor_from_image_mat(image_file_or_mat)
 
-        #logging.info( "time.norm: " + str(time.time() - s_t))
-        s_t = time.time()
 
         results = self._session.run(self._output_operation.outputs[0],
-                                        {self._input_operation.outputs[0]: t})
-
-        #logging.info( "time.cls: " + str(time.time() - s_t))
+                                    {self._input_operation.outputs[0]: t})
 
         top_results = min(top_results, len(self._labels))
         results = np.squeeze(results)
