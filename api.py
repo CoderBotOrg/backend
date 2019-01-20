@@ -92,10 +92,7 @@ prog = None
 prog_engine = ProgramEngine.get_instance()
 
 # Programs and Activities databases
-programs = TinyDB("data/programs.json")
 activities = TinyDB("data/activities.json")
-
-query = Query()
 
 ## Robot control
 
@@ -104,12 +101,10 @@ def stop():
     return 200
 
 def move(data):
-    print(data)
     bot.move(speed=data["speed"], elapse=data["elapse"])
     return 200
 
 def turn(data):
-    print(data)
     bot.turn(speed=data["speed"], elapse=data["elapse"])
     return 200
 
@@ -158,31 +153,24 @@ def updateFromPackage():
 ## Programs
 
 def saveProgram(data, overwrite):
-    print(overwrite)
-    if programs.search(query.name == data["name"]) == []:
-        programs.insert(data)
-        return 200
-    else:
-        # Disallow overwriting a default program
-        if programs.search((query.name == data["name"]) & (query.default == "True")):
-            return "defaultOverwrite"
-        # Overwrite existing program with the same name
-        else:
-            if overwrite == "1":
-                programs.update(data, query.name == data["name"])
-                return 200
-            else:
-                return "askOverwrite"
+    existing_program = prog_engine.load(data["name"])
+    if existing_program and not overwrite:
+        return "askOverwrite"
+    elif existing_program and existing_program["default"] == True:
+        return "defaultOverwrite"
+    program = Program(name=data["name"], code=data["code"], dom_code=data["dom_code"])
+    prog_engine.save(program)
+    return 200
 
 def loadProgram(name):
-    return programs.search(query.name == name)[0], 200
+    existing_program = prog_engine.load(name)
+    return existing_program.as_dict(), 200
 
 def deleteProgram(data):
-    programs.remove(query.name == data["name"])
-
+    prog_engine.delete(data["name"])
 
 def listPrograms():
-    return programs.all()
+    return prog_engine.prog_list()
 
 
 ## Activities
