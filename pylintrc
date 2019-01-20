@@ -60,7 +60,7 @@ disable=
     missing-docstring,
     protected-access,
     too-few-public-methods,
-
+    
 
 [REPORTS]
 
@@ -138,7 +138,7 @@ callbacks=cb_,_cb
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=130
+max-line-length=180
 
 # Regexp for a line that is allowed to be longer than the limit.
 ignore-long-lines=^\s*(# )?<?https?://\S+>?$

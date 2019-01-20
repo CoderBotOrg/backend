@@ -10,6 +10,18 @@ import subprocess
 import picamera
 import connexion
 
+from flask import (render_template,
+                   request,
+                   send_file,
+                   Response,
+                   jsonify,
+                   send_from_directory,
+                   redirect)
+
+from flask_babel import Babel
+from flask_cors import CORS
+from werkzeug.datastructures import Headers
+
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
 from motion import Motion
@@ -18,19 +30,6 @@ from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
-from conversation import Conversation
-
-from flask import (Flask,
-                    render_template,
-                    request,
-                    send_file,
-                    Response,
-                    jsonify,
-                    send_from_directory,
-                    redirect)
-from flask_babel import Babel
-from flask_cors import CORS
-from werkzeug.datastructures import Headers
 
 # Logging configuration
 logger = logging.getLogger()
@@ -43,15 +42,6 @@ fh.setFormatter(formatter)
 #logger.addHandler(sh)
 logger.addHandler(fh)
 
-# Initialisation
-global bot
-bot = None
-cam = None
-motion = None
-audio = None
-cnn = None
-event = None
-conv = None
 
 ## (Connexion) Flask app configuration
 
@@ -99,8 +89,8 @@ def serve_legacy():
                            locale=get_locale(),
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
-                           cam=cam != None,
-                           cnn_model_names = json.dumps([[name] for name in cnn.get_models().keys()]))
+                           cam=Camera.get_instance() != None,
+                           cnn_model_names=json.dumps([[name] for name in CNNManager.get_instance().get_models().keys()]))
 
 @babel.localeselector
 def get_locale():
@@ -111,10 +101,8 @@ def get_locale():
         loc = 'en'
     return loc
 
-"""
-Workaround: serve the 'static' subfolders with 'send_from_directory'
-(connexion wrapper ignores `static_url_path`)
-"""
+# Workaround: serve the 'static' subfolders with 'send_from_directory'
+# (connexion wrapper ignores `static_url_path`)
 
 @app.route('/css/<path:filename>')
 def render_static_assets0(filename):
@@ -138,7 +126,7 @@ def render_static_assets4(filename):
 
 def updateDict(oldDict, updatedValues):
     """
-    Update the keys of oldDict appearing in updatedValues with the values in 
+    Update the keys of oldDict appearing in updatedValues with the values in
     updatedValues
     """
     result = oldDict
@@ -161,7 +149,7 @@ def returnConfig():
     Expose configuration as JSON
     """
     app.bot_config = Config.get()
-    return(jsonify(app.bot_config)) 
+    return jsonify(app.bot_config)
 
 @app.route("/wifi", methods=["POST"])
 def handle_wifi():
@@ -180,18 +168,22 @@ def handle_wifi():
     os.system("sudo reboot")
     if mode == "ap":
         return "http://coder.bot"
-    else:
-        return "http://coderbot.local"
+    return "http://coderbot.local"
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
     """
     Execute a bot command
     """
+    bot = CoderBot.get_instance()
+    cam = Camera.get_instance()
+    motion = Motion.get_instance()
+    audio = Audio.get_instance()
+
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
-    print('/bot',json.dumps(request.args))
+    print('/bot', json.dumps(request.args))
     if cmd == "move":
         bot.move(speed=int(param1), elapse=float(param2))
     elif cmd == "turn":
@@ -203,31 +195,31 @@ def handle_bot():
     elif cmd == "stop":
         bot.stop()
         try:
-          motion.stop()
-        except:
-          logging.warning("Camera not present")
-          pass
+            motion.stop()
+        except Exception:
+            logging.warning("Camera not present")
+
     elif cmd == "take_photo":
         try:
             cam.photo_take()
             audio.say(app.bot_config.get("sound_shutter"))
-        except:
+        except Exception:
             logging.warning("Camera not present")
-            pass
+
     elif cmd == "video_rec":
         try:
-          cam.video_rec()
-          audio.say(app.bot_config.get("sound_shutter"))
-        except:
-          logging.warning("Camera not present")
-          pass
+            cam.video_rec()
+            audio.say(app.bot_config.get("sound_shutter"))
+        except Exception:
+            logging.warning("Camera not present")
+
     elif cmd == "video_stop":
         try:
-          cam.video_stop()
-          audio.say(app.bot_config.get("sound_shutter"))
-        except:
-          logging.warning("Camera not present")
-          pass
+            cam.video_stop()
+            audio.say(app.bot_config.get("sound_shutter"))
+        except Exception:
+            logging.warning("Camera not present")
+
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
         audio.say(param1, get_locale())
@@ -236,6 +228,7 @@ def handle_bot():
         logging.info("shutting down")
         audio.say(app.bot_config.get("sound_stop"))
         bot.halt()
+
     elif cmd == "restart":
         logging.info("restarting bot")
         bot.restart()
@@ -261,12 +254,13 @@ def video_stream(a_cam):
 @app.route("/video/stream")
 def handle_video_stream():
     try:
+        cam = Camera.get_instance()
         h = Headers()
         h.add('Age', 0)
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except:
+    except Exception:
         pass
 
 @app.route("/photos", methods=["GET"])
@@ -274,29 +268,33 @@ def handle_photos():
     """
     Expose the list of taken photos
     """
+    cam = Camera.get_instance()
     logging.info("photos")
     return json.dumps(cam.get_photo_list())
 
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo_get(filename):
-    logging.info("media filename: " + filename)
+    cam = Camera.get_instance()
+    logging.info("media filename: %s", filename)
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
         media_file = cam.get_photo_file(filename)
         return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
     except picamera.exc.PiCameraError as e:
-        logging.error("Error: " + str(e))
+        logging.error("Error: %s", str(e))
 
 @app.route("/photos/<filename>", methods=["PUT"])
 def handle_photo_put(filename):
+    cam = Camera.get_instance()
     logging.info("photo update")
     data = request.get_data(as_text=True)
     data = json.loads(data)
-    cam.update_photo({"name": filename, "tag":data["tag"]})
+    cam.update_photo({"name": filename, "tag": data["tag"]})
     return jsonify({"res":"ok"})
 
 @app.route("/photos/<filename>", methods=["DELETE"])
 def handle_photo_cmd(filename):
+    cam = Camera.get_instance()
     logging.debug("photo delete")
     cam.delete_photo(filename)
     return "ok"
@@ -377,11 +375,14 @@ def handle_program_status():
 
 @app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_list")
     return json.dumps(cnn.get_models())
 
 @app.route("/cnnmodels", methods=["POST"])
 def handle_cnn_models_new():
+    cam = Camera.get_instance()
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_new")
     data = json.loads(request.get_data(as_text=True))
     cnn.train_new_model(model_name=data["model_name"],
@@ -395,6 +396,7 @@ def handle_cnn_models_new():
 
 @app.route("/cnnmodels/<model_name>", methods=["GET"])
 def handle_cnn_models_status(model_name):
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_status")
     model_status = cnn.get_models().get(model_name)
 
@@ -402,6 +404,7 @@ def handle_cnn_models_status(model_name):
 
 @app.route("/cnnmodels/<model_name>", methods=["DELETE"])
 def handle_cnn_models_delete(model_name):
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_delete")
     model_status = cnn.delete_model(model_name=model_name)
 
@@ -437,13 +440,8 @@ def remove_doreset_file():
 
 # Finally, get the server running
 def run_server():
-    global bot
-    global cam
-    global motion
-    global audio
-    global cnn
-    global conv
-    global event
+    bot = None
+    cam = None
     try:
         try:
             app.bot_config = Config.read()
@@ -453,15 +451,14 @@ def run_server():
             audio.say(app.bot_config.get("sound_start"))
             try:
                 cam = Camera.get_instance()
-                motion = Motion.get_instance()
+                Motion.get_instance()
             except picamera.exc.PiCameraError:
                 logging.error("Camera not present")
 
-            cnn = CNNManager.get_instance()
-            event = EventManager.get_instance("coderbot")
-            conv = Conversation.get_instance()
+            CNNManager.get_instance()
+            EventManager.get_instance("coderbot")
 
-            if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
+            if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
                 app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
                 app.prog.execute()
         except ValueError as e:

@@ -18,7 +18,6 @@
 ############################################################################
 
 import os
-import sys
 import threading
 import json
 import logging
@@ -30,7 +29,6 @@ import motion
 import config
 import audio
 import event
-import conversation
 
 from tinydb import TinyDB, Query
 from tinydb.operations import delete
@@ -58,10 +56,9 @@ def get_prog_eng():
 def get_event():
     return event.EventManager.get_instance()
 
-def get_conv():
-    return conversation.Conversation.get_instance()
-
 class ProgramEngine:
+
+    # pylint: disable=exec-used
 
     _instance = None
 
@@ -70,7 +67,7 @@ class ProgramEngine:
         self._repository = {}
         self._log = ""
         self._programs = TinyDB("data/programs.json")
-        for dirname, dirnames, filenames, in os.walk(PROGRAM_PATH):
+        for dirname, filenames, in os.walk(PROGRAM_PATH):
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
@@ -121,7 +118,6 @@ class ProgramEngine:
     def get_log(self):
         return self._log
 
-
 class Program:
     _running = False
 
@@ -146,9 +142,9 @@ class Program:
             self._thread = threading.Thread(target=self.run)
             self._thread.start()
         except RuntimeError as re:
-            logging.error("RuntimeError:" + str(re))
+            logging.error("RuntimeError: %s", str(re))
         except Exception as e:
-            logging.error("Exception:" + str(e))
+            logging.error("Exception: %s", str(e))
 
         return "ok"
 
@@ -158,7 +154,7 @@ class Program:
             self._thread.join()
 
     def check_end(self):
-        if self._running == False:
+        if self._running is False:
             raise RuntimeError('end requested')
         return None
 
@@ -167,14 +163,12 @@ class Program:
 
     def run(self):
         try:
-            bot = coderbot.CoderBot.get_instance()
             program = self
             try:
-                cam = camera.Camera.get_instance()
                 if config.Config.get().get("prog_video_rec") == "true":
                     get_cam().video_rec(program.name)
                     logging.debug("starting video")
-            except:
+            except Exception:
                 logging.error("Camera not available")
 
             imports = "import json\n"
@@ -182,22 +176,23 @@ class Program:
             env = globals()
             exec(code, env, env)
         except RuntimeError as re:
-            logging.info("quit: " + str(re))
+            logging.info("quit: %s", str(re))
             get_prog_eng().log(str(re))
         except Exception as e:
-            logging.info("quit: " + str(e))
+            logging.info("quit: %s", str(e))
             get_prog_eng().log(str(e))
         finally:
             try:
                 get_event().wait_event_generators()
                 get_event().unregister_listeners()
                 get_event().unregister_publishers()
-            except:
+            except Exception:
                 logging.error("error polishing event system")
             try:
                 get_cam().video_stop() #if video is running, stop it
+                get_cam().set_text("") #clear overlay text (if any)
                 get_motion().stop()
-            except:
+            except Exception:
                 logging.error("Camera not available")
             self._running = False
 
@@ -208,5 +203,5 @@ class Program:
                 'code': self._code}
 
     @classmethod
-    def from_json(cls, map):
-        return Program(name=map['name'], dom_code=map['dom_code'], code=map['code'])
+    def from_json(cls, amap):
+        return Program(name=amap['name'], dom_code=amap['dom_code'], code=amap['code'])

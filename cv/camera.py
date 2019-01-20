@@ -20,14 +20,12 @@
 The Camera module implements the Camera class, which is the abstraction
 from the lower lever PiCamera (RPI specific)
 """
-import picamera
 import io
 import os
-import time
-import copy
 import logging
-import numpy as np
 from threading import Condition
+import numpy as np
+import picamera
 
 class Camera(object):
 
