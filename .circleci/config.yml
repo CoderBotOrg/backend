@@ -42,7 +42,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python -m unittest test/*.py > test/test-report.txt
+            PYTHONPATH=./test/stub python -m unittest test/*.py > test/test-report.txt
 
       - store_artifacts:
           path: test/*.txt
