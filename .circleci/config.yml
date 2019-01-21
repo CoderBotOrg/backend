@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/python:3.5
+      - image: coderbot/python-gpac:3.5
       
     working_directory: ~/repo
 
@@ -27,7 +27,6 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements_stub.txt
-            apt-get install -y gpac
 
       - save_cache:
           paths:
