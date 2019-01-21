@@ -38,9 +38,11 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            PYTHONPATH=./stub python -m unittest test/*.py 
+            PYTHONPATH=./stub python3 -m unittest test/*.py 
 
       - store_artifacts:
-          path: .
-          destination: test-reports
-          
+          path: test-reports/
+          destination: tr1
+
+      - store_test_results:
+          path: test-reports/ 
