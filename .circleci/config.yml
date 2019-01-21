@@ -27,6 +27,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements_stub.txt
+            apt-get install -y gpac
 
       - save_cache:
           paths:
@@ -42,7 +43,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            PYTHONPATH=./test/stub python -m unittest test/*.py > test/test-report.txt
+            PYTHONPATH=./stub python -m unittest test/*.py > test/test-report.txt
 
       - store_artifacts:
           path: test/*.txt
