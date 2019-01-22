@@ -1,14 +1,14 @@
 import unittest
 import os
 import test.pyaudio_mock
-
+import pyaudio
 import audio
 
 FILENAME = "test.wav"
 
 class AudioTest(unittest.TestCase):
     def setUp(self):
-        piaudio.PyAudio = test.pyaudio_mock.PyAudioMock
+        pyaudio.PyAudio = test.pyaudio_mock.PyAudioMock
         self.audio = audio.Audio.get_instance()
    
     def tearDown(self):
