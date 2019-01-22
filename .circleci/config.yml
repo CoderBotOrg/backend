@@ -40,7 +40,7 @@ jobs:
             . venv/bin/activate
             export PYTHONPATH=./stub
             mkdir test-reports
-            python3 -m unittest test/coderbot_test.py > test-reports/test_report.txt
+            python3 -m unittest test/*_test.py > test-reports/test_report.txt 2>&1 
 
       - store_artifacts:
           path: test-reports/
