@@ -72,11 +72,11 @@ def serve_vue_app(filename):
     """
     return send_from_directory('dist', filename)
 
-@app.route('/docs/<path:filename')
+@app.route('/docs/<path:filename>')
 def serve_docs_app(filename):
     """
     Serve (a build of) the documentation
-    'cb_docs' is the output of `npx vuepress build pages/` 
+    'cb_docs' is the output of `npx vuepress build pages/`
     from the 'docs' repository
     """
     return send_from_directory('cb_docs', filename)

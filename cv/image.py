@@ -39,8 +39,7 @@ except:
 MIN_MATCH_COUNT = 10
 
 try:
-    import zbar
-    code_scanner = zbar.ImageScanner()
+    from pyzbar.pyzbar import decode
 except:
     logging.info("zbar not availabe")
 
@@ -259,8 +258,8 @@ class Image():
         text_found = None
         img_size = self._data.shape
         gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
-        image_code = zbar.Image(img_size[1], img_size[0], "Y800", gray.tostring())
-        code_num = code_scanner.scan(image_code)
+        image_code = decode(gray)
+        logging.warning(str(image_code))
         for symbol in image_code:
             text_found = symbol.data
             break

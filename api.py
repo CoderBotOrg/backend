@@ -11,7 +11,7 @@ from tinydb import TinyDB, Query
 from tinydb.operations import delete
 from cachetools import cached, TTLCache
 from coderbot import CoderBot
-from program import ProgramEngine
+from program import ProgramEngine, Program
 from config import Config
 
 bot_config = Config.get()
@@ -156,7 +156,7 @@ def saveProgram(data, overwrite):
     existing_program = prog_engine.load(data["name"])
     if existing_program and not overwrite:
         return "askOverwrite"
-    elif existing_program and existing_program["default"] == True:
+    elif existing_program and existing_program.is_default() == True:
         return "defaultOverwrite"
     program = Program(name=data["name"], code=data["code"], dom_code=data["dom_code"])
     prog_engine.save(program)

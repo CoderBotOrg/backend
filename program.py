@@ -89,12 +89,12 @@ class ProgramEngine:
         query = Query()
         self._program = program
         program_db_entry = program.as_dict()
-        program_db_entry["filename"] = os.path.join(PROGRAM_PATH, PROGRAM_PREFIX, program.name, PROGRAM_SUFFIX)
+        program_db_entry["filename"] = os.path.join(PROGRAM_PATH, PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX)
         if self._programs.search(query.name == program.name) != []:
             self._programs.update(program_db_entry, query.name == program.name)
         else:
             self._programs.insert(program_db_entry)
-        f = open(program_db_entry["filename"], 'w')
+        f = open(program_db_entry["filename"], 'w+')
         json.dump(program.as_dict(), f)
         f.close()
 
@@ -111,8 +111,8 @@ class ProgramEngine:
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
         if program_db_entries != []:
+            os.remove(program_db_entries[0]["filename"])
             self._programs.remove(query.name == name)
-            os.remove(program_db_entry["filename"])
 
     def create(self, name, code):
         self._program = Program(name, code)
@@ -173,6 +173,9 @@ class Program:
 
     def is_running(self):
         return self._running
+
+    def is_default(self):
+        return self._default
 
     def run(self):
         try:
