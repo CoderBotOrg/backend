@@ -68,13 +68,21 @@ connexionApp.add_api('v2.yml')
 def serve_vue_app(filename):
     """
     Serve (a build of) the new Vue application
-    "dist" is the output of `npm run build` from the 'vue-app 'repository
+    "dist" is the output of `npm run build` from the 'vue-app' repository
     """
     return send_from_directory('dist', filename)
 
+@app.route('/docs/<path:filename')
+def serve_docs_app(filename):
+    """
+    Serve (a build of) the documentation
+    'cb_docs' is the output of `npx vuepress build pages/` 
+    from the 'docs' repository
+    """
+    return send_from_directory('cb_docs', filename)
+
 @app.route('/')
 def redirect_vue_app():
-
     return redirect('/vue/index.html', code=302)
 
 ## Legacy API and web application
