@@ -72,7 +72,7 @@ def serve_vue_app(filename):
     """
     return send_from_directory('dist', filename)
 
-@app.route('/docs/<path:filename')
+@app.route('/docs/<path:filename>')
 def serve_docs_app(filename):
     """
     Serve (a build of) the documentation
