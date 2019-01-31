@@ -259,9 +259,8 @@ class Image():
         img_size = self._data.shape
         gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
         image_code = decode(gray)
-        logging.warning(str(image_code))
         for symbol in image_code:
-            text_found = symbol.data
+            text_found = symbol.data.decode("utf-8")
             break
         return text_found
 
