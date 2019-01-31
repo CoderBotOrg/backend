@@ -1,4 +1,3 @@
-from __future__ import print_function
 """This program handles the communication over I2C
 between a Raspberry Pi and a MPU-6050 Gyroscope / Accelerometer combo.
 Made by: MrTijn/Tijndagamer
@@ -6,8 +5,8 @@ Released under the MIT License
 Copyright 2015
 """
 
-import smbus2 as smbus
 import time
+import smbus2 as smbus
 
 class MPU6050:
 
@@ -88,10 +87,9 @@ class MPU6050:
 
         value = (high << 8) + low
 
-        if (value >= 0x8000):
+        if value >= 0x8000:
             return -((65535 - value) + 1)
-        else:
-            return value
+        return value
 
     # MPU-6050 Methods
 
@@ -120,7 +118,7 @@ class MPU6050:
         # Write the new range to the ACCEL_CONFIG register
         self.bus.write_byte_data(self.address, self.ACCEL_CONFIG, accel_range)
 
-    def read_accel_range(self, raw = False):
+    def read_accel_range(self, raw=False):
         """Reads the range the accelerometer is set to.
         If raw is True, it will return the raw value from the ACCEL_CONFIG
         register
@@ -141,10 +139,9 @@ class MPU6050:
                 return 8
             elif raw_data == self.ACCEL_RANGE_16G:
                 return 16
-            else:
-                return -1
+        return -1
 
-    def get_accel_data(self, g = False):
+    def get_accel_data(self, g=False):
         """Gets and returns the X, Y and Z values from the accelerometer.
         If g is True, it will return the data in g
         If g is False, it will return the data in m/s^2
@@ -174,13 +171,11 @@ class MPU6050:
         y = y / accel_scale_modifier
         z = z / accel_scale_modifier
 
-        if g is True:
-            return {'x': x, 'y': y, 'z': z}
-        elif g is False:
+        if g is False:
             x = x * self.GRAVITIY_MS2
             y = y * self.GRAVITIY_MS2
             z = z * self.GRAVITIY_MS2
-            return {'x': x, 'y': y, 'z': z}
+        return {'x': x, 'y': y, 'z': z}
 
     def set_gyro_range(self, gyro_range):
         """Sets the range of the gyroscope to range.
@@ -193,7 +188,7 @@ class MPU6050:
         # Write the new range to the ACCEL_CONFIG register
         self.bus.write_byte_data(self.address, self.GYRO_CONFIG, gyro_range)
 
-    def read_gyro_range(self, raw = False):
+    def read_gyro_range(self, raw=False):
         """Reads the range the gyroscope is set to.
         If raw is True, it will return the raw value from the GYRO_CONFIG
         register.
@@ -214,8 +209,7 @@ class MPU6050:
                 return 1000
             elif raw_data == self.GYRO_RANGE_2000DEG:
                 return 2000
-            else:
-                return -1
+        return -1
 
     def get_gyro_data(self):
         """Gets and returns the X, Y and Z values from the gyroscope.
@@ -249,9 +243,9 @@ class MPU6050:
 
     def get_all_data(self):
         """Reads and returns all the available data."""
-        temp = get_temp()
-        accel = get_accel_data()
-        gyro = get_gyro_data()
+        temp = self.get_temp()
+        accel = self.get_accel_data()
+        gyro = self.get_gyro_data()
 
         return [accel, gyro, temp]
 
@@ -267,4 +261,4 @@ if __name__ == "__main__":
         if abs(gyro_data['z']) > mpu.GYRO_THRESHOLD_Z:
             dz = gyro_data['z'] * dt
             z = z + dz
-            print( "z: ", z, end="\r")
+            print("z: ", z, end="\r")

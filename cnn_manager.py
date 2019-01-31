@@ -73,8 +73,8 @@ class CNNManager(object):
             try:
                 os.remove(MODEL_PATH + "/" + model_name + ".pb")
                 os.remove(MODEL_PATH + "/" + model_name + ".txt")
-            except:
-                logging.warning("model files not found: " + model_name)
+            except Exception:
+                logging.warning("model files not found: %s", model_name)
             del self._models[model_name]
             self._save_model_meta()
 
@@ -103,12 +103,12 @@ class CNNManager(object):
     def load_model(self, model_name):
         model_info = self._models.get(model_name)
         if model_info:
-            return CNNClassifier(model_file = MODEL_PATH + "/" + model_name + ".pb",
-                                 label_file = MODEL_PATH + "/" + model_name + ".txt",
+            return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".pb",
+                                 label_file=MODEL_PATH + "/" + model_name + ".txt",
                                  output_layer=model_info["output_layer"],
-                                 input_height = int(model_info["image_height"]),
-                                 input_width = int(model_info["image_width"]))
-
+                                 input_height=int(model_info["image_height"]),
+                                 input_width=int(model_info["image_width"]))
+        return None
     class TrainThread(threading.Thread):
 
         def __init__(self, manager, model_name, architecture, image_tags, photos_metadata, training_steps, learning_rate):

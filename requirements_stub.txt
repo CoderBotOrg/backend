@@ -30,6 +30,7 @@ protobuf==3.6.1
 Pypubsub==4.0.0
 pytz==2018.4
 pyyaml>=4.2b1
+pyzbar==0.1.7
 requests==2.20.0
 six==1.11.0
 smbus2==0.2.0
