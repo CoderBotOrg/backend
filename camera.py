@@ -267,10 +267,8 @@ class Camera(object):
     def find_face(self):
         face_x = face_y = face_size = None
         img = self.get_image()
-        ts = time.time()
         faces = img.grayscale().find_faces()
-        logging.info("face.detect: %s", str(time.time() - ts))
-        if faces:
+        if len(faces):
             # Get the largest face, face is a rectangle
             x, y, w, h = faces[0]
             center_x = x + (w/2)
@@ -283,26 +281,23 @@ class Camera(object):
         return [face_x, face_y, face_size]
 
     def path_ahead(self):
-
         image_size = self._camera.out_rgb_resolution
-        #ts = time.time()
         img = self.get_image()
 
         size_y = img._data.shape[0]
         size_x = img._data.shape[1]
-        threshold = img.crop(0, size_y - (size_y/12), size_x, size_y)._data.mean() / 2
+        threshold = img.crop(0, size_y - int(size_y/12), size_x, size_y)._data.mean() / 2
 
         blobs = img.binarize(threshold).dilate().find_blobs(minsize=self._path_object_size_min, maxsize=self._path_object_size_max)
         coordY = 60
         if blobs:
             obstacle = blob.Blob.sort_distance((image_size[0]/2, image_size[1]), blobs)[0]
 
-            logging.info("obstacle: %s", str(obstacle.bottom))
             coords = img.transform([(obstacle.center[0], obstacle.bottom)], img.get_transform(img.size()[1]))
             x = coords[0][0]
             y = coords[0][1]
             coordY = 60 - ((y * 48) / (480 / self._cv_image_factor))
-            logging.info("x: " + str(x) + " y: " + str(y) + " coordY: " + str(coordY))
+            logging.info("x: %s y: %s coordY: %s", str(x), str(y), str(coordY))
 
         return coordY
 
@@ -320,7 +315,7 @@ class Camera(object):
         fov_total_y = 68 #cm
         fov_total_x = 60 #cm
 
-        if objects and objects:
+        if objects:
             obj = objects[-1]
             logging.info("bottom: " + str(obj.center[0]) + " " + str(obj.bottom))
             coords = bw.transform([(obj.center[0], obj.bottom)], bw.get_transform(bw.size()[1]))

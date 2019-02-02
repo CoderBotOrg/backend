@@ -32,7 +32,7 @@ tesseract_whitelists = {
 }
 
 try:
-    ocr = cv2.text.OCRTesseract_create(Null, "eng", tesseract_whitelists['unspec'], 0, cv2.text.OCR_LEVEL_TEXTLINE)
+    ocr = cv2.text.OCRTesseract_create(language="eng", char_whitelist=tesseract_whitelists['unspec'], oem=0, psmode=cv2.text.OCR_LEVEL_TEXTLINE)
 except:
     logging.info("tesseract not availabe")
 
@@ -248,10 +248,8 @@ class Image():
 
     def find_text(self, accept):
         wlist = tesseract_whitelists.get(accept, None)
-        t = time.time()
         ocr.setWhiteList(wlist)
         text = ocr.run(self._data, 60)
-        logging.info("time: " + str(time.time() - t) + " text: " +str(text))
         return text
 
     def find_qr_code(self):
