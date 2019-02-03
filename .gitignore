@@ -80,6 +80,8 @@ pyvenv.cfg
 
 # Vue build
 dist/
+# Docs
+cb_docs/
 
 coderbot.cfg
 
