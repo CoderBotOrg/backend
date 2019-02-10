@@ -10,6 +10,7 @@ import urllib
 import fcntl
 import struct
 import json
+import argparse
 
 class WiFi():
 
@@ -137,6 +138,11 @@ class WiFi():
         cls.save_config()
 
     @classmethod
+    def set_bot_name(cls, name):
+        cls._config["bot_name"] = name
+        cls.save_config()
+
+    @classmethod
     def start_as_client(cls):
         cls.stop_dnsmasq()
         cls.stop_hostapd()
@@ -224,19 +230,27 @@ class WiFi():
         return cpuserial
 
 def main():
+    parser = argparse.ArgumentParser(description="CoderBot wifi config manager and daemon initializer", prog="wifi.py")
+    subparsers = parser.add_subparsers()
+    up = subparsers.add_parser('updatecfg', help="update configuration")
+    up.add_argument('-m', '--mode', choices=['ap', 'client'], help='wifi mode')
+    up.add_argument('-s', '--ssid', help='wifi ssid')
+    up.add_argument('-p', '--pwd', help='wifi password')
+    up.add_argument('-n', '--name', help='coderbot unique id')
+    args = vars(parser.parse_args())
+    print(args)
     w = WiFi()
-    if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
-        if len(sys.argv) > 2 and sys.argv[2] == "ap":
+    if args:
+        if args['mode'] == 'ap':
             w.set_start_as_ap()
-            if len(sys.argv) > 4:
-                w.set_ap_params(sys.argv[3], sys.argv[4])
-        elif len(sys.argv) > 2 and sys.argv[2] == "client":
-            if len(sys.argv) > 3:
-                w.set_client_params(sys.argv[3], sys.argv[4])
+            if args.get('ssid') and args.get('pwd'):
+                w.set_ap_params(args['ssid'], args['pwd'])
+        elif args['mode'] == 'client':
             w.set_start_as_client()
-        elif len(sys.argv) > 3 and sys.argv[2] == "bot_name":
-            WiFi.get_config()['bot_name'] = sys.argv[3]
-            WiFi.save_config()
+            if args.get('ssid') and args.get('pwd'):
+                w.set_client_params(args['ssid'], args['pwd'])
+        if args['name']:
+            w.set_bot_name(args['name'])
     else:
         w.set_unique_ssid()
         w.start_service()
