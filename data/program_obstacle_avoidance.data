@@ -1,1 +1,0 @@
-{"dom_code": "", "code": "while True:\n  get_prog_eng().check_end()\n  if get_bot().get_sonar_distance(0) < 15:\n    get_bot().backward(speed=100, elapse=0.5)\n    get_bot().right(speed=100, elapse=0.7)\n  else:\n    get_bot().forward(speed=100, elapse=0.5)\nget_bot().stop()\n", "name": "obstacle_avoidance"}

@@ -18,34 +18,19 @@
 ############################################################################
 
 import os
-import time
-from sys import byteorder
 from array import array
-from struct import pack
+import time
 import logging
-
-import pyaudio
 import wave
 import audioop
-import logging
+import pyaudio
 
 try:
     from pocketsphinx.pocketsphinx import Decoder
     from sphinxbase.sphinxbase import *
-except:
+except Exception:
     logging.info("pocketsphinx not available")
 
-## GOOGLE Speech API ##
-# [START import_libraries]
-#from __future__ import division
-
-import re
-import sys
-
-#from google.cloud import speech
-#from google.cloud.speech import enums
-#from google.cloud.speech import types
-import pyaudio
 from six.moves import queue
 # [END import_libraries]
 
@@ -76,7 +61,7 @@ class Audio:
             #  frames_per_buffer=CHUNK)
             #self.stream_in.start_stream()
             self.stream_in = self.MicrophoneStream(FORMAT, RATE, CHUNK)
-        except Exception as e:
+        except Exception:
             logging.info("Audio: input stream not available")
 
         #self._google_speech_client = speech.SpeechClient()
@@ -89,29 +74,24 @@ class Audio:
 
     def say(self, what, locale='en'):
         if what and "$" in what:
-            os.system ('omxplayer sounds/' + what[1:])
-        elif what and len(what):
-            os.system ('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -D hw:1,0')
+            os.system('omxplayer sounds/' + what[1:])
+        elif what and what:
+            os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -D hw:1,0')
 
     def normalize(self, snd_data):
         "Average the volume out"
         MAXIMUM = 16384
-        times = float(MAXIMUM)/max(abs(i) for i in snd_data)
+        times = float(MAXIMUM) / max(abs(i) for i in snd_data)
 
         r = array('h', snd_data)
         c = 0
         for i in snd_data:
             r[c] = int(i*times)
-            c +=1
+            c += 1
         return r
 
     def record(self, elapse):
-        num_silent = 0
-        snd_started = False
-        c = 0
-
         r = bytearray()
-
         t = time.time()
         with self.stream_in as stream:
             audio_generator = stream.generator()
@@ -119,6 +99,7 @@ class Audio:
                 r.extend(content)
                 if time.time() - t >= elapse:
                     return r
+        return r
 
     def record_to_file(self, filename, elapse):
         data = self.record(elapse)
@@ -126,13 +107,13 @@ class Audio:
 
         wf = wave.open(SOUNDDIR + filename, 'wb')
         wf.setnchannels(1)
-        wf.setsampwidth(self.pyaudio.get_sample_size(FORMAT))
+        wf.setsampwidth(self.stream_in.get_sample_size(FORMAT))
         wf.setframerate(RATE)
         wf.writeframes(data)
         wf.close()
 
     def play(self, filename):
-        os.system ('omxplayer sounds/' + filename)
+        os.system('omxplayer sounds/' + filename)
 
         """
         # open the file for reading.
@@ -160,8 +141,6 @@ class Audio:
         """
 
     def hear(self, level, elapse=1.0):
-        ts_total = time.time()
-
         t = time.time()
         with self.stream_in as stream:
             audio_generator = stream.generator()
@@ -171,9 +150,9 @@ class Audio:
                     return True
                 if time.time() - t >= elapse:
                     return False
+        return False
 
     def speech_recog(self, model):
-
         # Create a decoder with certain model
         config = Decoder.default_config()
         config.set_string('-hmm', '/usr/local/share/pocketsphinx/model/en-us/en-us')
@@ -186,7 +165,6 @@ class Audio:
         decoder = Decoder(config)
 
         decoder.start_utt()
-        tstamp = time.time()
         recog_text = ''
 
         with self.stream_in as stream:
@@ -195,11 +173,11 @@ class Audio:
                 decoder.process_raw(content, False, False)
                 if decoder.hyp() and decoder.hyp().hypstr != '':
                     recog_text += decoder.hyp().hypstr
-                    tstamp = time.time()
                     if len(recog_text) > 1:
                         decoder.end_utt()
-                        logging.info("recog text: " + recog_text)
+                        logging.info("recog text: %s", recog_text)
                         return recog_text
+        return recog_text
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""
@@ -217,21 +195,21 @@ class Audio:
             self._audio_interface = pyaudio.PyAudio()
             self._buff = queue.Queue()
             self._audio_stream = self._audio_interface.open(
-              format=self._format,
-              # The API currently only supports 1-channel (mono) audio
-              # https://goo.gl/z757pE
-              channels=1, rate=self._rate,
-              input=True, frames_per_buffer=self._chunk,
-              # Run the audio stream asynchronously to fill the buffer object.
-              # This is necessary so that the input device's buffer doesn't
-              # overflow while the calling thread makes network requests, etc.
-              stream_callback=self._fill_buffer,
+                format=self._format,
+                # The API currently only supports 1-channel (mono) audio
+                # https://goo.gl/z757pE
+                channels=1, rate=self._rate,
+                input=True, frames_per_buffer=self._chunk,
+                # Run the audio stream asynchronously to fill the buffer object.
+                # This is necessary so that the input device's buffer doesn't
+                # overflow while the calling thread makes network requests, etc.
+                stream_callback=self._fill_buffer,
             )
             self.closed = False
 
             return self
 
-        def __exit__(self, type, value, traceback):
+        def __exit__(self, atype, value, traceback):
             self._audio_stream.stop_stream()
             self._audio_stream.close()
             self._audio_interface.terminate()
@@ -245,6 +223,9 @@ class Audio:
             """Continuously collect data from the audio stream, into the buffer."""
             self._buff.put(in_data)
             return None, pyaudio.paContinue
+
+        def get_sample_size(self, fmt):
+            return self._audio_interface.get_sample_size(fmt)
 
         def generator(self):
             while not self.closed:

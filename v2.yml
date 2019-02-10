@@ -1,0 +1,242 @@
+swagger: "2.0"
+info:
+  version: "0.2"
+  title: OpenAPI 2.0 definition of Coderbot API v2
+
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/v2"
+
+# Paths supported by the server application
+paths:
+  /restoreSettings:
+    post:
+      operationId: "api.restoreSettings"
+      summary: "Restore settings to default"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - CoderBot configuration
+  /delete:
+    post:
+      operationId: "api.deleteProgram"
+      summary: "Delete a program"
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Program management
+  /list:
+    get:
+      operationId: "api.listPrograms"
+      summary: "Get the list of all the saved programs"
+      tags:
+        - Program management
+      responses:
+        200:
+          description: "ok"
+  /load:
+    get:
+      operationId: "api.loadProgram"
+      summary: "Get the program with the specified name"
+      parameters:
+        - name: name
+          in: query
+          type: string
+          required: true
+      tags:
+        - Program management
+      responses:
+        200:
+          description: "ok"
+  /saveActivity:
+    post:
+      operationId: "api.saveActivity"
+      summary: "Save a new activity"
+      tags:
+        - Activity management
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "Failed to save the activity"
+  /updateFromPackage:
+    post:
+      operationId: "api.updateFromPackage"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: file_to_upload
+          in: formData
+          type: file
+          required: true
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "upload failed"
+  /deleteActivity:
+    post:
+      operationId: "api.deleteActivity"
+      summary: "Delete an activity"
+      tags:
+        - Activity management
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+  /listActivities:
+    get:
+      operationId: "api.listActivities"
+      summary: "Get the list of all the saved activities"
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+  /loadActivity:
+    get:
+      operationId: "api.loadActivity"
+      summary: "Get the activity with the specified name"
+      parameters:
+        - name: name
+          in: query
+          type: string
+          required: true
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+  /saveProgram:
+    post:
+      operationId: "api.saveProgram"
+      summary: "Save a new program"
+      tags:
+        - Program management
+      parameters:
+        - name: overwrite
+          in: query
+          required: false
+          type: string
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "Failed to save the program"
+
+  /exec:
+    post:
+      operationId: "api.exec"
+      summary: "Execute the given program"
+      tags:
+        - Program management
+      parameters:
+        - in: body
+          name: data
+          schema:
+            type: object
+      responses:
+        200:
+          description: "ok"
+  /status:
+    get:
+      operationId: "api.status"
+      summary: "Bot general informations and execution status"
+      tags:
+        - Status informations
+      responses:
+        200:
+          description: "Bot status"
+  /info:
+    get:
+      operationId: "api.info"
+      summary: "Bot general informations and execution status"
+      tags:
+        - Status informations
+      responses:
+        200:
+          description: "Bot status"
+  /stop:
+    post:
+      operationId: "api.stop"
+      summary: Stops the bot motors
+      tags:
+        - Direct control
+      responses:
+        200:
+          description: "Successfully stopped the motors"
+  /move:
+    post:
+      summary: Moves the bot forward or backward.
+      operationId: "api.move"
+      tags:
+        - Direct control
+      parameters:
+        - in: body
+          name: data
+          description: Movement speed and duration
+          schema:
+            type: object
+            default: {'speed': 100, 'elapse':-1}
+            required:
+              - speed
+              - elapse
+            properties:
+              speed:
+                type: number
+                description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+              elapse:
+                type: number
+                description: Duration of the movement. -1 moves the bot until a /stop command is received.
+      responses:
+        200:
+          description: Sent command to the bot GPIO.
+  /turn:
+    post:
+      summary: Make a turn with the motors
+      operationId: "api.turn"
+      tags:
+        - Direct control
+      parameters:
+        - in: body
+          name: data
+          description: Turn
+          schema:
+            type: object
+            default: {'speed': -80, 'elapse':-1}
+            required:
+              - speed
+              - elapse
+            properties:
+              speed:
+                type: number
+                description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+              elapse:
+                type: number
+                description: Duration of the movement. -1 moves the bot until a /stop command is received.
+      responses:
+        200:
+          description: Sent command to the bot GPIO.

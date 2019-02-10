@@ -50,7 +50,7 @@ class CNNManager(object):
         try:
             f = open(MODEL_METADATA, "r")
             self._models = json.load(f)
-            f.close
+            f.close()
         except IOError:
             self._models = {}
             self._save_model_meta()
@@ -66,15 +66,15 @@ class CNNManager(object):
     def _save_model_meta(self):
         f = open(MODEL_METADATA, "w")
         json.dump(self._models, f)
-        f.close
+        f.close()
 
     def delete_model(self, model_name):
         if self._models.get(model_name):
             try:
                 os.remove(MODEL_PATH + "/" + model_name + ".pb")
                 os.remove(MODEL_PATH + "/" + model_name + ".txt")
-            except:
-                logging.warning("model files not found: " + model_name)
+            except Exception:
+                logging.warning("model files not found: %s", model_name)
             del self._models[model_name]
             self._save_model_meta()
 
@@ -93,7 +93,7 @@ class CNNManager(object):
 
     def save_model_status(self, model_name, architecture, status):
         model_info = architecture.split("_")
-        self._models[model_name] = {"status": status, "image_height": model_info[2], "image_width": model_info[2]}
+        self._models[model_name] = {"status": status, "image_height": model_info[3], "image_width": model_info[3], "output_layer": "final_result"}
         self._save_model_meta()
 
     def wait_train_jobs(self):
@@ -103,11 +103,12 @@ class CNNManager(object):
     def load_model(self, model_name):
         model_info = self._models.get(model_name)
         if model_info:
-            return CNNClassifier(model_file = MODEL_PATH + "/" + model_name + ".pb",
-                                 label_file = MODEL_PATH + "/" + model_name + ".txt",
-                                 input_height = int(model_info["image_height"]),
-                                 input_width = int(model_info["image_width"]))
-
+            return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".pb",
+                                 label_file=MODEL_PATH + "/" + model_name + ".txt",
+                                 output_layer=model_info["output_layer"],
+                                 input_height=int(model_info["image_height"]),
+                                 input_width=int(model_info["image_width"]))
+        return None
     class TrainThread(threading.Thread):
 
         def __init__(self, manager, model_name, architecture, image_tags, photos_metadata, training_steps, learning_rate):

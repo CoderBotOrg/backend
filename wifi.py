@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import socket
 import subprocess
@@ -6,16 +6,16 @@ import shutil
 import sys
 import os
 import time
-import urllib2
+import urllib
 import fcntl
 import struct
 import json
 
 class WiFi():
 
-    CONFIG_FILE = "/etc/coderbot_wifi.conf"
+    CONFIG_FILE = "/etc/coderbot/wifi.conf"
     adapters = ["default", "RT5370", "RTL8188CUS"]
-    hostapds = {"default": "hostapd", "RT5370": "hostapd.RT5370", "RTL8188CUS": "hostapd.RTL8188"}
+    hostapds = {"default": "hostapd", "RT5370": "hostapd-RT5370.conf", "RTL8188CUS": "hostapd-RTL8188.conf"}
     web_url = "http://my.coderbot.org/api/coderbot/1.0/bot/"
     wifi_client_conf_file = "/etc/wpa_supplicant/wpa_supplicant.conf"
     _config = {}
@@ -38,7 +38,7 @@ class WiFi():
 
     @classmethod
     def get_adapter_type(cls):
-        lsusb_out = subprocess.check_output("lsusb")
+        lsusb_out = str(subprocess.check_output("lsusb"))
         for a in cls.adapters:
             if a in lsusb_out:
                 return a
@@ -107,8 +107,8 @@ class WiFi():
                     "bot_ip": bot_ipaddr,
                     "bot_version": "1.0",
                     "user_email": user_email}
-            req = urllib2.Request(cls.web_url + bot_uid, json.dumps(data), headers={"Authorization": "CoderBot 123456"})
-            ret = urllib2.urlopen(req)
+            req = urllib.Request(cls.web_url + bot_uid, json.dumps(data), headers={"Authorization": "CoderBot 123456"})
+            ret = urllib.urlopen(req)
             if ret.getcode() != 200:
                 raise Exception()
         except Exception as e:
@@ -121,13 +121,8 @@ class WiFi():
 
     @classmethod
     def set_client_params(cls, wssid, wpsk):
-        f = open (cls.wifi_client_conf_file, "w+")
-        f.write("""ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-    update_config=1
-    network={\n""")
-        f.write("  ssid=\""+wssid+"\"\n")
-        f.write("  psk=\""+wpsk+"\"\n")
-        f.write("}")
+        os.system("sudo sed -i s/ssid=.*$/ssid='\"" + wssid + "\"'/ " + cls.wifi_client_conf_file)
+        os.system("sudo sed -i s/psk=.*$/psk='\"" + wpsk + "\"'/ " + cls.wifi_client_conf_file)
 
     @classmethod
     def set_ap_params(cls, wssid, wpsk):
@@ -167,10 +162,10 @@ class WiFi():
     @classmethod
     def start_as_ap(cls):
         time.sleep(1.0)
-        out = subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"])
-        out += subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"])
-        out += subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"])
-        out += subprocess.check_output(["ifconfig"])
+        out = str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"]))
+        out += str(subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"]))
+        out += str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"]))
+        out += str(subprocess.check_output(["ifconfig"]))
         print(out)
         cls.start_hostapd()
         cls.start_dnsmasq()
@@ -189,6 +184,45 @@ class WiFi():
                 print("Unable to register ip, revert to ap mode")
                 cls.start_as_ap()
 
+    @classmethod
+    def get_hostapd_config_file(cls):
+        adapter = cls.get_adapter_type()
+        hostapd_type = cls.hostapds.get(adapter)
+        return "/etc/hostapd/" + hostapd_type + ".conf"
+
+    @classmethod
+    def set_unique_ssid(cls):
+        """
+        See if ssid is already a unique id based on CPU serial number.
+        If not, set it in hostapd.conf
+        """
+        try:
+            inconfig = None
+            with open(cls.get_hostapd_config_file()) as infile:
+                inconfig = infile.read()
+            inconfig = inconfig.replace("CHANGEMEATFIRSTRUN", str(abs(hash(cls.get_serial())))[0:4])
+            with open(cls.get_hostapd_config_file(), "w") as outfile:
+                outfile.write(inconfig)
+        except:
+            print("Unexpected error: ", sys.exc_info()[0])
+            raise
+
+    @classmethod
+    def get_serial(cls):
+        """
+        Extract serial from cpuinfo file
+        """
+        cpuserial = "0000000000000000"
+        try:
+            f = open('/proc/cpuinfo','r')
+            for line in f:
+                if line[0:6]=='Serial':
+                    cpuserial = line[10:26]
+            f.close()
+        except:
+            cpuserial = "ERROR000000000"
+        return cpuserial
+
 def main():
     w = WiFi()
     if len(sys.argv) > 2 and sys.argv[1] == "updatecfg":
@@ -204,6 +238,7 @@ def main():
             WiFi.get_config()['bot_name'] = sys.argv[3]
             WiFi.save_config()
     else:
+        w.set_unique_ssid()
         w.start_service()
 
 if __name__ == "__main__":

@@ -38,6 +38,10 @@ photos/*.mp4
 photos/*.h264
 photos/*.json
 
+#cnn models
+cnn_models/*
+cnn_models/cache/*
+
 # Sounds recorded
 sounds/*.wav
 
@@ -47,9 +51,6 @@ logs/*.log.*
 
 # User programs
 data/*.data
-
-# CNN Models
-cnn_models/*
 
 # Tutorial
 static/blockly-tutorial
@@ -72,5 +73,22 @@ Thumbs.db
 
 bin/
 lib/
+lib64/
+lib64
 share/
 pyvenv.cfg
+
+# Vue build
+dist/
+# Docs
+cb_docs/
+
+coderbot.cfg
+
+swagger-ui/
+
+# Photos
+photos/metadata.json
+
+# Uploaded updates folder
+updatePackages/

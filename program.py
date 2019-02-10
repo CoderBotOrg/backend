@@ -18,23 +18,25 @@
 ############################################################################
 
 import os
-import sys
 import threading
 import json
 import logging
 
 import math
+from tinydb import TinyDB, Query
+
 import coderbot
 import camera
 import motion
 import config
 import audio
 import event
-import conversation
+
+
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
-PROGRAM_SUFFIX = ".data"
+PROGRAM_SUFFIX = ".json"
 
 def get_cam():
     return camera.Camera.get_instance()
@@ -54,22 +56,25 @@ def get_prog_eng():
 def get_event():
     return event.EventManager.get_instance()
 
-def get_conv():
-    return conversation.Conversation.get_instance()
-
 class ProgramEngine:
+
+    # pylint: disable=exec-used
 
     _instance = None
 
     def __init__(self):
         self._program = None
-        self._repository = {}
         self._log = ""
-        for dirname, dirnames, filenames,  in os.walk("./data"):
+        self._programs = TinyDB("data/programs.json")
+        query = Query()
+        for dirname, dirnames, filenames, in os.walk(PROGRAM_PATH):
+            dirnames
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
-                    self._repository[program_name] = filename
+                    if self._programs.search(query.name == program_name) == []:
+                        logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
+                        self._programs.insert({"name": program_name, "filename": os.path.join(dirname, filename), "default": str("default" in dirname)})
 
     @classmethod
     def get_instance(cls):
@@ -78,31 +83,43 @@ class ProgramEngine:
         return cls._instance
 
     def prog_list(self):
-        return list(self._repository.keys())
+        return self._programs.all()
 
     def save(self, program):
-        self._program = self._repository[program.name] = program
-        f = open(PROGRAM_PATH + PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX, 'w')
-        json.dump(program.as_json(), f)
+        query = Query()
+        self._program = program
+        program_db_entry = program.as_dict()
+        program_db_entry["filename"] = os.path.join(PROGRAM_PATH, PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX)
+        if self._programs.search(query.name == program.name) != []:
+            self._programs.update(program_db_entry, query.name == program.name)
+        else:
+            self._programs.insert(program_db_entry)
+        f = open(program_db_entry["filename"], 'w+')
+        json.dump(program.as_dict(), f)
         f.close()
 
     def load(self, name):
-        #return self._repository[name]
-        f = open(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX, 'r')
-        self._program = Program.from_json(json.load(f))
+        query = Query()
+        program_db_entries = self._programs.search(query.name == name)
+        if program_db_entries != []:
+            logging.info(program_db_entries[0])
+            f = open(program_db_entries[0]["filename"], 'r')
+            self._program = Program.from_dict(json.load(f))
         return self._program
 
     def delete(self, name):
-        del self._repository[name]
-        os.remove(PROGRAM_PATH + PROGRAM_PREFIX + name + PROGRAM_SUFFIX)
-        return "ok"
+        query = Query()
+        program_db_entries = self._programs.search(query.name == name)
+        if program_db_entries != []:
+            os.remove(program_db_entries[0]["filename"])
+            self._programs.remove(query.name == name)
 
     def create(self, name, code):
         self._program = Program(name, code)
         return self._program
 
     def is_running(self, name):
-        return self._repository[name].is_running()
+        return self._program.is_running() and self._program.name == name
 
     def check_end(self):
         return self._program.check_end()
@@ -113,7 +130,6 @@ class ProgramEngine:
     def get_log(self):
         return self._log
 
- 
 class Program:
     _running = False
 
@@ -121,12 +137,13 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, code=None, dom_code=None):
+    def __init__(self, name, code=None, dom_code=None, default=False):
         #super(Program, self).__init__()
         self._thread = None
         self.name = name
         self._dom_code = dom_code
         self._code = code
+        self._default = default
 
     def execute(self):
         if self._running:
@@ -138,9 +155,9 @@ class Program:
             self._thread = threading.Thread(target=self.run)
             self._thread.start()
         except RuntimeError as re:
-            logging.error("RuntimeError:" + str(re))
+            logging.error("RuntimeError: %s", str(re))
         except Exception as e:
-            logging.error("Exception:" + str(e))
+            logging.error("Exception: %s", str(e))
 
         return "ok"
 
@@ -150,23 +167,24 @@ class Program:
             self._thread.join()
 
     def check_end(self):
-        if self._running == False:
+        if self._running is False:
             raise RuntimeError('end requested')
         return None
 
     def is_running(self):
         return self._running
 
+    def is_default(self):
+        return self._default
+
     def run(self):
         try:
-            bot = coderbot.CoderBot.get_instance()
             program = self
             try:
-                cam = camera.Camera.get_instance()
                 if config.Config.get().get("prog_video_rec") == "true":
                     get_cam().video_rec(program.name)
                     logging.debug("starting video")
-            except:
+            except Exception:
                 logging.error("Camera not available")
 
             imports = "import json\n"
@@ -174,31 +192,33 @@ class Program:
             env = globals()
             exec(code, env, env)
         except RuntimeError as re:
-            logging.info("quit: " + str(re))
+            logging.info("quit: %s", str(re))
             get_prog_eng().log(str(re))
         except Exception as e:
-            logging.info("quit: " + str(e))
+            logging.info("quit: %s", str(e))
             get_prog_eng().log(str(e))
         finally:
             try:
                 get_event().wait_event_generators()
                 get_event().unregister_listeners()
                 get_event().unregister_publishers()
-            except:
+            except Exception:
                 logging.error("error polishing event system")
             try:
                 get_cam().video_stop() #if video is running, stop it
+                get_cam().set_text("") #clear overlay text (if any)
                 get_motion().stop()
-            except:
+            except Exception:
                 logging.error("Camera not available")
             self._running = False
 
 
-    def as_json(self):
+    def as_dict(self):
         return {'name': self.name,
                 'dom_code': self._dom_code,
-                'code': self._code}
+                'code': self._code,
+                'default': self._default}
 
     @classmethod
-    def from_json(cls, map):
-        return Program(name=map['name'], dom_code=map['dom_code'], code=map['code'])
+    def from_dict(cls, amap):
+        return Program(name=amap['name'], dom_code=amap['dom_code'], code=amap['code'], default=amap.get('default', False))

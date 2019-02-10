@@ -1,24 +1,6 @@
-############################################################################
-#    CoderBot, a didactical programmable robot.
-#    Copyright (C) 2014, 2015 Roberto Previtera <info@coderbot.org>
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License along
-#    with this program; if not, write to the Free Software Foundation, Inc.,
-#    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-############################################################################
 """
-This is mudule main, which provides the http web server that expose the
-CoderBot REST API and static resources (html, js, css, jpg).
+This module provides the http web server exposing the
+CoderBot REST API and static resources
 """
 import os
 import json
@@ -26,6 +8,19 @@ import logging
 import logging.handlers
 import subprocess
 import picamera
+import connexion
+
+from flask import (render_template,
+                   request,
+                   send_file,
+                   Response,
+                   jsonify,
+                   send_from_directory,
+                   redirect)
+
+from flask_babel import Babel
+from flask_cors import CORS
+from werkzeug.datastructures import Headers
 
 from coderbot import CoderBot, PIN_PUSHBUTTON
 from camera import Camera
@@ -35,44 +30,83 @@ from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
-from conversation import Conversation
 
-from flask import Flask, render_template, request, send_file, Response, jsonify
-from flask_babel import Babel
-from flask_cors import CORS
-from werkzeug.datastructures import Headers
-
+# Logging configuration
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
+logger.setLevel(logging.INFO)
 sh = logging.StreamHandler()
-# add a rotating handler
 fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(message)s')
 sh.setFormatter(formatter)
 fh.setFormatter(formatter)
-
-logger.addHandler(sh)
+#logger.addHandler(sh)
 logger.addHandler(fh)
 
-bot = None
-cam = None
-motion = None
-audio = None
-cnn = None
-event = None
-conv = None
 
-app = Flask(__name__, static_url_path="")
+## (Connexion) Flask app configuration
+
+# Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
+#  from the folder 'swagger-ui'. Clone the 'swagger-ui' repository inside the backend folder
+connexionApp = connexion.App(__name__, swagger_ui=True, swagger_path='swagger-ui/')
+
+# Connexion wraps FlaskApp, so app becomes connexionApp.app
+app = connexionApp.app
+# Access-Control-Allow-Origin
 CORS(app)
-#app.config.from_pyfile('coderbot.cfg')
 babel = Babel(app)
 app.debug = False
-#sockets = Sockets(app)
-
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
+
+## New API and web application
+
+# API v2 is defined in v2.yml and its methods are in api.py
+connexionApp.add_api('v2.yml')
+
+@app.route('/vue/<path:filename>')
+def serve_vue_app(filename):
+    """
+    Serve (a build of) the new Vue application
+    "dist" is the output of `npm run build` from the 'vue-app' repository
+    """
+    return send_from_directory('dist', filename)
+
+@app.route('/docs/')
+def redirect_docs_app():
+    return redirect('/docs/index.html', code=302)
+
+@app.route('/docs/<path:subpath>')
+def serve_docs_app(subpath):
+    """
+    Serve (a build of) the documentation
+    'cb_docs' is the output of `npx vuepress build pages/`
+    from the 'docs' repository
+    """
+    print("Running docs path")
+    print(subpath)
+    if (subpath[-1] == '/'):
+        subpath = subpath + 'index.html'
+    return send_from_directory('cb_docs', subpath)
+
+@app.route('/')
+def redirect_vue_app():
+    return redirect('/vue/index.html', code=302)
+
+## Legacy API and web application
+
+@app.route("/old")
+def serve_legacy():
+    """
+    Serve the the legacy web application
+    """
+    return render_template('main.html',
+                           host=request.host[:request.host.find(':')],
+                           locale=get_locale(),
+                           config=app.bot_config,
+                           program_level=app.bot_config.get("prog_level", "std"),
+                           cam=Camera.get_instance() != None,
+                           cnn_model_names=json.dumps([[name] for name in CNNManager.get_instance().get_models().keys()]))
 
 @babel.localeselector
 def get_locale():
@@ -83,47 +117,89 @@ def get_locale():
         loc = 'en'
     return loc
 
-@app.route("/")
-def handle_home():
-    return render_template('main.html',
-                           host=request.host[:request.host.find(':')],
-                           locale=get_locale(),
-                           config=app.bot_config,
-                           program_level=app.bot_config.get("prog_level", "std"),
-                           cam=cam != None,
-                           cnn_model_names = json.dumps({}))
+# Workaround: serve the 'static' subfolders with 'send_from_directory'
+# (connexion wrapper ignores `static_url_path`)
+
+@app.route('/css/<path:filename>')
+def render_static_assets0(filename):
+    return send_from_directory('static/css', filename)
+
+@app.route('/fonts/<path:filename>')
+def render_static_assets1(filename):
+    return send_from_directory('static/fonts', filename)
+
+@app.route('/images/<path:filename>')
+def render_static_assets2(filename):
+    return send_from_directory('static/images', filename)
+
+@app.route('/js/<path:filename>')
+def render_static_assets3(filename):
+    return send_from_directory('static/js', filename)
+
+@app.route('/media/<path:filename>')
+def render_static_assets4(filename):
+    return send_from_directory('static/media', filename)
+
+def updateDict(oldDict, updatedValues):
+    """
+    Update the keys of oldDict appearing in updatedValues with the values in
+    updatedValues
+    """
+    result = oldDict
+    for key, value in updatedValues.items():
+        result[key] = value
+    return result
+
 @app.route("/config", methods=["POST"])
 def handle_config():
-    Config.write(request.form)
+    """
+    Overwrite configuration file on disk and reload it
+    """
+    Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
 
+@app.route("/config", methods=["GET"])
+def returnConfig():
+    """
+    Expose configuration as JSON
+    """
+    app.bot_config = Config.get()
+    return jsonify(app.bot_config)
+
 @app.route("/wifi", methods=["POST"])
 def handle_wifi():
+    """
+    Passes the received Wi-Fi configuration to the wifi.py script, applying it.
+    Then reboots
+    """
     mode = request.form.get("wifi_mode")
     ssid = request.form.get("wifi_ssid")
     psk = request.form.get("wifi_psk")
+
     logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
     client_params = " \"" + ssid + "\" \"" + psk + "\"" if ssid != "" and psk != "" else ""
     logging.info(client_params)
-    os.system("sudo python wifi.py updatecfg " + mode + client_params)
+    os.system("sudo ./wifi.py updatecfg " + mode + client_params)
     os.system("sudo reboot")
     if mode == "ap":
-        return "http://coder.bot:8080"
-    else:
-        return "http://coderbot.local:8080"
-
-@app.route("/update", methods=["GET"])
-def handle_update():
-    logging.info("updating system.start")
-    return Response(execute("./scripts/update_coderbot.sh"), mimetype='text/plain')
+        return "http://coder.bot"
+    return "http://coderbot.local"
 
 @app.route("/bot", methods=["GET"])
 def handle_bot():
+    """
+    Execute a bot command
+    """
+    bot = CoderBot.get_instance()
+    cam = Camera.get_instance()
+    motion = Motion.get_instance()
+    audio = Audio.get_instance()
+
     cmd = request.args.get('cmd')
     param1 = request.args.get('param1')
     param2 = request.args.get('param2')
-
+    print('/bot', json.dumps(request.args))
     if cmd == "move":
         bot.move(speed=int(param1), elapse=float(param2))
     elif cmd == "turn":
@@ -136,40 +212,45 @@ def handle_bot():
         bot.stop()
         try:
             motion.stop()
-        except:
+        except Exception:
             logging.warning("Camera not present")
+
     elif cmd == "take_photo":
         try:
             cam.photo_take()
             audio.say(app.bot_config.get("sound_shutter"))
-        except:
+        except Exception:
             logging.warning("Camera not present")
+
     elif cmd == "video_rec":
         try:
             cam.video_rec()
             audio.say(app.bot_config.get("sound_shutter"))
-        except:
+        except Exception:
             logging.warning("Camera not present")
+
     elif cmd == "video_stop":
         try:
             cam.video_stop()
             audio.say(app.bot_config.get("sound_shutter"))
-        except:
+        except Exception:
             logging.warning("Camera not present")
+
     elif cmd == "say":
         logging.info("say: " + str(param1) + " in: " + str(get_locale()))
         audio.say(param1, get_locale())
+
     elif cmd == "halt":
         logging.info("shutting down")
         audio.say(app.bot_config.get("sound_stop"))
         bot.halt()
+
     elif cmd == "restart":
         logging.info("restarting bot")
         bot.restart()
     elif cmd == "reboot":
         logging.info("rebooting")
         bot.reboot()
-
     return "ok"
 
 @app.route("/bot/status", methods=["GET"])
@@ -185,87 +266,68 @@ def video_stream(a_cam):
         yield frame
         yield "\r\n"
 
-@app.route("/video")
-def handle_video():
-    return """
-<html>
-<head>
-<style type=text/css>
-    body { background-image: url(/video/stream); background-repeat:no-repeat; background-position:center top; background-attachment:fixed; height:100% }
-</style>
-</head>
-<body>
-&nbsp;
-</body>
-</html>
-"""
-
+# Render cam stream
 @app.route("/video/stream")
 def handle_video_stream():
     try:
+        cam = Camera.get_instance()
         h = Headers()
         h.add('Age', 0)
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
         return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except:
-        pass
-
-def video_stream_cv(a_cam):
-    while not app.shutdown_requested:
-        frame = a_cam.get_image_cv_jpeg()
-        yield ("--BOUNDARYSTRING\r\n" +
-               "Content-type: image/jpeg\r\n" +
-               "Content-Length: " + str(len(frame)) + "\r\n\r\n" +
-               frame + "\r\n")
-
-@app.route("/video/stream/cv")
-def handle_video_stream_cv():
-    try:
-        h = Headers()
-        h.add('Age', 0)
-        h.add('Cache-Control', 'no-cache, private')
-        h.add('Pragma', 'no-cache')
-        return Response(video_stream_cv(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except:
+    except Exception:
         pass
 
 @app.route("/photos", methods=["GET"])
 def handle_photos():
+    """
+    Expose the list of taken photos
+    """
+    cam = Camera.get_instance()
     logging.info("photos")
     return json.dumps(cam.get_photo_list())
 
 @app.route("/photos/<filename>", methods=["GET"])
 def handle_photo_get(filename):
-    logging.info("media filename: " + filename)
+    cam = Camera.get_instance()
+    logging.info("media filename: %s", filename)
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
         media_file = cam.get_photo_file(filename)
         return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
     except picamera.exc.PiCameraError as e:
-        logging.error("Error: " + str(e))
+        logging.error("Error: %s", str(e))
 
 @app.route("/photos/<filename>", methods=["PUT"])
 def handle_photo_put(filename):
+    cam = Camera.get_instance()
     logging.info("photo update")
     data = request.get_data(as_text=True)
     data = json.loads(data)
-    cam.update_photo({"name": filename, "tag":data["tag"]})
+    cam.update_photo({"name": filename, "tag": data["tag"]})
     return jsonify({"res":"ok"})
 
 @app.route("/photos/<filename>", methods=["DELETE"])
 def handle_photo_cmd(filename):
+    cam = Camera.get_instance()
     logging.debug("photo delete")
     cam.delete_photo(filename)
     return "ok"
 
 @app.route("/program/list", methods=["GET"])
 def handle_program_list():
+    """
+    Expose the list of saved programs
+    """
     logging.debug("program_list")
     return json.dumps(app.prog_engine.prog_list())
 
 @app.route("/program/load", methods=["GET"])
 def handle_program_load():
+    """
+    Expose a saved program as JSON
+    """
     logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
@@ -273,6 +335,9 @@ def handle_program_load():
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
+    """
+    Save the given program
+    """
     logging.debug("program_save")
     name = request.form.get('name')
     dom_code = request.form.get('dom_code')
@@ -283,6 +348,9 @@ def handle_program_save():
 
 @app.route("/program/delete", methods=["POST"])
 def handle_program_delete():
+    """
+    Delete the given saved program
+    """
     logging.debug("program_delete")
     name = request.form.get('name')
     app.prog_engine.delete(name)
@@ -290,6 +358,9 @@ def handle_program_delete():
 
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
+    """
+    Execute the given program
+    """
     logging.debug("program_exec")
     name = request.form.get('name')
     code = request.form.get('code')
@@ -298,6 +369,9 @@ def handle_program_exec():
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
+    """
+    Stop the program execution
+    """
     logging.debug("program_end")
     if app.prog:
         app.prog.end()
@@ -306,6 +380,9 @@ def handle_program_end():
 
 @app.route("/program/status", methods=["GET"])
 def handle_program_status():
+    """
+    Expose the program status
+    """
     logging.debug("program_status")
     prog = Program("")
     if app.prog:
@@ -314,11 +391,14 @@ def handle_program_status():
 
 @app.route("/cnnmodels", methods=["GET"])
 def handle_cnn_models_list():
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_list")
     return json.dumps(cnn.get_models())
 
 @app.route("/cnnmodels", methods=["POST"])
 def handle_cnn_models_new():
+    cam = Camera.get_instance()
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_new")
     data = json.loads(request.get_data(as_text=True))
     cnn.train_new_model(model_name=data["model_name"],
@@ -332,6 +412,7 @@ def handle_cnn_models_new():
 
 @app.route("/cnnmodels/<model_name>", methods=["GET"])
 def handle_cnn_models_status(model_name):
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_status")
     model_status = cnn.get_models().get(model_name)
 
@@ -339,16 +420,20 @@ def handle_cnn_models_status(model_name):
 
 @app.route("/cnnmodels/<model_name>", methods=["DELETE"])
 def handle_cnn_models_delete(model_name):
+    cnn = CNNManager.get_instance()
     logging.info("cnn_models_delete")
     model_status = cnn.delete_model(model_name=model_name)
 
     return json.dumps(model_status)
 
-
+# Spawn a sub-process and execute things there
 def execute(command):
+    """
+    Spawn a sub-process and execute the program there, then poll it until
+    it has finished
+    """
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    # Poll process for new output until finished
     while True:
         nextline = process.stdout.readline()
         if nextline == '' and process.poll() != None:
@@ -363,14 +448,16 @@ def button_pushed():
         elif app.prog and not app.prog.is_running():
             app.prog.execute()
 
+def remove_doreset_file():
+    try:
+        os.remove("/home/pi/doreset")
+    except OSError:
+        pass
+
+# Finally, get the server running
 def run_server():
-    global bot
-    global cam
-    global motion
-    global audio
-    global cnn
-    global conv
-    global event
+    bot = None
+    cam = None
     try:
         try:
             app.bot_config = Config.read()
@@ -380,15 +467,14 @@ def run_server():
             audio.say(app.bot_config.get("sound_start"))
             try:
                 cam = Camera.get_instance()
-                motion = Motion.get_instance()
+                Motion.get_instance()
             except picamera.exc.PiCameraError:
                 logging.error("Camera not present")
 
-            cnn = CNNManager.get_instance()
-            event = EventManager.get_instance("coderbot")
-            conv = Conversation.get_instance()
+            CNNManager.get_instance()
+            EventManager.get_instance("coderbot")
 
-            if app.bot_config.get('load_at_start') and len(app.bot_config.get('load_at_start')):
+            if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
                 app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
                 app.prog.execute()
         except ValueError as e:
@@ -396,7 +482,10 @@ def run_server():
             logging.error(e)
 
         bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
-        app.run(host="0.0.0.0", port=8080, debug=True, use_reloader=False, threaded=True)
+
+        remove_doreset_file()
+
+        app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()
