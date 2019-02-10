@@ -121,14 +121,17 @@ class WiFi():
         out = subprocess.check_output(["iwlist", "wlan0", "scan"])
 
     @classmethod
-    def set_client_params(cls, wssid, wpsk):
-        os.system("sudo sed -i s/ssid=.*$/ssid='\"" + wssid + "\"'/ " + cls.wifi_client_conf_file)
-        os.system("sudo sed -i s/psk=.*$/psk='\"" + wpsk + "\"'/ " + cls.wifi_client_conf_file)
+    def set_client_params(cls, wssid=None, wpsk=None):
+        if wssid:
+            os.system("sudo sed -i s/ssid=.*$/ssid='\"" + wssid + "\"'/ " + cls.wifi_client_conf_file)
+        if wpsk:
+            os.system("sudo sed -i s/psk=.*$/psk='\"" + wpsk + "\"'/ " + cls.wifi_client_conf_file)
 
     @classmethod
-    def set_ap_params(cls, wssid, wpsk):
+    def set_ap_params(cls, wssid=None, wpsk=None):
         adapter = cls.get_adapter_type()
-        os.system("sudo sed -i s/ssid=.*$/ssid=" + wssid + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
+        if wssid:
+            os.system("sudo sed -i s/ssid=.*$/ssid=" + wssid + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
         if wpsk:
             os.system("sudo sed -i s/wpa_passphrase=.*$/wpa_passphrase=" + wpsk + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
 
@@ -243,12 +246,10 @@ def main():
     if args:
         if args['mode'] == 'ap':
             w.set_start_as_ap()
-            if args.get('ssid') and args.get('pwd'):
-                w.set_ap_params(args['ssid'], args['pwd'])
+            w.set_ap_params(args['ssid'], args['pwd'])
         elif args['mode'] == 'client':
             w.set_start_as_client()
-            if args.get('ssid') and args.get('pwd'):
-                w.set_client_params(args['ssid'], args['pwd'])
+            w.set_client_params(args['ssid'], args['pwd'])
         if args['name']:
             w.set_bot_name(args['name'])
     else:
