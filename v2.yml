@@ -179,6 +179,15 @@ paths:
       responses:
         200:
           description: "Bot status"
+  /reset:
+    get:
+      operationId: "api.reset"
+      summary: "Reset coderbot by restoring boot partition"
+      tags:
+        - Coderbot reset
+      responses:
+        200:
+          description: "reset log file"
   /stop:
     post:
       operationId: "api.stop"

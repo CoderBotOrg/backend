@@ -204,3 +204,16 @@ def resetDefaultPrograms():
             with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
+
+## Reset
+def reset():
+    pi = pigpio.pi('localhost')
+    pi.write(BUTTON_PIN, 0)
+    pi.write(BUTTON_PIN, 1)
+    with open('/home/pi/log/reset_trigger_service.log', 'r') as log_file:
+        data = [x for x in log_file.read().split('\n') if x]
+
+    return {
+    "log": data,
+    "status": "ok"
+    }
