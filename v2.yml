@@ -164,16 +164,7 @@ paths:
   /status:
     get:
       operationId: "api.status"
-      summary: "Bot general informations and execution status"
-      tags:
-        - Status informations
-      responses:
-        200:
-          description: "Bot status"
-  /info:
-    get:
-      operationId: "api.info"
-      summary: "Bot general informations and execution status"
+      summary: "Bot general informations, execution status and reset log file"
       tags:
         - Status informations
       responses:
@@ -187,7 +178,16 @@ paths:
         - Coderbot reset
       responses:
         200:
-          description: "reset log file"
+          description: "resets coderbot entirely"
+  /info:
+    get:
+      operationId: "api.info"
+      summary: "Bot general informations and execution status"
+      tags:
+        - Status informations
+      responses:
+        200:
+          description: "Bot status"
   /stop:
     post:
       operationId: "api.stop"
