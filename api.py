@@ -117,8 +117,11 @@ def exec(data):
 def status():
     sts = get_status()
     # getting reset log file
-    with open('/home/pi/log/reset_trigger_service.log', 'r') as log_file:
-        data = [x for x in log_file.read().split('\n') if x]
+    try:
+        with open('/home/pi/log/reset_trigger_service.log', 'r') as log_file:
+            data = [x for x in log_file.read().split('\n') if x]
+    except Exception:
+        data = [] # if file doesn't exist, no restore as ever been performed. return empty data
 
     return {
         "status": "ok",
