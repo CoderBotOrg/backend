@@ -64,6 +64,7 @@ static/blockly-tutorial
 .Trashes
 ehthumbs.db
 Thumbs.db
+.vscode
 
 # Swap files
 *.swp
