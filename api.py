@@ -126,6 +126,7 @@ def status():
     except Exception:
         data = [] # if file doesn't exist, no restore as ever been performed. return empty data
 
+
     return {
         "status": "ok",
         "internetConnectivity": sts["internet_status"],
@@ -218,6 +219,7 @@ def resetDefaultPrograms():
 ## Reset
 def reset():
     pi = pigpio.pi('localhost')
+    #simulating FALLING EDGE ...|¯|_|¯...
     pi.write(BUTTON_PIN, 1)
     pi.write(BUTTON_PIN, 0)
     pi.write(BUTTON_PIN, 1)
