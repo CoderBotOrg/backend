@@ -13,6 +13,9 @@ from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
+import pigpio
+
+BUTTON_PIN = 16
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
@@ -215,6 +218,7 @@ def resetDefaultPrograms():
 ## Reset
 def reset():
     pi = pigpio.pi('localhost')
+    pi.write(BUTTON_PIN, 1)
     pi.write(BUTTON_PIN, 0)
     pi.write(BUTTON_PIN, 1)
 
