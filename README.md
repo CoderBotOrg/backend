@@ -30,7 +30,7 @@ pip3 install -r requirements_stub.txt
 pip3 install -r requirements.txt
 
 # Start the backend in stub mode
-PYTHONPATH=stub python3 init.py
+PYTHONPATH=stub:test python3 init.py
 
 # or, run the real thing if you're on a physical RPi
 python3 init.py
