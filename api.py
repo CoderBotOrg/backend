@@ -219,10 +219,9 @@ def resetDefaultPrograms():
 ## Reset
 def reset():
     pi = pigpio.pi('localhost')
-    #simulating FALLING EDGE ...|¯|_|¯...
+    #simulating FALLING EDGE
     pi.write(BUTTON_PIN, 1)
     pi.write(BUTTON_PIN, 0)
-    pi.write(BUTTON_PIN, 1)
 
     return {
         "status": "ok"
