@@ -20,6 +20,8 @@ bot = CoderBot.get_instance(
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
 )
 
+query = Query()
+
 def get_serial():
     """
     Extract serial from cpuinfo file
