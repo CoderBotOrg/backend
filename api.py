@@ -121,7 +121,7 @@ def status():
     sts = get_status()
     # getting reset log file
     try:
-        with open('/home/pi/log/reset_trigger_service.log', 'r') as log_file:
+        with open('/home/pi/coderbot/log/reset_trigger_service.log', 'r') as log_file:
             data = [x for x in log_file.read().split('\n') if x]
     except Exception:
         data = [] # if file doesn't exist, no restore as ever been performed. return empty data
@@ -220,6 +220,7 @@ def resetDefaultPrograms():
 def reset():
     pi = pigpio.pi('localhost')
     #simulating FALLING EDGE
+    # it triggers the reset by using the service altready running on the system that detects a button press (3 sec).
     pi.write(BUTTON_PIN, 1)
     pi.write(BUTTON_PIN, 0)
 
