@@ -13,6 +13,9 @@ from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
+import pigpio
+
+BUTTON_PIN = 16
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
@@ -118,12 +121,20 @@ def exec(data):
 
 def status():
     sts = get_status()
+    # getting reset log file
+    try:
+        with open('/home/pi/coderbot/logs/reset_trigger_service.log', 'r') as log_file:
+            data = [x for x in log_file.read().split('\n') if x]
+    except Exception:
+        data = [] # if file doesn't exist, no restore as ever been performed. return empty data
+
 
     return {
         "status": "ok",
         "internetConnectivity": sts["internet_status"],
         "temp": sts["temp"],
         "uptime": sts["uptime"],
+        "log": data
     }
 
 def info():
@@ -206,3 +217,16 @@ def resetDefaultPrograms():
             with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
+
+## Reset
+def reset():
+    pi = pigpio.pi('localhost')
+    #simulating FALLING EDGE
+    # it triggers the reset by using the service altready running on the system that detects a button press (3 sec).
+    pi.write(BUTTON_PIN, 1)
+    pi.write(BUTTON_PIN, 0)
+
+    return {
+        "status": "ok"
+    }
+

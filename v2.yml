@@ -164,12 +164,21 @@ paths:
   /status:
     get:
       operationId: "api.status"
-      summary: "Bot general informations and execution status"
+      summary: "Bot general informations, execution status and reset log file"
       tags:
         - Status informations
       responses:
         200:
           description: "Bot status"
+  /reset:
+    post:
+      operationId: "api.reset"
+      summary: "Reset coderbot by restoring boot partition"
+      tags:
+        - Coderbot reset
+      responses:
+        200:
+          description: "resets coderbot entirely"
   /info:
     get:
       operationId: "api.info"
