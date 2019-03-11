@@ -365,44 +365,44 @@ class CoderBot(object):
     class TwinMotorsEncoder(object):
         def __init__(self, apigpio, pin_enable, pin_forward_left, pin_backward_left, pin_encoder_left, pin_forward_right, pin_backward_right, pin_encoder_right):
             self._straight = False
-            self._running = False
-            self._encoder_sem = threading.Condition()
-            self._motor_left = CoderBot.MotorEncoder(self, apigpio, pin_enable, pin_forward_left, pin_backward_left, pin_encoder_left)
-            self._motor_right = CoderBot.MotorEncoder(self, apigpio, pin_enable, pin_forward_right, pin_backward_right, pin_encoder_right)
+            #self._running = False
+            #self._encoder_sem = threading.Condition()
+            #self._motor_left = CoderBot.MotorEncoder(self, apigpio, pin_enable, pin_forward_left, pin_backward_left, pin_encoder_left)
+            #self._motor_right = CoderBot.MotorEncoder(self, apigpio, pin_enable, pin_forward_right, pin_backward_right, pin_encoder_right)
 
-        def exit(self):
-            self._motor_left.exit()
-            self._motor_right.exit()
+        #def exit(self):
+        #    self._motor_left.exit()
+        #    self._motor_right.exit()
 
-        def control(self, power_left=100.0, power_right=100.0, elapse=-1, speed_left=-1, speed_right=-1, steps_left=-1, steps_right=-1):
-            self._straight = power_left == power_right and speed_left == speed_right and steps_left == steps_right
+        # def control(self, power_left=100.0, power_right=100.0, elapse=-1, speed_left=-1, speed_right=-1, steps_left=-1, steps_right=-1):
+        #     self._straight = power_left == power_right and speed_left == speed_right and steps_left == steps_right
+        #
+        #     if steps_left >= 0 or steps_right >= 0:
+        #         self._encoder_sem.acquire()
+        #
+        #     self._motor_left.control(power=power_left, elapse=-1, speed=speed_left, steps=steps_left)
+        #     self._motor_right.control(power=power_right, elapse=-1, speed=speed_right, steps=steps_right)
+        #     self._running = True
+        #
+        #     if elapse > 0:
+        #         time.sleep(elapse)
+        #         self.stop()
+        #
+        #     if steps_left >= 0 or steps_right >= 0:
+        #         self._encoder_sem.wait()
+        #         self._encoder_sem.release()
+        #         self.stop()
 
-            if steps_left >= 0 or steps_right >= 0:
-                self._encoder_sem.acquire()
+        #def stop(self):
+        #    self._motor_left.stop()
+        #    self._motor_right.stop()
+        #    self._running = False
 
-            self._motor_left.control(power=power_left, elapse=-1, speed=speed_left, steps=steps_left)
-            self._motor_right.control(power=power_right, elapse=-1, speed=speed_right, steps=steps_right)
-            self._running = True
+        #def distance(self):
+        #    return (self._motor_left.distance() + self._motor_right.distance()) / 2
 
-            if elapse > 0:
-                time.sleep(elapse)
-                self.stop()
-
-            if steps_left >= 0 or steps_right >= 0:
-                self._encoder_sem.wait()
-                self._encoder_sem.release()
-                self.stop()
-
-        def stop(self):
-            self._motor_left.stop()
-            self._motor_right.stop()
-            self._running = False
-
-        def distance(self):
-            return (self._motor_left.distance() + self._motor_right.distance()) / 2
-
-        def speed(self):
-            return (self._motor_left.speed() + self._motor_right.speed()) / 2
+        #def speed(self):
+        #    return (self._motor_left.speed() + self._motor_right.speed()) / 2
 
         def _cb_encoder(self, motor, gpio, level, tick):
             if (self._straight and self._running and not self._motor_left.stopping() and not self._motor_right.stopping() and
