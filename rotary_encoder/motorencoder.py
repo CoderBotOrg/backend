@@ -1,6 +1,6 @@
 import pigpio
 import threading
-from time import sleep
+from time import sleep, time
 
 from rotarydecoder import RotaryDecoder
 
@@ -67,7 +67,7 @@ class MotorEncoder:
     def control(self, power=100.0, time_elapse=0):
         self._motor_lock.acquire()  # acquiring lock
 
-        self.stop()  # stopping motor to initialize new movement
+        #self.stop()  # stopping motor to initialize new movement
 
         self._direction = 1 if power > 0 else -1  # setting direction according to speed
         self._power = power # setting current power
@@ -129,8 +129,8 @@ class MotorEncoder:
     def rotary_callback(self, tick):
         self._motor_lock.acquire()
         self._ticks += tick  # updating ticks
-        # self._encoder_speed = ?    # encoder speed (mm/s)
         self._distance = self._ticks * 0.196  # (mm) travelled
+        #self._encoder_speed = (mm/s)
         self._motor_lock.release()
 
     # callback cancelling

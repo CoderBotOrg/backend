@@ -52,29 +52,45 @@ class WheelsAxel:
         return (l_speed + r_speed) / 2
 
     # MOVEMENT
+    """ Motor time control allows the motors
+        to run for a certain amount of time """
     def control_time(self, power_left=100, power_right=100, time_elapse=0):
-         self._wheelsAxle_lock.acquire()
+         self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
+
+         # applying tension to motors
          self._left_motor.control(power_left)
          self._right_motor.control(power_right)
          self._is_moving = True
 
-         if(time_elapse > 0):
-             sleep(time_elapse)
-             self.stop()
+         # moving for desired time
+         sleep(time_elapse)
+         self.stop()
 
+    """ Motor distance control allows the motors
+            to run for a certain amount of distance (mm) """
     def control_distance(self, power_left=100, power_right=100, target_distance=0):
-        self._wheelsAxle_lock.acquire()
+        self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
         self._is_moving = True
 
+        # applying tension to motors
         self._left_motor.control(power_left)
         self._right_motor.control(power_right)
 
+        # moving for certaing amount of distance
         while(target_distance > 0):
-            target_distance = target_distance - self.distance()
-            print(str(target_distance))
+            sleep(0.05) # check if arrived every 50ms,
+            print(str(self._left_motor._encoder_speed))
+            target_distance = target_distance - self.distance() # updating target distance
 
+        # robot arrived
         self.stop()
 
+    """ Motor speed control allows the motors
+        to run at a certaing amount of speed (mm/s) """
+    def control_speed(self):
+        pass
+
+    # old control distance, trying to adjust power
     # def control_distance(self, power_left = 100, power_right = 100, target_distance = 0):
     #     self._is_moving = True
     #     delta = 1
@@ -109,8 +125,7 @@ class WheelsAxel:
     def stop(self):
         self._left_motor.stop()
         self._right_motor.stop()
-        print(self._left_motor.distance())
-        print(self._right_motor._distance)
+
         self._is_moving = False
         self._wheelsAxle_lock.release()
 
