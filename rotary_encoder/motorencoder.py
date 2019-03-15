@@ -67,19 +67,19 @@ class MotorEncoder:
     def control(self, power=100.0, time_elapse=0):
         self._motor_lock.acquire()  # acquiring lock
 
-        self._direction = 1 if power > 0 else -1  # setting direction according to speed
-        self._power = power
         self.stop()  # stopping motor to initialize new movement
+
+        self._direction = 1 if power > 0 else -1  # setting direction according to speed
+        self._power = power # setting current power
+
         self._pi.write(self._enable_pin, True)  # enabling motors
 
         # going forward
-        if (self._direction):
+        if (self._direction == 1):
             self._pi.set_PWM_dutycycle(self._forward_pin, abs(power))
-            self._direction = 1
         # going bacakward
         else:
             self._pi.set_PWM_dutycycle(self._backward_pin, abs(power))
-            self._direction = -1
 
         self._is_moving = True
 

@@ -52,22 +52,67 @@ class WheelsAxel:
         return (l_speed + r_speed) / 2
 
     # MOVEMENT
-    def control(self, power_left = 100, power_right = 100, time_elapse = 0):
+    def control_time(self, power_left=100, power_right=100, time_elapse=0):
+         self._wheelsAxle_lock.acquire()
+         self._left_motor.control(power_left)
+         self._right_motor.control(power_right)
+         self._is_moving = True
 
-        self._left_motor.control(power_left, time_elapse)
-        self._right_motor.control(power_right, time_elapse)
+         if(time_elapse > 0):
+             sleep(time_elapse)
+             self.stop()
+
+    def control_distance(self, power_left=100, power_right=100, target_distance=0):
+        self._wheelsAxle_lock.acquire()
         self._is_moving = True
 
-        if(time_elapse > 0):
-            sleep(time_elapse)
-            self.stop()
+        self._left_motor.control(power_left)
+        self._right_motor.control(power_right)
+
+        while(target_distance > 0):
+            target_distance = target_distance - self.distance()
+            print(str(target_distance))
+
+        self.stop()
+
+    # def control_distance(self, power_left = 100, power_right = 100, target_distance = 0):
+    #     self._is_moving = True
+    #     delta = 1
+    #
+    #     while(target_distance > 0):
+    #
+    #         self._left_motor.control(min(max(power_left * delta, power_left), 100))
+    #         self._right_motor.control(min(max(power_right * delta, power_right), 100))
+    #
+    #         print("Target distance: " + str(target_distance))
+    #         print("Power left: " + str(power_left * delta))
+    #         print("Power right: " + str(power_right * delta))
+    #
+    #         sleep(.2)
+    #
+    #         try:
+    #             delta = self._left_motor.ticks() / self._right_motor.ticks()
+    #             target_distance = target_distance - self.distance()
+    #         except:
+    #             delta = 1
+    #
+    #         print("delta_ticks: " + str(delta))
+    #         print("new target distance: " + str(target_distance))
+    #         print("")
+    #
+    #     print("Stopping...")
+    #     self.stop()
 
     """ The stop function calls the two stop functions of the two
-        correspondent motors """
+        correspondent motors 
+        locks are automatically obtained """
     def stop(self):
         self._left_motor.stop()
         self._right_motor.stop()
+        print(self._left_motor.distance())
+        print(self._right_motor._distance)
         self._is_moving = False
+        self._wheelsAxle_lock.release()
 
     # CALLBACK
 
