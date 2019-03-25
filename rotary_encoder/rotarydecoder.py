@@ -6,38 +6,74 @@ class RotaryDecoder:
 
    """ Class to decode mechanical rotary encoder pulses """
 
-   def __init__(self, pi, encoder_feedback_pin, callback):
+   def __init__(self, pi, feedback_pin_A, feedback_pin_B, callback):
 
       self._pi = pi
-      self._encoder_feedback_pin = encoder_feedback_pin   # encoder feedback pin
+      self._feedback_pin_A = feedback_pin_A   # encoder feedback pin A
+      self._feedback_pin_B = feedback_pin_B   # encoder feedback pin B
       self._callback = callback   # callback function on event
-      self._value = 0             # value of encoder feedback
+      self._direction = 0         # direction, forward = 1, backward = -1, steady = 0
+
+      self._levelA = 0  # value of encoder feedback pin A
+      self._levelB = 0  # value of encoder feedback pin B
 
       # setting up GPIO
-      self._pi.set_mode(encoder_feedback_pin, pigpio.INPUT)
-      self._pi.set_pull_up_down(encoder_feedback_pin, pigpio.PUD_UP)
+      self._pi.set_mode(feedback_pin_A, pigpio.INPUT)
+      self._pi.set_mode(feedback_pin_B, pigpio.INPUT)
+      self._pi.set_pull_up_down(feedback_pin_A, pigpio.PUD_UP)
+      self._pi.set_pull_up_down(feedback_pin_B, pigpio.PUD_UP)
 
-      # callback function on EITHER_EDGE
-      self._callback_trigger = self._pi.callback(encoder_feedback_pin, pigpio.EITHER_EDGE, self._pulse)
+      # callback function on EITHER_EDGE for each pin
+      self._callback_triggerA = self._pi.callback(feedback_pin_A, pigpio.EITHER_EDGE, self._pulse)
+      self._callback_triggerB = self._pi.callback(feedback_pin_B, pigpio.EITHER_EDGE, self._pulse)
+
+      self._lastGpio = None
 
    """ pulse is the callback function on EITHER_EDGE
-       it returns a 1 if the feedback square wave is on a falling edge 
-       It simply returns a 1 on FALLING EDGE, i've detached this class in order
-       to make it easier in case of extension with PIN A attached too """
-   def _pulse(self, pi, level, tick):
-      self._value = level
+       We have two feedback input from pin A and B (two train waves)
+       it returns a 1 if the square waves have A leading B because we're moving forward
+       It returns a -1 if the square waves have B leading A because we're moving backwards
+       In either case, A is staggered from B by (+-)pi/2 radiants
+       
+                +---------+         +---------+            0
+                |         |         |         |
+            A   |         |         |         |
+                |         |         |         |
+            ----+         +---------+         +----------+ 1   # A leading B
+                      +---------+         +---------+      0   # forward
+                      |         |         |         |
+            B         |         |         |         |
+                      |         |         |         |
+            +---------+         +---------+         +----- 1
+   """
+   def _pulse(self, gpio, level, tick):
+      # interrupt comes from pin A
+      if (gpio == self._feedback_pin_A):
+         self._levelA = level   # set level of squared wave (0, 1) on A
+      # interrupt comes from pin B
+      else:
+         self._levelB = level   # set level of squared wave (0, 1) on B
 
-      # RAISING EDGE
-      if self._value == 1:
-          self._callback(1)
+      if (gpio != self._lastGpio): # debounce
+         self._lastGpio = gpio
+
+         if (gpio == self._feedback_pin_A and level == 1):
+            if (self._levelB == 1):
+               self._callback(1) # A leading B, moving forward
+               self._direction = 1 # forward
+
+         elif (gpio == self._feedback_pin_B and level == 1):
+            if (self._levelA == 1):
+               self._callback(-1)   # B leading A, moving forward
+               self._direction = -1 # backwards
 
 
    def cancel(self):
 
       """
-      Cancel the rotary encoder decoder.
+      Cancel the rotary encoder decoder callbacks.
       """
-
-      self._callback_trigger.cancel()
+      self._callback_triggerA.cancel()
+      self._callback_triggerB.cancel()
 
 

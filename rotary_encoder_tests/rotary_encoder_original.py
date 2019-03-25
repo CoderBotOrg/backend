@@ -79,13 +79,13 @@ class decoder:
              |         |         |         |
          B   |         |         |         |
              |         |         |         |
-         ----+         +---------+         +---------+  1
+         ----+         +---------+         +----------+ 1
       """
 
       if gpio == self.gpioA:
          self.levA = level
       else:
-         self.levB = level;
+         self.levB = level
 
       if gpio != self.lastGpio: # debounce
          self.lastGpio = gpio
