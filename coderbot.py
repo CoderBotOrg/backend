@@ -28,10 +28,10 @@ from wheelsaxel import WheelsAxel
 # GPIO
 # motors
 PIN_MOTOR_ENABLE = 22
-PIN_LEFT_FORWARD = 24
-PIN_LEFT_BACKWARD = 25
-PIN_RIGHT_FORWARD = 17
-PIN_RIGHT_BACKWARD = 4
+PIN_LEFT_FORWARD = 25
+PIN_LEFT_BACKWARD = 24
+PIN_RIGHT_FORWARD = 4
+PIN_RIGHT_BACKWARD = 17
 #?
 PIN_PUSHBUTTON = 11
 # servo
@@ -96,7 +96,7 @@ class CoderBot(object):
         except IOError:
             logging.info("MPU not available")
 
-        self.stop()
+        #self.stop()
         self._is_moving = False
 
     the_bot = None
@@ -114,35 +114,35 @@ class CoderBot(object):
             cls.the_bot = CoderBot(servo, motor_trim_factor)
         return cls.the_bot
 
-    def move(self, speed=100, elapse=-1):
+    def move(self, speed=100, time_elapse=0, target_distance=0):
         speed_left = min(100, max(-100, speed * self._motor_trim_factor))
         speed_right = min(100, max(-100, speed / self._motor_trim_factor))
-        self.motor_control(speed_left=speed_left, speed_right=speed_right, elapse=elapse)
+        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=time_elapse, target_distance=target_distance)
 
-    def turn(self, speed=100, elapse=-1):
+    def turn(self, speed=100, time_elapse=0):
         speed_left = min(100, max(-100, speed * self._motor_trim_factor))
         speed_right = -min(100, max(-100, speed / self._motor_trim_factor))
-        self.motor_control(speed_left=speed_left, speed_right=speed_right, elapse=elapse)
+        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=time_elapse)
 
     def turn_angle(self, speed=100, angle=0):
         z = self._ag.get_gyro_data()['z']
-        self.turn(speed, elapse=-1)
+        self.turn(speed, time_elapse=0)
         while abs(z - self._ag.get_gyro_data()['z']) < angle:
             time.sleep(0.05)
             logging.info(self._ag.get_gyro_data()['z'])
         self.stop()
 
-    def forward(self, speed=100, elapse=-1):
-        self.move(speed=speed, elapse=elapse)
+    def forward(self, speed=100, time_elapse=0):
+        self.move(speed=speed, time_elapse=time_elapse)
 
-    def backward(self, speed=100, elapse=-1):
-        self.move(speed=-speed, elapse=elapse)
+    def backward(self, speed=100, time_elapse=0):
+        self.move(speed=-speed, time_elapse=elapse)
 
-    def left(self, speed=100, elapse=-1):
-        self.turn(speed=-speed, elapse=elapse)
+    def left(self, speed=100, time_elapse=0):
+        self.turn(speed=-speed, time_elapse=time_elapse)
 
-    def right(self, speed=100, elapse=-1):
-        self.turn(speed=speed, elapse=elapse)
+    def right(self, speed=100, time_elapse=0):
+        self.turn(speed=speed, time_elapse=time_elapse)
 
     def get_sonar_distance(self, sonar_id=0):
         return self.sonar[sonar_id].get_distance()
@@ -187,5 +187,8 @@ class CoderBot(object):
     def reboot(self):
         os.system('sudo reboot')
 
-    def _dc_enc_motor(self, speed_left=100, speed_right=100, elapse=0):
-        self._twin_motors_enc.control_time(power_left=speed_left, power_right=speed_right, time_elapse=elapse)
+    def _dc_enc_motor(self, speed_left=100, speed_right=100, time_elapse=0, target_distance=0):
+        self._twin_motors_enc.control(power_left=speed_left,
+                                      power_right=speed_right,
+                                      time_elapse=time_elapse,
+                                      target_distance=target_distance)

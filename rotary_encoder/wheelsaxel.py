@@ -54,6 +54,18 @@ class WheelsAxel:
         return (l_speed + r_speed) / 2
 
     # MOVEMENT
+    """ Movement wrapper method 
+        if time is specified and distance is not, control_time is called
+        if distance is specified and time is not, control_distance is called
+        if both distance and time are specified, control_velocity is called """
+    def control(self, power_left=100, power_right=100, time_elapse=0, target_distance=0):
+        if(time_elapse != 0 and target_distance == 0): # time
+            self.control_time(power_left, power_right, time_elapse)
+        elif(time_elapse == 0 and target_distance != 0): # distance
+            self.control_distance(power_left, power_right, target_distance)
+        else: # velocity
+            self.control_velocity(time_elapse, target_distance)
+
     """ Motor time control allows the motors
         to run for a certain amount of time """
     def control_time(self, power_left=100, power_right=100, time_elapse=0):
@@ -81,11 +93,16 @@ class WheelsAxel:
         # moving for certaing amount of distance
         while(target_distance > 0):
             sleep(0.05) # check if arrived every 50ms,
-            print(str(self._left_motor._encoder_speed))
+            print(str(self.distance()))
             target_distance = target_distance - self.distance() # updating target distance
 
         # robot arrived
         self.stop()
+
+    """ Motor speed control to travel given distance
+        in given time adjusting power on motors invididually """
+    def control_velocity(self, time_elapse=0, target_distance=0):
+        pass
 
     # old control distance, trying to adjust power
     # def control_distance(self, power_left = 100, power_right = 100, target_distance = 0):
