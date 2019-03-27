@@ -25,23 +25,32 @@ import sonar
 import mpu
 from wheelsaxel import WheelsAxel
 
+# GPIO
+# motors
 PIN_MOTOR_ENABLE = 22
 PIN_LEFT_FORWARD = 24
 PIN_LEFT_BACKWARD = 25
 PIN_RIGHT_FORWARD = 17
 PIN_RIGHT_BACKWARD = 4
+#?
 PIN_PUSHBUTTON = 11
+# servo
 PIN_SERVO_3 = 9
 PIN_SERVO_4 = 10
+# sonar
 PIN_SONAR_1_TRIGGER = 18
 PIN_SONAR_1_ECHO = 7
 PIN_SONAR_2_TRIGGER = 18
 PIN_SONAR_2_ECHO = 8
 PIN_SONAR_3_TRIGGER = 18
 PIN_SONAR_3_ECHO = 23
-PIN_ENCODER_LEFT = 15
-PIN_ENCODER_RIGHT = 14
+# encoder
+PIN_ENCODER_LEFT_A = 14
+PIN_ENCODER_LEFT_B = 6
+PIN_ENCODER_RIGHT_A = 15
+PIN_ENCODER_RIGHT_B = 12
 
+# PWM
 PWM_FREQUENCY = 100 #Hz
 PWM_RANGE = 100 #0-100
 
@@ -51,13 +60,12 @@ class CoderBot(object):
 
     _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
 
-    def __init__(self, servo=False, motor_trim_factor=1.0, encoder=True):
+    def __init__(self, motor_trim_factor=1.0, encoder=True):
         self.pi = pigpio.pi('localhost')
         self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
         self._cb = dict()
         self._cb_last_tick = dict()
         self._cb_elapse = dict()
-        self._servo = servo
         self._encoder = encoder
         self._motor_trim_factor = motor_trim_factor
         self._twin_motors_enc = WheelsAxel(
@@ -65,10 +73,12 @@ class CoderBot(object):
             enable_pin=PIN_MOTOR_ENABLE,
             left_forward_pin=PIN_LEFT_FORWARD,
             left_backward_pin=PIN_LEFT_BACKWARD,
-            left_encoder_feedback_pin=PIN_ENCODER_LEFT,
+            left_encoder_feedback_pin_A=PIN_ENCODER_LEFT_A,
+            left_encoder_feedback_pin_B=PIN_ENCODER_LEFT_B,
             right_forward_pin=PIN_RIGHT_FORWARD,
             right_backward_pin=PIN_RIGHT_BACKWARD,
-            right_encoder_feedback_pin=PIN_ENCODER_RIGHT)
+            right_encoder_feedback_pin_A=PIN_ENCODER_RIGHT_A,
+            right_encoder_feedback_pin_B=PIN_ENCODER_RIGHT_B)
         self.motor_control = self._dc_enc_motor
 
         self._cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, self._cb_button)
@@ -177,6 +187,5 @@ class CoderBot(object):
     def reboot(self):
         os.system('sudo reboot')
 
-
-    def _dc_enc_motor(self, speed_left=100, speed_right=100, elapse=-1):
+    def _dc_enc_motor(self, speed_left=100, speed_right=100, elapse=0):
         self._twin_motors_enc.control_time(power_left=speed_left, power_right=speed_right, time_elapse=elapse)

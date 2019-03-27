@@ -14,8 +14,8 @@ class WheelsAxel:
         that makes one wheel go slower than the other """
 
     def __init__(self, pi, enable_pin,
-                 left_forward_pin, left_backward_pin, left_encoder_feedback_pin,
-                 right_forward_pin, right_backward_pin, right_encoder_feedback_pin):
+                 left_forward_pin, left_backward_pin, left_encoder_feedback_pin_A, left_encoder_feedback_pin_B,
+                 right_forward_pin, right_backward_pin, right_encoder_feedback_pin_A, right_encoder_feedback_pin_B):
 
         # state variables
         self._is_moving = False
@@ -25,13 +25,15 @@ class WheelsAxel:
                                         enable_pin,
                                         left_forward_pin,
                                         left_backward_pin,
-                                        left_encoder_feedback_pin)
+                                        left_encoder_feedback_pin_A,
+                                        left_encoder_feedback_pin_B)
         # right motor
         self._right_motor = MotorEncoder(pi,
                                          enable_pin,
                                          right_forward_pin,
                                          right_backward_pin,
-                                         right_encoder_feedback_pin)
+                                         right_encoder_feedback_pin_B,
+                                         right_encoder_feedback_pin_A)
 
         # other
         self._wheelsAxle_lock = threading.Condition() # race condition lock
@@ -55,16 +57,16 @@ class WheelsAxel:
     """ Motor time control allows the motors
         to run for a certain amount of time """
     def control_time(self, power_left=100, power_right=100, time_elapse=0):
-         self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
+        self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
 
-         # applying tension to motors
-         self._left_motor.control(power_left)
-         self._right_motor.control(power_right)
-         self._is_moving = True
+        # applying tension to motors
+        self._left_motor.control(power_left)
+        self._right_motor.control(power_right)
+        self._is_moving = True
 
-         # moving for desired time
-         sleep(time_elapse)
-         self.stop()
+        # moving for desired time
+        sleep(time_elapse)
+        self.stop()
 
     """ Motor distance control allows the motors
             to run for a certain amount of distance (mm) """
@@ -84,11 +86,6 @@ class WheelsAxel:
 
         # robot arrived
         self.stop()
-
-    """ Motor speed control allows the motors
-        to run at a certaing amount of speed (mm/s) """
-    def control_speed(self):
-        pass
 
     # old control distance, trying to adjust power
     # def control_distance(self, power_left = 100, power_right = 100, target_distance = 0):
@@ -120,8 +117,8 @@ class WheelsAxel:
     #     self.stop()
 
     """ The stop function calls the two stop functions of the two
-        correspondent motors 
-        locks are automatically obtained """
+        correspondent motors. 
+        Locks are automatically obtained """
     def stop(self):
         self._left_motor.stop()
         self._right_motor.stop()
@@ -130,8 +127,6 @@ class WheelsAxel:
         self._wheelsAxle_lock.release()
 
     # CALLBACK
-
-
     def cancel_callback(self):
         self._right_motor.cancel_callback()
         self._left_motor.cancel_callback()

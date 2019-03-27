@@ -15,13 +15,14 @@ class MotorEncoder:
         concurrency problems on GPIO READ/WRITE """
 
     # default constructor
-    def __init__(self, pi, enable_pin, forward_pin, backward_pin, encoder_feedback_pin):
+    def __init__(self, pi, enable_pin, forward_pin, backward_pin, feedback_pin_A, feedback_pin_B):
         # setting pin variables
         self._pi = pi
         self._enable_pin = enable_pin
         self._forward_pin = forward_pin
         self._backward_pin = backward_pin
-        self._encoder_feedback_pin = encoder_feedback_pin
+        self._feedback_pin_A = feedback_pin_A
+        self._feedback_pin_B = feedback_pin_B
 
         # setting movement variables
         self._direction = 0
@@ -33,7 +34,7 @@ class MotorEncoder:
 
         # other
         self._motor_lock = threading.RLock()
-        self._rotary_decoder = RotaryDecoder(pi, encoder_feedback_pin, self.rotary_callback)
+        self._rotary_decoder = RotaryDecoder(pi, feedback_pin_A, feedback_pin_B, self.rotary_callback)
 
     # GETTERS
     # ticks
