@@ -12,7 +12,7 @@ if __name__ == "__main__":
    import time
    import pigpio
    
-   #pi = pigpio.pi('coderbot.local')
+   #pi = pigpio.pi('backend.local')
    pi = pigpio.pi()
    print("Connected, waiting for signal")
 

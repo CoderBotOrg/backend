@@ -91,7 +91,7 @@ class WheelsAxel:
         self._right_motor.control(power_right)
 
         # moving for certaing amount of distance
-        while(target_distance > 0):
+        while(self.distance() < target_distance):
             sleep(0.05) # check if arrived every 50ms,
             print(str(self.distance()))
             target_distance = target_distance - self.distance() # updating target distance

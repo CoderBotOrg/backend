@@ -58,15 +58,21 @@ class RotaryDecoder:
          self._lastGpio = gpio
 
          if (gpio == self._feedback_pin_A and level == 1):
+            if (self._levelB == 0):
+               self._callback(1) # A leading B, moving forward
+               self._direction = 1 # forward
+         elif (gpio == self._feedback_pin_A and level == 0):
             if (self._levelB == 1):
                self._callback(1) # A leading B, moving forward
                self._direction = 1 # forward
-
          elif (gpio == self._feedback_pin_B and level == 1):
-            if (self._levelA == 1):
+            if (self._levelA == 0):
                self._callback(-1)   # B leading A, moving forward
                self._direction = -1 # backwards
-
+         elif (gpio == self._feedback_pin_B and level == 0):
+            if (self._levelA == 1):
+               self._callback(-1) # A leading B, moving forward
+               self._direction = -1 # forward
 
    def cancel(self):
 

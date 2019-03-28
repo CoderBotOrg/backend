@@ -31,10 +31,10 @@ if __name__ == "__main__":
       print("pos_RIGHT={}".format(pos_right))
 
 
-   # pi = pigpio.pi('coderbot.local')
+   # pi = pigpio.pi('backend.local')
    pi = pigpio.pi()
 
-   decoder_left = RotaryDecoder(pi, PIN_ENCODER_LEFT_A, PIN_ENCODER_LEFT_B, callback_left)
+   decoder_left = RotaryDecoder(pi, PIN_ENCODER_LEFT_B, PIN_ENCODER_LEFT_A, callback_left)
    decoder_right = RotaryDecoder(pi, PIN_ENCODER_RIGHT_A, PIN_ENCODER_RIGHT_B, callback_right)
 
    time.sleep(1000)
