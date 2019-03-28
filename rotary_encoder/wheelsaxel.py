@@ -100,38 +100,9 @@ class WheelsAxel:
         self.stop()
 
     """ Motor speed control to travel given distance
-        in given time adjusting power on motors invididually """
+        in given time adjusting power on motors """
     def control_velocity(self, time_elapse=0, target_distance=0):
         pass
-
-    # old control distance, trying to adjust power
-    # def control_distance(self, power_left = 100, power_right = 100, target_distance = 0):
-    #     self._is_moving = True
-    #     delta = 1
-    #
-    #     while(target_distance > 0):
-    #
-    #         self._left_motor.control(min(max(power_left * delta, power_left), 100))
-    #         self._right_motor.control(min(max(power_right * delta, power_right), 100))
-    #
-    #         print("Target distance: " + str(target_distance))
-    #         print("Power left: " + str(power_left * delta))
-    #         print("Power right: " + str(power_right * delta))
-    #
-    #         sleep(.2)
-    #
-    #         try:
-    #             delta = self._left_motor.ticks() / self._right_motor.ticks()
-    #             target_distance = target_distance - self.distance()
-    #         except:
-    #             delta = 1
-    #
-    #         print("delta_ticks: " + str(delta))
-    #         print("new target distance: " + str(target_distance))
-    #         print("")
-    #
-    #     print("Stopping...")
-    #     self.stop()
 
     """ The stop function calls the two stop functions of the two
         correspondent motors. 

@@ -125,7 +125,7 @@ class MotorEncoder:
         - 1 wheel revolution = 2πR = 2 * π * 30mm = 188.5mm
         - 1920 ticks = 188.5mm
         - 1 tick = 0.0981mm
-        - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks aproximately """
+        - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately """
 
     # callback function
     def rotary_callback(self, tick):
