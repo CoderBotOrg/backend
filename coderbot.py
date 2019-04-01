@@ -114,35 +114,36 @@ class CoderBot(object):
             cls.the_bot = CoderBot(servo, motor_trim_factor)
         return cls.the_bot
 
-    def move(self, speed=100, time_elapse=0, target_distance=0):
+    def move(self, speed=100, elapse=0, distance=0):
+        self._motor_trim_factor = 1.0
         speed_left = min(100, max(-100, speed * self._motor_trim_factor))
         speed_right = min(100, max(-100, speed / self._motor_trim_factor))
-        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=time_elapse, target_distance=target_distance)
+        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse, target_distance=distance)
 
-    def turn(self, speed=100, time_elapse=0):
+    def turn(self, speed=100, elapse=0):
         speed_left = min(100, max(-100, speed * self._motor_trim_factor))
         speed_right = -min(100, max(-100, speed / self._motor_trim_factor))
-        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=time_elapse)
+        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse)
 
     def turn_angle(self, speed=100, angle=0):
         z = self._ag.get_gyro_data()['z']
-        self.turn(speed, time_elapse=0)
+        self.turn(speed, elapse=0)
         while abs(z - self._ag.get_gyro_data()['z']) < angle:
             time.sleep(0.05)
             logging.info(self._ag.get_gyro_data()['z'])
         self.stop()
 
-    def forward(self, speed=100, time_elapse=0):
-        self.move(speed=speed, time_elapse=time_elapse)
+    def forward(self, speed=100, elapse=0, distance=0):
+        self.move(speed=speed, elapse=elapse, distance=distance)
 
-    def backward(self, speed=100, time_elapse=0):
-        self.move(speed=-speed, time_elapse=elapse)
+    def backward(self, speed=100, elapse=0, distance=0):
+        self.move(speed=-speed, elapse=elapse, distance=distance)
 
-    def left(self, speed=100, time_elapse=0):
-        self.turn(speed=-speed, time_elapse=time_elapse)
+    def left(self, speed=100, elapse=0):
+        self.turn(speed=-speed, elapse=elapse)
 
-    def right(self, speed=100, time_elapse=0):
-        self.turn(speed=speed, time_elapse=time_elapse)
+    def right(self, speed=100, elapse=0):
+        self.turn(speed=speed, elapse=elapse)
 
     def get_sonar_distance(self, sonar_id=0):
         return self.sonar[sonar_id].get_distance()

@@ -106,11 +106,11 @@ def stop():
     return 200
 
 def move(data):
-    bot.move(speed=data["speed"], elapse=data["elapse"])
+    bot.move(speed=data["speed"], time_elapse=data["elapse"], target_distance=data["distance"])
     return 200
 
 def turn(data):
-    bot.turn(speed=data["speed"], elapse=data["elapse"])
+    bot.turn(speed=data["speed"], time_elapse=data["elapse"])
     return 200
 
 def exec(data):

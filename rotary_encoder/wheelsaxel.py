@@ -45,13 +45,13 @@ class WheelsAxel:
     def distance(self):
         l_dist = self._left_motor.distance()
         r_dist = self._right_motor.distance()
-        return (l_dist + r_dist) / 2
+        return (l_dist + r_dist) * 0.5
 
     #speed
     def speed(self):
         l_speed = self._left_motor.speed()
         r_speed = self._right_motor.speed()
-        return (l_speed + r_speed) / 2
+        return (l_speed + r_speed) * 0.5
 
     # MOVEMENT
     """ Movement wrapper method 
@@ -91,10 +91,8 @@ class WheelsAxel:
         self._right_motor.control(power_right)
 
         # moving for certaing amount of distance
-        while(self.distance() < target_distance):
-            sleep(0.05) # check if arrived every 50ms,
-            print(str(self.distance()))
-            target_distance = target_distance - self.distance() # updating target distance
+        while(abs(self.distance()) < target_distance):
+            pass # busy waiting
 
         # robot arrived
         self.stop()
@@ -110,7 +108,6 @@ class WheelsAxel:
     def stop(self):
         self._left_motor.stop()
         self._right_motor.stop()
-
         self._is_moving = False
         self._wheelsAxle_lock.release()
 
