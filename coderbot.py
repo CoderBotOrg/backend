@@ -109,9 +109,9 @@ class CoderBot(object):
             s.cancel()
 
     @classmethod
-    def get_instance(cls, servo=False, motor_trim_factor=1.0):
+    def get_instance(cls, motor_trim_factor=1.0, encoder=True):
         if not cls.the_bot:
-            cls.the_bot = CoderBot(servo, motor_trim_factor)
+            cls.the_bot = CoderBot(motor_trim_factor=motor_trim_factor, encoder=encoder)
         return cls.the_bot
 
     def move(self, speed=100, elapse=0, distance=0):
