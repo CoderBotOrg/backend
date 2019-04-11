@@ -91,6 +91,7 @@ class WheelsAxel:
         self._right_motor.control(power_right)
 
         # moving for certaing amount of distance
+        # threshold value avoid to stop it after
         while(abs(self.distance()) < target_distance):
             pass # busy waiting
 
@@ -98,7 +99,8 @@ class WheelsAxel:
         self.stop()
 
     """ Motor speed control to travel given distance
-        in given time adjusting power on motors """
+        in given time adjusting power on motors 
+        NOT very intuitive, idea has been postponed"""
     def control_velocity(self, time_elapse=0, target_distance=0):
         pass
 
@@ -106,9 +108,19 @@ class WheelsAxel:
         correspondent motors. 
         Locks are automatically obtained """
     def stop(self):
+        # stopping left and right motors
         self._left_motor.stop()
         self._right_motor.stop()
+
+        # trying to fix distance different than zero after
+        # wheels has stopped by re-resetting state after 0.5s
+        sleep(0.5)
+        self._left_motor.reset_state()
+        self._right_motor.reset_state()
+
+        # updating state
         self._is_moving = False
+        # restoring callback
         self._wheelsAxle_lock.release()
 
     # CALLBACK

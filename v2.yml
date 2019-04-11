@@ -179,6 +179,29 @@ paths:
       responses:
         200:
           description: "resets coderbot entirely"
+  /testCoderbot:
+    post:
+      summary: Tests CoderBot components.
+      operationId: "api.testCoderbot"
+      tags:
+        - CoderBot Test
+      parameters:
+        - in: body
+          name: data
+          description: Components names to be tested
+          schema:
+            type: object
+            default: {'varargin': ['motors', 'sonar', 'speaker']}
+            required:
+              - varargin
+            properties:
+              speed:
+                type: list
+                description: Components names to be tested
+
+      responses:
+        200:
+          description: Test ended.
   /info:
     get:
       operationId: "api.info"

@@ -34,6 +34,7 @@ class MotorEncoder:
 
         # other
         self._motor_lock = threading.RLock()
+        self._start_timer = 0
         self._rotary_decoder = RotaryDecoder(pi, feedback_pin_A, feedback_pin_B, self.rotary_callback)
 
     # GETTERS
@@ -103,16 +104,22 @@ class MotorEncoder:
         self._pi.write(self._backward_pin, 0)
         self._pi.write(self._forward_pin, 0)
 
-        # returning state variables to consistent state
-        self._distance = 0       # resetting distance travelled
-        self._ticks = 0          # resetting ticks
-        self._power = 0          # resetting PWM power
-        self._encoder_speed = 0  # resetting encoder speed
-        self._direction = 0      # resetting direction
-        self._is_moving = False  # resetting moving flag
+        # resetting wheel state
+        self.reset_state()
 
-        # releasing lock
+       # releasing lock
         self._motor_lock.release()
+
+    # stop auxiliary function, resets wheel state
+    def reset_state(self):
+        # returning state variables to consistent state
+        self._distance = 0  # resetting distance travelled
+        self._ticks = 0  # resetting ticks
+        self._power = 0  # resetting PWM power
+        self._encoder_speed = 0  # resetting encoder speed
+        self._direction = 0  # resetting direction
+        self._start_timer = 0
+        self._is_moving = False  # resetting moving flag
 
     # CALLBACK
     """ The callback function rotary_callback is called on FALLING_EDGE by the
@@ -132,7 +139,12 @@ class MotorEncoder:
         self._motor_lock.acquire()
         self._ticks += tick  # updating ticks
         self._distance = self._ticks * 0.0981  # (mm) travelled
-        #self._encoder_speed = (mm/s)
+
+        # velocity calculation
+        elapse = time() - self._start_timer
+        if(elapse != 0):
+            self._encoder_speed = (self._distance / 1000) / elapse #(mm/s)
+
         self._motor_lock.release()
 
     # callback cancelling

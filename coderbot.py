@@ -159,6 +159,14 @@ class CoderBot(object):
     def is_moving(self):
         return self._is_moving
 
+    # Distance travelled getter
+    def distance(self):
+        return self._twin_motors_enc.distance()
+
+    # CoderBot velocity getter
+    def speed(self):
+        return self._twin_motors_enc.speed()
+
     def set_callback(self, gpio, callback, elapse):
         self._cb_elapse[gpio] = elapse * 1000
         self._cb[gpio] = callback

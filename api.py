@@ -13,6 +13,7 @@ from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
+from coderbotTestUnit import run_test as runCoderbotTestUnit
 import pigpio
 
 BUTTON_PIN = 16
@@ -241,3 +242,7 @@ def reset():
         "status": "ok"
     }
 
+## Test
+def testCoderbot(data):
+    tests_state = runCoderbotTestUnit(data)
+    return tests_state
