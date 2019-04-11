@@ -195,8 +195,8 @@ paths:
             required:
               - varargin
             properties:
-              speed:
-                type: list
+              varargin:
+                type: object
                 description: Components names to be tested
 
       responses:

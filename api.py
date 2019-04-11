@@ -244,5 +244,5 @@ def reset():
 
 ## Test
 def testCoderbot(data):
-    tests_state = runCoderbotTestUnit(data)
+    tests_state = runCoderbotTestUnit(data["varargrin"])
     return tests_state

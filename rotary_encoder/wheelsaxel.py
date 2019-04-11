@@ -53,6 +53,15 @@ class WheelsAxel:
         r_speed = self._right_motor.speed()
         return (l_speed + r_speed) * 0.5
 
+    #direction
+    def speed(self):
+        l_dir = self._left_motor.direction()
+        r_dir = self._right_motor.direction()
+        if(l_dir == r_dir):
+            return l_dir
+        else:
+            return 0
+
     # MOVEMENT
     """ Movement wrapper method 
         if time is specified and distance is not, control_time is called

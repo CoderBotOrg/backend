@@ -69,7 +69,9 @@ class MotorEncoder:
     def control(self, power=100.0, time_elapse=0):
         self._motor_lock.acquire()  # acquiring lock
 
-        #self.stop()  # stopping motor to initialize new movement
+        # resetting distance and ticks before new movement
+        self._distance = 0  # resetting distance travelled
+        self._ticks = 0  # resetting ticks
 
         self._direction = 1 if power > 0 else -1  # setting direction according to speed
         self._power = power # setting current power
@@ -113,8 +115,10 @@ class MotorEncoder:
     # stop auxiliary function, resets wheel state
     def reset_state(self):
         # returning state variables to consistent state
-        self._distance = 0  # resetting distance travelled
-        self._ticks = 0  # resetting ticks
+        # after stopping, values of distance and ticks remains until
+        # next movement
+        #self._distance = 0  # resetting distance travelled
+        #self._ticks = 0  # resetting ticks
         self._power = 0  # resetting PWM power
         self._encoder_speed = 0  # resetting encoder speed
         self._direction = 0  # resetting direction

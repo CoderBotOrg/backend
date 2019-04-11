@@ -167,6 +167,10 @@ class CoderBot(object):
     def speed(self):
         return self._twin_motors_enc.speed()
 
+    # CoderBot direction getter
+    def direction(self):
+        return self._twin_motors_enc.speed()
+
     def set_callback(self, gpio, callback, elapse):
         self._cb_elapse[gpio] = elapse * 1000
         self._cb[gpio] = callback

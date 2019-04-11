@@ -11,11 +11,87 @@
     If a test passes for correspondent component, a 1 is returned.
     If no test was executed on that component, 0 is preserved.
 """
+from coderbot import CoderBot
+c = CoderBot.get_instance()
+
 # Single components tests
 
 # encoder motors
 def __test_encoder():
-    return 1
+    try:
+        # moving both wheels at speed 100 clockwise
+        print("moving both wheels at speed 100 clockwise")
+        assert(c.speed() == 0)
+        c.move(speed=100, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving both wheels at speed 40 clockwise
+        print("moving both wheels at speed 40 clockwise")
+        assert(c.speed() == 0)
+        c.move(speed=40, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving both wheels at speed 100 counter-clockwise
+        print("moving both wheels at speed 100 counter-clockwise")
+        assert(c.speed() == 0)
+        c.move(speed=-100, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving both wheels at speed 40 counter-clockwise
+        print("moving both wheels at speed 40 counter-clockwise")
+        assert(c.speed() == 0)
+        c.move(speed=-40, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving forward
+        print("moving forward")
+        assert(c.speed() == 0)
+        c.forward(speed=100, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving backwards
+        print("moving backwards")
+        assert(c.speed() == 0)
+        c.backward(speed=100, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving forward for 1 meter
+        print("moving forward for 1 meter")
+        assert(c.speed() == 0)
+        c.forward(speed=100, distance=1000)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # moving backwards for 1 meter
+        print("moving backwards for 1 meter")
+        assert(c.speed() == 0)
+        c.backward(speed=100, distance=1000)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # turning left
+        print("turning left")
+        assert(c.speed() == 0)
+        c.left(speed=100, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        # turning right
+        print("turning right")
+        assert(c.speed() == 0)
+        c.right(speed=100, elapse=2)
+        assert(c.distance() != 0)
+        assert (c.speed() == 0)
+
+        return 1
+    except:
+        return -1
 
 # sonar
 def __testSonar():
