@@ -35,6 +35,9 @@ class MotorEncoder:
         # other
         self._motor_lock = threading.RLock()
         self._start_timer = 0
+        self._current_timer = 0
+        self._ticks_threshold = 10
+        self._ticks_counter = 0
         self._rotary_decoder = RotaryDecoder(pi, feedback_pin_A, feedback_pin_B, self.rotary_callback)
 
     # GETTERS
@@ -123,6 +126,8 @@ class MotorEncoder:
         self._encoder_speed = 0  # resetting encoder speed
         self._direction = 0  # resetting direction
         self._start_timer = 0
+        self._current_timer = 0
+        self._ticks_counter = 0
         self._is_moving = False  # resetting moving flag
 
     # CALLBACK
@@ -138,16 +143,45 @@ class MotorEncoder:
         - 1 tick = 0.0981mm
         - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately """
 
+    """
     # callback function
     def rotary_callback(self, tick):
         self._motor_lock.acquire()
+        
+        # on first movement
+        if(self._distance == 0):
+            self._start_timer = time() # clock started
+        
+        
         self._ticks += tick  # updating ticks
         self._distance = self._ticks * 0.0981  # (mm) travelled
 
         # velocity calculation
-        elapse = time() - self._start_timer
+        self._current_timer = time()
+
+        elapse = self._current_timer - self._start_timer
         if(elapse != 0):
-            self._encoder_speed = (self._distance / 1000) / elapse #(mm/s)
+            self._encoder_speed = self._distance / elapse #(mm/s)
+
+        self._motor_lock.release()
+    """
+
+    # callback function
+    def rotary_callback(self, tick):
+        self._motor_lock.acquire()
+
+        # taking groups of n ticks each
+        if (self._ticks_counter == 0):
+            self._start_timer = time()  # clock started
+        elif (self._ticks_counter == self._ticks_threshold):
+            self._current_timer = time()
+            elapse = self._current_timer - self._start_timer
+            self._encoder_speed = self._ticks_threshold * 0.0981 / elapse  # (mm/s)
+
+        self._ticks += tick  # updating ticks
+        self._distance = self._ticks * 0.0981  # (mm) travelled so far
+
+        self._ticks_counter += 1 % (self._ticks_threshold + 1)
 
         self._motor_lock.release()
 
