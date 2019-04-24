@@ -191,7 +191,7 @@ paths:
           description: Components names to be tested
           schema:
             type: object
-            default: {'varargin': ['motors', 'sonar', 'speaker']}
+            default: {'varargin': ['motors', 'sonar', 'speaker', 'ocr']}
             required:
               - varargin
             properties:

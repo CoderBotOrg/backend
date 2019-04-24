@@ -244,5 +244,6 @@ def reset():
 
 ## Test
 def testCoderbot(data):
-    tests_state = runCoderbotTestUnit(data["varargrin"])
+    # taking first JSON key value (varargin)
+    tests_state = runCoderbotTestUnit(data[list(data.keys())[0]])
     return tests_state

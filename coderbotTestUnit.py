@@ -134,7 +134,7 @@ def run_test(varargin):
             tests_state[test] = __testSonar()
         elif (test == 'speaker'):
             tests_state[test] = __test_speaker()
-        elif(test == 'OCR'):
+        elif(test == 'ocr'):
             tests_state[test] = __test_OCR()
         #add more test cases here
 
