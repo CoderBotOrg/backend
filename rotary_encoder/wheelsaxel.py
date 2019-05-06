@@ -54,7 +54,7 @@ class WheelsAxel:
         return (l_speed + r_speed) * 0.5
 
     #direction
-    def speed(self):
+    def direction(self):
         l_dir = self._left_motor.direction()
         r_dir = self._right_motor.direction()
         if(l_dir == r_dir):

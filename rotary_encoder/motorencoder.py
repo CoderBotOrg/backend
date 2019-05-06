@@ -32,12 +32,14 @@ class MotorEncoder:
         self._encoder_speed = 0
         self._is_moving = False
 
-        # other
-        self._motor_lock = threading.RLock()
+        # quadrature encoder variables
         self._start_timer = 0
         self._current_timer = 0
-        self._ticks_threshold = 10
+        self._ticks_threshold = 3
         self._ticks_counter = 0
+
+        # other
+        self._motor_lock = threading.RLock()
         self._rotary_decoder = RotaryDecoder(pi, feedback_pin_A, feedback_pin_B, self.rotary_callback)
 
     # GETTERS
@@ -137,14 +139,21 @@ class MotorEncoder:
         - Gearbox ratio: 120:1 (1 wheel revolution = 120 motor revolution)
         - Encoder ratio: 16:1 encoder ticks for 1 motor revolution
         - 1 wheel revolution = 120 * 16 = 1920 ticks
-        - R = 30mm
-        - 1 wheel revolution = 2πR = 2 * π * 30mm = 188.5mm
+        - R = 30mm        - 1 wheel revolution = 2πR = 2 * π * 30mm = 188.5mm
         - 1920 ticks = 188.5mm
         - 1 tick = 0.0981mm
-        - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately """
+        - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately 
+        So 0.0981 is the ticks->distance(mm) conversion coefficient
+        
+        The callback function calculates current velocity by taking groups of 
+        ticks_threshold ticks"""
 
     """
     # callback function
+    # it calculates velocity via approssimation
+    # it doeas a mean on current time passed and actual distance travelled
+    # NOT USEFUL FOR VELOCITY REGULATION since we need to know the current
+    # velocity updated each time
     def rotary_callback(self, tick):
         self._motor_lock.acquire()
         
@@ -175,15 +184,25 @@ class MotorEncoder:
             self._start_timer = time()  # clock started
         elif (self._ticks_counter == self._ticks_threshold):
             self._current_timer = time()
-            elapse = self._current_timer - self._start_timer
+            elapse = self._current_timer - self._start_timer # calculating time elapse
+            # calculating current speed
             self._encoder_speed = self._ticks_threshold * 0.0981 / elapse  # (mm/s)
 
         self._ticks += tick  # updating ticks
         self._distance = self._ticks * 0.0981  # (mm) travelled so far
 
-        self._ticks_counter += 1 % (self._ticks_threshold + 1)
 
-        self._motor_lock.release()
+        if(self._ticks_counter < self._ticks_threshold):
+            self._ticks_counter += 1
+        else:
+            self._ticks_counter = 0
+
+        # updating ticks counter using module
+        # 0, 1, 2, ... 8, 9, 10, 0, 1, 2, ...
+        # not ideal, module on ticks counter not precise, may miss an interrupt
+        #self._ticks_counter += 1 % (self._ticks_threshold + 1)
+
+        self._motor_lock.release() # releasing lock
 
     # callback cancelling
     def cancel_callback(self):
