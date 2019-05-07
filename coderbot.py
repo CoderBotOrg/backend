@@ -23,7 +23,7 @@ import logging
 import pigpio
 import sonar
 import mpu
-from wheelsaxel import WheelsAxel
+from rotary_encoder.wheelsaxel import WheelsAxel
 
 # GPIO
 # motors
