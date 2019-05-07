@@ -38,7 +38,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            export PYTHONPATH=./stub
+            export PYTHONPATH=./stub:test
             mkdir test-reports
             python3 -m unittest test/coderbot_test.py 2>&1 | tee test-reports/test_report.txt
             #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
