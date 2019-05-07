@@ -75,3 +75,5 @@ class PIGPIOMock(object):
         def cancel(self):
             pass
 
+    def set_pull_up_down(self, feedback_pin_A, mode):
+        pass
