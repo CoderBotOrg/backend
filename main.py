@@ -466,8 +466,8 @@ def run_server():
     try:
         try:
             app.bot_config = Config.read()
-            bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode") == "servo"),
-                                        motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
+            bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
+                                        encoder=bool(app.bot_config.get('encoder')))
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
             try:

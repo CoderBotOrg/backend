@@ -13,14 +13,15 @@ from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
+from coderbotTestUnit import run_test as runCoderbotTestUnit
 import pigpio
 
 BUTTON_PIN = 16
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
-    servo=(bot_config.get("move_motor_mode") == "servo"),
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
+    encoder=bool(bot_config.get("encoder"))
 )
 
 query = Query()
@@ -85,13 +86,23 @@ def get_info():
         update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
     except Exception:
         update_status = 'undefined'
+    try:
+        encoder = bool(Config.read().get('encoder'))
+        if(encoder):
+            motors = 'DC encoder motors'
+        else:
+            motors = 'DC motors'
+    except Exception:
+        motors = 'undefined'
 
     serial = get_serial()
+
     return {'backend_commit': backend_commit,
             'coderbot_version': coderbot_version,
             'update_status': update_status,
             'kernel': kernel,
-            'serial': serial}
+            'serial': serial,
+            'motors': motors}
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -106,11 +117,11 @@ def stop():
     return 200
 
 def move(data):
-    bot.move(speed=data["speed"], elapse=data["elapse"])
+    bot.move(speed=data["speed"], elapse=data["elapse"], distance=data["distance"])
     return 200
 
 def turn(data):
-    bot.turn(speed=data["speed"], elapse=data["elapse"])
+    bot.turn(speed=data["speed"], time_elapse=data["elapse"])
     return 200
 
 def exec(data):
@@ -145,7 +156,8 @@ def info():
         "backend commit build": inf["backend_commit"],
         "kernel" : inf["kernel"],
         "update status": inf["update_status"],
-        "serial": inf["serial"]
+        "serial": inf["serial"],
+        "motors": inf["motors"]
     }
 
 def restoreSettings():
@@ -230,3 +242,8 @@ def reset():
         "status": "ok"
     }
 
+## Test
+def testCoderbot(data):
+    # taking first JSON key value (varargin)
+    tests_state = runCoderbotTestUnit(data[list(data.keys())[0]])
+    return tests_state

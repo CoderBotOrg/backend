@@ -179,6 +179,29 @@ paths:
       responses:
         200:
           description: "resets coderbot entirely"
+  /testCoderbot:
+    post:
+      summary: Tests CoderBot components.
+      operationId: "api.testCoderbot"
+      tags:
+        - CoderBot Test
+      parameters:
+        - in: body
+          name: data
+          description: Components names to be tested
+          schema:
+            type: object
+            default: {'varargin': ['motors', 'sonar', 'speaker', 'ocr']}
+            required:
+              - varargin
+            properties:
+              varargin:
+                type: object
+                description: Components names to be tested
+
+      responses:
+        200:
+          description: Test ended.
   /info:
     get:
       operationId: "api.info"
@@ -209,17 +232,21 @@ paths:
           description: Movement speed and duration
           schema:
             type: object
-            default: {'speed': 100, 'elapse':-1}
+            default: {'speed': 100, 'elapse':0, 'distance':0}
             required:
               - speed
               - elapse
+              - distance
             properties:
               speed:
                 type: number
                 description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
               elapse:
                 type: number
-                description: Duration of the movement. -1 moves the bot until a /stop command is received.
+                description: Duration of the movement. 0 doesn't move the coderbot.
+              distance:
+                type: number
+                description: Target distance for the bot to travel
       responses:
         200:
           description: Sent command to the bot GPIO.
