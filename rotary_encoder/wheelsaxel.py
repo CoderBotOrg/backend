@@ -2,7 +2,7 @@ import pigpio
 import threading
 from time import sleep
 
-from motorencoder import MotorEncoder
+from rotary_encoder.motorencoder import MotorEncoder
 
 class WheelsAxel:
     """ Class that handles both motor encoders, left and right

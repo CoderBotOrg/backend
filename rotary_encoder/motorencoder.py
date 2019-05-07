@@ -2,7 +2,7 @@ import pigpio
 import threading
 from time import sleep, time
 
-from rotarydecoder import RotaryDecoder
+from rotary_encoder.rotarydecoder import RotaryDecoder
 
 
 class MotorEncoder:
