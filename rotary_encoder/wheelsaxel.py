@@ -86,8 +86,10 @@ class WheelsAxel:
         self._is_moving = True
 
         # moving for desired time
-        sleep(time_elapse)
-        self.stop()
+        # fixed for direct control that uses time_elapse -1 and stops manually
+        if(time_elapse > 0):
+            sleep(time_elapse)
+            self.stop()
 
     """ Motor distance control allows the motors
             to run for a certain amount of distance (mm) """
@@ -123,14 +125,17 @@ class WheelsAxel:
 
         # trying to fix distance different than zero after
         # wheels has stopped by re-resetting state after 0.5s
-        sleep(0.5)
+        sleep(0.1)
         self._left_motor.reset_state()
         self._right_motor.reset_state()
 
         # updating state
         self._is_moving = False
         # restoring callback
-        self._wheelsAxle_lock.release()
+        try:
+            self._wheelsAxle_lock.release()
+        except Exception as e:
+            pass
 
     # CALLBACK
     def cancel_callback(self):
