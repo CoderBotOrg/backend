@@ -101,10 +101,50 @@ class WheelsAxel:
         self._left_motor.control(power_left)
         self._right_motor.control(power_right)
 
+        #PID parameters
+        # assuming that power_right is equal to power_left and that coderbot
+        # moves at 11.5mm/s at full PWM duty cycle
+        TARGET = 0.95 * power_right #velocity [mm/s]
+        KP = 0.02   #proportional coefficient
+        KI = 0.005
+        SAMPLETIME = 0.05
+        left_speed = TARGET
+        right_speed = left_speed
+        integral_error = 0
+
         # moving for certaing amount of distance
-        # threshold value avoid to stop it after
         while(abs(self.distance()) < target_distance):
-            pass # busy waiting
+            # PI controller
+
+            # relative error
+            left_error = TARGET - self._left_motor.speed()
+            right_error = TARGET - self._right_motor.speed()
+
+            left_speed += (left_error * KP) - (integral_error * KI)
+            right_speed += (right_error * KP) + (integral_error * KI)
+
+            # conrispondent new power
+            left_power = max(min(100 * left_speed / 95, 100), 0)
+            right_power =  max(min(100 * right_speed / 95, 100), 0)
+
+            print("Left SPEED: %f" % (self._left_motor.speed()))
+            print("Right SPEED: %f" % (self._right_motor.speed()))
+            print("Left POWER: %f" % (left_power))
+            print("Right POWER: %f" % (right_power))
+
+            # adjusting power on each motors
+            self._left_motor.adjust_power(left_power)
+            self._right_motor.adjust_power(right_power)
+
+
+            integral_error += (left_speed - right_speed)
+
+            # restoring factor
+            left_speed = TARGET
+            right_speed = TARGET
+
+            # checking each SAMPLETIME seconds
+            sleep(SAMPLETIME)
 
         # robot arrived
         self.stop()
