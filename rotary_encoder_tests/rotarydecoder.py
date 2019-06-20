@@ -34,28 +34,13 @@ class RotaryDecoder:
        it returns a 1 if the square waves have A leading B because we're moving forward
        It returns a -1 if the square waves have B leading A because we're moving backwards
        In either case, A is staggered from B by (+-)pi/2 radiants
-       Note: level = 0 falling edge
-                     1 raising edge
-                     2 from watchdog
        
-                      +---------+         +---------+      0   
-                      |         |         |         |
-            B         |         |         |         |
-                      |         |         |         |
-            +---------+         +---------+         +----- 1   # B leading A
-                +---------+         +---------+            0   # forward
-                |         |         |         |
-            A   |         |         |         |
-                |         |         |         |
-            ----+         +---------+         +----------+ 1   
-            
-            
                 +---------+         +---------+            0
                 |         |         |         |
             A   |         |         |         |
                 |         |         |         |
             ----+         +---------+         +----------+ 1   # A leading B
-                      +---------+         +---------+      0   # backward
+                      +---------+         +---------+      0   # forward
                       |         |         |         |
             B         |         |         |         |
                       |         |         |         |
@@ -72,25 +57,22 @@ class RotaryDecoder:
       if (gpio != self._lastGpio): # debounce
          self._lastGpio = gpio
 
-         # backward (A leading B)
          if (gpio == self._feedback_pin_A and level == 1):
             if (self._levelB == 0):
-               self._callback(-1)   # A leading B, moving backward
-               self._direction = -1 # backward
+               self._callback(1) # A leading B, moving forward
+               self._direction = 1 # forward
          elif (gpio == self._feedback_pin_A and level == 0):
             if (self._levelB == 1):
-               self._callback(-1)   # A leading B, moving backward
-               self._direction = -1 # backward
-
-         # forward (B leading A)
+               self._callback(1) # A leading B, moving forward
+               self._direction = 1 # forward
          elif (gpio == self._feedback_pin_B and level == 1):
             if (self._levelA == 0):
-               self._callback(1)   # B leading A, moving forward
-               self._direction = 1 # forward
+               self._callback(-1)   # B leading A, moving forward
+               self._direction = -1 # backwards
          elif (gpio == self._feedback_pin_B and level == 0):
             if (self._levelA == 1):
-               self._callback(1)   # A leading B, moving forward
-               self._direction = 1 # forward
+               self._callback(-1) # A leading B, moving forward
+               self._direction = -1 # forward
 
    def cancel(self):
 

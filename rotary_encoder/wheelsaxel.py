@@ -104,47 +104,74 @@ class WheelsAxel:
         #PID parameters
         # assuming that power_right is equal to power_left and that coderbot
         # moves at 11.5mm/s at full PWM duty cycle
-        TARGET = 0.95 * power_right #velocity [mm/s]
-        KP = 0.02   #proportional coefficient
-        KI = 0.005
-        SAMPLETIME = 0.05
-        left_speed = TARGET
-        right_speed = left_speed
-        integral_error = 0
+        MAX_SPEED = 260
+        TARGET_LEFT = (MAX_SPEED/100) * power_left #velocity [mm/s]
+        TARGET_RIGHT = (MAX_SPEED / 100) * power_right  # velocity [mm/s]
+
+        # SOFT RESPONSE
+        #KP = 0.04  #proportional coefficient
+        #KD = 0.02  # derivative coefficient
+        #KI = 0.005 # integral coefficient
+
+        # MEDIUM RESPONSE
+        #KP = 0.8  #proportional coefficient
+        #KD = 0.04 # derivative coefficient
+        #KI = 0.02 # integral coefficient
+
+        # STRONG RESPONSE
+        KP = 0.9   # proportional coefficient
+        KD = 0.05  # derivative coefficient
+        KI = 0.03  # integral coefficient
+
+        SAMPLETIME = 0.1
+
+        left_speed = TARGET_LEFT
+        right_speed = TARGET_RIGHT
+
+        left_derivative_error = 0
+        right_derivative_error = 0
+        left_integral_error = 0
+        right_integral_error = 0
 
         # moving for certaing amount of distance
         while(abs(self.distance()) < target_distance):
             # PI controller
 
             # relative error
-            left_error = TARGET - self._left_motor.speed()
-            right_error = TARGET - self._right_motor.speed()
+            left_error = TARGET_LEFT - self._right_motor.speed()
+            right_error = TARGET_RIGHT - self._left_motor.speed()
 
-            left_speed += (left_error * KP) - (integral_error * KI)
-            right_speed += (right_error * KP) + (integral_error * KI)
+            left_speed += (left_error * KP) + (left_derivative_error * KD) + (left_integral_error * KI)
+            right_speed += (right_error * KP) + (right_derivative_error * KD) + (right_integral_error * KI)
+            print("LEFT correction: %f" % (left_error * KP + left_derivative_error * KD + left_integral_error * KI))
+            print("RIGHT correction: %f" % (right_error * KP + right_derivative_error * KD + right_integral_error * KI))
 
             # conrispondent new power
-            left_power = max(min(100 * left_speed / 95, 100), 0)
-            right_power =  max(min(100 * right_speed / 95, 100), 0)
+            left_power = max(min(100 * left_speed / MAX_SPEED, 100), 0)
+            right_power =  max(min(100 * right_speed / MAX_SPEED, 100), 0)
 
-            print("Left SPEED: %f" % (self._left_motor.speed()))
-            print("Right SPEED: %f" % (self._right_motor.speed()))
-            print("Left POWER: %f" % (left_power))
-            print("Right POWER: %f" % (right_power))
+            print("Left SPEED: %f" % (self._right_motor.speed()))
+            print("Right SPEED: %f" % (self._left_motor.speed()))
+            print("Left POWER: %f" % (right_power))
+            print("Right POWER: %f" % (left_power))
+            print("")
 
             # adjusting power on each motors
             self._left_motor.adjust_power(left_power)
             self._right_motor.adjust_power(right_power)
 
+            print("Left error: %f" % (left_error))
+            print("Right error: %f"  % (right_error))
+            print("")
 
-            integral_error += (left_speed - right_speed)
-
-            # restoring factor
-            left_speed = TARGET
-            right_speed = TARGET
 
             # checking each SAMPLETIME seconds
             sleep(SAMPLETIME)
+
+            left_derivative_error = left_error
+            right_derivative_error = right_error
+            left_integral_error += left_error
+            right_integral_error += right_error
 
         # robot arrived
         self.stop()
