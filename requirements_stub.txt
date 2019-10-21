@@ -40,6 +40,6 @@ tensorflow==1.11.0
 termcolor==1.1.0
 tinydb==3.12.1
 urllib3==1.23
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 setuptools==39.1.0
 cachetools==3.0.0
