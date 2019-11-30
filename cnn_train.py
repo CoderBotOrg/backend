@@ -109,7 +109,6 @@ import tensorflow as tf
 
 from tensorflow.python.framework import graph_util
 from tensorflow.python.framework import tensor_shape
-from tensorflow.python.platform import gfile
 
 FLAGS = None
 
@@ -145,7 +144,7 @@ class CNNTrainer(object):
 
         # Needed to make sure the logging output is visible.
         # See https://github.com/tensorflow/tensorflow/issues/3047
-        tf.logging.set_verbosity(tf.logging.INFO)
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
         # Prepare necessary directories that can be used during training
         self.prepare_file_system()
@@ -153,7 +152,7 @@ class CNNTrainer(object):
         # Gather information about the model architecture we'll be using.
         self.model_info = self.create_model_info(self.architecture)
         if not self.model_info:
-            tf.logging.error('Did not recognize architecture flag')
+            tf.compat.v1.logging.error('Did not recognize architecture flag')
             raise Exception("Did not recognize architecture flag'")
 
         # Set up the pre-trained graph.
@@ -177,17 +176,17 @@ class CNNTrainer(object):
                                               self.validation_percentage)
         class_count = len(image_lists.keys())
         if class_count == 0:
-            tf.logging.error('No valid folders of images found at %s', image_dir)
+            tf.compat.v1.logging.error('No valid folders of images found at %s', image_dir)
             return -1
 
         if class_count == 1:
-            tf.logging.error('Only one valid folder of images found at %s - multiple classes are needed for classification.', image_dir)
+            tf.compat.v1.logging.error('Only one valid folder of images found at %s - multiple classes are needed for classification.', image_dir)
             return -1
 
         # See if the command-line flags mean we're applying any distortions.
         do_distort_images = self.should_distort_images(flip_left_right, random_crop, random_scale, random_brightness)
 
-        with tf.Session(graph=self.graph) as sess:
+        with tf.compat.v1.Session(graph=self.graph) as sess:
             # Set up the image decoding sub-graph.
             jpeg_data_tensor, decoded_image_tensor = self.add_jpeg_decoding(self.model_info['input_width'], self.model_info['input_height'],
                                                                             self.model_info['input_depth'], self.model_info['input_mean'],
@@ -217,7 +216,7 @@ class CNNTrainer(object):
             evaluation_step, prediction = self.add_evaluation_step(final_tensor, ground_truth_input)
 
             # Merge all the summaries and write them out to the summaries_dir
-            merged = tf.summary.merge_all()
+            merged = tf.compat.v1.summary.merge_all()
             if self.write_logs:
                 train_writer = tf.summary.FileWriter(self.summaries_dir + '/train', sess.graph)
 
@@ -225,7 +224,7 @@ class CNNTrainer(object):
                 validation_writer = tf.summary.FileWriter(self.summaries_dir + '/validation')
 
             # Set up all our weights to their initial default values.
-            init = tf.global_variables_initializer()
+            init = tf.compat.v1.global_variables_initializer()
             sess.run(init)
 
             # Run the training for as many cycles as requested on the command line.
@@ -258,8 +257,8 @@ class CNNTrainer(object):
                     train_accuracy, cross_entropy_value = sess.run([evaluation_step, cross_entropy],
                                                                    feed_dict={bottleneck_input: train_bottlenecks,
                                                                               ground_truth_input: train_ground_truth})
-                    tf.logging.info('%s: Step %d: Train accuracy = %.1f%%' % (datetime.now(), i, train_accuracy * 100))
-                    tf.logging.info('%s: Step %d: Cross entropy = %f' % (datetime.now(), i, cross_entropy_value))
+                    tf.compat.v1.logging.info('%s: Step %d: Train accuracy = %.1f%%' % (datetime.now(), i, train_accuracy * 100))
+                    tf.compat.v1.logging.info('%s: Step %d: Cross entropy = %f' % (datetime.now(), i, cross_entropy_value))
                     validation_bottlenecks, validation_ground_truth, _ = (
                         self.get_random_cached_bottlenecks(sess, image_lists, self.validation_batch_size, 'validation',
                                                            self.bottleneck_dir, image_dir, jpeg_data_tensor,
@@ -272,7 +271,7 @@ class CNNTrainer(object):
                                                                                   ground_truth_input: validation_ground_truth})
                     if self.write_logs:
                         validation_writer.add_summary(validation_summary, i)
-                    tf.logging.info('%s: Step %d: Validation accuracy = %.1f%% (N=%d)' % (datetime.now(), i, validation_accuracy * 100,
+                    tf.compat.v1.logging.info('%s: Step %d: Validation accuracy = %.1f%% (N=%d)' % (datetime.now(), i, validation_accuracy * 100,
                                                                                           len(validation_bottlenecks)))
                 # Store intermediate results
                 intermediate_frequency = self.intermediate_store_frequency
@@ -280,7 +279,7 @@ class CNNTrainer(object):
                 if(intermediate_frequency > 0 and (i % intermediate_frequency == 0) and i > 0):
                     intermediate_file_name = (self.intermediate_output_graphs_dir +
                                               'intermediate_' + str(i) + '.pb')
-                    tf.logging.info('Save intermediate result to : %s', intermediate_file_name)
+                    tf.compat.v1.logging.info('Save intermediate result to : %s', intermediate_file_name)
                     self.save_graph_to_file(sess, self.graph, intermediate_file_name, self.final_tensor_name)
 
                 self.manager.save_model_status(output_graph[output_graph.rfind("/")+1:], self.architecture, i / training_steps)
@@ -295,18 +294,18 @@ class CNNTrainer(object):
             test_accuracy, predictions = sess.run([evaluation_step, prediction],
                                                   feed_dict={bottleneck_input: test_bottlenecks,
                                                              ground_truth_input: test_ground_truth})
-            tf.logging.info('Final test accuracy = %.1f%% (N=%d)' % (test_accuracy * 100, len(test_bottlenecks)))
+            tf.compat.v1.logging.info('Final test accuracy = %.1f%% (N=%d)' % (test_accuracy * 100, len(test_bottlenecks)))
 
             if self.print_misclassified_test_images:
-                tf.logging.info('=== MISCLASSIFIED TEST IMAGES ===')
+                tf.compat.v1.logging.info('=== MISCLASSIFIED TEST IMAGES ===')
                 for i, test_filename in enumerate(test_filenames):
                     if predictions[i] != test_ground_truth[i].argmax():
-                        tf.logging.info('%70s  %s' % (test_filename, list(image_lists.keys())[predictions[i]]))
+                        tf.compat.v1.logging.info('%70s  %s' % (test_filename, list(image_lists.keys())[predictions[i]]))
 
             # Write out the trained graph and labels with the weights stored as
             # constants.
             self.save_graph_to_file(sess, self.graph, output_graph + ".pb", self.final_tensor_name)
-            with gfile.FastGFile(output_graph + ".txt", 'w') as f:
+            with tf.io.gfile.GFile(output_graph + ".txt", 'w') as f:
                 f.write('\n'.join(image_lists.keys()) + '\n')
         return 0
 
@@ -326,11 +325,11 @@ class CNNTrainer(object):
           A dictionary containing an entry for each label subfolder, with images split
           into training, testing, and validation sets within each label.
         """
-        if not gfile.Exists(image_dir):
-            tf.logging.error("Image directory '" + image_dir + "' not found.")
+        if not tf.io.gfile.exists(image_dir):
+            tf.compat.v1.logging.error("Image directory '" + image_dir + "' not found.")
             return None
         result = {}
-        sub_dirs = [x[0] for x in gfile.Walk(image_dir)]
+        sub_dirs = [x[0] for x in tf.compat.v1.gfile.Walk(image_dir)]
         # The root directory comes first, so skip it.
         is_root_dir = True
         for sub_dir in sub_dirs:
@@ -342,17 +341,17 @@ class CNNTrainer(object):
             dir_name = os.path.basename(sub_dir)
             if dir_name == image_dir:
                 continue
-            tf.logging.info("Looking for images in '" + dir_name + "'")
+            tf.compat.v1.logging.info("Looking for images in '" + dir_name + "'")
             for extension in extensions:
                 file_glob = os.path.join(image_dir, dir_name, '*.' + extension)
-                file_list.extend(gfile.Glob(file_glob))
+                file_list.extend(tf.compat.v1.gfile.Glob(file_glob))
             if not file_list:
-                tf.logging.warning('No files found')
+                tf.compat.v1.logging.warning('No files found')
                 continue
             if len(file_list) < 20:
-                tf.logging.warning('WARNING: Folder has less than 20 images, which may cause issues.')
+                tf.compat.v1.logging.warning('WARNING: Folder has less than 20 images, which may cause issues.')
             elif len(file_list) > MAX_NUM_IMAGES_PER_CLASS:
-                tf.logging.warning('WARNING: Folder {} has more than {} images. Some images will '
+                tf.compat.v1.logging.warning('WARNING: Folder {} has more than {} images. Some images will '
                                    'never be selected.'.format(dir_name, MAX_NUM_IMAGES_PER_CLASS))
             label_name = re.sub(r'[^a-z0-9]+', ' ', dir_name.lower())
             training_images = []
@@ -373,7 +372,7 @@ class CNNTrainer(object):
             for file_name in file_list:
                 base_name = os.path.basename(file_name)
                 training_images.append(base_name)
-            tf.logging.info("training_images: %s testing_images: %s validation_images: %s",
+            tf.compat.v1.logging.info("training_images: %s testing_images: %s validation_images: %s",
                             str(len(training_images)), str(len(testing_images)), str(len(validation_images)))
             result[label_name] = {
                 'dir': dir_name,
@@ -402,13 +401,13 @@ class CNNTrainer(object):
 
         """
         if label_name not in image_lists:
-            tf.logging.fatal('Label does not exist %s.', label_name)
+            tf.compat.v1.logging.fatal('Label does not exist %s.', label_name)
         label_lists = image_lists[label_name]
         if category not in label_lists:
-            tf.logging.fatal('Category does not exist %s.', category)
+            tf.compat.v1.logging.fatal('Category does not exist %s.', category)
         category_list = label_lists[category]
         if not category_list:
-            tf.logging.fatal('Label %s has no images in the category %s.',
+            tf.compat.v1.logging.fatal('Label %s has no images in the category %s.',
                              label_name, category)
         mod_index = index % len(category_list)
         base_name = category_list[mod_index]
@@ -450,8 +449,8 @@ class CNNTrainer(object):
         """
         with tf.Graph().as_default() as graph:
             model_path = os.path.join(self.model_dir, model_info['model_file_name'])
-            with gfile.FastGFile(model_path, 'rb') as f:
-                graph_def = tf.GraphDef()
+            with tf.io.gfile.GFile(model_path, 'rb') as f:
+                graph_def = tf.compat.v1.GraphDef()
                 graph_def.ParseFromString(f.read())
                 bottleneck_tensor, resized_input_tensor = (tf.import_graph_def(
                     graph_def,
@@ -513,7 +512,7 @@ class CNNTrainer(object):
             filepath, _ = urllib.request.urlretrieve(data_url, filepath, _progress)
             print()
             statinfo = os.stat(filepath)
-            tf.logging.info('Successfully downloaded %s %d %s', filename, statinfo.st_size,
+            tf.compat.v1.logging.info('Successfully downloaded %s %d %s', filename, statinfo.st_size,
                             'bytes.')
         tarfile.open(filepath, 'r:gz').extractall(dest_directory)
 
@@ -536,12 +535,12 @@ class CNNTrainer(object):
                                decoded_image_tensor, resized_input_tensor,
                                bottleneck_tensor):
         """Create a single bottleneck file."""
-        tf.logging.info('Creating bottleneck at ' + bottleneck_path)
+        tf.compat.v1.logging.info('Creating bottleneck at ' + bottleneck_path)
         image_path = self.get_image_path(image_lists, label_name, index,
                                          image_dir, category)
-        if not gfile.Exists(image_path):
-            tf.logging.fatal('File does not exist %s', image_path)
-        image_data = gfile.FastGFile(image_path, 'rb').read()
+        if not tf.io.gfile.exists(image_path):
+            tf.compat.v1.logging.fatal('File does not exist %s', image_path)
+        image_data = tf.io.gfile.GFile(image_path, 'rb').read()
         try:
             bottleneck_values = self.run_bottleneck_on_image(
                 sess, image_data, jpeg_data_tensor, decoded_image_tensor,
@@ -600,7 +599,7 @@ class CNNTrainer(object):
         try:
             bottleneck_values = [float(x) for x in bottleneck_string.split(',')]
         except ValueError:
-            tf.logging.warning('Invalid float found, recreating bottleneck')
+            tf.compat.v1.logging.warning('Invalid float found, recreating bottleneck')
             did_hit_error = True
         if did_hit_error:
             self.create_bottleneck_file(bottleneck_path, image_lists, label_name, index,
@@ -655,7 +654,7 @@ class CNNTrainer(object):
 
                     how_many_bottlenecks += 1
                     if how_many_bottlenecks % 100 == 0:
-                        tf.logging.info(
+                        tf.compat.v1.logging.info(
                             str(how_many_bottlenecks) + ' bottleneck files created.')
 
 
@@ -762,9 +761,9 @@ class CNNTrainer(object):
             image_index = random.randrange(MAX_NUM_IMAGES_PER_CLASS + 1)
             image_path = self.get_image_path(image_lists, label_name, image_index, image_dir,
                                              category)
-            if not gfile.Exists(image_path):
-                tf.logging.fatal('File does not exist %s', image_path)
-            jpeg_data = gfile.FastGFile(image_path, 'rb').read()
+            if not tf.io.gfile.exists(image_path):
+                tf.compat.v1.logging.fatal('File does not exist %s', image_path)
+            jpeg_data = tf.io.gfile.GFile(image_path, 'rb').read()
             # Note that we materialize the distorted_image_data as a numpy array before
             # sending running inference on the image. This involves 2 memory copies and
             # might be optimized in other implementations.
@@ -858,15 +857,15 @@ class CNNTrainer(object):
           The jpeg input layer and the distorted result tensor.
         """
 
-        tf.logging.info("distortion - crop: " + str(random_crop) + " scale: " + str(random_scale) + " flip: " + str(flip_left_right))
-        jpeg_data = tf.placeholder(tf.string, name='DistortJPGInput')
+        tf.compat.v1.logging.info("distortion - crop: " + str(random_crop) + " scale: " + str(random_scale) + " flip: " + str(flip_left_right))
+        jpeg_data = tf.compat.v1.placeholder(tf.string, name='DistortJPGInput')
         decoded_image = tf.image.decode_jpeg(jpeg_data, channels=input_depth)
         decoded_image_as_float = tf.cast(decoded_image, dtype=tf.float32)
         decoded_image_4d = tf.expand_dims(decoded_image_as_float, 0)
         margin_scale = 1.0 + (random_crop / 100.0)
         resize_scale = 1.0 + (random_scale / 100.0)
         margin_scale_value = tf.constant(margin_scale)
-        resize_scale_value = tf.random_uniform(tensor_shape.scalar(),
+        resize_scale_value = tf.random.uniform(tensor_shape.scalar(),
                                                minval=1.0,
                                                maxval=resize_scale)
         scale_value = tf.multiply(margin_scale_value, resize_scale_value)
@@ -874,10 +873,10 @@ class CNNTrainer(object):
         precrop_height = tf.multiply(scale_value, input_height)
         precrop_shape = tf.stack([precrop_height, precrop_width])
         precrop_shape_as_int = tf.cast(precrop_shape, dtype=tf.int32)
-        precropped_image = tf.image.resize_bilinear(decoded_image_4d,
+        precropped_image = tf.compat.v1.image.resize_bilinear(decoded_image_4d,
                                                     precrop_shape_as_int)
         precropped_image_3d = tf.squeeze(precropped_image, axis=[0])
-        cropped_image = tf.random_crop(precropped_image_3d,
+        cropped_image = tf.image.random_crop(precropped_image_3d,
                                        [input_height, input_width, input_depth])
         if flip_left_right:
             flipped_image = tf.image.random_flip_left_right(cropped_image)
@@ -885,7 +884,7 @@ class CNNTrainer(object):
             flipped_image = cropped_image
         brightness_min = 1.0 - (random_brightness / 100.0)
         brightness_max = 1.0 + (random_brightness / 100.0)
-        brightness_value = tf.random_uniform(tensor_shape.scalar(),
+        brightness_value = tf.random.uniform(tensor_shape.scalar(),
                                              minval=brightness_min,
                                              maxval=brightness_max)
         brightened_image = tf.multiply(flipped_image, brightness_value)
@@ -931,12 +930,12 @@ class CNNTrainer(object):
           bottleneck input and ground truth input.
         """
         with tf.name_scope('input'):
-            bottleneck_input = tf.placeholder_with_default(
+            bottleneck_input = tf.compat.v1.placeholder_with_default(
                 bottleneck_tensor,
                 shape=[None, bottleneck_tensor_size],
                 name='BottleneckInputPlaceholder')
 
-            ground_truth_input = tf.placeholder(tf.float32,
+            ground_truth_input = tf.compat.v1.placeholder(tf.float32,
                                                 [None, class_count],
                                                 name='GroundTruthInput')
 
@@ -945,7 +944,7 @@ class CNNTrainer(object):
         layer_name = 'final_training_ops'
         with tf.name_scope(layer_name):
             with tf.name_scope('weights'):
-                initial_value = tf.truncated_normal(
+                initial_value = tf.random.truncated_normal(
                     [bottleneck_tensor_size, class_count], stddev=0.001)
 
                 layer_weights = tf.Variable(initial_value, name='final_weights')
@@ -962,14 +961,14 @@ class CNNTrainer(object):
         tf.summary.histogram('activations', final_tensor)
 
         with tf.name_scope('cross_entropy'):
-            cross_entropy = tf.nn.softmax_cross_entropy_with_logits_v2(
+            cross_entropy = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(
                 labels=ground_truth_input, logits=logits)
             with tf.name_scope('total'):
                 cross_entropy_mean = tf.reduce_mean(cross_entropy)
         tf.summary.scalar('cross_entropy', cross_entropy_mean)
 
         with tf.name_scope('train'):
-            optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+            optimizer = tf.compat.v1.train.GradientDescentOptimizer(learning_rate)
             train_step = optimizer.minimize(cross_entropy_mean)
 
         return (train_step, cross_entropy_mean, bottleneck_input, ground_truth_input,
@@ -1001,15 +1000,15 @@ class CNNTrainer(object):
     def save_graph_to_file(self, sess, graph, graph_file_name, final_tensor_name):
         output_graph_def = graph_util.convert_variables_to_constants(
             sess, graph.as_graph_def(), [final_tensor_name])
-        with gfile.FastGFile(graph_file_name, 'wb') as f:
+        with tf.io.gfile.GFile(graph_file_name, 'wb') as f:
             f.write(output_graph_def.SerializeToString())
         return
 
     def prepare_file_system(self):
         # Setup the directory we'll write summaries to for TensorBoard
-        if tf.gfile.Exists(self.summaries_dir):
-            tf.gfile.DeleteRecursively(self.summaries_dir)
-        tf.gfile.MakeDirs(self.summaries_dir)
+        if tf.io.gfile.exists(self.summaries_dir):
+            tf.compat.v1.gfile.DeleteRecursively(self.summaries_dir)
+        tf.compat.v1.gfile.MakeDirs(self.summaries_dir)
         if self.intermediate_store_frequency > 0:
             self.ensure_dir_exists(self.intermediate_output_graphs_dir)
         return
@@ -1049,7 +1048,7 @@ class CNNTrainer(object):
         elif architecture.startswith('mobilenet_'):
             parts = architecture.split('_')
             if len(parts) != 3 and len(parts) != 4:
-                tf.logging.error("Couldn't understand architecture name '%s'",
+                tf.compat.v1.logging.error("Couldn't understand architecture name '%s'",
                                  architecture)
                 return None
             v_string = parts[1]
@@ -1057,20 +1056,20 @@ class CNNTrainer(object):
             if(version_string != '1.0' and version_string != '0.75' and
                version_string != '0.50' and version_string != '0.5' and
                version_string != '0.35' and version_string != '0.25'):
-                tf.logging.error("The Mobilenet version should be '1.0', '0.75', '0.50', '0.35', or '0.25', but found '%s' for architecture '%s'",
+                tf.compat.v1.logging.error("The Mobilenet version should be '1.0', '0.75', '0.50', '0.35', or '0.25', but found '%s' for architecture '%s'",
                                  version_string, architecture)
                 return None
             size_string = parts[3]
             if(size_string != '224' and size_string != '192' and
                size_string != '160' and size_string != '128'):
-                tf.logging.error("The Mobilenet input size should be '224', '192', '160', or '128', but found '%s' for architecture '%s'",
+                tf.compat.v1.logging.error("The Mobilenet input size should be '224', '192', '160', or '128', but found '%s' for architecture '%s'",
                                  size_string, architecture)
                 return None
             if len(parts) == 4:
                 is_quantized = False
             else:
                 if parts[4] != 'quantized':
-                    tf.logging.error("Couldn't understand architecture suffix '%s' for '%s'", parts[3], architecture)
+                    tf.compat.v1.logging.error("Couldn't understand architecture suffix '%s' for '%s'", parts[3], architecture)
                     return None
                 is_quantized = True
             data_url = 'http://'
@@ -1105,7 +1104,7 @@ class CNNTrainer(object):
             input_std = 127.5
             print(data_url)
         else:
-            tf.logging.error("Couldn't understand architecture name '%s'", architecture)
+            tf.compat.v1.logging.error("Couldn't understand architecture name '%s'", architecture)
             raise ValueError('Unknown architecture', architecture)
 
         return {
@@ -1138,13 +1137,13 @@ class CNNTrainer(object):
           Tensors for the node to feed JPEG data into, and the output of the
             preprocessing steps.
         """
-        jpeg_data = tf.placeholder(tf.string, name='DecodeJPGInput')
+        jpeg_data = tf.compat.v1.placeholder(tf.string, name='DecodeJPGInput')
         decoded_image = tf.image.decode_jpeg(jpeg_data, channels=input_depth)
         decoded_image_as_float = tf.cast(decoded_image, dtype=tf.float32)
         decoded_image_4d = tf.expand_dims(decoded_image_as_float, 0)
         resize_shape = tf.stack([input_height, input_width])
         resize_shape_as_int = tf.cast(resize_shape, dtype=tf.int32)
-        resized_image = tf.image.resize_bilinear(decoded_image_4d,
+        resized_image = tf.compat.v1.image.resize_bilinear(decoded_image_4d,
                                                  resize_shape_as_int)
         offset_image = tf.subtract(resized_image, input_mean)
         mul_image = tf.multiply(offset_image, 1.0 / input_std)
