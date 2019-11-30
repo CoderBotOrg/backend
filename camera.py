@@ -358,6 +358,7 @@ class Camera(object):
         else:
             classifier = self._cnn_classifier_default
 
+        t0 = time.time()
         classes = None
         try:
             img = self.get_image()
@@ -365,6 +366,8 @@ class Camera(object):
         except Exception:
             logging.warning("classifier not available")
             classes = [("None", 1.0)]
+            raise
+        logging.info("fps: %f", 1.0/(time.time()-t0))
         return classes
 
     def find_class(self):

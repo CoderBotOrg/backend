@@ -71,7 +71,7 @@ class CNNManager(object):
     def delete_model(self, model_name):
         if self._models.get(model_name):
             try:
-                os.remove(MODEL_PATH + "/" + model_name + ".pb")
+                os.remove(MODEL_PATH + "/" + model_name + ".tflite")
                 os.remove(MODEL_PATH + "/" + model_name + ".txt")
             except Exception:
                 logging.warning("model files not found: %s", model_name)
@@ -103,7 +103,7 @@ class CNNManager(object):
     def load_model(self, model_name):
         model_info = self._models.get(model_name)
         if model_info:
-            return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".pb",
+            return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".tflite",
                                  label_file=MODEL_PATH + "/" + model_name + ".txt",
                                  output_layer=model_info["output_layer"],
                                  input_height=int(model_info["image_height"]),

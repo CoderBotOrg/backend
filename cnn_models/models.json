@@ -1,1 +1,1 @@
-{}
+{"mobilenet_v1_1_0_quant": {"status": 100, "image_height": 120, "image_width": 160, "output_layer":"final_result"}}

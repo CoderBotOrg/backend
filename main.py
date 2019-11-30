@@ -485,7 +485,7 @@ def run_server():
 
         remove_doreset_file()
 
-        app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
+        app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()
