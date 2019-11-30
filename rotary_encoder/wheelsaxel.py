@@ -130,7 +130,10 @@ class WheelsAxel:
         # updating state
         self._is_moving = False
         # restoring callback
-        self._wheelsAxle_lock.release()
+        try:
+            self._wheelsAxle_lock.release()
+        except RuntimeError:
+            pass
 
     # CALLBACK
     def cancel_callback(self):
