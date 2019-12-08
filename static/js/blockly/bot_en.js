@@ -52,6 +52,7 @@ Blockly.Msg.CODERBOT_SENSOR_FINDFACE_SIZE = "size";
 Blockly.Msg.CODERBOT_SENSOR_FINDFACE_ALL = "x, y, size (as list)";
 Blockly.Msg.CODERBOT_SENSOR_FINDLOGO = "find logo";
 Blockly.Msg.CODERBOT_SENSOR_FINDCLASS = "find class";
+Blockly.Msg.CODERBOT_SENSOR_FINDOBJECT = "detect objects";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE = "get image average";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_HUE = "Hue";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_SATURATION = "Saturation";

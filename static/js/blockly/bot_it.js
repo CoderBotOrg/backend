@@ -52,6 +52,7 @@ Blockly.Msg.CODERBOT_SENSOR_FINDFACE_SIZE = "dimensione";
 Blockly.Msg.CODERBOT_SENSOR_FINDFACE_ALL = "x, y, dimensione (come lista)";
 Blockly.Msg.CODERBOT_SENSOR_FINDLOGO = "trova logo";
 Blockly.Msg.CODERBOT_SENSOR_FINDCLASS = "trova classe";
+Blockly.Msg.CODERBOT_SENSOR_FINDOBJECT = "trova oggetti";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE = "valore medio immagine";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_HUE = "Tinta";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_SATURATION = "Saturazione";

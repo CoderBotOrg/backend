@@ -129,23 +129,55 @@ class CNNClassifier(object):
         #else:
         input_image = self.read_tensor_from_image_mat(image_file_or_mat)
 
-        logger.info("classify.0")
         self._interpreter.set_tensor(self._input_details[0]['index'], input_image)
         self._interpreter.invoke()
-        logger.info("classify.1")
         scores = self._interpreter.get_tensor(self._output_details[0]['index'])[0] # Bounding box coordinates of detected objects
-        #logger.info("classify.2")
-        #classes = self._interpreter.get_tensor(self._output_details[1]['index'])[0] # Class index of detected objects
-        #logger.info("classify.3")
-        #scores = self._interpreter.get_tensor(self._output_details[2]['index'])[0] # Confidence of detected objects
-        #logger.info("classify.4")
 
-        #pairs = [(classes[i], scores[i], boxes[i]) for i in range(0, len(classes))]
         pairs = []
         for i in range(0, len(scores)):
-            if scores[i] > 0.5:
+            if scores[i] > 128:
                 object_name = self._labels[i]
-                pairs.append((object_name, scores[i]))
+                pairs.append((object_name, int(100*scores[i]/256)))
 
+        pairs = sorted(pairs, key=lambda x: x[1], reverse=True)[:top_results]
+        logger.info(str(pairs))
+        return pairs
+
+    def detect_objects(self,
+                       image_file_or_mat,
+                       top_results=3):
+        input_image = None
+        #if isinstance(image_file_or_mat, str):
+        #    t = self.read_tensor_from_image_file(file_name=image_file_or_mat)
+        #else:
+        input_image = self.read_tensor_from_image_mat(image_file_or_mat)
+
+        self._interpreter.set_tensor(self._input_details[0]['index'], input_image)
+        self._interpreter.invoke()
+
+        # Retrieve detection results
+        boxes = self._interpreter.get_tensor(self._output_details[0]['index'])[0] # Bounding box coordinates of detected objects
+        classes = self._interpreter.get_tensor(self._output_details[1]['index'])[0] # Class index of detected objects
+        scores = self._interpreter.get_tensor(self._output_details[2]['index'])[0] # Confidence of detected objects
+
+        # Loop over all detections and draw detection box if confidence is above minimum threshold
+        min_conf_threshold=0.1
+        imH=100
+        imW=100
+        pairs = []
+        for i in range(len(scores)):
+            if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
+
+                # Get bounding box coordinates and draw box
+                # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
+                ymin = int(max(1,(boxes[i][0] * imH)))
+                xmin = int(max(1,(boxes[i][1] * imW)))
+                ymax = int(min(imH,(boxes[i][2] * imH)))
+                xmax = int(min(imW,(boxes[i][3] * imW)))
+
+                object_name = self._labels[int(classes[i])]
+                pairs.append((object_name, int(100*scores[i]), (xmin, ymin, xmax, ymax)))
+
+        pairs = sorted(pairs, key=lambda x: x[1], reverse=True)[:top_results]
         logger.info(str(pairs))
         return pairs
