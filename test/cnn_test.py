@@ -41,11 +41,11 @@ class CNNTest(unittest.TestCase):
         mod = cnn.load_model(name)
         result = mod.classify_image("photos/DSC86.jpg")
         print("result: " + str(result))
-        self.assertTrue(result[0][0] == "kiwi" and result[0][1] == 1.0)
+        self.assertTrue(result[0][0] == "kiwi" and result[0][1] > 0.9)
 
         cnn = cnn_manager.CNNManager.get_instance()
-        #cnn.delete_model(name)
-        #self.assertTrue(cnn.get_models().get(name) is None)
+        cnn.delete_model(name)
+        self.assertTrue(cnn.get_models().get(name) is None)
 
     """
     def test_train_set_2(self):
