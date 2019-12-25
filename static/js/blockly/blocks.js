@@ -759,29 +759,6 @@ Blockly.Python['coderbot_adv_cnn_classify'] = function(block) {
   return [class_scores, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_adv_cnn_detect_objects'] = {
-  /**
-   * Block for find_class function.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(250);
-    this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDOBJECT)
-        .appendField(new Blockly.FieldDropdown(CODERBOT_CNN_MODEL_LIST), 'MODEL');
-    this.setInputsInline(true);
-    this.setOutput(true, ['Array']);
-    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
-  }
-};
-
-Blockly.Python['coderbot_adv_cnn_detect_objects'] = function(block) {
-  var model = block.getFieldValue('MODEL');
-  var class_scores = 'get_cam().cnn_detect_objects("'+ model +'")';
-  return [class_scores, Blockly.Python.ORDER_ATOMIC];
-};
-
 Blockly.Blocks['coderbot_event_generator'] = {
   init: function() {
     this.appendDummyInput()

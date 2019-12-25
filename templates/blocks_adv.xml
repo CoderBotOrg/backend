@@ -303,7 +303,6 @@
       <block type="coderbot_adv_findARCode"></block>
       <block type="coderbot_adv_find_class"></block>
       <block type="coderbot_adv_cnn_classify"></block>
-      <block type="coderbot_adv_cnn_detect_objects"></block>
       <block type="coderbot_sonar_get_distance"></block>
     </category>{%endif%}
     <category name="{% trans %}Sound{% endtrans %}" colour="220">
