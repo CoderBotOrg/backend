@@ -1,7 +1,6 @@
 import time
 
-from lsm9ds1 import lsm9ds1
-
+import lsm9ds1
 
 class SimpleExample:
     X_IND = 1

@@ -9,7 +9,6 @@ from smbus2 import SMBusWrapper
 
 MAX_INVALID_MAG = 99.0
 
-#
 # Hardware Constants
 #
 # from LSM9DS1_Datasheet.pdf
