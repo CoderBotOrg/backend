@@ -37,6 +37,7 @@ smbus2==0.2.0
 swagger-spec-validator==2.3.1
 termcolor==1.1.0
 tinydb==3.12.1
+tensorflow==2.0.0
 urllib3==1.24.2
 Werkzeug==0.15.3
 setuptools==42.0.1
