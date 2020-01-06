@@ -27,28 +27,31 @@ from rotary_encoder.wheelsaxel import WheelsAxel
 
 # GPIO
 # motors
-PIN_MOTOR_ENABLE = 22
-PIN_LEFT_FORWARD = 25
-PIN_LEFT_BACKWARD = 24
-PIN_RIGHT_FORWARD = 4
-PIN_RIGHT_BACKWARD = 17
+PIN_MOTOR_ENABLE = None #22
+PIN_LEFT_FORWARD = 17 #25
+PIN_LEFT_BACKWARD = 18 # 24
+PIN_RIGHT_FORWARD = 22 # 4
+PIN_RIGHT_BACKWARD = 23 #17
 #?
-PIN_PUSHBUTTON = 11
+PIN_PUSHBUTTON = 16 #11
 # servo
-PIN_SERVO_3 = 9
-PIN_SERVO_4 = 10
+PIN_SERVO_3 = 7 #9
+PIN_SERVO_4 = 1 #10
 # sonar
-PIN_SONAR_1_TRIGGER = 18
-PIN_SONAR_1_ECHO = 7
-PIN_SONAR_2_TRIGGER = 18
-PIN_SONAR_2_ECHO = 8
-PIN_SONAR_3_TRIGGER = 18
-PIN_SONAR_3_ECHO = 23
+PIN_SONAR_1_TRIGGER = 5 #18
+PIN_SONAR_1_ECHO = 27 #7
+PIN_SONAR_2_TRIGGER = 5 #18
+PIN_SONAR_2_ECHO = 6 #8
+PIN_SONAR_3_TRIGGER = 5 #18
+PIN_SONAR_3_ECHO = 12 #23
+PIN_SONAR_4_TRIGGER = 5 #18
+PIN_SONAR_4_ECHO = 13 #23
+
 # encoder
 PIN_ENCODER_LEFT_A = 14
-PIN_ENCODER_LEFT_B = 6
-PIN_ENCODER_RIGHT_A = 15
-PIN_ENCODER_RIGHT_B = 12
+PIN_ENCODER_LEFT_B = 15 #6
+PIN_ENCODER_RIGHT_A = 24 #15
+PIN_ENCODER_RIGHT_B = 25 #12
 
 # PWM
 PWM_FREQUENCY = 100 #Hz
@@ -58,7 +61,7 @@ class CoderBot(object):
 
     # pylint: disable=too-many-instance-attributes
 
-    _pin_out = [PIN_MOTOR_ENABLE, PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
+    _pin_out = [PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
 
     def __init__(self, motor_trim_factor=1.0, encoder=True):
         self.pi = pigpio.pi('localhost')
@@ -89,7 +92,8 @@ class CoderBot(object):
 
         self.sonar = [sonar.Sonar(self.pi, PIN_SONAR_1_TRIGGER, PIN_SONAR_1_ECHO),
                       sonar.Sonar(self.pi, PIN_SONAR_2_TRIGGER, PIN_SONAR_2_ECHO),
-                      sonar.Sonar(self.pi, PIN_SONAR_3_TRIGGER, PIN_SONAR_3_ECHO)]
+                      sonar.Sonar(self.pi, PIN_SONAR_3_TRIGGER, PIN_SONAR_3_ECHO),
+                      sonar.Sonar(self.pi, PIN_SONAR_4_TRIGGER, PIN_SONAR_4_ECHO)]
 
         try:
             self._ag = mpu.AccelGyro()
@@ -126,11 +130,11 @@ class CoderBot(object):
         self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse)
 
     def turn_angle(self, speed=100, angle=0):
-        z = self._ag.get_gyro_data()['z']
+        z = self._ag.get_gyro()[2]
         self.turn(speed, elapse=0)
-        while abs(z - self._ag.get_gyro_data()['z']) < angle:
+        while abs(z - self._ag.get_gyro()[2]) < angle:
             time.sleep(0.05)
-            logging.info(self._ag.get_gyro_data()['z'])
+            logging.info(self._ag.get_gyro()[2])
         self.stop()
 
     def forward(self, speed=100, elapse=0, distance=0):
@@ -145,8 +149,21 @@ class CoderBot(object):
     def right(self, speed=100, elapse=0):
         self.turn(speed=speed, elapse=elapse)
 
+    def servo3(self, angle):
+        self._servo_control(PIN_SERVO_3, angle)
+
+    def servo4(self, angle):
+        self._servo_control(PIN_SERVO_4, angle)
+
     def get_sonar_distance(self, sonar_id=0):
         return self.sonar[sonar_id].get_distance()
+
+    def _servo_control(self, pin, angle):
+        duty = ((angle + 90) * 100 / 180) + 25
+
+        self.pi.set_PWM_range(pin, 1000)
+        self.pi.set_PWM_frequency(pin, 50)
+        self.pi.set_PWM_dutycycle(pin, duty)
 
     def stop(self):
         if self._encoder:

@@ -3,19 +3,19 @@ import time
 import lsm9ds1
 
 class SimpleExample:
-    X_IND = 1
-    Y_IND = 2
-    Z_IND = 0
+    X_IND = 0
+    Y_IND = 1
+    Z_IND = 2
 
-    PITCH_IND = 1
-    ROLL_IND = 0
+    PITCH_IND = 0
+    ROLL_IND = 1
     YAW_IND = 2
 
     """This example shows how to poll the sensor for new data.
     It queries the sensor to discover when the accelerometer/gyro
     has new data and then reads all the sensors."""
     def __init__(self):
-        self.driver = lsm9ds1.make_i2c(0)
+        self.driver = lsm9ds1.make_i2c(1)
         mc = lsm9ds1.MagCalibration(xmin=-0.3612, xmax=-0.17836000000000002,
                                     ymin=-0.08750000000000001, ymax=0.07826000000000001,
                                     heading_offset=95.3491645593403)

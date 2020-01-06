@@ -386,6 +386,38 @@ Blockly.Python['coderbot_adv_motor'] = function(block) {
   return code;
 };
 
+Blockly.Blocks['coderbot_adv_move_enc'] = {
+  // Block for moving forward.
+  init: function() {
+    this.setHelpUrl('http://code.google.com/p/blockly/wiki/Motor');
+    this.setColour(40);
+    
+    this.appendValueInput('SPEED')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR + " " + Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_SPEED);
+    this.appendValueInput('DISTANCE')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_DISTANCE);
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+    var thisBlock = this;
+    this.setTooltip(function() {
+      var mode = thisBlock.getFieldValue('ACTION');
+      return TOOLTIPS[mode] + Blockly.Msg.CODERBOT_MOVE_ADV_TIP_TAIL;
+    });
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+  }
+};
+
+Blockly.Python['coderbot_adv_move_enc'] = function(block) {
+  // Generate Python for moving forward.
+  var speed = Blockly.Python.valueToCode(block, 'SPEED', Blockly.Python.ORDER_NONE);
+  var distance = Blockly.Python.valueToCode(block, 'DISTANCE', Blockly.Python.ORDER_NONE);
+  var code = "get_bot().move(speed=" + speed + ", distance=" + distance + ")\n";
+  return code;
+};
+
 Blockly.Blocks['coderbot_adv_stop'] = {
   // Block to stop the get_bot().
   init: function() {
@@ -1055,7 +1087,8 @@ Blockly.Blocks['coderbot_sonar_get_distance'] = {
         .appendField(Blockly.Msg.CODERBOT_SONAR_GET_DISTANCE)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SONAR_SENSOR_1, "0"],
                                                 [Blockly.Msg.CODERBOT_SONAR_SENSOR_2, "1"],
-                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_3, "2"]]), 'SONAR');
+                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_3, "2"],
+                                                [Blockly.Msg.CODERBOT_SONAR_SENSOR_4, "3"]]), 'SONAR');
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }

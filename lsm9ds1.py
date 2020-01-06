@@ -297,7 +297,7 @@ class lsm9ds1:
         tempf = (tempc * 9/5) + 32
         acc = [c * lsm9ds1.ACC_SENSOR_SCALE for c in acc]
         gyro = [g * lsm9ds1.DPS_SENSOR_SCALE for g in gyro]
-        return tempf, acc, gyro
+        return tempc, acc, gyro
 
     #
     # Raw interface

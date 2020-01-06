@@ -30,10 +30,10 @@ class WheelsAxel:
         # right motor
         self._right_motor = MotorEncoder(pi,
                                          enable_pin,
-                                         right_forward_pin,
                                          right_backward_pin,
-                                         right_encoder_feedback_pin_B,
-                                         right_encoder_feedback_pin_A)
+                                         right_forward_pin,
+                                         right_encoder_feedback_pin_A,
+                                         right_encoder_feedback_pin_B)
 
         # other
         self._wheelsAxle_lock = threading.Condition() # race condition lock
@@ -86,7 +86,7 @@ class WheelsAxel:
         self._is_moving = True
 
         # moving for desired time
-        sleep(time_elapse)
+        sleep(max(time_elapse, 0))
         self.stop()
 
     """ Motor distance control allows the motors
