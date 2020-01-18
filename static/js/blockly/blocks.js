@@ -1113,7 +1113,7 @@ Blockly.Blocks['coderbot_mpu_get_accel'] = {
         .appendField(Blockly.Msg.CODERBOT_MPU_GET_ACCEL)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_MPU_AXIS_X, "0"],
                                                 [Blockly.Msg.CODERBOT_MPU_AXIS_Y, "1"],
-                                                [Blockly.Msg.CODERBOT_MPU_AXIS_Z, "2"], 'AXIS');
+                                                [Blockly.Msg.CODERBOT_MPU_AXIS_Z, "2"]]), 'AXIS');
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
@@ -1138,7 +1138,7 @@ Blockly.Blocks['coderbot_mpu_get_gyro'] = {
         .appendField(Blockly.Msg.CODERBOT_MPU_GET_GYRO)
         .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_MPU_AXIS_X, "0"],
                                                 [Blockly.Msg.CODERBOT_MPU_AXIS_Y, "1"],
-                                                [Blockly.Msg.CODERBOT_MPU_AXIS_Z, "2"], 'AXIS');
+                                                [Blockly.Msg.CODERBOT_MPU_AXIS_Z, "2"]]), 'AXIS');
     this.setOutput(true, 'Number');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }

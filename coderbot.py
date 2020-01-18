@@ -96,7 +96,7 @@ class CoderBot(object):
                       sonar.Sonar(self.pi, PIN_SONAR_4_TRIGGER, PIN_SONAR_4_ECHO)]
 
         try:
-            self._ag = mpu.AccelGyroMag()
+            self._mpu = mpu.AccelGyroMag()
         except IOError:
             logging.info("MPU not available")
 
@@ -130,11 +130,11 @@ class CoderBot(object):
         self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse)
 
     def turn_angle(self, speed=100, angle=0):
-        z = self._ag.get_gyro()[2]
+        z = self._mpu.get_gyro()[2]
         self.turn(speed, elapse=0)
-        while abs(z - self._ag.get_gyro()[2]) < angle:
+        while abs(z - self._mpu.get_gyro()[2]) < angle:
             time.sleep(0.05)
-            logging.info(self._ag.get_gyro()[2])
+            logging.info(self._mpu.get_gyro()[2])
         self.stop()
 
     def forward(self, speed=100, elapse=0, distance=0):
@@ -159,25 +159,25 @@ class CoderBot(object):
         return self.sonar[sonar_id].get_distance()
 
     def get_mpu_accel(self, axis=None):
-        acc = self.mpu.get_acc()
+        acc = self._mpu.get_acc()
         if axis is None:
             return acc
         else:
             return acc[axis]
 
     def get_mpu_gyro(self, axis=None):
-        gyro = self.mpu.get_gyro()
+        gyro = self._mpu.get_gyro()
         if axis is None:
             return gyro
         else:
             return gyro[axis]
 
     def get_mpu_heading(self):
-        hdg = self.mpu.get_hdg()
+        hdg = self._mpu.get_hdg()
         return hdg
 
     def get_mpu_temp(self):
-        hdg = self.mpu.get_temp()
+        temp = self._mpu.get_temp()
         return temp
 
     def _servo_control(self, pin, angle):
