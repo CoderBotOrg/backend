@@ -16,9 +16,9 @@ class SimpleExample:
     has new data and then reads all the sensors."""
     def __init__(self):
         self.driver = lsm9ds1.make_i2c(1)
-        mc = lsm9ds1.MagCalibration(xmin=-0.3612, xmax=-0.17836000000000002,
-                                    ymin=-0.08750000000000001, ymax=0.07826000000000001,
-                                    heading_offset=95.3491645593403)
+        mc = lsm9ds1.MagCalibration(xmin=0.03234, xmax=0.25718,
+                                    ymin=0.036120000000000006, ymax=0.19138000000000002,
+                                    heading_offset=-130.29698965718163)
         self.driver.configure(mc)
 
     def main(self):
@@ -36,17 +36,19 @@ class SimpleExample:
 
     def read_ag(self):
         temp, acc, gyro = self.driver.read_values()
-        print("Temp: %.1f °f" % temp)
+        print("Temp: %.1f °f" % temp, end='')
         print("Gyro Roll: %.4f, Pitch: %.4f, Yaw: %.4f" % (gyro[SimpleExample.ROLL_IND],
                                                            gyro[SimpleExample.PITCH_IND],
-                                                           gyro[SimpleExample.YAW_IND]))
+                                                           gyro[SimpleExample.YAW_IND]), end='')
         print("X: %.4f, Y: %.4f, Z: %.4f" % (acc[SimpleExample.X_IND],
                                              acc[SimpleExample.Y_IND],
-                                             acc[SimpleExample.Z_IND]))
+                                             acc[SimpleExample.Z_IND]), end='')
 
     def read_magnetometer(self):
         hdg = self.driver.mag_heading()
-        print("Heading: %.2f" % hdg)
+        print("headind: %f ", hdg, end='')
+        mag = self.driver.read_magnetometer()
+        print('Mag {}'.format(mag))
 
 
 if __name__ == '__main__':

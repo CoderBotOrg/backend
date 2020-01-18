@@ -96,7 +96,7 @@ class CoderBot(object):
                       sonar.Sonar(self.pi, PIN_SONAR_4_TRIGGER, PIN_SONAR_4_ECHO)]
 
         try:
-            self._ag = mpu.AccelGyro()
+            self._ag = mpu.AccelGyroMag()
         except IOError:
             logging.info("MPU not available")
 
@@ -157,6 +157,28 @@ class CoderBot(object):
 
     def get_sonar_distance(self, sonar_id=0):
         return self.sonar[sonar_id].get_distance()
+
+    def get_mpu_accel(self, axis=None):
+        acc = self.mpu.get_acc()
+        if axis is None:
+            return acc
+        else:
+            return acc[axis]
+
+    def get_mpu_gyro(self, axis=None):
+        gyro = self.mpu.get_gyro()
+        if axis is None:
+            return gyro
+        else:
+            return gyro[axis]
+
+    def get_mpu_heading(self):
+        hdg = self.mpu.get_hdg()
+        return hdg
+
+    def get_mpu_temp(self):
+        hdg = self.mpu.get_temp()
+        return temp
 
     def _servo_control(self, pin, angle):
         duty = ((angle + 90) * 100 / 180) + 25

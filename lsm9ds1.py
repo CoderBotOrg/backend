@@ -427,5 +427,5 @@ def run_interactive_calibration(i2cbus_no):
 
 
 if __name__ == '__main__':
-    mc = run_interactive_calibration(0)
+    mc = run_interactive_calibration(1)
     print(mc.to_json())
