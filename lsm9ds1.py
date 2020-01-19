@@ -5,7 +5,7 @@ import json
 import spidev
 import threading
 
-from smbus2 import SMBusWrapper
+from smbus2 import SMBus
 
 MAX_INVALID_MAG = 99.0
 
@@ -154,16 +154,16 @@ class I2CTransport():
         self.data_ready_interrupt = None
 
     def write_byte(self, address, value):
-        with SMBusWrapper(self.port) as bus:
+        with SMBus(self.port) as bus:
             bus.write_byte_data(self.i2c_device, address, value)
 
     def read_byte(self, address):
-        with SMBusWrapper(self.port) as bus:
+        with SMBus(self.port) as bus:
             bus.write_byte(self.i2c_device, address)
             return bus.read_byte(self.i2c_device)
 
     def read_bytes(self, address, length):
-        with SMBusWrapper(self.port) as bus:
+        with SMBus(self.port) as bus:
             bus.write_byte(self.i2c_device, address)
             result = bus.read_i2c_block_data(self.i2c_device, address, length)
             return result
