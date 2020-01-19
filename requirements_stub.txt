@@ -42,4 +42,5 @@ tensorflow_hub>=0.7.0
 urllib3==1.24.2
 Werkzeug==0.15.3
 setuptools==42.0.1
+spidev==3.4
 cachetools==3.0.0
