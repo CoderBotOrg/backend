@@ -97,7 +97,7 @@ class CoderBot(object):
 
         try:
             self._mpu = mpu.AccelGyroMag()
-        except IOError:
+        except:
             logging.info("MPU not available")
 
         #self.stop()
