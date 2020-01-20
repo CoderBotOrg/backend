@@ -26,32 +26,59 @@ import mpu
 from rotary_encoder.wheelsaxel import WheelsAxel
 
 # GPIO
-# motors
-PIN_MOTOR_ENABLE = None #22
-PIN_LEFT_FORWARD = 17 #25
-PIN_LEFT_BACKWARD = 18 # 24
-PIN_RIGHT_FORWARD = 22 # 4
-PIN_RIGHT_BACKWARD = 23 #17
-#?
-PIN_PUSHBUTTON = 16 #11
-# servo
-PIN_SERVO_3 = 7 #9
-PIN_SERVO_4 = 1 #10
-# sonar
-PIN_SONAR_1_TRIGGER = 5 #18
-PIN_SONAR_1_ECHO = 27 #7
-PIN_SONAR_2_TRIGGER = 5 #18
-PIN_SONAR_2_ECHO = 6 #8
-PIN_SONAR_3_TRIGGER = 5 #18
-PIN_SONAR_3_ECHO = 12 #23
-PIN_SONAR_4_TRIGGER = 5 #18
-PIN_SONAR_4_ECHO = 13 #23
+class GPIO_CODERBOT_V_4():
+    # motors
+    PIN_MOTOR_ENABLE = 22
+    PIN_LEFT_FORWARD = 25
+    PIN_LEFT_BACKWARD = 24
+    PIN_RIGHT_FORWARD = 4
+    PIN_RIGHT_BACKWARD = 17
 
-# encoder
-PIN_ENCODER_LEFT_A = 14
-PIN_ENCODER_LEFT_B = 15 #6
-PIN_ENCODER_RIGHT_A = 24 #15
-PIN_ENCODER_RIGHT_B = 25 #12
+    PIN_PUSHBUTTON = 11
+    # servo
+    PIN_SERVO_3 = 9
+    PIN_SERVO_4 = 10
+    # sonar
+    PIN_SONAR_1_TRIGGER = 18
+    PIN_SONAR_1_ECHO = 7
+    PIN_SONAR_2_TRIGGER = 18
+    PIN_SONAR_2_ECHO = 8
+    PIN_SONAR_3_TRIGGER = 18
+    PIN_SONAR_3_ECHO = 23
+
+    # encoder
+    PIN_ENCODER_LEFT_A = 14
+    PIN_ENCODER_LEFT_B = 6
+    PIN_ENCODER_RIGHT_A = 15
+    PIN_ENCODER_RIGHT_B = 12
+
+class GPIO_CODERBOT_V_5():
+    # motors
+    PIN_MOTOR_ENABLE = None #22
+    PIN_LEFT_FORWARD = 17 #25
+    PIN_LEFT_BACKWARD = 18 # 24
+    PIN_RIGHT_FORWARD = 22 # 4
+    PIN_RIGHT_BACKWARD = 23 #17
+
+    PIN_PUSHBUTTON = 16 #11
+    # servo
+    PIN_SERVO_3 = 7 #9
+    PIN_SERVO_4 = 1 #10
+    # sonar
+    PIN_SONAR_1_TRIGGER = 5 #18
+    PIN_SONAR_1_ECHO = 27 #7
+    PIN_SONAR_2_TRIGGER = 5 #18
+    PIN_SONAR_2_ECHO = 6 #8
+    PIN_SONAR_3_TRIGGER = 5 #18
+    PIN_SONAR_3_ECHO = 12 #23
+    PIN_SONAR_4_TRIGGER = 5 #18
+    PIN_SONAR_4_ECHO = 13 #23
+
+    # encoder
+    PIN_ENCODER_LEFT_A = 14
+    PIN_ENCODER_LEFT_B = 15 #6
+    PIN_ENCODER_RIGHT_A = 24 #15
+    PIN_ENCODER_RIGHT_B = 25 #12
 
 # PWM
 PWM_FREQUENCY = 100 #Hz
@@ -61,11 +88,18 @@ class CoderBot(object):
 
     # pylint: disable=too-many-instance-attributes
 
-    _pin_out = [PIN_LEFT_FORWARD, PIN_RIGHT_FORWARD, PIN_LEFT_BACKWARD, PIN_RIGHT_BACKWARD, PIN_SERVO_3, PIN_SERVO_4]
-
     def __init__(self, motor_trim_factor=1.0, encoder=True):
+        try:
+            self._mpu = mpu.AccelGyroMag()
+            self.GPIOS = GPIO_CODERBOT_V_5()
+            logging.info("MPU available")
+        except:
+            logging.info("MPU not available")
+            self.GPIOS = GPIO_CODERBOT_V_4()
+
+        self._pin_out = [self.GPIOS.PIN_LEFT_FORWARD, self.GPIOS.PIN_RIGHT_FORWARD, self.GPIOS.PIN_LEFT_BACKWARD, self.GPIOS.PIN_RIGHT_BACKWARD, self.GPIOS.PIN_SERVO_3, self.GPIOS.PIN_SERVO_4]
         self.pi = pigpio.pi('localhost')
-        self.pi.set_mode(PIN_PUSHBUTTON, pigpio.INPUT)
+        self.pi.set_mode(self.GPIOS.PIN_PUSHBUTTON, pigpio.INPUT)
         self._cb = dict()
         self._cb_last_tick = dict()
         self._cb_elapse = dict()
@@ -73,32 +107,28 @@ class CoderBot(object):
         self._motor_trim_factor = motor_trim_factor
         self._twin_motors_enc = WheelsAxel(
             self.pi,
-            enable_pin=PIN_MOTOR_ENABLE,
-            left_forward_pin=PIN_LEFT_FORWARD,
-            left_backward_pin=PIN_LEFT_BACKWARD,
-            left_encoder_feedback_pin_A=PIN_ENCODER_LEFT_A,
-            left_encoder_feedback_pin_B=PIN_ENCODER_LEFT_B,
-            right_forward_pin=PIN_RIGHT_FORWARD,
-            right_backward_pin=PIN_RIGHT_BACKWARD,
-            right_encoder_feedback_pin_A=PIN_ENCODER_RIGHT_A,
-            right_encoder_feedback_pin_B=PIN_ENCODER_RIGHT_B)
+            enable_pin=self.GPIOS.PIN_MOTOR_ENABLE,
+            left_forward_pin=self.GPIOS.PIN_LEFT_FORWARD,
+            left_backward_pin=self.GPIOS.PIN_LEFT_BACKWARD,
+            left_encoder_feedback_pin_A=self.GPIOS.PIN_ENCODER_LEFT_A,
+            left_encoder_feedback_pin_B=self.GPIOS.PIN_ENCODER_LEFT_B,
+            right_forward_pin=self.GPIOS.PIN_RIGHT_FORWARD,
+            right_backward_pin=self.GPIOS.PIN_RIGHT_BACKWARD,
+            right_encoder_feedback_pin_A=self.GPIOS.PIN_ENCODER_RIGHT_A,
+            right_encoder_feedback_pin_B=self.GPIOS.PIN_ENCODER_RIGHT_B)
         self.motor_control = self._dc_enc_motor
 
-        self._cb1 = self.pi.callback(PIN_PUSHBUTTON, pigpio.EITHER_EDGE, self._cb_button)
+        self._cb1 = self.pi.callback(self.GPIOS.PIN_PUSHBUTTON, pigpio.EITHER_EDGE, self._cb_button)
 
         for pin in self._pin_out:
             self.pi.set_PWM_frequency(pin, PWM_FREQUENCY)
             self.pi.set_PWM_range(pin, PWM_RANGE)
 
-        self.sonar = [sonar.Sonar(self.pi, PIN_SONAR_1_TRIGGER, PIN_SONAR_1_ECHO),
-                      sonar.Sonar(self.pi, PIN_SONAR_2_TRIGGER, PIN_SONAR_2_ECHO),
-                      sonar.Sonar(self.pi, PIN_SONAR_3_TRIGGER, PIN_SONAR_3_ECHO),
-                      sonar.Sonar(self.pi, PIN_SONAR_4_TRIGGER, PIN_SONAR_4_ECHO)]
+        self.sonar = [sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_1_TRIGGER, self.GPIOS.PIN_SONAR_1_ECHO),
+                      sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_2_TRIGGER, self.GPIOS.PIN_SONAR_2_ECHO),
+                      sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_3_TRIGGER, self.GPIOS.PIN_SONAR_3_ECHO),
+                      sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_4_TRIGGER, self.GPIOS.PIN_SONAR_4_ECHO)]
 
-        try:
-            self._mpu = mpu.AccelGyroMag()
-        except:
-            logging.info("MPU not available")
 
         #self.stop()
         self._is_moving = False
@@ -163,22 +193,22 @@ class CoderBot(object):
         if axis is None:
             return acc
         else:
-            return acc[axis]
+            return int(acc[axis]*100.0)/100.0
 
     def get_mpu_gyro(self, axis=None):
         gyro = self._mpu.get_gyro()
         if axis is None:
             return gyro
         else:
-            return gyro[axis]
+            return int(gyro[axis]*100.0)/200.0
 
     def get_mpu_heading(self):
         hdg = self._mpu.get_hdg()
-        return hdg
+        return int(hdg)
 
     def get_mpu_temp(self):
         temp = self._mpu.get_temp()
-        return temp
+        return int(temp*100.0)/100.0
 
     def _servo_control(self, pin, angle):
         duty = ((angle + 90) * 100 / 180) + 25

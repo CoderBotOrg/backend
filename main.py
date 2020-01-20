@@ -22,7 +22,7 @@ from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
 
-from coderbot import CoderBot, PIN_PUSHBUTTON
+from coderbot import CoderBot
 from camera import Camera
 from motion import Motion
 from audio import Audio
@@ -486,7 +486,7 @@ def run_server():
             app.bot_config = {}
             logging.error(e)
 
-        bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
+        bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)
 
         remove_doreset_file()
 

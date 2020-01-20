@@ -28,7 +28,8 @@ class SimpleExample:
                 ag_data_ready = self.driver.read_ag_status().accelerometer_data_available
                 if ag_data_ready:
                     self.read_ag()
-                    self.read_magnetometer()
+                    print("")
+                    #self.read_magnetometer()
                     count += 1
                 time.sleep(0.05)
         finally:
@@ -36,10 +37,10 @@ class SimpleExample:
 
     def read_ag(self):
         temp, acc, gyro = self.driver.read_values()
-        print("Temp: %.1f °f" % temp, end='')
-        print("Gyro Roll: %.4f, Pitch: %.4f, Yaw: %.4f" % (gyro[SimpleExample.ROLL_IND],
-                                                           gyro[SimpleExample.PITCH_IND],
-                                                           gyro[SimpleExample.YAW_IND]), end='')
+        #print("Temp: %.1f °f" % temp, end='')
+        #print("Gyro Roll: %.4f, Pitch: %.4f, Yaw: %.4f" % (gyro[SimpleExample.ROLL_IND],
+        #                                                   gyro[SimpleExample.PITCH_IND],
+        #                                                   gyro[SimpleExample.YAW_IND]), end='')
         print("X: %.4f, Y: %.4f, Z: %.4f" % (acc[SimpleExample.X_IND],
                                              acc[SimpleExample.Y_IND],
                                              acc[SimpleExample.Z_IND]), end='')

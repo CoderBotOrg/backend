@@ -46,9 +46,9 @@ class AccelGyroMag:
 
     def get_acc(self):
         temp, acc, gyro = self.driver.read_values()
-        return (gyro[AccelGyroMag.X_IND],
-                gyro[AccelGyroMag.Y_IND],
-                gyro[AccelGyroMag.Z_IND])
+        return (acc[AccelGyroMag.X_IND],
+                acc[AccelGyroMag.Y_IND],
+                acc[AccelGyroMag.Z_IND])
 
     def get_hdg(self):
         hdg = self.driver.mag_heading()
