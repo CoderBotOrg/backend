@@ -336,7 +336,7 @@ def handle_program_load():
     logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
-    return jsonify(app.prog.as_json())
+    return jsonify(app.prog.as_dict())
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():

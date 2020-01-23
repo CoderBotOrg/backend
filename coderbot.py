@@ -36,8 +36,8 @@ class GPIO_CODERBOT_V_4():
 
     PIN_PUSHBUTTON = 11
     # servo
-    PIN_SERVO_3 = 9
-    PIN_SERVO_4 = 10
+    PIN_SERVO_1 = 9
+    PIN_SERVO_2 = 10
     # sonar
     PIN_SONAR_1_TRIGGER = 18
     PIN_SONAR_1_ECHO = 7
@@ -45,6 +45,8 @@ class GPIO_CODERBOT_V_4():
     PIN_SONAR_2_ECHO = 8
     PIN_SONAR_3_TRIGGER = 18
     PIN_SONAR_3_ECHO = 23
+    PIN_SONAR_4_TRIGGER = 18
+    PIN_SONAR_4_ECHO = None
 
     # encoder
     PIN_ENCODER_LEFT_A = 14
@@ -62,8 +64,8 @@ class GPIO_CODERBOT_V_5():
 
     PIN_PUSHBUTTON = 16 #11
     # servo
-    PIN_SERVO_3 = 7 #9
-    PIN_SERVO_4 = 1 #10
+    PIN_SERVO_1 = 19 #9
+    PIN_SERVO_2 = 26 #10
     # sonar
     PIN_SONAR_1_TRIGGER = 5 #18
     PIN_SONAR_1_ECHO = 27 #7
@@ -97,7 +99,7 @@ class CoderBot(object):
             logging.info("MPU not available")
             self.GPIOS = GPIO_CODERBOT_V_4()
 
-        self._pin_out = [self.GPIOS.PIN_LEFT_FORWARD, self.GPIOS.PIN_RIGHT_FORWARD, self.GPIOS.PIN_LEFT_BACKWARD, self.GPIOS.PIN_RIGHT_BACKWARD, self.GPIOS.PIN_SERVO_3, self.GPIOS.PIN_SERVO_4]
+        self._pin_out = [self.GPIOS.PIN_LEFT_FORWARD, self.GPIOS.PIN_RIGHT_FORWARD, self.GPIOS.PIN_LEFT_BACKWARD, self.GPIOS.PIN_RIGHT_BACKWARD, self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
         self.pi = pigpio.pi('localhost')
         self.pi.set_mode(self.GPIOS.PIN_PUSHBUTTON, pigpio.INPUT)
         self._cb = dict()
@@ -128,7 +130,7 @@ class CoderBot(object):
                       sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_2_TRIGGER, self.GPIOS.PIN_SONAR_2_ECHO),
                       sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_3_TRIGGER, self.GPIOS.PIN_SONAR_3_ECHO),
                       sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_4_TRIGGER, self.GPIOS.PIN_SONAR_4_ECHO)]
-
+        self._servos = [self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
 
         #self.stop()
         self._is_moving = False
@@ -179,11 +181,8 @@ class CoderBot(object):
     def right(self, speed=100, elapse=0):
         self.turn(speed=speed, elapse=elapse)
 
-    def servo3(self, angle):
-        self._servo_control(PIN_SERVO_3, angle)
-
-    def servo4(self, angle):
-        self._servo_control(PIN_SERVO_4, angle)
+    def servo(self, servo, angle):
+        self._servo_control(self._servos[servo], angle)
 
     def get_sonar_distance(self, sonar_id=0):
         return self.sonar[sonar_id].get_distance()

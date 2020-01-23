@@ -107,7 +107,7 @@ def _get_hparams(train_epochs=1, learning_rate=0.005):
   return lib.HParams(
     train_epochs=train_epochs,
     do_fine_tuning=False,
-    batch_size=1,
+    batch_size=2,
     learning_rate=learning_rate,
     momentum=0.9)
 
