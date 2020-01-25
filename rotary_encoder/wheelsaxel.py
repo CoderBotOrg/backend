@@ -86,8 +86,9 @@ class WheelsAxel:
         self._is_moving = True
 
         # moving for desired time
-        sleep(max(time_elapse, 0))
-        self.stop()
+        if time_elapse > 0:
+            sleep(max(time_elapse, 0))
+            self.stop()
 
     """ Motor distance control allows the motors
             to run for a certain amount of distance (mm) """
