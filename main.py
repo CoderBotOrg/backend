@@ -22,7 +22,7 @@ from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
 
-from coderbot import CoderBot, PIN_PUSHBUTTON
+from coderbot import CoderBot
 from camera import Camera
 from motion import Motion
 from audio import Audio
@@ -336,7 +336,7 @@ def handle_program_load():
     logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
-    return jsonify(app.prog.as_json())
+    return jsonify(app.prog.as_dict())
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
@@ -486,11 +486,11 @@ def run_server():
             app.bot_config = {}
             logging.error(e)
 
-        bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
+        bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)
 
         remove_doreset_file()
 
-        app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
+        app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()

@@ -63,6 +63,17 @@ class CNNManager(object):
     def get_model_status(self, model_name):
         return self._models[model_name]
 
+    @classmethod
+    def get_model_info(cls, architecture):
+        model_info = architecture.split("/")[1].split("_")
+        return model_info
+
+    @classmethod
+    def get_model_shape(cls, architecture):
+        model_info = cls.get_model_info(architecture)
+        size = int(model_info[3])
+        return (size, size)
+
     def _save_model_meta(self):
         f = open(MODEL_METADATA, "w")
         json.dump(self._models, f)
@@ -71,7 +82,7 @@ class CNNManager(object):
     def delete_model(self, model_name):
         if self._models.get(model_name):
             try:
-                os.remove(MODEL_PATH + "/" + model_name + ".pb")
+                os.remove(MODEL_PATH + "/" + model_name + ".tflite")
                 os.remove(MODEL_PATH + "/" + model_name + ".txt")
             except Exception:
                 logging.warning("model files not found: %s", model_name)
@@ -92,7 +103,7 @@ class CNNManager(object):
         self._trainers[model_name] = trainer
 
     def save_model_status(self, model_name, architecture, status):
-        model_info = architecture.split("_")
+        model_info = self.get_model_info(architecture)
         self._models[model_name] = {"status": status, "image_height": model_info[3], "image_width": model_info[3], "output_layer": "final_result"}
         self._save_model_meta()
 
@@ -103,11 +114,8 @@ class CNNManager(object):
     def load_model(self, model_name):
         model_info = self._models.get(model_name)
         if model_info:
-            return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".pb",
-                                 label_file=MODEL_PATH + "/" + model_name + ".txt",
-                                 output_layer=model_info["output_layer"],
-                                 input_height=int(model_info["image_height"]),
-                                 input_width=int(model_info["image_width"]))
+            return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".tflite",
+                                 label_file=MODEL_PATH + "/" + model_name + ".txt")
         return None
     class TrainThread(threading.Thread):
 
@@ -127,7 +135,7 @@ class CNNManager(object):
             model["status"] = status
 
         def run(self):
-            self.trainer = CNNTrainer(self.manager, self.architecture)
+            self.trainer = CNNTrainer(self.manager, self.architecture, CNNManager.get_model_shape(self.architecture))
             self.manager.save_model_status(self.model_name, self.architecture, 0)
             image_dir = self.prepare_images()
             logging.info("retrain")

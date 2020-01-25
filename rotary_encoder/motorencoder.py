@@ -81,7 +81,8 @@ class MotorEncoder:
         self._direction = 1 if power > 0 else -1  # setting direction according to speed
         self._power = power # setting current power
 
-        self._pi.write(self._enable_pin, True)  # enabling motors
+        if self._enable_pin is not None:
+            self._pi.write(self._enable_pin, True)  # enabling motors
 
         # going forward
         if (self._direction == 1):

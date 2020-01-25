@@ -34,7 +34,7 @@ class PIGPIOMock(object):
         """mock write"""
         assert(pin_id > 0 and pin_id < 32)
         assert(value == 0 or value == 1)
-        
+
     def read(self, pin_id):
         """mock read"""
         pass
@@ -43,17 +43,21 @@ class PIGPIOMock(object):
         """mock gpio_trigger"""
         assert(pin_id > 0 and pin_id < 32)
         # mock sonars triger and echo
-        if pin_id == coderbot.PIN_SONAR_1_TRIGGER:
-            self.callbacks[coderbot.PIN_SONAR_1_ECHO](coderbot.PIN_SONAR_1_TRIGGER, 0, 0)
-            self.callbacks[coderbot.PIN_SONAR_2_ECHO](coderbot.PIN_SONAR_1_TRIGGER, 0, 0)
-            self.callbacks[coderbot.PIN_SONAR_3_ECHO](coderbot.PIN_SONAR_1_TRIGGER, 0, 0)
-            self.callbacks[coderbot.PIN_SONAR_1_ECHO](coderbot.PIN_SONAR_1_ECHO, 1, 0)
-            self.callbacks[coderbot.PIN_SONAR_2_ECHO](coderbot.PIN_SONAR_2_ECHO, 1, 0)
-            self.callbacks[coderbot.PIN_SONAR_3_ECHO](coderbot.PIN_SONAR_3_ECHO, 1, 0)
+        if pin_id == coderbot.GPIO_CODERBOT_V_4.PIN_SONAR_1_TRIGGER or pin_id == coderbot.GPIO_CODERBOT_V_5.PIN_SONAR_1_TRIGGER:
+            if pin_id == coderbot.GPIO_CODERBOT_V_4.PIN_SONAR_1_TRIGGER:
+                GPIOS=coderbot.GPIO_CODERBOT_V_4
+            else:
+                GPIOS=coderbot.GPIO_CODERBOT_V_5
+            self.callbacks[GPIOS.PIN_SONAR_1_ECHO](GPIOS.PIN_SONAR_1_TRIGGER, 0, 0)
+            self.callbacks[GPIOS.PIN_SONAR_2_ECHO](GPIOS.PIN_SONAR_1_TRIGGER, 0, 0)
+            self.callbacks[GPIOS.PIN_SONAR_3_ECHO](GPIOS.PIN_SONAR_1_TRIGGER, 0, 0)
+            self.callbacks[GPIOS.PIN_SONAR_1_ECHO](GPIOS.PIN_SONAR_1_ECHO, 1, 0)
+            self.callbacks[GPIOS.PIN_SONAR_2_ECHO](GPIOS.PIN_SONAR_2_ECHO, 1, 0)
+            self.callbacks[GPIOS.PIN_SONAR_3_ECHO](GPIOS.PIN_SONAR_3_ECHO, 1, 0)
             time.sleep(0.005)
-            self.callbacks[coderbot.PIN_SONAR_1_ECHO](coderbot.PIN_SONAR_1_ECHO, 0, 5000)
-            self.callbacks[coderbot.PIN_SONAR_2_ECHO](coderbot.PIN_SONAR_2_ECHO, 0, 5000)
-            self.callbacks[coderbot.PIN_SONAR_3_ECHO](coderbot.PIN_SONAR_3_ECHO, 0, 5000)
+            self.callbacks[GPIOS.PIN_SONAR_1_ECHO](GPIOS.PIN_SONAR_1_ECHO, 0, 5000)
+            self.callbacks[GPIOS.PIN_SONAR_2_ECHO](GPIOS.PIN_SONAR_2_ECHO, 0, 5000)
+            self.callbacks[GPIOS.PIN_SONAR_3_ECHO](GPIOS.PIN_SONAR_3_ECHO, 0, 5000)
 
     def set_PWM_frequency(self, pin_id, frequency):
         """mock set_PWM_frequency"""
@@ -63,7 +67,7 @@ class PIGPIOMock(object):
     def set_PWM_range(self, pin_id, range):
         """mock set_PWM_range"""
         pass
-    
+
     def set_PWM_dutycycle(self, pin_id, dutycycle):
         """mock set_PWM_dutycyle"""
         pass

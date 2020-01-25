@@ -30,10 +30,10 @@ class WheelsAxel:
         # right motor
         self._right_motor = MotorEncoder(pi,
                                          enable_pin,
-                                         right_forward_pin,
                                          right_backward_pin,
-                                         right_encoder_feedback_pin_B,
-                                         right_encoder_feedback_pin_A)
+                                         right_forward_pin,
+                                         right_encoder_feedback_pin_A,
+                                         right_encoder_feedback_pin_B)
 
         # other
         self._wheelsAxle_lock = threading.Condition() # race condition lock
@@ -201,7 +201,7 @@ class WheelsAxel:
         # restoring callback
         try:
             self._wheelsAxle_lock.release()
-        except Exception as e:
+        except RuntimeError:
             pass
 
     # CALLBACK

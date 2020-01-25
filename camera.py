@@ -358,6 +358,7 @@ class Camera(object):
         else:
             classifier = self._cnn_classifier_default
 
+        t0 = time.time()
         classes = None
         try:
             img = self.get_image()
@@ -365,8 +366,31 @@ class Camera(object):
         except Exception:
             logging.warning("classifier not available")
             classes = [("None", 1.0)]
+            raise
+        logging.info("fps: %f", 1.0/(time.time()-t0))
         return classes
 
     def find_class(self):
         return self.cnn_classify(top_results=1)[0][0]
 
+    def cnn_detect_objects(self, model_name=None, top_results=3):
+        classifier = None
+        if model_name:
+            classifier = self._cnn_classifiers.get(model_name)
+            if classifier is None:
+                classifier = CNNManager.get_instance().load_model(model_name)
+                self._cnn_classifiers[model_name] = classifier
+        else:
+            classifier = self._cnn_classifier_default
+
+        t0 = time.time()
+        classes = None
+        try:
+            img = self.get_image()
+            classes = classifier.detect_objects(img.mat(), top_results=top_results)
+        except Exception:
+            logging.warning("classifier not available")
+            classes = [("None", 100)]
+            raise
+        logging.info("fps: %f", 1.0/(time.time()-t0))
+        return classes

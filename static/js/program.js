@@ -12,7 +12,7 @@ if($('#page-program')) {
             } else {
                 editor = new ProgramEditorPython(editorDOMElement);
             }
-         $("#b_new_prog").on("click", function() {editor.newProgramDlg()});
+        $("#b_new_prog").on("click", function() {editor.newProgramDlg()});
         $("#b_load_prog").on("click", function() {editor.loadProgramDlg()});
         $("#b_save_prog").on("click", function() {editor.saveProgram()});
         $("#b_save_prog_as").on("click", function() {editor.saveProgramAsDlg()});
@@ -76,7 +76,7 @@ class ProgramEditor {
     loadProgramDlg() {
         $('#i_prog_list').empty();
         for(var i in this.programList) {
-            var name = this.programList[i];
+            var name = this.programList[i].name;
             $('#i_prog_list').append('<li data-prog-name="' + name +'"><a href="#" class="c_load_prog"><h2>'+name+'</h2></a><a href="#" class="c_delete_prog">Delete program</a></li>');
         }
         $('#i_prog_list').listview('refresh'); 

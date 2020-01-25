@@ -267,6 +267,18 @@
           </block>
         </value>
       </block>
+      <block type="coderbot_adv_move_enc">
+        <value name="SPEED">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+        <value name="DISTANCE">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
       <block type="coderbot_adv_stop"></block>
       <block type="coderbot_sleep">
         <value name="ELAPSE">
@@ -281,7 +293,7 @@
       <block type="coderbot_camera_videoRec"></block>
       <block type="coderbot_camera_videoStop"></block>
     </category>
-    <category name="{% trans %}Sensor{% endtrans %}" colour="250">
+    <category name="{% trans %}Vision{% endtrans %}" colour="250">
       <block type="coderbot_cam_average"></block>
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
@@ -303,8 +315,15 @@
       <block type="coderbot_adv_findARCode"></block>
       <block type="coderbot_adv_find_class"></block>
       <block type="coderbot_adv_cnn_classify"></block>
-      <block type="coderbot_sonar_get_distance"></block>
+      <block type="coderbot_adv_cnn_detect_objects"></block>
     </category>{%endif%}
+    <category name="{% trans %}Sensor{% endtrans %}" colour="240">
+      <block type="coderbot_sonar_get_distance"></block>
+      <block type="coderbot_mpu_get_gyro"></block>
+      <block type="coderbot_mpu_get_accel"></block>
+      <block type="coderbot_mpu_get_heading"></block>
+      <block type="coderbot_mpu_get_temp"></block>
+    </category>
     <category name="{% trans %}Sound{% endtrans %}" colour="220">
       <block type="coderbot_audio_say"></block>
       <block type="coderbot_audio_record"></block>

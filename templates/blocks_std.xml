@@ -58,7 +58,7 @@
         </value>
       </block>
     </category>{%if cam%}
-    <category name="{% trans %}Sensor{% endtrans %}" colour="290">
+    <category name="{% trans %}Vision{% endtrans %}" colour="290">
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
       <block type="coderbot_adv_findSignal"></block>
