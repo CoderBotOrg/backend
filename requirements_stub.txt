@@ -2,7 +2,6 @@
 #  install the packages in `requirements.txt` too.
 
 absl-py==0.8.1
-apiai==1.2.3
 astor==0.7.1
 Babel==2.5.3
 certifi==2018.4.16
@@ -13,7 +12,7 @@ connexion==1.4.2
 Flask==1.1.1
 Flask-Babel==0.12.2
 Flask-Cors==3.0.8
-gast==0.2.0
+gast==0.2.2
 grpcio==1.25.0
 idna==2.6
 inflection==0.3.1
@@ -26,13 +25,13 @@ numpy==1.17.4
 opencv-contrib-python==3.4.3.18
 pigpio==1.44
 Pillow==7.0.0
-protobuf==3.6.1
+protobuf==3.11.3
 Pypubsub==4.0.0
 pytz==2018.4
 pyyaml>=4.2b1
 pyzbar==0.1.7
-requests==2.20.0
-six==1.11.0
+requests==2.22.0
+six==1.14.0
 swagger-spec-validator==2.3.1
 termcolor==1.1.0
 tinydb==3.12.1
