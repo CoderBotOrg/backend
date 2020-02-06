@@ -58,12 +58,12 @@ class CoderBotServoMotorTestCase(unittest.TestCase):
         self.bot.left(speed=100, elapse=0.1)
 
     def test_motor_move(self):
-        self.bot.move(speed=100, elapse=0.1, steps=-1)
-        self.bot.move(speed=-100, elapse=0.1, steps=-1)
+        self.bot.move(speed=100, elapse=0.1)
+        self.bot.move(speed=-100, elapse=0.1)
 
     def test_motor_turn(self):
-        self.bot.turn(speed=100, elapse=0.1, steps=-1)
-        self.bot.turn(speed=-100, elapse=0.1, steps=-1)
+        self.bot.turn(speed=100, elapse=0.1)
+        self.bot.turn(speed=-100, elapse=0.1)
 
 
 class CoderBotSonarTestCase(unittest.TestCase):
