@@ -161,7 +161,7 @@ class Image():
     def find_blobs(self, minsize=0, maxsize=10000000):
         blobs = []
         image = contours = hyerarchy = None
-        image, contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         for c in contours:
             area = cv2.contourArea(c)
