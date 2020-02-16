@@ -51,7 +51,7 @@ class Image():
     _aruco_parameters = cv2.aruco.DetectorParameters_create()
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
-    _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
+    _face_cascade = cv2.CascadeClassifier('/usr/share/opencv/lbpcascades/lbpcascade_frontalface.xml')
 
     def __init__(self, array):
         self._data = array
