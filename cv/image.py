@@ -51,7 +51,7 @@ class Image():
     _aruco_parameters = cv2.aruco.DetectorParameters_create()
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
-    _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
+    _face_cascade = cv2.CascadeClassifier('/usr/share/opencv/lbpcascades/lbpcascade_frontalface.xml')
 
     def __init__(self, array):
         self._data = array
@@ -161,7 +161,7 @@ class Image():
     def find_blobs(self, minsize=0, maxsize=10000000):
         blobs = []
         image = contours = hyerarchy = None
-        image, contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         for c in contours:
             area = cv2.contourArea(c)

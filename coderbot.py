@@ -132,7 +132,7 @@ class CoderBot(object):
                       sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_4_TRIGGER, self.GPIOS.PIN_SONAR_4_ECHO)]
         self._servos = [self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
 
-        #self.stop()
+        self.stop()
         self._is_moving = False
 
     the_bot = None

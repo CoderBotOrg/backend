@@ -1,6 +1,7 @@
 import pigpio
 import threading
 from time import sleep
+import logging
 
 from rotary_encoder.motorencoder import MotorEncoder
 
@@ -36,7 +37,7 @@ class WheelsAxel:
                                          right_encoder_feedback_pin_B)
 
         # other
-        self._wheelsAxle_lock = threading.Condition() # race condition lock
+        #self._wheelsAxle_lock = threading.RLock() # race condition lock
 
     # STATE GETTERS
     """ Distance and speed are calculated by a mean of the feedback
@@ -78,7 +79,7 @@ class WheelsAxel:
     """ Motor time control allows the motors
         to run for a certain amount of time """
     def control_time(self, power_left=100, power_right=100, time_elapse=0):
-        self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
+        #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
 
         # applying tension to motors
         self._left_motor.control(power_left)
@@ -94,7 +95,7 @@ class WheelsAxel:
     """ Motor distance control allows the motors
             to run for a certain amount of distance (mm) """
     def control_distance(self, power_left=100, power_right=100, target_distance=0):
-        self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
+        #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
         self._is_moving = True
 
         # applying tension to motors
@@ -192,17 +193,18 @@ class WheelsAxel:
 
         # trying to fix distance different than zero after
         # wheels has stopped by re-resetting state after 0.5s
-        sleep(0.1)
+
         self._left_motor.reset_state()
         self._right_motor.reset_state()
 
         # updating state
         self._is_moving = False
         # restoring callback
-        try:
-            self._wheelsAxle_lock.release()
-        except RuntimeError:
-            pass
+        #try:
+        #    self._wheelsAxle_lock.release()
+        #except RuntimeError as e:
+        #    logging.error("error: " + str(e))
+        #    pass
 
     # CALLBACK
     def cancel_callback(self):
