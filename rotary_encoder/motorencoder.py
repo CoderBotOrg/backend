@@ -136,7 +136,7 @@ class MotorEncoder:
     # CALLBACK
     """ The callback function rotary_callback is called on FALLING_EDGE by the
         rotary_decoder with a parameter value of 1 (1 new tick)
-        
+
         - Gearbox ratio: 120:1 (1 wheel revolution = 120 motor revolution)
         - Encoder ratio: 16:1 encoder ticks for 1 motor revolution
         - 1 wheel revolution = 120 * 16 = 1920 ticks
@@ -145,7 +145,7 @@ class MotorEncoder:
         - 1 tick = 0.0981mm
         - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately 
         So 0.0981 is the ticks->distance(mm) conversion coefficient
-        
+
         The callback function calculates current velocity by taking groups of 
         ticks_threshold ticks"""
 
