@@ -27,9 +27,31 @@
 ############################################################################
 
 import os
+import sox
 
+class Music:
 
-class Musical:
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = Music()
+        return cls._instance
 
     def __init__(self):
+        os.putenv('AUDIODRIVER', 'alsa')
+        os.putenv('AUDIODEV', 'hw:1,0')
         print("We have create a class: MUSICAL")
+
+    def test(self):
+        tfm = sox.Transformer()
+        tfm.preview('cat.wav')  
+
+if __name__ == "__main__":
+    a = Music()
+    
+    a.test()
+    a.test()
+    a.test()
+    a.test()
