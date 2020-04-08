@@ -28,6 +28,7 @@
 
 import os
 import sox
+import time
 
 class Music:
 
@@ -47,11 +48,51 @@ class Music:
     def test(self):
         tfm = sox.Transformer()
         tfm.preview('cat.wav')  
+        tfm.build('cat.wav', 'outMusicDemo.wav')
+
+    #play a pause
+    # @param duration: duration of the pause in seconds
+    def play_pause(self, duration):
+        time.sleep(duration)
+
+    #play a given note for a given instrument
+    # @param instrument: name of the instrument to be used
+    # @param note: name of the note in the following format "A2"
+    # @para alteration: if it is a diesis or a bemolle
+    # @param time: duration of the note in seconds
+    def play_note(self, note, alteration='none', time=1.0, instrument='piano'):
+            tfm = sox.Transformer()
+            
+            time = float(time)
+
+            alt = 0.0
+            
+            #noteArray={}
+
+            if note == 'C2':
+            # pitch shift combined audio up n semitones, quick may reduce audio quality
+                shift = -7.0 + alt
+            elif note == 'D2':
+                shift = -5.0 + alt
+            elif note == 'E2':
+                shift = -3.0 + alt
+            elif note == 'F2':
+                shift = -2.0 + alt
+            elif note == 'F#2':
+                shift = -1.0 + alt
+                       
+            tfm.pitch(shift, quick=False)
+
+            tfm.trim(0.0, end_time=0.5*time)
+            
+            tfm.preview(instrument + '.wav')
+            print("play_note:  note " + note )
 
 if __name__ == "__main__":
     a = Music()
     
-    a.test()
-    a.test()
-    a.test()
+    a.play_note('C2')
+    a.play_pause(1)
+    a.play_note('E2')
+    a.play_note('D2')
     a.test()
