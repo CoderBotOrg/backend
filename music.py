@@ -32,6 +32,11 @@ import time
 
 class Music:
 
+    noteDict = {
+        'C2': -7.0, 'D2' : -5.0, 'E2' : -3.0, 'F2' : -2.0, 'F#2' : -1.0, 'G2' : 0.0,
+        'A2' : 2.0, 'Bb2' : 3.0, 'B2' : 4.0, 'C3' : 5.0, 'D3' : 7.0, 'E3' : 9.0,
+        'F3' : 10.0, 'G3' : 12.0
+    }
     _instance = None
 
     @classmethod
@@ -61,32 +66,70 @@ class Music:
     # @para alteration: if it is a diesis or a bemolle
     # @param time: duration of the note in seconds
     def play_note(self, note, alteration='none', time=1.0, instrument='piano'):
-            tfm = sox.Transformer()
-            
-            time = float(time)
+        tfm = sox.Transformer()
+        
+        time = float(time)
 
-            alt = 0.0
-            
-            #noteArray={}
+        alt = 0.0
+        if alteration == 'bmolle':
+            alt = -1.0
+        elif alteration == 'diesis':
+            alt = 1.0
 
-            if note == 'C2':
-            # pitch shift combined audio up n semitones, quick may reduce audio quality
-                shift = -7.0 + alt
-            elif note == 'D2':
-                shift = -5.0 + alt
-            elif note == 'E2':
-                shift = -3.0 + alt
-            elif note == 'F2':
-                shift = -2.0 + alt
-            elif note == 'F#2':
-                shift = -1.0 + alt
-                       
-            tfm.pitch(shift, quick=False)
+        if note in self.noteDict :
+            shift = self.noteDict[note]+ alt
+        else:
+            print('note not exist')            
 
-            tfm.trim(0.0, end_time=0.5*time)
+        tfm.pitch(shift, quick=False)
+        tfm.trim(0.0, end_time=0.5*time)
+        tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
+        
+    def play_animal(self, instrument, note='G2', alteration='none', time=1.0):
+        tfm = sox.Transformer()
             
-            tfm.preview(instrument + '.wav')
-            print("play_note:  note " + note )
+        time = float(time)
+
+        alt = 0.0
+        if alteration == 'bmolle':
+            alt = -1.0
+        elif alteration == 'diesis':
+            alt = 1.0
+
+        if note == 'C2':
+            shift = -7.0 + alt
+        elif note == 'D2':
+            shift = -5.0 + alt
+        elif note == 'E2':
+            shift = -3.0 + alt
+        elif note == 'F2':
+            shift = -2.0 + alt
+        elif note == 'F#2':
+            shift = -1.0 + alt
+        elif note == 'G2':
+            shift = 0.0 + alt
+        elif note == 'A2':
+            shift = 2.0 + alt
+        elif note == 'Bb2':
+            shift = 3.0 + alt
+        elif note == 'B2':
+            shift = 4.0 + alt
+        elif note == 'C3':
+            shift = 5.0 + alt
+        elif note == 'D3':
+            shift = 7.0 + alt
+        elif note == 'E3':
+            shift = 9.0 + alt
+        elif note == 'F3':
+            shift = 10.0 + alt
+        elif note == 'G3':
+            shift = 12.0 + alt                
+        tfm.pitch(shift, quick=False)
+        tfm.trim(0.0, end_time=0.5*time)
+        #tfm.stretch(time, window=20)
+        tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
+
+           
 
 if __name__ == "__main__":
     a = Music()
@@ -94,5 +137,7 @@ if __name__ == "__main__":
     a.play_note('C2')
     a.play_pause(1)
     a.play_note('E2')
-    a.play_note('D2')
-    a.test()
+    a.play_note('C2')
+    a.play_note('E2')
+    a.play_note('C2')
+    a.play_animal(instrument='cat')
