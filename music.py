@@ -29,8 +29,11 @@
 import os
 import sox
 import time
+from musicPackages import MusicPackageManager,MusicPackageInterface,MusicPackage
 
 class Music:
+
+    managerPackage = None
 
     noteDict = {
         'C2': -7.0, 'D2' : -5.0, 'E2' : -3.0, 'F2' : -2.0, 'F#2' : -1.0, 'G2' : 0.0,
@@ -45,9 +48,10 @@ class Music:
             cls._instance = Music()
         return cls._instance
 
-    def __init__(self):
+    def __init__(self,managerPackage):
         os.putenv('AUDIODRIVER', 'alsa')
         os.putenv('AUDIODEV', 'hw:1,0')
+        self.managerPackage = managerPackage
         print("We have create a class: MUSICAL")
 
     def test(self):
@@ -83,7 +87,10 @@ class Music:
 
         tfm.pitch(shift, quick=False)
         tfm.trim(0.0, end_time=0.5*time)
-        tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
+        if self.managerPackage.isPackageAvailable(instrument):
+            tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
+        else:
+            print("no instrument:"+str(instrument)+" present in this coderbot!")
         
     def play_animal(self, instrument, note='G2', alteration='none', time=1.0):
         tfm = sox.Transformer()
@@ -132,12 +139,13 @@ class Music:
            
 
 if __name__ == "__main__":
-    a = Music()
+    b = MusicPackageManager()
+    a = Music(b)
     
     a.play_note('C2')
     a.play_pause(1)
     a.play_note('E2')
-    a.play_note('C2')
-    a.play_note('E2')
+    a.play_note('C2',instrument="piano")
+    a.play_note('E2',instrument="guitar")
     a.play_note('C2')
     a.play_animal(instrument='cat')

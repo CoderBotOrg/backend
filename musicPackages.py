@@ -86,7 +86,7 @@ class MusicPackageManager:
     packages = None
 
     def __init__(self):
-        packages = dict()
+        self.packages = dict()
         with open('./sounds/notes/music_package.json') as json_file:
             data = json.load(json_file)
             for p in data['packages']:
@@ -98,8 +98,11 @@ class MusicPackageManager:
                     mpi = MusicPackageInterface(i,interfaceItem['available'],interfaceItem['icon'])
                     mp.addInterface(mpi)
 
-                if p not in packages:
-                    packages[p] = mp
-        
-if __name__ == "__main__":
-    a = MusicPackageManager()
+                if p not in self.packages:
+                    self.packages[p] = mp
+
+    def isPackageAvailable(self,namePackage):
+        if namePackage in self.packages:
+            return True
+        else:
+            return False
