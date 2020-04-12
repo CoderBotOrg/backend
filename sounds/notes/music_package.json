@@ -1,0 +1,47 @@
+{
+    "packages":{ 
+        "cat":{
+            "category":"animal",
+            "name_IT":"gatto",
+            "name_EN":"cat",
+            "version":"0.1",
+            "date":"2020-04-08",
+            "interface":{
+                "base":{
+                    "available":"TRUE",
+                    "icon":"cat.png"
+                },
+                "intermediate":{
+                    "available":"FALSE",
+                    "icon":"cat.png"
+                },
+                "advanced":{
+                    "available":"MAYBE",
+                    "icon":"cat.png"
+                }
+            }
+        },
+
+        "piano":{
+            "category":"instrument",
+            "name_IT":"pianoforte",
+            "name_EN":"piano",
+            "version":"0.1",
+            "date":"2020-04-08",
+            "interface":{
+                "base":{
+                    "available":"TRUE",
+                    "icon":"piano.png"
+                },
+                "intermediate":{
+                    "available":"TRUE",
+                    "icon":"piano.png"
+                },
+                "advanced":{
+                    "available":"TRUE",
+                    "icon":"piano.png"
+                }
+            }
+        }
+    }
+}
