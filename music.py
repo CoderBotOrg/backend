@@ -29,10 +29,9 @@
 import os
 import sox
 import time
-from musicPackages import MusicPackageManager,MusicPackageInterface,MusicPackage
 
 class Music:
-
+    _instance = None
     managerPackage = None
 
     noteDict = {
@@ -40,12 +39,12 @@ class Music:
         'A2' : 2.0, 'Bb2' : 3.0, 'B2' : 4.0, 'C3' : 5.0, 'D3' : 7.0, 'E3' : 9.0,
         'F3' : 10.0, 'G3' : 12.0
     }
-    _instance = None
+    
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls,managerPackage):
         if cls._instance is None:
-            cls._instance = Music()
+            cls._instance = Music(managerPackage)
         return cls._instance
 
     def __init__(self,managerPackage):

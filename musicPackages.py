@@ -83,7 +83,14 @@ class MusicPackageInterface:
         return self.icon
 
 class MusicPackageManager:
+    _instance = None
     packages = None
+    
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = MusicPackageManager()
+        return cls._instance
 
     def __init__(self):
         self.packages = dict()
