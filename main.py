@@ -30,6 +30,7 @@ from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
+from audioControls import AudioCtrl
 
 # Logging configuration
 logger = logging.getLogger()
@@ -41,7 +42,8 @@ sh.setFormatter(formatter)
 fh.setFormatter(formatter)
 #logger.addHandler(sh)
 logger.addHandler(fh)
-
+##audioext
+audioCtrl = AudioCtrl.get_instance()
 
 ## (Connexion) Flask app configuration
 
@@ -157,7 +159,7 @@ def handle_config():
     """
     Overwrite configuration file on disk and reload it
     """
-    print(request.form)
+    audioCtrl.setVolume(int(request.form['audio_volume_level']))
     Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
