@@ -59,6 +59,8 @@ app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
 
+
+
 ## New API and web application
 
 # API v2 is defined in v2.yml and its methods are in api.py
@@ -155,6 +157,7 @@ def handle_config():
     """
     Overwrite configuration file on disk and reload it
     """
+    print(request.form)
     Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
