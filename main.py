@@ -42,8 +42,7 @@ sh.setFormatter(formatter)
 fh.setFormatter(formatter)
 #logger.addHandler(sh)
 logger.addHandler(fh)
-##audioext
-audioCtrl = AudioCtrl.get_instance()
+
 
 ## (Connexion) Flask app configuration
 
@@ -159,6 +158,7 @@ def handle_config():
     """
     Overwrite configuration file on disk and reload it
     """
+    audioCtrl = AudioCtrl.get_instance()
     audioCtrl.setVolume(int(request.form['audio_volume_level']))
     Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
@@ -475,6 +475,10 @@ def run_server():
                                         encoder=bool(app.bot_config.get('encoder')))
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
+
+            audioCtrl = AudioCtrl.get_instance()
+            audioCtrl.setVolume(app.bot_config.get(int(request.form['audio_volume_level'])))
+
             try:
                 cam = Camera.get_instance()
                 Motion.get_instance()
