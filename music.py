@@ -69,11 +69,11 @@ class Music:
     # @param note: name of the note in the following format "A2"
     # @para alteration: if it is a diesis or a bemolle
     # @param time: duration of the note in seconds
-    def play_note(self, note, instrument='piano', alteration='none', time=1.0):
+    def play_note(self, note, instrument='piano', alteration='none', duration=1.0):
         print(note)
         tfm = sox.Transformer()
         
-        time = float(time)
+        duration = float(duration)
 
         alt = 0.0
         if alteration == 'bmolle':
@@ -87,16 +87,16 @@ class Music:
             print('note not exist')            
 
         tfm.pitch(shift, quick=False)
-        tfm.trim(0.0, end_time=0.5*time)
+        tfm.trim(0.0, end_time=0.5*duration)
         if self.managerPackage.isPackageAvailable(instrument):
-            tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
+            tfm.preview('./sounds/notes/' + instrument + '/audio.wav')            
         else:
             print("no instrument:"+str(instrument)+" present in this coderbot!")
         
-    def play_animal(self, instrument, note='G2', alteration='none', time=1.0):
+    def play_animal(self, instrument, note='G2', alteration='none', duration=1.0):
         tfm = sox.Transformer()
             
-        time = float(time)
+        duration = float(duration)
 
         alt = 0.0
         if alteration == 'bmolle':
@@ -133,6 +133,6 @@ class Music:
         elif note == 'G3':
             shift = 12.0 + alt                
         tfm.pitch(shift, quick=False)
-        tfm.trim(0.0, end_time=0.5*time)
+        tfm.trim(0.0, end_time=0.5*duration)
         #tfm.stretch(time, window=20)
         tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
