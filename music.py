@@ -62,6 +62,7 @@ class Music:
     #play a pause
     # @param duration: duration of the pause in seconds
     def play_pause(self, duration):
+        duration = float(duration)
         time.sleep(duration)
 
     #play a given note for a given instrument
