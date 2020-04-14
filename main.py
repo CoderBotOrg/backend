@@ -477,7 +477,7 @@ def run_server():
             audio.say(app.bot_config.get("sound_start"))
 
             audioCtrl = AudioCtrl.get_instance()
-            audioCtrl.setVolume(app.bot_config.get(int(request.form['audio_volume_level'])))
+            audioCtrl.setVolume(int(app.bot_config.get['audio_volume_level']))
 
             try:
                 cam = Camera.get_instance()
