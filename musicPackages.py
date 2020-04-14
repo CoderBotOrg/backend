@@ -90,11 +90,13 @@ class MusicPackageManager:
     def get_instance(cls):
         if cls._instance is None:
             cls._instance = MusicPackageManager()
+            print("make MusicPackageManager")
         return cls._instance
 
     def __init__(self):
         self.packages = dict()
         with open('./sounds/notes/music_package.json') as json_file:
+            print("99 musik pac")
             data = json.load(json_file)
             for p in data['packages']:
                 

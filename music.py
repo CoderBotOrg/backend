@@ -48,8 +48,9 @@ class Music:
         return cls._instance
 
     def __init__(self,managerPackage):
-        os.putenv('AUDIODRIVER', 'alsa')
-        os.putenv('AUDIODEV', 'hw:1,0')
+        
+        #os.putenv('AUDIODRIVER', 'alsa')
+        #os.putenv('AUDIODEV', 'hw:1,0')
         self.managerPackage = managerPackage
         print("We have create a class: MUSICAL")
 
@@ -68,7 +69,8 @@ class Music:
     # @param note: name of the note in the following format "A2"
     # @para alteration: if it is a diesis or a bemolle
     # @param time: duration of the note in seconds
-    def play_note(self, note, alteration='none', time=1.0, instrument='piano'):
+    def play_note(self, note, instrument='piano', alteration='none', time=1.0):
+        print(note)
         tfm = sox.Transformer()
         
         time = float(time)
@@ -134,17 +136,3 @@ class Music:
         tfm.trim(0.0, end_time=0.5*time)
         #tfm.stretch(time, window=20)
         tfm.preview('./sounds/notes/' + instrument + '/audio.wav')
-
-           
-
-if __name__ == "__main__":
-    b = MusicPackageManager()
-    a = Music(b)
-    
-    a.play_note('C2')
-    a.play_pause(1)
-    a.play_note('E2')
-    a.play_note('C2',instrument="piano")
-    a.play_note('E2',instrument="guitar")
-    a.play_note('C2')
-    a.play_animal(instrument='cat')
