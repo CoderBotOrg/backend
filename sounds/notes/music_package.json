@@ -12,12 +12,33 @@
                     "icon":"cat.png"
                 },
                 "intermediate":{
-                    "available":"FALSE",
+                    "available":"TRUE",
                     "icon":"cat.png"
                 },
                 "advanced":{
-                    "available":"MAYBE",
+                    "available":"TRUE",
                     "icon":"cat.png"
+                }
+            }
+        },
+        "dog":{
+            "category":"animal",
+            "name_IT":"cane",
+            "name_EN":"dog",
+            "version":"0.1",
+            "date":"2020-04-08",
+            "interface":{
+                "base":{
+                    "available":"TRUE",
+                    "icon":"dog.png"
+                },
+                "intermediate":{
+                    "available":"TRUE",
+                    "icon":"dog.png"
+                },
+                "advanced":{
+                    "available":"TRUE",
+                    "icon":"dog.png"
                 }
             }
         },
@@ -42,6 +63,76 @@
                     "icon":"piano.png"
                 }
             }
-        }
+        },
+        "piano":{
+            "category":"instrument",
+            "name_IT":"pianoforte",
+            "name_EN":"piano",
+            "version":"0.1",
+            "date":"2020-04-08",
+            "interface":{
+                "base":{
+                    "available":"TRUE",
+                    "icon":"piano.png"
+                },
+                "intermediate":{
+                    "available":"TRUE",
+                    "icon":"piano.png"
+                },
+                "advanced":{
+                    "available":"TRUE",
+                    "icon":"piano.png"
+                }
+            }
+        },
+        "guitar":{
+            "category":"instrument",
+            "name_IT":"chitarra",
+            "name_EN":"guitar",
+            "version":"0.1",
+            "date":"2020-04-08",
+            "interface":{
+                "base":{
+                    "available":"TRUE",
+                    "icon":"guitar.png"
+                },
+                "intermediate":{
+                    "available":"TRUE",
+                    "icon":"guitar.png"
+                },
+                "advanced":{
+                    "available":"TRUE",
+                    "icon":"guitar.png"
+                }
+            }
+        },
+        "flute":{
+            "category":"instrument",
+            "name_IT":"flauto",
+            "name_EN":"flute",
+            "version":"0.1",
+            "date":"2020-04-08",
+            "interface":{
+                "base":{
+                    "available":"TRUE",
+                    "icon":"flute.png"
+                },
+                "intermediate":{
+                    "available":"TRUE",
+                    "icon":"flute.png"
+                },
+                "advanced":{
+                    "available":"TRUE",
+                    "icon":"flute.png"
+                }
+            }
+        },
+
+
+
+
+
+
+
     }
 }
