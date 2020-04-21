@@ -86,6 +86,7 @@ class Music:
             shift = self.noteDict[note]+ alt
         else:
             print('note not exist')            
+            return
 
         tfm.pitch(shift, quick=False)
         tfm.trim(0.0, end_time=0.5*duration)
@@ -133,6 +134,18 @@ class Music:
             shift = 10.0 + alt
         elif note == 'G3':
             shift = 12.0 + alt                
+
+        if note in self.noteDict :
+            shift = self.noteDict[note]+ alt
+        else:
+            print('note not exist')            
+            return
+
+        if self.managerPackage.isPackageAvailable(instrument):
+            tfm.preview('./sounds/notes/' + instrument + '/audio.wav')            
+        else:
+            print("no animal verse:"+str(instrument)+" present in this coderbot!")
+            return 
         tfm.pitch(shift, quick=False)
         tfm.trim(0.0, end_time=0.5*duration)
         #tfm.stretch(time, window=20)
