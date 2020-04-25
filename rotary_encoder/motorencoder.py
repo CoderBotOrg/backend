@@ -151,52 +151,7 @@ class MotorEncoder:
 
     # CALLBACK
     """ The callback function rotary_callback is called on FALLING_EDGE by the
-        rotary_decoder with a parameter value of 1 (1 new tick)
-
-        - Gearbox ratio: 120:1 (1 wheel revolution = 120 motor revolution)
-        - Encoder ratio: 16:1 encoder ticks for 1 motor revolution
-        - 1 wheel revolution = 120 * 16 = 1920 ticks
-        - R = 30mm        - 1 wheel revolution = 2πR = 2 * π * 30mm = 188.5mm
-        - 1920 ticks = 188.5mm
-        - 1 tick = 0.0981mm
-        - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately 
-        So 0.0981 is the ticks->distance(mm) conversion coefficient
-
-        The callback function calculates current velocity by taking groups of 
-        ticks_threshold ticks"""
-
-    # callback function
-    # it calculates velocity via approssimation
-    # it doeas a mean on current time passed and actual distance travelled
-    # NOT USEFUL FOR VELOCITY REGULATION since we need to know the current
-    # velocity updated each time
-    def rotary_callback(self, tick):
-        self._motor_lock.acquire()
-
-        # on first movement
-        if(self._distance == 0):
-            self._start_timer = time() # clock started
-
-
-        self._ticks += tick  # updating ticks
-        self._distance = self._ticks * 0.0981  # (mm) travelled
-
-        self._power = power  # setting current power
-
-        # adjusting power forward
-        if (self._direction == 1):
-            self._pi.set_PWM_dutycycle(self._forward_pin, abs(power))
-        # adjusting power bacakward
-        else:
-            self._pi.set_PWM_dutycycle(self._backward_pin, abs(power))
-
-        # releasing lock on motor
-        self._motor_lock.release()
-
-    # CALLBACK
-    """ The callback function rotary_callback is called on FALLING_EDGE by the
             rotary_decoder with a parameter value of 1 (1 new tick)
-
             - Gearbox ratio: 120:1 (1 wheel revolution = 120 motor revolution)
             - Encoder ratio: 16:1 encoder ticks for 1 motor revolution
             - 1 wheel revolution = 120 * 16 = 1920 ticks
@@ -205,7 +160,6 @@ class MotorEncoder:
             - 1 tick = 0.0981mm
             - 1 tick : 0.0981mm = x : 1000mm -> x = 10193 ticks approximately 
             So 0.0981 is the ticks->distance(mm) conversion coefficient
-
             The callback function calculates current velocity by taking groups of 
             ticks_threshold ticks"""
     # callback function

@@ -829,9 +829,7 @@ Blockly.Blocks['coderbot_event_generator'] = {
 
 var coderbot_generator_id = 1;
 Blockly.Python['coderbot_event_generator'] = function(block) {
-  Blockly.Generator.prototype.INDENT = '    ';
   var statements_event_generator = Blockly.Python.statementToCode(block, 'generator_statements');
-  Blockly.Generator.prototype.INDENT = '  ';
   var code = 'def event_generator_' + coderbot_generator_id + '():\n' +
              '  while True:\n' +
              '    get_prog_eng().check_end()\n' +

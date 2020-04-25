@@ -1,9 +1,5 @@
 'use strict';
 
-goog.provide('Blockly.Msg.en');
-
-goog.require('Blockly.Msg');
-
 Blockly.Msg.CODERBOT_MOVE_FORWARD = "move forward";
 Blockly.Msg.CODERBOT_MOVE_BACKWARD = "move backward";
 Blockly.Msg.CODERBOT_MOVE_LEFT = "turn left";

@@ -181,7 +181,7 @@ class ProgramEditor {
             } else {
                 $('#b_end_prog_d').text(BotMessages.ProgramDialogStop);
                 $('#i_dialog_running_title').text('CoderBot ' + BotMessages.ProgramStatusRunning);
-                setTimeout(statusProgram, 1000);
+                setTimeout(editor.statusProgram, 1000);
             }  
         }});
     }
@@ -223,7 +223,8 @@ class ProgramEditorBlockly extends ProgramEditor {
         var dom_code = Blockly.Xml.domToText(xml_code);
 
         window.LoopTrap = 1000;
-        Blockly.Python.INFINITE_LOOP_TRAP = '  get_prog_eng().check_end()\n';
+        #Blockly.Python.INDENT='  ';
+        Blockly.Python.INFINITE_LOOP_TRAP = 'get_prog_eng().check_end()\n';
         var code = Blockly.Python.workspaceToCode();
         Blockly.Python.INFINITE_LOOP_TRAP = null;
 

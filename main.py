@@ -106,7 +106,7 @@ def serve_legacy():
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=Camera.get_instance() != None,
-                           cnn_model_names=json.dumps([[name] for name in CNNManager.get_instance().get_models().keys()]))
+                           cnn_model_names=json.dumps([[name, name] for name in CNNManager.get_instance().get_models().keys()]))
 
 @babel.localeselector
 def get_locale():
@@ -198,7 +198,7 @@ def handle_bot():
     except:
         cam = None
         motion = None
-    
+
     audio = Audio.get_instance()
 
     cmd = request.args.get('cmd')
