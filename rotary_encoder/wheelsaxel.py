@@ -82,8 +82,8 @@ class WheelsAxel:
         #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
 
         # applying tension to motors
-        self._left_motor.control(power_left)
-        self._right_motor.control(power_right)
+        self._left_motor.control(power_left, -1)
+        self._right_motor.control(power_right, -1)
         self._is_moving = True
 
         # moving for desired time
@@ -98,6 +98,9 @@ class WheelsAxel:
         #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
         self._is_moving = True
 
+        self._left_motor.reset_state()
+        self._right_motor.reset_state()
+
         # applying tension to motors
         self._left_motor.control(power_left)
         self._right_motor.control(power_right)
@@ -106,8 +109,8 @@ class WheelsAxel:
         # assuming that power_right is equal to power_left and that coderbot
         # moves at 11.5mm/s at full PWM duty cycle
         MAX_SPEED = 180
-        TARGET_LEFT = (MAX_SPEED / 100) * power_left #velocity [mm/s]
-        TARGET_RIGHT = (MAX_SPEED / 100) * power_right  # velocity [mm/s]
+        target_speed_left = (MAX_SPEED / 100) * power_left #velocity [mm/s]
+        target_speed_right = (MAX_SPEED / 100) * power_right  # velocity [mm/s]
 
         # SOFT RESPONSE
         #KP = 0.04  #proportional coefficient
@@ -126,42 +129,49 @@ class WheelsAxel:
 
         SAMPLETIME = 0.1
 
-        left_speed = TARGET_LEFT
-        right_speed = TARGET_RIGHT
+        #left_speed = TARGET_LEFT
+        #right_speed = TARGET_RIGHT
 
         left_derivative_error = 0
         right_derivative_error = 0
         left_integral_error = 0
         right_integral_error = 0
 
-        power_left_norm = power_left
-        power_right_norm = power_right
+        #power_left_norm = power_left
+        #power_right_norm = power_right
         # moving for certaing amount of distance
-        while(abs(self.distance()) < target_distance):
+        logging.info("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
+        while(abs(self.distance()) < target_distance and self._is_moving == True):
             # PI controller
+            logging.info("control_distance.1")
             if(self._left_motor.speed() > 10 and self._right_motor.speed() > 10):
+                logging.info("control_distance.2")
                 # relative error
-                left_error = (TARGET_LEFT - self._left_motor.speed())/TARGET_LEFT*100.0
-                right_error = (TARGET_RIGHT - self._right_motor.speed())/TARGET_RIGHT*100.0
+                left_error = (target_speed_left - self._left_motor.speed())/target_speed_left*100.0
+                right_error = (target_speed_right - self._right_motor.speed())/target_speed_right*100.0
 
-                power_left = power_left_norm + (left_error * KP) + (left_derivative_error * KD) + (left_integral_error * KI)
-                power_right  = power_left_norm + (right_error * KP) + (right_derivative_error * KD) + (right_integral_error * KI)
+                left_correction = (left_error * KP) + (left_derivative_error * KD) + (left_integral_error * KI)
+                right_correction = (right_error * KP) + (right_derivative_error * KD) + (right_integral_error * KI)
+
+                corrected_power_left = power_left + left_correction - right_correction
+                corrected_power_right  = power_right + right_correction - left_correction
+
                 #print("LEFT correction: %f" % (left_error * KP + left_derivative_error * KD + left_integral_error * KI))
                 #print("RIGHT correction: %f" % (right_error * KP + right_derivative_error * KD + right_integral_error * KI))
 
                 # conrispondent new power
-                power_left_norm = max(min(power_left, 100), 0)
-                power_right_norm =  max(min(power_right, 100), 0)
+                power_left_norm = max(min(corrected_power_left, 100), 0)
+                power_right_norm =  max(min(corrected_power_right, 100), 0)
 
                 #print("Left SPEED: %f" % (self._right_motor.speed()))
                 #print("Right SPEED: %f" % (self._left_motor.speed()))
                 #print("Left POWER: %f" % (right_power))
                 #print("Right POWER: %f" % (left_power))
                 #print("")
-                print("ml:", int(self._right_motor.speed()), " mr: ", int(self._left_motor.speed()), 
+                print("ls:", int(self._left_motor.speed()), " rs: ", int(self._right_motor.speed()), 
                       " le:", int(left_error), " re: ", int(right_error), 
-                      " ls: ", int(left_speed), " rs: ", int(right_speed), 
-                      " lp: ", int(power_left), " rp: ", int(power_right))
+                      " lc: ", int(left_correction), " rc: ", int(right_correction), 
+                      " lp: ", int(power_left_norm), " rp: ", int(power_right_norm))
  
                 # adjusting power on each motors
                 self._left_motor.adjust_power(power_left_norm)
@@ -179,7 +189,7 @@ class WheelsAxel:
             # checking each SAMPLETIME seconds
             sleep(SAMPLETIME)
 
-
+        logging.info("control_distance.stop")
         # robot arrived
         self.stop()
 
@@ -200,10 +210,11 @@ class WheelsAxel:
         # trying to fix distance different than zero after
         # wheels has stopped by re-resetting state after 0.5s
 
-        self._left_motor.reset_state()
-        self._right_motor.reset_state()
+        #self._left_motor.reset_state()
+        #self._right_motor.reset_state()
 
         # updating state
+        logging.info("stopping")
         self._is_moving = False
         # restoring callback
         #try:

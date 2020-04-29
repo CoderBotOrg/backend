@@ -26,7 +26,8 @@ class MotorEncoder:
 
         # setting movement variables
         self._direction = 0
-        self._distance = 0
+        #self._distance = 0
+        self._distance_per_tick = 0.0981 #(mm)
         self._ticks = 0
         self._power = 0
         self._encoder_speed = 0
@@ -39,7 +40,7 @@ class MotorEncoder:
         self._ticks_counter = 0
 
         # other
-        self._motor_lock = threading.RLock()
+        #self._motor_lock = threading.RLock()
         self._rotary_decoder = RotaryDecoder(pi, feedback_pin_A, feedback_pin_B, self.rotary_callback)
 
     # GETTERS
@@ -49,7 +50,8 @@ class MotorEncoder:
 
     # distance
     def distance(self):
-        return self._distance
+        #return self._distance
+        return self._ticks * self._distance_per_tick
 
     # direction
     def direction(self):
@@ -72,7 +74,7 @@ class MotorEncoder:
         for a certain amount of time """
 
     def control(self, power=100.0, time_elapse=0):
-        self._motor_lock.acquire()  # acquiring lock
+        #self._motor_lock.acquire()  # acquiring lock
 
         # resetting distance and ticks before new movement
         self._distance = 0  # resetting distance travelled
@@ -94,7 +96,7 @@ class MotorEncoder:
         self._is_moving = True
 
         # releasing lock on motor
-        self._motor_lock.release()
+        #self._motor_lock.release()
 
         # movement time elapse
         if (time_elapse > 0):
@@ -106,17 +108,17 @@ class MotorEncoder:
         and releases the lock afterwards """
 
     def stop(self):
-        self._motor_lock.acquire()
+        #self._motor_lock.acquire()
 
         # stopping motor
         self._pi.write(self._backward_pin, 0)
         self._pi.write(self._forward_pin, 0)
 
         # resetting wheel state
-        self.reset_state()
+        #self.reset_state()
 
-       # releasing lock
-        self._motor_lock.release()
+        # releasing lock
+        #self._motor_lock.release()
 
     # stop auxiliary function, resets wheel state
     def reset_state(self):
@@ -135,7 +137,7 @@ class MotorEncoder:
 
     # adjust power for velocity control loop
     def adjust_power(self, power):
-        self._motor_lock.acquire()  # acquiring lock
+        #self._motor_lock.acquire()  # acquiring lock
 
         self._power = power  # setting current power
 
@@ -147,7 +149,7 @@ class MotorEncoder:
             self._pi.set_PWM_dutycycle(self._backward_pin, abs(power))
 
         # releasing lock on motor
-        self._motor_lock.release()
+        #self._motor_lock.release()
 
     # CALLBACK
     """ The callback function rotary_callback is called on FALLING_EDGE by the
@@ -164,7 +166,7 @@ class MotorEncoder:
             ticks_threshold ticks"""
     # callback function
     def rotary_callback(self, tick):
-        self._motor_lock.acquire()
+        #self._motor_lock.acquire()
 
         # taking groups of n ticks each
         if (self._ticks_counter == 0):
@@ -178,7 +180,7 @@ class MotorEncoder:
             #print("Speed: %f" % (self._encoder_speed))
 
         self._ticks += tick  # updating ticks
-        self._distance = self._ticks * 0.0981  # (mm) travelled so far
+        #self._distance = self._ticks * 0.0981  # (mm) travelled so far
 
 
         if(self._ticks_counter < self._ticks_threshold):
@@ -191,7 +193,7 @@ class MotorEncoder:
         # not ideal, module on ticks counter not precise, may miss an interrupt
         #self._ticks_counter += 1 % (self._ticks_threshold + 1)
 
-        self._motor_lock.release() # releasing lock
+        #self._motor_lock.release() # releasing lock
 
     # callback cancelling
     def cancel_callback(self):

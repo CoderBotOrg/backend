@@ -231,7 +231,7 @@ Blockly.Python['coderbot_sleep'] = function(block) {
   // Generate Python for sleeping.
   var elapse = Blockly.Python.valueToCode(block, 'ELAPSE',
       Blockly.Python.ORDER_NONE) || '\'\'';
-  return 'get_cam().sleep(' + elapse + ')\n';
+  return 'get_bot().sleep(' + elapse + ')\n';
 };
 
 Blockly.Blocks['coderbot_adv_move'] = {
