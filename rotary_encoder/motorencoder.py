@@ -176,8 +176,6 @@ class MotorEncoder:
             elapse = self._current_timer - self._start_timer # calculating time elapse
             # calculating current speed
             self._encoder_speed = self._ticks_threshold * 0.0981 / elapse  # (mm/s)
-            #print("Elapse: %f" % (elapse))
-            #print("Speed: %f" % (self._encoder_speed))
 
         self._ticks += tick  # updating ticks
         #self._distance = self._ticks * 0.0981  # (mm) travelled so far

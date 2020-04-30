@@ -140,12 +140,12 @@ class WheelsAxel:
         #power_left_norm = power_left
         #power_right_norm = power_right
         # moving for certaing amount of distance
-        logging.info("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
+        #logging.debug("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
         while(abs(self.distance()) < target_distance and self._is_moving == True):
             # PI controller
-            logging.info("control_distance.1")
+            #logging.debug("control_distance.1")
             if(self._left_motor.speed() > 10 and self._right_motor.speed() > 10):
-                logging.info("control_distance.2")
+                #logging.debug("control_distance.2")
                 # relative error
                 left_error = (target_speed_left - self._left_motor.speed())/target_speed_left*100.0
                 right_error = (target_speed_right - self._right_motor.speed())/target_speed_right*100.0
@@ -168,10 +168,10 @@ class WheelsAxel:
                 #print("Left POWER: %f" % (right_power))
                 #print("Right POWER: %f" % (left_power))
                 #print("")
-                print("ls:", int(self._left_motor.speed()), " rs: ", int(self._right_motor.speed()), 
-                      " le:", int(left_error), " re: ", int(right_error), 
-                      " lc: ", int(left_correction), " rc: ", int(right_correction), 
-                      " lp: ", int(power_left_norm), " rp: ", int(power_right_norm))
+                #logging.debug("ls:", int(self._left_motor.speed()), " rs: ", int(self._right_motor.speed()), 
+                #              " le:", int(left_error), " re: ", int(right_error), 
+                #              " lc: ", int(left_correction), " rc: ", int(right_correction), 
+                #              " lp: ", int(power_left_norm), " rp: ", int(power_right_norm))
  
                 # adjusting power on each motors
                 self._left_motor.adjust_power(power_left_norm)
@@ -189,7 +189,7 @@ class WheelsAxel:
             # checking each SAMPLETIME seconds
             sleep(SAMPLETIME)
 
-        logging.info("control_distance.stop")
+        #logging.debug("control_distance.stop")
         # robot arrived
         self.stop()
 
