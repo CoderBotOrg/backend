@@ -659,25 +659,16 @@ Blockly.Blocks['coderbot_adv_findText'] = {
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
     this.setColour(250);
     this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND)
-        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHA, 'alpha'], 
-                                                [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_NUM, 'num'],
-                                                [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHANUM,'alphanum'],
-                                                [Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_UNSPEC,'unspec']]), 'ACCEPT')
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR);
-    this.appendValueInput('COLOR')
-        .setCheck(['Colour','String']);
+        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND);
     this.setInputsInline(true);
-    this.setOutput(true, ['Number', 'Array']);
+    this.setOutput(true, 'String');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
   }
 };
 
 Blockly.Python['coderbot_adv_findText'] = function(block) {
   // Boolean values true and false.
-  var accept = block.getFieldValue('ACCEPT');
-  var color = Blockly.Python.valueToCode(block, 'COLOR', Blockly.Python.ORDER_NONE);
-  var code = 'get_cam().find_text(accept="' + accept + '", back_color=' + color  + ')';
+  var code = 'get_cam().find_text()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 

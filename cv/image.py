@@ -25,18 +25,6 @@ import cv2.aruco
 import cv.blob as blob
 import pytesseract
 
-tesseract_whitelists = {
-    'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
-    'num': "1234567890 ",
-    'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-    'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-}
-
-#try:
-#    ocr = cv2.text.OCRTesseract_create(language="eng", char_whitelist=tesseract_whitelists['unspec'], oem=0, psmode=cv2.text.OCR_LEVEL_TEXTLINE)
-#except:
-#    logging.info("tesseract not availabe")
-
 MIN_MATCH_COUNT = 10
 
 try:
@@ -247,7 +235,7 @@ class Image():
                                          int(min(image_size[0], -border+center[1]+(size[1]-5)/2)))
         return rect_image
 
-    def find_text(self, accept):
+    def find_text(self):
         #wlist = tesseract_whitelists.get(accept, None)
         #ocr.setWhiteList(wlist)
         #text = ocr.run(self._data, 60)
