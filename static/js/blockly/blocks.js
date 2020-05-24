@@ -357,12 +357,6 @@ Blockly.Blocks['coderbot_adv_motor'] = {
     this.appendValueInput('ELAPSE')
         .setCheck('Number')
         .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_ELAPSE);
-    this.appendValueInput('STEPS_LEFT')
-        .setCheck('Number')
-        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_STEPS_LEFT);
-    this.appendValueInput('STEPS_RIGHT')
-        .setCheck('Number')
-        .appendField(Blockly.Msg.CODERBOT_MOVE_ADV_MOTOR_STEPS_RIGHT);
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
     var thisBlock = this;
@@ -380,9 +374,7 @@ Blockly.Python['coderbot_adv_motor'] = function(block) {
   var speed_left = Blockly.Python.valueToCode(block, 'SPEED_LEFT', Blockly.Python.ORDER_NONE);
   var speed_right = Blockly.Python.valueToCode(block, 'SPEED_RIGHT', Blockly.Python.ORDER_NONE);
   var elapse = Blockly.Python.valueToCode(block, 'ELAPSE', Blockly.Python.ORDER_NONE);
-  var steps_left = Blockly.Python.valueToCode(block, 'STEPS_LEFT', Blockly.Python.ORDER_NONE);
-  var steps_right = Blockly.Python.valueToCode(block, 'STEPS_RIGHT', Blockly.Python.ORDER_NONE);
-  var code = "get_bot().motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", elapse=" + elapse + ", steps_left=" + steps_left + ", steps_right=" + steps_right + ")\n";
+  var code = "get_bot().motor_control(speed_left=" + speed_left + ", speed_right=" + speed_right + ", time_elapse=" + elapse + ")\n";
   return code;
 };
 

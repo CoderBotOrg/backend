@@ -133,7 +133,6 @@ class CoderBot(object):
         self._servos = [self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
 
         self.stop()
-        self._is_moving = False
 
     the_bot = None
 
@@ -217,15 +216,10 @@ class CoderBot(object):
         self.pi.set_PWM_dutycycle(pin, duty)
 
     def stop(self):
-        if self._encoder:
-            self._twin_motors_enc.stop()
-        else:
-            for pin in self._pin_out:
-                self.pi.write(pin, 0)
-        self._is_moving = False
+        self._twin_motors_enc.stop()
 
     def is_moving(self):
-        return self._is_moving
+        return self._twin_motors_enc._is_moving
 
     # Distance travelled getter
     def distance(self):

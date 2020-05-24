@@ -65,7 +65,7 @@ class RotaryDecoder:
              +---------+         +---------+         +----- 1
     """
     def _pulse(self, gpio, level, tick):
-        #self._lock.acquire()
+        self._lock.acquire()
         # interrupt comes from pin A
         if (gpio == self._feedback_pin_A):
             self._levelA = level   # set level of squared wave (0, 1) on A
@@ -76,26 +76,20 @@ class RotaryDecoder:
         if (gpio != self._lastGpio): # debounce
             self._lastGpio = gpio
 
-            # backward (A leading B)
-            if (gpio == self._feedback_pin_A and level == 1):
-                if (self._levelB == 0):
-                    self._callback(-1)   # A leading B, moving backward
-                    self._direction = -1 # backward
-            elif (gpio == self._feedback_pin_A and level == 0):
-                if (self._levelB == 1):
-                    self._callback(-1)   # A leading B, moving backward
-                    self._direction = -1 # backward
-
-            # forward (B leading A)
-            elif (gpio == self._feedback_pin_B and level == 1):
-                if (self._levelA == 0):
-                    self._callback(1)   # B leading A, moving forward
-                    self._direction = 1 # forward
-            elif (gpio == self._feedback_pin_B and level == 0):
-                if (self._levelA == 1):
-                    self._callback(1)   # A leading B, moving forward
-                    self._direction = 1 # forward
-        #self._lock.release()
+            # forward (A leading B)
+            if (gpio == self._feedback_pin_A and 
+                ((level == 1 and self._levelB == 0) or 
+                (level == 0 and self._levelB == 1))):
+                self._direction = 1 # forward
+            # backward (B leading A)
+            elif (gpio == self._feedback_pin_B and 
+                ((level == 1 and self._levelA == 0) or
+                (level == 0 and self._levelA == 1))):
+                self._direction = -1 # forward
+        
+        direction = self._direction
+        self._lock.release()
+        self._callback(direction)
 
     def cancel(self):
 

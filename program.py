@@ -205,6 +205,7 @@ class Program:
             except Exception:
                 logging.error("error polishing event system")
             try:
+                get_bot().stop()
                 get_cam().video_stop() #if video is running, stop it
                 get_cam().set_text("") #clear overlay text (if any)
                 get_motion().stop()

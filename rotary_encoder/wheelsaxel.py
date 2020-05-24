@@ -42,6 +42,10 @@ class WheelsAxel:
     # STATE GETTERS
     """ Distance and speed are calculated by a mean of the feedback
         from the two motors """
+
+    def is_moving(self):
+        return self._left_motor.is_moving() or self._right_motor.is_moving()
+    
     # distance
     def distance(self):
         l_dist = self._left_motor.distance()
@@ -127,20 +131,14 @@ class WheelsAxel:
         #KD = 0.05  # derivative coefficient
         #KI = 0.03  # integral coefficient
 
-        SAMPLETIME = 0.1
-
-        #left_speed = TARGET_LEFT
-        #right_speed = TARGET_RIGHT
+        SAMPLETIME = 0.01
 
         left_derivative_error = 0
         right_derivative_error = 0
         left_integral_error = 0
         right_integral_error = 0
-
-        #power_left_norm = power_left
-        #power_right_norm = power_right
         # moving for certaing amount of distance
-        #logging.debug("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
+        logging.debug("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
         while(abs(self.distance()) < target_distance and self._is_moving == True):
             # PI controller
             #logging.debug("control_distance.1")
@@ -163,23 +161,14 @@ class WheelsAxel:
                 power_left_norm = max(min(corrected_power_left, 100), 0)
                 power_right_norm =  max(min(corrected_power_right, 100), 0)
 
-                #print("Left SPEED: %f" % (self._right_motor.speed()))
-                #print("Right SPEED: %f" % (self._left_motor.speed()))
-                #print("Left POWER: %f" % (right_power))
-                #print("Right POWER: %f" % (left_power))
-                #print("")
-                #logging.debug("ls:", int(self._left_motor.speed()), " rs: ", int(self._right_motor.speed()), 
-                #              " le:", int(left_error), " re: ", int(right_error), 
-                #              " lc: ", int(left_correction), " rc: ", int(right_correction), 
-                #              " lp: ", int(power_left_norm), " rp: ", int(power_right_norm))
+                logging.debug("ls:" + str(int(self._left_motor.speed())) + " rs: " + str(int(self._right_motor.speed())) + 
+                              " le:" + str(int(left_error)) + " re: " + str(int(right_error)) + 
+                              " lc: " + str(int(left_correction)) + " rc: " + str(int(right_correction)) + 
+                              " lp: " + str(int(power_left_norm)) + " rp: " + str(int(power_right_norm)))
  
                 # adjusting power on each motors
                 self._left_motor.adjust_power(power_left_norm)
                 self._right_motor.adjust_power(power_right_norm)
-
-                #print("Left error: %f" % (left_error))
-                #print("Right error: %f"  % (right_error))
-                #print("")
 
                 left_derivative_error = left_error
                 right_derivative_error = right_error
@@ -189,7 +178,10 @@ class WheelsAxel:
             # checking each SAMPLETIME seconds
             sleep(SAMPLETIME)
 
-        #logging.debug("control_distance.stop")
+        logging.info("control_distance.stop, target dist: " + str(target_distance) + 
+            " actual distance: " + str(self.distance()) + 
+            " l ticks: " + str(self._left_motor.ticks()) + 
+            " r ticks: " + str(self._right_motor.ticks()))
         # robot arrived
         self.stop()
 
@@ -216,12 +208,6 @@ class WheelsAxel:
         # updating state
         logging.info("stopping")
         self._is_moving = False
-        # restoring callback
-        #try:
-        #    self._wheelsAxle_lock.release()
-        #except RuntimeError as e:
-        #    logging.error("error: " + str(e))
-        #    pass
 
     # CALLBACK
     def cancel_callback(self):
