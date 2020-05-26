@@ -26,7 +26,7 @@ class MotorEncoder:
 
         # setting movement variables
         self._direction = 0
-        self._distance_per_tick = 0.053 #(mm)
+        self._distance_per_tick = 0.06 #(mm)
         self._ticks = 0
         self._power = 0
         self._encoder_speed = 0
@@ -157,7 +157,7 @@ class MotorEncoder:
         # taking groups of n ticks each
         if (self._ticks_counter == 0):
             self._start_timer = time()  # clock started
-        elif (self._ticks_counter == self._ticks_threshold):
+        elif (abs(self._ticks_counter) == self._ticks_threshold):
             self._current_timer = time()
             elapse = self._current_timer - self._start_timer # calculating time elapse
             # calculating current speed
@@ -165,7 +165,7 @@ class MotorEncoder:
 
         self._ticks += tick  # updating ticks
 
-        if(self._ticks_counter < self._ticks_threshold):
+        if(abs(self._ticks_counter) < self._ticks_threshold):
             self._ticks_counter += 1
         else:
             self._ticks_counter = 0

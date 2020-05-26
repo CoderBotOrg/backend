@@ -102,12 +102,18 @@ class WheelsAxel:
         #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
         self._is_moving = True
 
+        # get desired direction from power, then normalize on power > 0 
+        left_direction = power_left/abs(power_left)
+        right_direction = power_right/abs(power_right)
+        power_left = abs(power_left)
+        power_right = abs(power_right)
+
         self._left_motor.reset_state()
         self._right_motor.reset_state()
 
         # applying tension to motors
-        self._left_motor.control(power_left)
-        self._right_motor.control(power_right)
+        self._left_motor.control(power_left * left_direction)
+        self._right_motor.control(power_right * right_direction)
 
         #PID parameters
         # assuming that power_right is equal to power_left and that coderbot
@@ -122,7 +128,7 @@ class WheelsAxel:
         #KI = 0.005 # integral coefficient
 
         # MEDIUM RESPONSE
-        KP = 0.2  #proportional coefficient
+        KP = 0.4  #proportional coefficient
         KD = 0.1 # derivative coefficient
         KI = 0.02 # integral coefficient
 
@@ -138,15 +144,14 @@ class WheelsAxel:
         left_integral_error = 0
         right_integral_error = 0
         # moving for certaing amount of distance
-        logging.debug("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
-        while(abs(self.distance()) < target_distance and self._is_moving == True):
+        logging.info("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
+        while(abs(self.distance()) < abs(target_distance) and self._is_moving == True):
             # PI controller
-            #logging.debug("control_distance.1")
-            if(self._left_motor.speed() > 10 and self._right_motor.speed() > 10):
-                #logging.debug("control_distance.2")
+            logging.info("speed.left: " + str(self._left_motor.speed()) + " speed.right: " + str(self._right_motor.speed()))
+            if(abs(self._left_motor.speed()) > 10 and abs(self._right_motor.speed()) > 10):
                 # relative error
-                left_error = (target_speed_left - self._left_motor.speed())/target_speed_left*100.0
-                right_error = (target_speed_right - self._right_motor.speed())/target_speed_right*100.0
+                left_error = (target_speed_left - self._left_motor.speed()) / target_speed_left * 100.0
+                right_error = (target_speed_right - self._right_motor.speed()) / target_speed_right * 100.0
 
                 left_correction = (left_error * KP) + (left_derivative_error * KD) + (left_integral_error * KI)
                 right_correction = (right_error * KP) + (right_derivative_error * KD) + (right_integral_error * KI)
@@ -161,14 +166,14 @@ class WheelsAxel:
                 power_left_norm = max(min(corrected_power_left, 100), 0)
                 power_right_norm =  max(min(corrected_power_right, 100), 0)
 
-                logging.debug("ls:" + str(int(self._left_motor.speed())) + " rs: " + str(int(self._right_motor.speed())) + 
+                logging.info("ls:" + str(int(self._left_motor.speed())) + " rs: " + str(int(self._right_motor.speed())) + 
                               " le:" + str(int(left_error)) + " re: " + str(int(right_error)) + 
                               " lc: " + str(int(left_correction)) + " rc: " + str(int(right_correction)) + 
                               " lp: " + str(int(power_left_norm)) + " rp: " + str(int(power_right_norm)))
  
                 # adjusting power on each motors
-                self._left_motor.adjust_power(power_left_norm)
-                self._right_motor.adjust_power(power_right_norm)
+                self._left_motor.adjust_power(power_left_norm * left_direction )
+                self._right_motor.adjust_power(power_right_norm * right_direction)
 
                 left_derivative_error = left_error
                 right_derivative_error = right_error
