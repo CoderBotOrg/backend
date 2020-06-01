@@ -110,6 +110,19 @@ class MusicPackageManager:
                 if p not in self.packages:
                     self.packages[p] = mp
 
+
+   def deletePackage(self, packageName):
+       print("rimozione pacchetto")
+       if packageName in self.packages:
+          del self.packages[packageName]        
+          self.updatePackages()
+       else:
+          print("errore, il pacchetto " + packageName + " non è stato trovato")
+
+       if os.path.exists('./sounds/notes/' + packageName):
+          os.system('rm -rf ./sounds/notes/' + packageName)
+
+
     def isPackageAvailable(self,namePackage):
         if namePackage in self.packages:
             return True
