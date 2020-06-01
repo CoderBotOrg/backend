@@ -27,6 +27,8 @@
 ############################################################################
 
 import json
+import os
+
 class MusicPackage:
     name_IT = None
     name_EN = None
@@ -96,7 +98,6 @@ class MusicPackageManager:
     def __init__(self):
         self.packages = dict()
         with open('./sounds/notes/music_package.json') as json_file:
-            print("99 musik pac")
             data = json.load(json_file)
             for p in data['packages']:
                 
@@ -109,6 +110,7 @@ class MusicPackageManager:
 
                 if p not in self.packages:
                     self.packages[p] = mp
+
 
 
    def deletePackage(self, packageName):
