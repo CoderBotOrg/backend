@@ -80,14 +80,14 @@ class MusicPackageInterface:
 
     def getAvaiable(self):
         return self.available
-    
+
     def getIcon(self):
         return self.icon
 
 class MusicPackageManager:
     _instance = None
     packages = None
-    
+
     @classmethod
     def get_instance(cls):
         if cls._instance is None:
@@ -100,7 +100,7 @@ class MusicPackageManager:
         with open('./sounds/notes/music_package.json') as json_file:
             data = json.load(json_file)
             for p in data['packages']:
-                
+
                 package = data['packages'][p]
                 mp = MusicPackage(p,package['category'],package['name_IT'],package['name_EN'],package['version'],package['date'])
                 for i in package['interface']:
@@ -115,18 +115,21 @@ class MusicPackageManager:
 
    def deletePackage(self, packageName):
        if packageName in self.packages:
-          del self.packages[packageName]        
+           del self.packages[packageName]        
           self.updatePackages()
-       else:
+      else:
           print("errore, il pacchetto " + packageName + " non è stato trovato")
 
        if os.path.exists('./sounds/notes/' + packageName):
-          os.system('rm -rf ./sounds/notes/' + packageName)
+           os.system('rm -rf ./sounds/notes/' + packageName)
 
 
     def verifyVersion(self, packageName, version):
         print("verifica pacchetto")
         #newversionList = version.split('.')
+        if packageName not in this.packages:
+            return True
+            
         newVersionList = [int(x) for x in version.split('.')]
         #for i in ragen(0,len(newversionList) -1):
             #newversionList[i] = int(newLversionList[i])
@@ -136,11 +139,46 @@ class MusicPackageManager:
 
         for i in range(0,len(newVersionList) -1):
             if(newVersionList[i] > oldVersionList[i] ):
-               return True
+                return True
             else if(newVersionList[i] < oldVersionList[i] ):
                 return False
 
-        return False;
+        return False
+
+    def addPackage(self, filename):
+        pkgnames = filename.split('_')
+        version = pkgnames[1].replace('.zip', '')
+        pkgname = pkgnames[0]
+        pkgpath = './sounds/notes/' + pkgname
+        if not self.verifyVersion(pkgname, version):
+            if (version == this.package[pkgName]['version']):
+                return 3
+            else:
+                return 2
+        else:
+
+            os.system('unzip -o ' + './updatePackages/' + filename + " -d ./updatePackages")
+
+            os.system('mkdir ' + pkgpath)
+            os.system('mv ./updatePackages/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
+
+            with open('./updatePackages/' + pkgname + '/' + pkgname + '.json') as json_file:
+                print("adding " + pkgname + " package")
+                data = json.load(json_file)
+                for p in data['packages']:
+                    package = data['packages'][p]
+                    mp = MusicPackage(p,package['category'],package['name_IT'],package['name_EN'],package['version'],package['date'])
+                    for i in package['interface']:
+                        interfaceItem = package['interface'][i]
+                        mpi = MusicPackageInterface(i,interfaceItem['available'],interfaceItem['icon'])
+                        mp.addInterface(mpi)
+
+                    self.packages[p] = mp
+
+            self.updatePackages()
+
+            os.system('rm -rf ./updatePackages/' + pkgname)
+            return 1
 
 
     def isPackageAvailable(self,namePackage):
