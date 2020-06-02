@@ -114,7 +114,6 @@ class MusicPackageManager:
 
 
    def deletePackage(self, packageName):
-       print("rimozione pacchetto")
        if packageName in self.packages:
           del self.packages[packageName]        
           self.updatePackages()
@@ -123,6 +122,25 @@ class MusicPackageManager:
 
        if os.path.exists('./sounds/notes/' + packageName):
           os.system('rm -rf ./sounds/notes/' + packageName)
+
+
+    def verifyVersion(self, packageName, version):
+        print("verifica pacchetto")
+        #newversionList = version.split('.')
+        newVersionList = [int(x) for x in version.split('.')]
+        #for i in ragen(0,len(newversionList) -1):
+            #newversionList[i] = int(newLversionList[i])
+
+        oldVersion = self.packages[packageName]
+        oldVersionList = [int(x) for x in oldVersion.split('.')]    
+
+        for i in range(0,len(newVersionList) -1):
+            if(newVersionList[i] > oldVersionList[i] ):
+               return True
+            else if(newVersionList[i] < oldVersionList[i] ):
+                return False
+
+        return False;
 
 
     def isPackageAvailable(self,namePackage):
