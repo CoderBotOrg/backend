@@ -111,17 +111,40 @@ class MusicPackageManager:
                 if p not in self.packages:
                     self.packages[p] = mp
 
+    def updatePackages(self):
+        newdict = { 'packages': {} }
+        for element in self.packages:
+            nameID = self.packages[element].getNameID()
+            newdict['packages'][nameID] = {  }
+            newdict['packages'][nameID]['category']= self.packages[element].getCategory()
+            newdict['packages'][nameID]['name_IT']= self.packages[element].getNameIT()
+            newdict['packages'][nameID]['name_EN']= self.packages[element].getNameEN()
+            newdict['packages'][nameID]['version']= self.packages[element].getVersion()
+            newdict['packages'][nameID]['date']= self.packages[element].getDate()
+            newdict['packages'][nameID]['interface']= {'base':{}, 'intermediate':{}, 'advanced': {}}
+            newdict['packages'][nameID]['interface']['base']['available'] = self.packages[element].getInterfaces()[0].getAvailable()
+            newdict['packages'][nameID]['interface']['base']['icon'] = self.packages[element].getInterfaces()[0].getIcon()
+            newdict['packages'][nameID]['interface']['intermediate']['available'] = self.packages[element].getInterfaces()[1].getAvailable()
+            newdict['packages'][nameID]['interface']['intermediate']['icon'] = self.packages[element].getInterfaces()[1].getIcon() 
+            newdict['packages'][nameID]['interface']['advanced']['available'] = self.packages[element].getInterfaces()[2].getAvailable()
+            newdict['packages'][nameID]['interface']['advanced']['icon'] = self.packages[element].getInterfaces()[2].getIcon()
+
+        #json_packages = json.dumps(newdict)
+        with open('./dist/static/music_package.json', 'w', encoding='utf-8') as json_file:
+            json.dump(newdict, json_file, ensure_ascii=False, indent=4)
 
 
-   def deletePackage(self, packageName):
+    def deletePackage(self, packageName):
        if packageName in self.packages:
            del self.packages[packageName]        
           self.updatePackages()
-      else:
+       else:
           print("errore, il pacchetto " + packageName + " non è stato trovato")
+          return 2
 
        if os.path.exists('./sounds/notes/' + packageName):
            os.system('rm -rf ./sounds/notes/' + packageName)
+           return 1
 
 
     def verifyVersion(self, packageName, version):
@@ -152,8 +175,10 @@ class MusicPackageManager:
         pkgpath = './sounds/notes/' + pkgname
         if not self.verifyVersion(pkgname, version):
             if (version == this.package[pkgName]['version']):
+                print("errore, il pacchetto " + packageName + " ha versione identica a quello attualmente installato")
                 return 3
             else:
+                print("errore, il pacchetto " + packageName + " ha versione precendente a quello attualmente installato")
                 return 2
         else:
 
