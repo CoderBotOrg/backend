@@ -78,7 +78,7 @@ class MusicPackageInterface:
     def getInterfaceName(self):
         return self.interfaceName
 
-    def getAvaiable(self):
+    def getAvailable(self):
         return self.available
 
     def getIcon(self):
@@ -137,7 +137,7 @@ class MusicPackageManager:
     def deletePackage(self, packageName):
        if packageName in self.packages:
            del self.packages[packageName]        
-          self.updatePackages()
+           self.updatePackages()
        else:
           print("errore, il pacchetto " + packageName + " non è stato trovato")
           return 2
@@ -150,20 +150,20 @@ class MusicPackageManager:
     def verifyVersion(self, packageName, version):
         print("verifica pacchetto")
         #newversionList = version.split('.')
-        if packageName not in this.packages:
+        if packageName not in self.packages:
             return True
             
         newVersionList = [int(x) for x in version.split('.')]
         #for i in ragen(0,len(newversionList) -1):
             #newversionList[i] = int(newLversionList[i])
 
-        oldVersion = self.packages[packageName]
+        oldVersion = self.packages[packageName].getVersion()
         oldVersionList = [int(x) for x in oldVersion.split('.')]    
 
         for i in range(0,len(newVersionList) -1):
             if(newVersionList[i] > oldVersionList[i] ):
                 return True
-            else if(newVersionList[i] < oldVersionList[i] ):
+            elif(newVersionList[i] < oldVersionList[i] ):
                 return False
 
         return False
@@ -171,14 +171,15 @@ class MusicPackageManager:
     def addPackage(self, filename):
         pkgnames = filename.split('_')
         version = pkgnames[1].replace('.zip', '')
+        print(version)
         pkgname = pkgnames[0]
         pkgpath = './sounds/notes/' + pkgname
         if not self.verifyVersion(pkgname, version):
-            if (version == this.package[pkgName]['version']):
-                print("errore, il pacchetto " + packageName + " ha versione identica a quello attualmente installato")
+            if (version == self.packages[pkgname].getVersion()):
+                print("errore, il pacchetto " + pkgname + " ha versione identica a quello attualmente installato")
                 return 3
             else:
-                print("errore, il pacchetto " + packageName + " ha versione precendente a quello attualmente installato")
+                print("errore, il pacchetto " + pkgname + " ha versione precendente a quello attualmente installato")
                 return 2
         else:
 
