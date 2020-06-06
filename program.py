@@ -110,6 +110,7 @@ class ProgramEngine:
     def delete(self, name):
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
+        logging.info("deleting: " + name + " program: " + str(program_db_entries))
         if program_db_entries != []:
             os.remove(program_db_entries[0]["filename"])
             self._programs.remove(query.name == name)

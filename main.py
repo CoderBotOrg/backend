@@ -359,7 +359,7 @@ def handle_program_delete():
     logging.debug("program_delete")
     name = request.form.get('name')
     app.prog_engine.delete(name)
-    return "ok"
+    return jsonify({"status":"ok"})
 
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():

@@ -113,7 +113,7 @@ class ProgramEditor {
 
     saveProgramCallback() {
         alert(BotMessages.ProgramSaved);
-        this.loadProgramList();
+        editor.loadProgramList();
     }
 
     saveProgramAsDlg() {
@@ -133,15 +133,13 @@ class ProgramEditor {
         this.saveProgram();
     }
 
-    deleteProgram() {
+    deleteProgram(name) {
         var prog_element = $(this).parent('li'); 
-        var name=prog_element.attr('data-prog-name');
         if(confirm("Delete program " + name + "?")) {
-            var data =  {'name': name};
-            $.ajax({url: '/program/delete', data: data, type: "POST", success:function() {
-                prog_element.remove();
-                $('#i_prog_list').listview('refresh');
-                this.loadProgramList();
+            var data = {"name": name};
+            $.ajax({url: '/program/delete', data: data, dataType: "json", type: "POST", success:function() {
+                editor.loadProgramList()
+                $("#dialogLoadProg").popup("close");
 	    }});
         }
     }
