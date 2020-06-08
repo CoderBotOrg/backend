@@ -221,7 +221,6 @@ class ProgramEditorBlockly extends ProgramEditor {
         var dom_code = Blockly.Xml.domToText(xml_code);
 
         window.LoopTrap = 1000;
-        //Blockly.Python.INDENT='  ';
         Blockly.Python.INFINITE_LOOP_TRAP = 'get_prog_eng().check_end()\n';
         var code = Blockly.Python.workspaceToCode();
         Blockly.Python.INFINITE_LOOP_TRAP = null;
