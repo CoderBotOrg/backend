@@ -15,6 +15,7 @@ from program import ProgramEngine, Program
 from config import Config
 from coderbotTestUnit import run_test as runCoderbotTestUnit
 import pigpio
+from musicPackages import MusicPackageManager
 
 BUTTON_PIN = 16
 
