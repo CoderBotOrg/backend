@@ -31,7 +31,7 @@ from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
 from audioControls import AudioCtrl
-
+from musicPackages import MusicPackageManager
 # Logging configuration
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -163,6 +163,17 @@ def handle_config():
     Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
+
+@app.route("/deletepkg", methods=["POST"])
+def handle_packages():
+    """
+    Delete a musical package an save the list of available packages on disk
+    also delete package sounds and directory
+    """
+    packageName = request.form.get("nameID")
+    musicPkg = MusicPackageManager.get_instance()
+    musicPkg.deletePackage(packageName)
+    return "package deleted"
 
 @app.route("/config", methods=["GET"])
 def returnConfig():
