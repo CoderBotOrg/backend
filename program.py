@@ -188,10 +188,11 @@ class Program:
             except Exception:
                 logging.error("Camera not available")
 
+            self._log = "" #clear log
             imports = "import json\n"
             code = imports + self._code
             env = globals()
-            logging.info("** start code **\n"+str(code)+ "\n** end code **")
+            logging.debug("** start code **\n"+str(code)+ "\n** end code **")
             exec(code, env, env)
         except RuntimeError as re:
             logging.info("quit: %s", str(re))
