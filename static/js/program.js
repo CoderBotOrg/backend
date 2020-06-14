@@ -45,6 +45,7 @@ class ProgramEditor {
         this.program = {}
         this.programList = {}
         this.program.name = "no_name";
+        //Blockly.Generator.prototype.INDENT = '    ';
     }
 
     loadProgramList() {

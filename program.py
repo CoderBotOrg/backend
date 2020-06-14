@@ -191,6 +191,7 @@ class Program:
             imports = "import json\n"
             code = imports + self._code
             env = globals()
+            logging.info("** start code **\n"+str(code)+ "\n** end code **")
             exec(code, env, env)
         except RuntimeError as re:
             logging.info("quit: %s", str(re))
