@@ -279,6 +279,13 @@
           </block>
         </value>
       </block>
+      <block type="coderbot_move_servo">
+        <value name="ANGLE">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
       <block type="coderbot_adv_stop"></block>
       <block type="coderbot_sleep">
         <value name="ELAPSE">

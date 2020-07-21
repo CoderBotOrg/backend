@@ -83,8 +83,6 @@ def serve_docs_app(subpath):
     'cb_docs' is the output of `npx vuepress build pages/`
     from the 'docs' repository
     """
-    print("Running docs path")
-    print(subpath)
     if (subpath[-1] == '/'):
         subpath = subpath + 'index.html'
     return send_from_directory('cb_docs', subpath)
