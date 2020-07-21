@@ -13,12 +13,18 @@ from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
+from coderbotTestUnit import run_test as runCoderbotTestUnit
+import pigpio
+
+BUTTON_PIN = 16
 
 bot_config = Config.get()
 bot = CoderBot.get_instance(
-    servo=(bot_config.get("move_motor_mode") == "servo"),
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
+    encoder=bool(bot_config.get("encoder"))
 )
+
+query = Query()
 
 def get_serial():
     """
@@ -80,13 +86,23 @@ def get_info():
         update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
     except Exception:
         update_status = 'undefined'
+    try:
+        encoder = bool(Config.read().get('encoder'))
+        if(encoder):
+            motors = 'DC encoder motors'
+        else:
+            motors = 'DC motors'
+    except Exception:
+        motors = 'undefined'
 
     serial = get_serial()
+
     return {'backend_commit': backend_commit,
             'coderbot_version': coderbot_version,
             'update_status': update_status,
             'kernel': kernel,
-            'serial': serial}
+            'serial': serial,
+            'motors': motors}
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -101,11 +117,17 @@ def stop():
     return 200
 
 def move(data):
-    bot.move(speed=data["speed"], elapse=data["elapse"])
+    try:
+        bot.move(speed=data["speed"], elapse=data["elapse"], distance=data["distance"])
+    except Exception as e:
+        bot.move(speed=data["speed"], elapse=data["elapse"], distance=0)
     return 200
 
 def turn(data):
-    bot.turn(speed=data["speed"], elapse=data["elapse"])
+    try:
+        bot.turn(speed=data["speed"], elapse=data["elapse"])
+    except Exception as e:
+        bot.turn(speed=data["speed"], elapse=-1)
     return 200
 
 def exec(data):
@@ -116,12 +138,20 @@ def exec(data):
 
 def status():
     sts = get_status()
+    # getting reset log file
+    try:
+        with open('/home/pi/coderbot/logs/reset_trigger_service.log', 'r') as log_file:
+            data = [x for x in log_file.read().split('\n') if x]
+    except Exception: # direct control case
+        data = [] # if file doesn't exist, no restore as ever been performed. return empty data
+
 
     return {
         "status": "ok",
         "internetConnectivity": sts["internet_status"],
         "temp": sts["temp"],
         "uptime": sts["uptime"],
+        "log": data
     }
 
 def info():
@@ -132,7 +162,8 @@ def info():
         "backend commit build": inf["backend_commit"],
         "kernel" : inf["kernel"],
         "update status": inf["update_status"],
-        "serial": inf["serial"]
+        "serial": inf["serial"],
+        "motors": inf["motors"]
     }
 
 def restoreSettings():
@@ -204,3 +235,21 @@ def resetDefaultPrograms():
             with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
+
+## Reset
+def reset():
+    pi = pigpio.pi('localhost')
+    #simulating FALLING EDGE
+    # it triggers the reset by using the service altready running on the system that detects a button press (3 sec).
+    pi.write(BUTTON_PIN, 1)
+    pi.write(BUTTON_PIN, 0)
+
+    return {
+        "status": "ok"
+    }
+
+## Test
+def testCoderbot(data):
+    # taking first JSON key value (varargin)
+    tests_state = runCoderbotTestUnit(data[list(data.keys())[0]])
+    return tests_state

@@ -110,6 +110,7 @@ class ProgramEngine:
     def delete(self, name):
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
+        logging.info("deleting: " + name + " program: " + str(program_db_entries))
         if program_db_entries != []:
             os.remove(program_db_entries[0]["filename"])
             self._programs.remove(query.name == name)
@@ -187,9 +188,11 @@ class Program:
             except Exception:
                 logging.error("Camera not available")
 
+            self._log = "" #clear log
             imports = "import json\n"
             code = imports + self._code
             env = globals()
+            logging.debug("** start code **\n"+str(code)+ "\n** end code **")
             exec(code, env, env)
         except RuntimeError as re:
             logging.info("quit: %s", str(re))
@@ -205,6 +208,7 @@ class Program:
             except Exception:
                 logging.error("error polishing event system")
             try:
+                get_bot().stop()
                 get_cam().video_stop() #if video is running, stop it
                 get_cam().set_text("") #clear overlay text (if any)
                 get_motion().stop()

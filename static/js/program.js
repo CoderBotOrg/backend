@@ -12,7 +12,7 @@ if($('#page-program')) {
             } else {
                 editor = new ProgramEditorPython(editorDOMElement);
             }
-         $("#b_new_prog").on("click", function() {editor.newProgramDlg()});
+        $("#b_new_prog").on("click", function() {editor.newProgramDlg()});
         $("#b_load_prog").on("click", function() {editor.loadProgramDlg()});
         $("#b_save_prog").on("click", function() {editor.saveProgram()});
         $("#b_save_prog_as").on("click", function() {editor.saveProgramAsDlg()});
@@ -45,6 +45,7 @@ class ProgramEditor {
         this.program = {}
         this.programList = {}
         this.program.name = "no_name";
+        //Blockly.Generator.prototype.INDENT = '    ';
     }
 
     loadProgramList() {
@@ -76,7 +77,7 @@ class ProgramEditor {
     loadProgramDlg() {
         $('#i_prog_list').empty();
         for(var i in this.programList) {
-            var name = this.programList[i];
+            var name = this.programList[i].name;
             $('#i_prog_list').append('<li data-prog-name="' + name +'"><a href="#" class="c_load_prog"><h2>'+name+'</h2></a><a href="#" class="c_delete_prog">Delete program</a></li>');
         }
         $('#i_prog_list').listview('refresh'); 
@@ -113,7 +114,7 @@ class ProgramEditor {
 
     saveProgramCallback() {
         alert(BotMessages.ProgramSaved);
-        this.loadProgramList();
+        editor.loadProgramList();
     }
 
     saveProgramAsDlg() {
@@ -133,15 +134,13 @@ class ProgramEditor {
         this.saveProgram();
     }
 
-    deleteProgram() {
+    deleteProgram(name) {
         var prog_element = $(this).parent('li'); 
-        var name=prog_element.attr('data-prog-name');
         if(confirm("Delete program " + name + "?")) {
-            var data =  {'name': name};
-            $.ajax({url: '/program/delete', data: data, type: "POST", success:function() {
-                prog_element.remove();
-                $('#i_prog_list').listview('refresh');
-                this.loadProgramList();
+            var data = {"name": name};
+            $.ajax({url: '/program/delete', data: data, dataType: "json", type: "POST", success:function() {
+                editor.loadProgramList()
+                $("#dialogLoadProg").popup("close");
 	    }});
         }
     }
@@ -181,7 +180,7 @@ class ProgramEditor {
             } else {
                 $('#b_end_prog_d').text(BotMessages.ProgramDialogStop);
                 $('#i_dialog_running_title').text('CoderBot ' + BotMessages.ProgramStatusRunning);
-                setTimeout(statusProgram, 1000);
+                setTimeout(editor.statusProgram, 1000);
             }  
         }});
     }
@@ -223,7 +222,7 @@ class ProgramEditorBlockly extends ProgramEditor {
         var dom_code = Blockly.Xml.domToText(xml_code);
 
         window.LoopTrap = 1000;
-        Blockly.Python.INFINITE_LOOP_TRAP = '  get_prog_eng().check_end()\n';
+        Blockly.Python.INFINITE_LOOP_TRAP = 'get_prog_eng().check_end()\n';
         var code = Blockly.Python.workspaceToCode();
         Blockly.Python.INFINITE_LOOP_TRAP = null;
 

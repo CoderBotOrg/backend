@@ -329,15 +329,18 @@ class Camera(object):
         #print "object: " + str(time.time() - ts)
         return [dist, angle]
 
-    def find_text(self, accept, back_color):
+    def find_text(self):
+        t1 = time.time()
         text = None
-        color = (int(back_color[1:3], 16), int(back_color[3:5], 16), int(back_color[5:7], 16))
+        #color = (int(back_color[1:3], 16), int(back_color[3:5], 16), int(back_color[5:7], 16))
         img = self.get_image()
-        rec_image = img.find_rect(color=color)
-        if rec_image:
-            logging.info("image: %s", str(rec_image))
-            bin_image = rec_image.binarize().invert()
-            text = bin_image.find_text(accept)
+        #rec_image = img.find_rect(color=color)
+        text = img.find_text()
+        logging.info("find_text fps: " + str(1.0/(time.time() - t1)))
+        #if rec_image:
+        #    logging.info("image: %s", str(rec_image))
+        #    bin_image = rec_image.binarize().invert()
+        #    text = bin_image.find_text(accept)
         return text
 
     def find_qr_code(self):
@@ -358,6 +361,7 @@ class Camera(object):
         else:
             classifier = self._cnn_classifier_default
 
+        t0 = time.time()
         classes = None
         try:
             img = self.get_image()
@@ -365,7 +369,31 @@ class Camera(object):
         except Exception:
             logging.warning("classifier not available")
             classes = [("None", 1.0)]
+            raise
+        logging.info("fps: %f", 1.0/(time.time()-t0))
         return classes
 
     def find_class(self):
         return self.cnn_classify(top_results=1)[0][0]
+
+    def cnn_detect_objects(self, model_name=None, top_results=3):
+        classifier = None
+        if model_name:
+            classifier = self._cnn_classifiers.get(model_name)
+            if classifier is None:
+                classifier = CNNManager.get_instance().load_model(model_name)
+                self._cnn_classifiers[model_name] = classifier
+        else:
+            classifier = self._cnn_classifier_default
+
+        t0 = time.time()
+        classes = None
+        try:
+            img = self.get_image()
+            classes = classifier.detect_objects(img.mat(), top_results=top_results)
+        except Exception:
+            logging.warning("classifier not available")
+            classes = [("None", 100)]
+            raise
+        logging.info("fps: %f", 1.0/(time.time()-t0))
+        return classes

@@ -22,7 +22,7 @@ from flask_babel import Babel
 from flask_cors import CORS
 from werkzeug.datastructures import Headers
 
-from coderbot import CoderBot, PIN_PUSHBUTTON
+from coderbot import CoderBot
 from camera import Camera
 from motion import Motion
 from audio import Audio
@@ -83,8 +83,6 @@ def serve_docs_app(subpath):
     'cb_docs' is the output of `npx vuepress build pages/`
     from the 'docs' repository
     """
-    print("Running docs path")
-    print(subpath)
     if (subpath[-1] == '/'):
         subpath = subpath + 'index.html'
     return send_from_directory('cb_docs', subpath)
@@ -106,7 +104,7 @@ def serve_legacy():
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=Camera.get_instance() != None,
-                           cnn_model_names=json.dumps([[name] for name in CNNManager.get_instance().get_models().keys()]))
+                           cnn_model_names=json.dumps([[name, name] for name in CNNManager.get_instance().get_models().keys()]))
 
 @babel.localeselector
 def get_locale():
@@ -192,8 +190,13 @@ def handle_bot():
     Execute a bot command
     """
     bot = CoderBot.get_instance()
-    cam = Camera.get_instance()
-    motion = Motion.get_instance()
+    try:
+        cam = Camera.get_instance()
+        motion = Motion.get_instance()
+    except:
+        cam = None
+        motion = None
+
     audio = Audio.get_instance()
 
     cmd = request.args.get('cmd')
@@ -331,7 +334,7 @@ def handle_program_load():
     logging.debug("program_load")
     name = request.args.get('name')
     app.prog = app.prog_engine.load(name)
-    return jsonify(app.prog.as_json())
+    return jsonify(app.prog.as_dict())
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
@@ -354,7 +357,7 @@ def handle_program_delete():
     logging.debug("program_delete")
     name = request.form.get('name')
     app.prog_engine.delete(name)
-    return "ok"
+    return jsonify({"status":"ok"})
 
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
@@ -461,8 +464,8 @@ def run_server():
     try:
         try:
             app.bot_config = Config.read()
-            bot = CoderBot.get_instance(servo=(app.bot_config.get("move_motor_mode") == "servo"),
-                                        motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)))
+            bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
+                                        encoder=bool(app.bot_config.get('encoder')))
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
             try:
@@ -481,11 +484,11 @@ def run_server():
             app.bot_config = {}
             logging.error(e)
 
-        bot.set_callback(PIN_PUSHBUTTON, button_pushed, 100)
+        bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)
 
         remove_doreset_file()
 
-        app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False, threaded=True)
+        app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False, threaded=True)
     finally:
         if cam:
             cam.exit()

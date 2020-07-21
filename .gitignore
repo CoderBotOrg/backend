@@ -37,6 +37,7 @@ photos/*.jpg
 photos/*.mp4
 photos/*.h264
 photos/*.json
+saved_photos
 
 #cnn models
 cnn_models/*
@@ -64,6 +65,7 @@ static/blockly-tutorial
 .Trashes
 ehthumbs.db
 Thumbs.db
+.vscode
 
 # Swap files
 *.swp

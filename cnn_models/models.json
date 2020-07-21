@@ -1,1 +1,26 @@
-{}
+{
+  "base_high_slow": {
+    "output_layer": "final_result",
+    "image_width": 224,
+    "status": 1,
+    "image_height": 224
+  },
+  "base_low_fast": {
+    "output_layer": "final_result",
+    "image_width": 224,
+    "status": 100,
+    "image_height": 224
+  },
+  "object_detect": {
+    "output_layer": "final_result",
+    "image_width": 224,
+    "status": 1,
+    "image_height": 224
+  },
+  "object_detect_mobile": {
+    "output_layer": "final_result",
+    "image_width": 224,
+    "status": 1,
+    "image_height": 224
+  }
+}

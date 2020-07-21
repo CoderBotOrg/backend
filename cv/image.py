@@ -23,18 +23,7 @@ import numpy as np
 import cv2
 import cv2.aruco
 import cv.blob as blob
-
-tesseract_whitelists = {
-    'alpha': "ABCDEFGHIJKLMNOPQRSTUVXYZ ",
-    'num': "1234567890 ",
-    'alphanum': "ABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-    'unspec': "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ1234567890 ",
-}
-
-try:
-    ocr = cv2.text.OCRTesseract_create(language="eng", char_whitelist=tesseract_whitelists['unspec'], oem=0, psmode=cv2.text.OCR_LEVEL_TEXTLINE)
-except:
-    logging.info("tesseract not availabe")
+import pytesseract
 
 MIN_MATCH_COUNT = 10
 
@@ -51,7 +40,7 @@ class Image():
     _aruco_parameters = cv2.aruco.DetectorParameters_create()
 
     #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
-    _face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml')
+    _face_cascade = cv2.CascadeClassifier('/usr/share/opencv/lbpcascades/lbpcascade_frontalface.xml')
 
     def __init__(self, array):
         self._data = array
@@ -161,7 +150,7 @@ class Image():
     def find_blobs(self, minsize=0, maxsize=10000000):
         blobs = []
         image = contours = hyerarchy = None
-        image, contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hyerarchy = cv2.findContours(self._data, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         for c in contours:
             area = cv2.contourArea(c)
@@ -246,10 +235,11 @@ class Image():
                                          int(min(image_size[0], -border+center[1]+(size[1]-5)/2)))
         return rect_image
 
-    def find_text(self, accept):
-        wlist = tesseract_whitelists.get(accept, None)
-        ocr.setWhiteList(wlist)
-        text = ocr.run(self._data, 60)
+    def find_text(self):
+        #wlist = tesseract_whitelists.get(accept, None)
+        #ocr.setWhiteList(wlist)
+        #text = ocr.run(self._data, 60)
+        text = pytesseract.image_to_string(self._data)
         return text
 
     def find_qr_code(self):

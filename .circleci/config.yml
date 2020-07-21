@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: coderbot/python-gpac:3.5
+      - image: coderbot/python-gpac:3.5-tf2
       
     working_directory: ~/repo
 
@@ -26,6 +26,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
+            pip install --upgrade pip
             pip install -r requirements_stub.txt
 
       - save_cache:
@@ -38,11 +39,11 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            export PYTHONPATH=./stub
+            export PYTHONPATH=./stub:test
             mkdir test-reports
             python3 -m unittest test/coderbot_test.py 2>&1 | tee test-reports/test_report.txt
-            #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
             python3 -m unittest test/camera_test.py 2>&1 | tee test-reports/test_report.txt
+            #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
             echo "test complete"
       - store_artifacts:
           path: test-reports/
