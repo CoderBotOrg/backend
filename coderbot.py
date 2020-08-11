@@ -46,7 +46,7 @@ class GPIO_CODERBOT_V_4():
     PIN_SONAR_3_TRIGGER = 18
     PIN_SONAR_3_ECHO = 23
     PIN_SONAR_4_TRIGGER = 18
-    PIN_SONAR_4_ECHO = None
+    PIN_SONAR_4_ECHO = 13
 
     # encoder
     PIN_ENCODER_LEFT_A = 14
