@@ -31,12 +31,15 @@ import motion
 import config
 import audio
 import event
-
+import music
+import musicPackages
 
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".json"
+
+musicPackageManager = musicPackages.MusicPackageManager.get_instance()
 
 def get_cam():
     return camera.Camera.get_instance()
@@ -55,6 +58,9 @@ def get_prog_eng():
 
 def get_event():
     return event.EventManager.get_instance()
+
+def get_music():
+    return music.Music.get_instance(musicPackageManager)
 
 class ProgramEngine:
 

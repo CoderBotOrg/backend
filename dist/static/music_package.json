@@ -1,0 +1,172 @@
+{
+    "packages": {
+        "cat": {
+            "category": "animal",
+            "name_IT": "gatto",
+            "name_EN": "cat",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "cat.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "cat.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "cat.png"
+                }
+            }
+        },
+        "dog": {
+            "category": "animal",
+            "name_IT": "cane",
+            "name_EN": "dog",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "dog.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "dog.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "dog.png"
+                }
+            }
+        },
+        "piano": {
+            "category": "instrument",
+            "name_IT": "pianoforte",
+            "name_EN": "piano",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "piano.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "piano.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "piano.png"
+                }
+            }
+        },
+        "guitar": {
+            "category": "instrument",
+            "name_IT": "chitarra",
+            "name_EN": "guitar",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "guitar.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "guitar.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "guitar.png"
+                }
+            }
+        },
+        "flute": {
+            "category": "instrument",
+            "name_IT": "flauto",
+            "name_EN": "flute",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "flute.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "flute.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "flute.png"
+                }
+            }
+        },
+        "pig": {
+            "category": "animal",
+            "name_IT": "maiale",
+            "name_EN": "pig",
+            "version": "0.1",
+            "date": "2020-06-01",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "pig.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "pig.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "pig.png"
+                }
+            }
+        },
+        "elephant": {
+            "category": "animal",
+            "name_IT": "elefante",
+            "name_EN": "elephant",
+            "version": "0.1",
+            "date": "2020-06-01",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "elephant.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "elephant.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "elephant.png"
+                }
+            }
+        },
+        "snake": {
+            "category": "animal",
+            "name_IT": "serpente",
+            "name_EN": "snake",
+            "version": "0.1",
+            "date": "2020-06-01",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "snake.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "snake.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "snake.png"
+                }
+            }
+        }
+    }
+}

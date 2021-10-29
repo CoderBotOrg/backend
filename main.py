@@ -30,7 +30,8 @@ from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
-
+from audioControls import AudioCtrl
+from musicPackages import MusicPackageManager
 # Logging configuration
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -58,6 +59,8 @@ app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
 app.prog = None
 app.shutdown_requested = False
+
+
 
 ## New API and web application
 
@@ -153,9 +156,22 @@ def handle_config():
     """
     Overwrite configuration file on disk and reload it
     """
+    audioCtrl = AudioCtrl.get_instance()
+    audioCtrl.setVolume(int(request.form['audio_volume_level']))
     Config.write(updateDict(app.bot_config, request.form))
     app.bot_config = Config.get()
     return "ok"
+
+@app.route("/deletepkg", methods=["POST"])
+def handle_packages():
+    """
+    Delete a musical package an save the list of available packages on disk
+    also delete package sounds and directory
+    """
+    packageName = request.form.get("nameID")
+    musicPkg = MusicPackageManager.get_instance()
+    musicPkg.deletePackage(packageName)
+    return "package deleted"
 
 @app.route("/config", methods=["GET"])
 def returnConfig():
@@ -468,6 +484,10 @@ def run_server():
                                         encoder=bool(app.bot_config.get('encoder')))
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
+
+            audioCtrl = AudioCtrl.get_instance()
+            audioCtrl.setVolume(int(app.bot_config.get['audio_volume_level']))
+
             try:
                 cam = Camera.get_instance()
                 Motion.get_instance()
