@@ -47,8 +47,8 @@ class AudioCtrl:
     
     def setVolume(self,valueVolume):
         self.mixer.setvolume(valueVolume)
-'''
+
 if __name__ == "__main__":
     a = AudioCtrl()
     a.setVolume(20)
-    #a.setVolume(100)'''
+    #a.setVolume(100)
