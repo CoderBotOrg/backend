@@ -1206,3 +1206,71 @@ Blockly.Python['coderbot_mpu_get_temp'] = function(block) {
   var code = 'get_bot().get_mpu_temp()';
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
+
+Blockly.Blocks['coderbot_atmega_get_input'] = {
+  /**
+   * Block for get_input function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(240);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_READ)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_ATMEGA_AI_1, "0"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_AI_2, "1"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DI_3, "2"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DI_4, "3"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DI_5, "4"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DI_6, "5"],]), 'INPUT');
+    this.setOutput(true, 'Number');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_atmega_get_input'] = function(block) {
+  // input index: 0, 1 are Analogs, 2..5 are Digital
+  var input = block.getFieldValue('INPUT');
+  var code = 'get_atmega().get_input(' + input + ')';
+  return [code, Blockly.Python.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['coderbot_atmega_set_output'] = {
+  /**
+   * Block for set_output function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(240);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_WRITE)
+        .appendField(new Blockly.FieldDropdown([[Blockly.Msg.CODERBOT_ATMEGA_DO_1, "0"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_2, "1"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_3, "2"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_4, "3"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_5, "4"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_6, "5"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_7, "6"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_8, "7"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_9, "8"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_10, "9"],
+                                                [Blockly.Msg.CODERBOT_ATMEGA_DO_11, "10"],]), 'OUTPUT');
+    this.appendValueInput('VALUE')
+        .setCheck('Boolean')
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_VALUE);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_atmega_set_output'] = function(block) {
+  // input index: 0, 10 are Digital
+  var output = block.getFieldValue('OUTPUT');
+  var value = Blockly.Python.valueToCode(block, 'VALUE',
+      Blockly.Python.ORDER_NONE) || '\'\'';
+  var code = 'get_atmega().set_output(' + output + ', ' + value + ')\n';
+  return code;
+};

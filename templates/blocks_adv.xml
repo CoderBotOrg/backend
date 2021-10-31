@@ -331,6 +331,10 @@
       <block type="coderbot_mpu_get_heading"></block>
       <block type="coderbot_mpu_get_temp"></block>
     </category>
+    <category name="{% trans %}I/O Extensions{% endtrans %}" colour="240">
+      <block type="coderbot_atmega_get_input"></block>
+      <block type="coderbot_atmega_set_output"></block>
+    </category>
     <category name="{% trans %}Sound{% endtrans %}" colour="220">
       <block type="coderbot_audio_say"></block>
       <block type="coderbot_audio_record"></block>

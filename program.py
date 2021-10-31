@@ -31,8 +31,7 @@ import motion
 import config
 import audio
 import event
-
-
+import atmega328p 
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -55,6 +54,9 @@ def get_prog_eng():
 
 def get_event():
     return event.EventManager.get_instance()
+
+def get_atmega():
+    return atmega328p.ATMega328.get_instance()
 
 class ProgramEngine:
 
