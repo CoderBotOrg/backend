@@ -1,9 +1,5 @@
 'use strict';
 
-goog.provide('Blockly.Msg.en');
-
-goog.require('Blockly.Msg');
-
 Blockly.Msg.CODERBOT_MOVE_FORWARD = "avancer";
 Blockly.Msg.CODERBOT_MOVE_BACKWARD = "reculer";
 Blockly.Msg.CODERBOT_MOVE_LEFT = "tourner à gauche";
@@ -27,6 +23,11 @@ Blockly.Msg.CODERBOT_MOVE_ADV_TIP_LEFT = "à gauche"
 Blockly.Msg.CODERBOT_MOVE_ADV_TIP_TAIL= " avec une vitesse (0-100%) durant (secondes)"
 Blockly.Msg.CODERBOT_MOVE_MOTION_MOVE_TIP = "déplace le robot, en utilisant la caméra pour controller"
 Blockly.Msg.CODERBOT_MOVE_MOTION_TURN_TIP = "tourne le robot, en utilisant la caméra pour controller"
+Blockly.Msg.CODERBOT_MOVE_SERVO = "move servo";
+Blockly.Msg.CODERBOT_MOVE_SERVO_1 = "1";
+Blockly.Msg.CODERBOT_MOVE_SERVO_2 = "2";
+Blockly.Msg.CODERBOT_MOVE_SERVO_ANGLE = "angle";
+Blockly.Msg.CODERBOT_MOVE_SERVO_TIP_TAIL= " servo angle (90..90°)"
 Blockly.Msg.CODERBOT_MOVE_STOP = "stop";
 Blockly.Msg.CODERBOT_SAY = "dit";
 Blockly.Msg.CODERBOT_LOCALE_EN = "English";
@@ -57,7 +58,7 @@ Blockly.Msg.CODERBOT_SENSOR_AVERAGE_VALUE = "Value (brightness)";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_ALL = "HSV (as list)";
 Blockly.Msg.CODERBOT_SENSOR_FINDLOGO = "trouve le logo";
 Blockly.Msg.CODERBOT_SENSOR_FINDCLASS = "trouve le class";
-Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "find text of kind";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "trouve le text";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHA = "Alpha (A..Z)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_NUM = "Numeric (0..9)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHANUM = "Alphanumeric (A..Z;0..9)";

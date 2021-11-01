@@ -1,9 +1,5 @@
 'use strict';
 
-goog.provide('Blockly.Msg.en');
-
-goog.require('Blockly.Msg');
-
 Blockly.Msg.CODERBOT_MOVE_FORWARD = "move forward";
 Blockly.Msg.CODERBOT_MOVE_BACKWARD = "move backward";
 Blockly.Msg.CODERBOT_MOVE_LEFT = "turn left";
@@ -29,6 +25,11 @@ Blockly.Msg.CODERBOT_MOVE_ADV_TIP_LEFT = "left"
 Blockly.Msg.CODERBOT_MOVE_ADV_TIP_TAIL= " at speed (0-100%) for time (seconds)"
 Blockly.Msg.CODERBOT_MOVE_MOTION_MOVE_TIP = "move bot, using vision to control"
 Blockly.Msg.CODERBOT_MOVE_MOTION_TURN_TIP = "turn bot, using vision to control"
+Blockly.Msg.CODERBOT_MOVE_SERVO = "move servo";
+Blockly.Msg.CODERBOT_MOVE_SERVO_1 = "1";
+Blockly.Msg.CODERBOT_MOVE_SERVO_2 = "2";
+Blockly.Msg.CODERBOT_MOVE_SERVO_ANGLE = "angle";
+Blockly.Msg.CODERBOT_MOVE_SERVO_TIP_TAIL= " servo angle (-90..90°)"
 Blockly.Msg.CODERBOT_MOVE_STOP = "stop";
 Blockly.Msg.CODERBOT_SAY = "say";
 Blockly.Msg.CODERBOT_LOCALE_EN = "English";
@@ -60,14 +61,14 @@ Blockly.Msg.CODERBOT_SENSOR_AVERAGE_HUE = "Hue";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_SATURATION = "Saturation";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_VALUE = "Value (brightness)";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_ALL = "HSV (as list)";
-Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "find text of kind";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "find text";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHA = "Alpha (A..Z)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_NUM = "Numeric (0..9)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHANUM = "Alphanumeric (A..Z;0..9)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_UNSPEC = "Any";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_COLOR = "background color";
 Blockly.Msg.CODERBOT_SENSOR_FINDQRCODE = "read Bar-QRCode";
-Blockly.Msg.CODERBOT_SENSOR_FINDQRCODE = "read AR Code";
+Blockly.Msg.CODERBOT_SENSOR_FINDARCODE = "read AR Code";
 Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_NAME = "record as file";
 Blockly.Msg.CODERBOT_AUDIO_RECORD_FILE_ELAPSE = " of seconds";
 Blockly.Msg.CODERBOT_AUDIO_PLAY_FILE = "play file";
@@ -84,7 +85,7 @@ Blockly.Msg.CODERBOT_SONAR_SENSOR_2 = "2";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_3 = "3";
 Blockly.Msg.CODERBOT_SONAR_SENSOR_4 = "4";
 Blockly.Msg.CODERBOT_MPU_GET_GYRO = "gyroscope axis";
-Blockly.Msg.CODERBOT_MPU_GET_ACCEL = "gyroscope axis";
+Blockly.Msg.CODERBOT_MPU_GET_ACCEL = "accelerometer axis";
 Blockly.Msg.CODERBOT_MPU_GET_HEADING = "heading";
 Blockly.Msg.CODERBOT_MPU_GET_TEMP = "temperature";
 Blockly.Msg.CODERBOT_MPU_AXIS_X = "x";

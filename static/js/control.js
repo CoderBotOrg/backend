@@ -68,7 +68,7 @@ $(document).on( "pagecreate", '#page-control', function( event ) {
 		$('#b_right')
           	.on("mousedown", function (){bot.turn(CODERBOT_CTRL_TR_SPEED, CODERBOT_CTRL_TR_ELAPSE);})
 	  	.on("mouseup", function (){bot.stop();});
-                $('body').on("mouseup", function (){bot.stop();});
+                $('#ui_control_left').on("mouseup", function (){bot.stop();});
                 $('#b_counter').on("click", function (){if(confirm(BotMessages.CounterReset)) bot.counterReset();});
 	}
 	$('#b_say').on("click", function (){

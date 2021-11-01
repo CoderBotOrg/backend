@@ -1,9 +1,5 @@
 'use strict';
 
-goog.provide('Blockly.Msg.it');
-
-goog.require('Blockly.Msg');
-
 Blockly.Msg.CODERBOT_MOVE_FORWARD = "muovi avanti";
 Blockly.Msg.CODERBOT_MOVE_BACKWARD = "muovi indietro";
 Blockly.Msg.CODERBOT_MOVE_LEFT = "gira a sinistra";
@@ -29,6 +25,11 @@ Blockly.Msg.CODERBOT_MOVE_ADV_TIP_LEFT = "sinistra"
 Blockly.Msg.CODERBOT_MOVE_ADV_TIP_TAIL= " a velocità (0-100%) per tempo (secondi)"
 Blockly.Msg.CODERBOT_MOVE_MOTION_MOVE_TIP = "muovi bot, usando la camera per il posizionamento"
 Blockly.Msg.CODERBOT_MOVE_MOTION_TURN_TIP = "gira il bot, usando la camera per il posizionamento"
+Blockly.Msg.CODERBOT_MOVE_SERVO = "muovi servo";
+Blockly.Msg.CODERBOT_MOVE_SERVO_1 = "1";
+Blockly.Msg.CODERBOT_MOVE_SERVO_2 = "2";
+Blockly.Msg.CODERBOT_MOVE_SERVO_ANGLE = "angolo";
+Blockly.Msg.CODERBOT_MOVE_SERVO_TIP_TAIL= " angolo del servo (-90..90°)"
 Blockly.Msg.CODERBOT_MOVE_STOP = "stop";
 Blockly.Msg.CODERBOT_SAY = "pronuncia in";
 Blockly.Msg.CODERBOT_LOCALE_EN = "Inglese";
@@ -60,7 +61,7 @@ Blockly.Msg.CODERBOT_SENSOR_AVERAGE_HUE = "Tinta";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_SATURATION = "Saturazione";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_VALUE = "Luminosità";
 Blockly.Msg.CODERBOT_SENSOR_AVERAGE_ALL = "HSV (come lista)";
-Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "trova testo formato da";
+Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_FIND = "trova testo";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHA = "Lettere (A..Z)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_NUM = "Numeri (0..9)";
 Blockly.Msg.CODERBOT_SENSOR_FINDTEXT_ACCEPT_ALPHANUM = "Lettere e numeri (A..Z;0..9)";

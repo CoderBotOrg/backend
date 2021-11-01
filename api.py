@@ -118,11 +118,17 @@ def stop():
     return 200
 
 def move(data):
-    bot.move(speed=data["speed"], elapse=data["elapse"], distance=data["distance"])
+    try:
+        bot.move(speed=data["speed"], elapse=data["elapse"], distance=data["distance"])
+    except Exception as e:
+        bot.move(speed=data["speed"], elapse=data["elapse"], distance=0)
     return 200
 
 def turn(data):
-    bot.turn(speed=data["speed"], time_elapse=data["elapse"])
+    try:
+        bot.turn(speed=data["speed"], elapse=data["elapse"])
+    except Exception as e:
+        bot.turn(speed=data["speed"], elapse=-1)
     return 200
 
 def exec(data):
@@ -137,7 +143,7 @@ def status():
     try:
         with open('/home/pi/coderbot/logs/reset_trigger_service.log', 'r') as log_file:
             data = [x for x in log_file.read().split('\n') if x]
-    except Exception:
+    except Exception: # direct control case
         data = [] # if file doesn't exist, no restore as ever been performed. return empty data
 
 

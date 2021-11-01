@@ -1,7 +1,6 @@
 import pigpio
 import threading
 from time import sleep
-import logging
 
 from rotary_encoder.motorencoder import MotorEncoder
 
@@ -31,21 +30,17 @@ class WheelsAxel:
         # right motor
         self._right_motor = MotorEncoder(pi,
                                          enable_pin,
-                                         right_backward_pin,
                                          right_forward_pin,
-                                         right_encoder_feedback_pin_A,
-                                         right_encoder_feedback_pin_B)
+                                         right_backward_pin,
+                                         right_encoder_feedback_pin_B,
+                                         right_encoder_feedback_pin_A)
 
         # other
-        #self._wheelsAxle_lock = threading.RLock() # race condition lock
+        self._wheelsAxle_lock = threading.Condition() # race condition lock
 
     # STATE GETTERS
     """ Distance and speed are calculated by a mean of the feedback
         from the two motors """
-
-    def is_moving(self):
-        return self._left_motor.is_moving() or self._right_motor.is_moving()
-    
     # distance
     def distance(self):
         l_dist = self._left_motor.distance()
@@ -83,11 +78,11 @@ class WheelsAxel:
     """ Motor time control allows the motors
         to run for a certain amount of time """
     def control_time(self, power_left=100, power_right=100, time_elapse=0):
-        #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
+        self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
 
         # applying tension to motors
-        self._left_motor.control(power_left, -1)
-        self._right_motor.control(power_right, -1)
+        self._left_motor.control(power_left)
+        self._right_motor.control(power_right)
         self._is_moving = True
 
         # moving for desired time
@@ -99,28 +94,19 @@ class WheelsAxel:
     """ Motor distance control allows the motors
             to run for a certain amount of distance (mm) """
     def control_distance(self, power_left=100, power_right=100, target_distance=0):
-        #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
+        self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
         self._is_moving = True
 
-        # get desired direction from power, then normalize on power > 0 
-        left_direction = power_left/abs(power_left)
-        right_direction = power_right/abs(power_right)
-        power_left = abs(power_left)
-        power_right = abs(power_right)
-
-        self._left_motor.reset_state()
-        self._right_motor.reset_state()
-
         # applying tension to motors
-        self._left_motor.control(power_left * left_direction)
-        self._right_motor.control(power_right * right_direction)
+        self._left_motor.control(power_left)
+        self._right_motor.control(power_right)
 
         #PID parameters
         # assuming that power_right is equal to power_left and that coderbot
         # moves at 11.5mm/s at full PWM duty cycle
-        MAX_SPEED = 180
-        target_speed_left = (MAX_SPEED / 100) * power_left #velocity [mm/s]
-        target_speed_right = (MAX_SPEED / 100) * power_right  # velocity [mm/s]
+        MAX_SPEED = 260
+        TARGET_LEFT = (MAX_SPEED/100) * power_left #velocity [mm/s]
+        TARGET_RIGHT = (MAX_SPEED / 100) * power_right  # velocity [mm/s]
 
         # SOFT RESPONSE
         #KP = 0.04  #proportional coefficient
@@ -128,65 +114,65 @@ class WheelsAxel:
         #KI = 0.005 # integral coefficient
 
         # MEDIUM RESPONSE
-        KP = 0.4  #proportional coefficient
-        KD = 0.1 # derivative coefficient
-        KI = 0.02 # integral coefficient
+        #KP = 0.8  #proportional coefficient
+        #KD = 0.04 # derivative coefficient
+        #KI = 0.02 # integral coefficient
 
         # STRONG RESPONSE
-        #KP = 0.9   # proportional coefficient
-        #KD = 0.05  # derivative coefficient
-        #KI = 0.03  # integral coefficient
+        KP = 0.9   # proportional coefficient
+        KD = 0.05  # derivative coefficient
+        KI = 0.03  # integral coefficient
 
-        SAMPLETIME = 0.01
+        SAMPLETIME = 0.1
+
+        left_speed = TARGET_LEFT
+        right_speed = TARGET_RIGHT
 
         left_derivative_error = 0
         right_derivative_error = 0
         left_integral_error = 0
         right_integral_error = 0
+
         # moving for certaing amount of distance
-        logging.info("moving? " + str(self._is_moving) + " distance: " + str(self.distance()) + " target: " + str(target_distance))
-        while(abs(self.distance()) < abs(target_distance) and self._is_moving == True):
+        while(abs(self.distance()) < target_distance):
             # PI controller
-            logging.info("speed.left: " + str(self._left_motor.speed()) + " speed.right: " + str(self._right_motor.speed()))
-            if(abs(self._left_motor.speed()) > 10 and abs(self._right_motor.speed()) > 10):
-                # relative error
-                left_error = (target_speed_left - self._left_motor.speed()) / target_speed_left * 100.0
-                right_error = (target_speed_right - self._right_motor.speed()) / target_speed_right * 100.0
 
-                left_correction = (left_error * KP) + (left_derivative_error * KD) + (left_integral_error * KI)
-                right_correction = (right_error * KP) + (right_derivative_error * KD) + (right_integral_error * KI)
+            # relative error
+            left_error = TARGET_LEFT - self._left_motor.speed()
+            right_error = TARGET_RIGHT - self._right_motor.speed()
 
-                corrected_power_left = power_left + left_correction - right_correction
-                corrected_power_right  = power_right + right_correction - left_correction
+            left_speed += (left_error * KP) + (left_derivative_error * KD) + (left_integral_error * KI)
+            right_speed += (right_error * KP) + (right_derivative_error * KD) + (right_integral_error * KI)
+            print("LEFT correction: %f" % (left_error * KP + left_derivative_error * KD + left_integral_error * KI))
+            print("RIGHT correction: %f" % (right_error * KP + right_derivative_error * KD + right_integral_error * KI))
 
-                #print("LEFT correction: %f" % (left_error * KP + left_derivative_error * KD + left_integral_error * KI))
-                #print("RIGHT correction: %f" % (right_error * KP + right_derivative_error * KD + right_integral_error * KI))
+            # conrispondent new power
+            left_power = max(min(100 * left_speed / MAX_SPEED, 100), 0)
+            right_power =  max(min(100 * right_speed / MAX_SPEED, 100), 0)
 
-                # conrispondent new power
-                power_left_norm = max(min(corrected_power_left, 100), 0)
-                power_right_norm =  max(min(corrected_power_right, 100), 0)
+            print("Left SPEED: %f" % (self._right_motor.speed()))
+            print("Right SPEED: %f" % (self._left_motor.speed()))
+            print("Left POWER: %f" % (right_power))
+            print("Right POWER: %f" % (left_power))
+            print("")
 
-                logging.info("ls:" + str(int(self._left_motor.speed())) + " rs: " + str(int(self._right_motor.speed())) + 
-                              " le:" + str(int(left_error)) + " re: " + str(int(right_error)) + 
-                              " lc: " + str(int(left_correction)) + " rc: " + str(int(right_correction)) + 
-                              " lp: " + str(int(power_left_norm)) + " rp: " + str(int(power_right_norm)))
- 
-                # adjusting power on each motors
-                self._left_motor.adjust_power(power_left_norm * left_direction )
-                self._right_motor.adjust_power(power_right_norm * right_direction)
+            # adjusting power on each motors
+            self._left_motor.adjust_power(left_power)
+            self._right_motor.adjust_power(right_power)
 
-                left_derivative_error = left_error
-                right_derivative_error = right_error
-                left_integral_error += left_error
-                right_integral_error += right_error
+            print("Left error: %f" % (left_error))
+            print("Right error: %f"  % (right_error))
+            print("")
+
 
             # checking each SAMPLETIME seconds
             sleep(SAMPLETIME)
 
-        logging.info("control_distance.stop, target dist: " + str(target_distance) + 
-            " actual distance: " + str(self.distance()) + 
-            " l ticks: " + str(self._left_motor.ticks()) + 
-            " r ticks: " + str(self._right_motor.ticks()))
+            left_derivative_error = left_error
+            right_derivative_error = right_error
+            left_integral_error += left_error
+            right_integral_error += right_error
+
         # robot arrived
         self.stop()
 
@@ -206,13 +192,17 @@ class WheelsAxel:
 
         # trying to fix distance different than zero after
         # wheels has stopped by re-resetting state after 0.5s
-
-        #self._left_motor.reset_state()
-        #self._right_motor.reset_state()
+        sleep(0.1)
+        self._left_motor.reset_state()
+        self._right_motor.reset_state()
 
         # updating state
-        logging.info("stopping")
         self._is_moving = False
+        # restoring callback
+        try:
+            self._wheelsAxle_lock.release()
+        except Exception as e:
+            pass
 
     # CALLBACK
     def cancel_callback(self):

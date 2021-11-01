@@ -46,7 +46,7 @@ class GPIO_CODERBOT_V_4():
     PIN_SONAR_3_TRIGGER = 18
     PIN_SONAR_3_ECHO = 23
     PIN_SONAR_4_TRIGGER = 18
-    PIN_SONAR_4_ECHO = None
+    PIN_SONAR_4_ECHO = 13
 
     # encoder
     PIN_ENCODER_LEFT_A = 14
@@ -132,8 +132,7 @@ class CoderBot(object):
                       sonar.Sonar(self.pi, self.GPIOS.PIN_SONAR_4_TRIGGER, self.GPIOS.PIN_SONAR_4_ECHO)]
         self._servos = [self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
 
-        #self.stop()
-        self._is_moving = False
+        self.stop()
 
     the_bot = None
 
@@ -217,15 +216,10 @@ class CoderBot(object):
         self.pi.set_PWM_dutycycle(pin, duty)
 
     def stop(self):
-        if self._encoder:
-            self._twin_motors_enc.stop()
-        else:
-            for pin in self._pin_out:
-                self.pi.write(pin, 0)
-        self._is_moving = False
+        self._twin_motors_enc.stop()
 
     def is_moving(self):
-        return self._is_moving
+        return self._twin_motors_enc._is_moving
 
     # Distance travelled getter
     def distance(self):

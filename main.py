@@ -86,8 +86,6 @@ def serve_docs_app(subpath):
     'cb_docs' is the output of `npx vuepress build pages/`
     from the 'docs' repository
     """
-    print("Running docs path")
-    print(subpath)
     if (subpath[-1] == '/'):
         subpath = subpath + 'index.html'
     return send_from_directory('cb_docs', subpath)
@@ -109,7 +107,7 @@ def serve_legacy():
                            config=app.bot_config,
                            program_level=app.bot_config.get("prog_level", "std"),
                            cam=Camera.get_instance() != None,
-                           cnn_model_names=json.dumps([[name] for name in CNNManager.get_instance().get_models().keys()]))
+                           cnn_model_names=json.dumps([[name, name] for name in CNNManager.get_instance().get_models().keys()]))
 
 @babel.localeselector
 def get_locale():
@@ -214,7 +212,7 @@ def handle_bot():
     except:
         cam = None
         motion = None
-    
+
     audio = Audio.get_instance()
 
     cmd = request.args.get('cmd')
@@ -375,7 +373,7 @@ def handle_program_delete():
     logging.debug("program_delete")
     name = request.form.get('name')
     app.prog_engine.delete(name)
-    return "ok"
+    return jsonify({"status":"ok"})
 
 @app.route("/program/exec", methods=["POST"])
 def handle_program_exec():
