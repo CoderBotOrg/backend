@@ -215,6 +215,12 @@ class CoderBot(object):
         self.pi.set_PWM_frequency(pin, 50)
         self.pi.set_PWM_dutycycle(pin, duty)
 
+    def _dc_enc_motor(self, speed_left=100, speed_right=100, time_elapse=0, target_distance=0):
+        self._twin_motors_enc.control(power_left=speed_left,
+                                      power_right=speed_right,
+                                      time_elapse=time_elapse,
+                                      target_distance=target_distance)
+
     def stop(self):
         self._twin_motors_enc.stop()
 
@@ -262,8 +268,3 @@ class CoderBot(object):
     def reboot(self):
         os.system('sudo reboot')
 
-    def _dc_enc_motor(self, speed_left=100, speed_right=100, time_elapse=0, target_distance=0):
-        self._twin_motors_enc.control(power_left=speed_left,
-                                      power_right=speed_right,
-                                      time_elapse=time_elapse,
-                                      target_distance=target_distance)

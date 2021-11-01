@@ -70,7 +70,6 @@ Thumbs.db
 # Swap files
 *.swp
 
-
 # Python3 Virtual Environment folders
 
 bin/
@@ -94,3 +93,7 @@ photos/metadata.json
 
 # Uploaded updates folder
 updatePackages/
+
+# firmware
+firmware/
+

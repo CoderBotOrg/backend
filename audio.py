@@ -67,7 +67,7 @@ class Audio:
         #self._google_speech_client = speech.SpeechClient()
 
     def exit(self):
-        pass
+       pass
         # cleanup stuff.
         #self.stream_in.close()
         #self.pyaudio.terminate()

@@ -128,7 +128,7 @@ class CNNClassifier(object):
                 ymax = int(min(imH,(boxes[i][2] * imH)))
                 xmax = int(min(imW,(boxes[i][3] * imW)))
 
-                object_name = self._labels[int(classes[i])]
+                object_name = self._labels[int(classes[i])+1]
                 pairs.append((object_name, int(100*scores[i]), (xmin, ymin, xmax, ymax)))
 
         pairs = sorted(pairs, key=lambda x: x[1], reverse=True)[:top_results]
