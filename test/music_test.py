@@ -1,0 +1,116 @@
+import sys
+import sox
+import time
+import os
+sys.path.insert(0, './')
+from musicPackages import MusicPackageManager
+from music import Music
+
+class Music_test:
+
+    def test_library(self):
+        print("testing sound playback:...")
+        tfm = sox.Transformer()
+        tfm.preview('cat.wav')
+        tfm.build('cat.wav', 'outMusicDemo.wav')
+
+# test each parametr of the function play_note
+    def test_play_note(self):
+        musicPkg = MusicPackageManager()
+        m = Music(musicPkg)
+        print('test Music.play_note')
+        print("m.play_note(note='C2')")
+        m.play_note(note='C2')
+        print("m.play_note(note='C2',duration=2.0)")
+        m.play_note(note='C2',duration=2.0)
+        print("m.play_note(note='C2',instrument='guitar')")
+        m.play_note(note='C2',instrument='guitar')
+        print("m.play_note(note='C2',alteration='bmolle')")
+        m.play_note(note='C2',alteration='bmolle')
+        print("m.play_note(note='C2',alteration='diesis')")
+        m.play_note(note='C2',alteration='diesis')
+        print("m.play_note(note='C2',instrument='guitar')")
+        m.play_note(note='C2',instrument='guitar')
+        print("m.play_note(note='C2',alteration='bmolle')")
+        m.play_note(note='C2',alteration='bmolle')
+        print("m.play_note(note='C2',instrument='guitar',alteration='diesis')")
+        m.play_note(note='C2',instrument='guitar',alteration='diesis')
+        print("m.play_note(note='C2',instrument='guitar',alteration='diesis',duration=2.0)")
+        m.play_note(note='C2',instrument='guitar',alteration='diesis',duration=2.0)
+        print("m.play_note(note='G3',duration=2.0)")
+        m.play_note(note='G3',duration=2.0)
+        print("m.play_note(note='G3',instrument='guitar')")
+        m.play_note(note='G3',instrument='guitar')
+        print("m.play_note(note='G3',alteration='bmolle')")
+        m.play_note(note='G3',alteration='bmolle')
+        print("m.play_note(note='G3',alteration='diesis')")
+        m.play_note(note='G3',alteration='diesis')
+        print("m.play_note(note='G3',instrument='guitar')")
+        m.play_note(note='G3',instrument='guitar')
+        print("m.play_note(note='G3',alteration='bmolle')")
+        m.play_note(note='G3',alteration='bmolle')
+        print("m.play_note(note='G3',instrument='guitar',alteration='diesis')")
+        m.play_note(note='G3',instrument='guitar',alteration='diesis')
+        print("m.play_note(note='G3',instrument='guitar',alteration='diesis',duration=2.0)")
+        m.play_note(note='G3',instrument='guitar',alteration='diesis',duration=2.0)
+        print("it's ok if print: no instrument: coderInstrument present in this coderbot!")
+        m.play_note(note='C2',instrument='coderInstrument',alteration='diesis',duration=2.0)
+        print("it's ok if print: note: coderNote not exist")
+        m.play_note(note='coderNote',instrument='piano',alteration='diesis',duration=2.0)
+
+
+# test each parametr of the function play_note
+    def test_play_animal(self):
+        print('test Music.play_animal')
+        musicPkg = MusicPackageManager()
+        m = Music(musicPkg)
+        print("(note='C2',instrument='cat', duration=2.0)")
+        m.play_animal(note='C2',instrument='cat', duration=2.0)
+        print("m.play_animal(note='C2',instrument='dog')")
+        m.play_animal(note='C2',instrument='dog')
+        print("m.play_animal(note='C2',instrument='dog', alteration='bmolle')")
+        m.play_animal(note='C2',instrument='dog', alteration='bmolle')
+        print("m.play_animal(note='C2',instrument='cat', alteration='diesis')")
+        m.play_animal(note='C2',instrument='cat', alteration='diesis')
+        print("m.play_animal(note='C2',instrument='dinosaur')")
+        m.play_animal(note='C2',instrument='dinosaur')
+        print("m.play_animal(note='C2',alteration='bmolle')")
+        m.play_animal(note='C2',instrument="dinosaur", alteration='bmolle')
+        print("m.play_animal(note='C2',instrument='cat',alteration='diesis')")
+        m.play_animal(note='C2',instrument='cat',alteration='diesis')
+        print("m.play_animal(note='C2',instrument='cat',alteration='diesis',duration=2.0)")
+        m.play_animal(note='C2',instrument='cat',alteration='diesis',duration=2.0)
+        print("m.play_note(note='G3',duration=2.0)")
+        m.play_note(note='G3',duration=2.0)
+        print("m.play_note(note='G3',instrument='dinosaur',alteration='bmolle')")
+        m.play_note(note='G3',instrument='dinosaur',alteration='bmolle')
+        print("m.play_note(note='G3',instrument='dinosaur',alteration='diesis')")
+        m.play_note(note='G3',instrument='dinosaur',alteration='diesis')
+        print("m.play_note(note='G3',alteration='bmolle', instrument= 'cat')")
+        m.play_note(note='G3',alteration='bmolle', instrument= 'cat')
+        print("m.play_note(note='G3',instrument='cat',alteration='diesis')")
+        m.play_note(note='G3',instrument='cat',alteration='diesis')
+        print("m.play_note(note='G3',instrument='cat',alteration='diesis',duration=2.0)")
+        m.play_note(note='G3',instrument='cat',alteration='diesis',duration=2.0)
+        print("it's ok if print: no instrument: coderInstrument present in this coderbot!")
+        m.play_animal(note='C2',instrument='coderInstrument',alteration='diesis',duration=2.0)
+        print("it's ok if print: note: coderNote not exist")
+        m.play_animal(note='coderNote',instrument='cat',alteration='diesis',duration=2.0)
+        print('test Music.play_note: ENDED')
+
+
+    def test_play_pause(self):
+        print('test Music.play_pause')
+        musicPkg = MusicPackageManager()
+        m = Music()
+        prrint("play pause")
+        m.play_pause(1.0)
+        prrint("play pause and note")
+        m.play_note(note='C2',instrument='guitar')
+        m.play_pause(2.0)
+        m.play_note(note='C2',instrument='guitar')
+
+test = Music_test()
+test.test_play_note()
+test.test_play_animal()
+
