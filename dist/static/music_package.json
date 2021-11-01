@@ -1,47 +1,5 @@
 {
     "packages": {
-        "cat": {
-            "category": "animal",
-            "name_IT": "gatto",
-            "name_EN": "cat",
-            "version": "0.1",
-            "date": "2020-04-08",
-            "interface": {
-                "base": {
-                    "available": "TRUE",
-                    "icon": "cat.png"
-                },
-                "intermediate": {
-                    "available": "TRUE",
-                    "icon": "cat.png"
-                },
-                "advanced": {
-                    "available": "TRUE",
-                    "icon": "cat.png"
-                }
-            }
-        },
-        "dog": {
-            "category": "animal",
-            "name_IT": "cane",
-            "name_EN": "dog",
-            "version": "0.1",
-            "date": "2020-04-08",
-            "interface": {
-                "base": {
-                    "available": "TRUE",
-                    "icon": "dog.png"
-                },
-                "intermediate": {
-                    "available": "TRUE",
-                    "icon": "dog.png"
-                },
-                "advanced": {
-                    "available": "TRUE",
-                    "icon": "dog.png"
-                }
-            }
-        },
         "piano": {
             "category": "instrument",
             "name_IT": "pianoforte",
@@ -102,6 +60,48 @@
                 "advanced": {
                     "available": "TRUE",
                     "icon": "flute.png"
+                }
+            }
+        }, 
+        "cat": {
+            "category": "animal",
+            "name_IT": "gatto",
+            "name_EN": "cat",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "cat.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "cat.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "cat.png"
+                }
+            }
+        },
+        "dog": {
+            "category": "animal",
+            "name_IT": "cane",
+            "name_EN": "dog",
+            "version": "0.1",
+            "date": "2020-04-08",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "dog.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "dog.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "dog.png"
                 }
             }
         },
@@ -165,6 +165,27 @@
                 "advanced": {
                     "available": "TRUE",
                     "icon": "snake.png"
+                }
+            }
+        },
+        "duck": {
+            "category": "animal",
+            "name_IT": "anatra",
+            "name_EN": "duck",
+            "version": "0.1",
+            "date": "2020-06-01",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "duck.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "duck.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "duck.png"
                 }
             }
         }
