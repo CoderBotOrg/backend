@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: coderbot/python-gpac:3.5-tf2
+      - image: coderbot/python-gpac:3.7
       
     working_directory: ~/repo
 
