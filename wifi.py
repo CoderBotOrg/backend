@@ -91,7 +91,7 @@ class WiFi():
         return socket.inet_ntoa(fcntl.ioctl(
             s.fileno(),
             0x8915,  # SIOCGIFADDR
-            struct.pack('256s', ifname[:15])
+            struct.pack('256s', ifname.encode('utf-8')[:15])
         )[20:24])
 
     @classmethod
@@ -153,7 +153,11 @@ class WiFi():
             time.sleep(1.0)
             out = os.system("wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null 2>&1")
             out += os.system("dhclient -1 wlan0")
-            print(out)
+            print("start_as_client: " + str(out))
+            ipaddr = cls.get_ipaddr("wlan0")
+            if ipaddr is None or "169.254" in ipaddr:
+                os.system("sudo pkill wpa_supplicant")
+                raise Exception()
             try:
                 cls.register_ipaddr(cls.get_macaddr("wlan0"), cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"), "roberto.previtera@gmail.com")
                 print("registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot')))
@@ -175,7 +179,7 @@ class WiFi():
         out += str(subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"]))
         out += str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"]))
         out += str(subprocess.check_output(["ifconfig"]))
-        print(out)
+        print("start_as_ap: " + str(out))
         cls.start_hostapd()
         cls.start_dnsmasq()
 
