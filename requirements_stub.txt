@@ -38,7 +38,7 @@ termcolor==1.1.0
 tinydb==3.12.1
 tensorflow==2.1.0
 tensorflow_hub>=0.7.0
-urllib3==1.24.2
+urllib3==1.26.5
 Werkzeug==0.15.3
 setuptools==42.0.1
 smbus2==0.3.0
