@@ -22,7 +22,7 @@ Jinja2==2.11.1
 jsonschema==2.6.0
 Markdown==3.1.1
 MarkupSafe==1.1.1
-numpy==1.17.4
+numpy==1.22.1
 opencv-contrib-python==4.1.1.26
 pigpio==1.45
 Pillow==7.0.0
