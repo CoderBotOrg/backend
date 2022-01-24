@@ -12,7 +12,7 @@ connexion==1.5.3
 Flask==1.1.4
 Flask-Babel==0.12.2
 Flask-Cors==3.0.10
-gast==0.5.3
+gast==0.2.2
 grpcio==1.41.1
 idna==2.10
 pybind11==2.9.0
