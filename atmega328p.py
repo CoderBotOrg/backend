@@ -60,12 +60,23 @@ class ATMega328():
         resp = self.spi.xfer([START, CMD_SET_LED, begin_led, end_led, red,green, blue], BAUDRATE)
         return resp[3]
 
+    def set_led(self, begin_led, end_led, red, green, blue):
+        begin = begin_led - 1
+        end = end_led - 1
+        red = int(red * 255 / 100)
+        green = int(green * 255 / 100)
+        blue = int(blue * 255 / 100)
+        return self.setLed(begin, end, red, green, blue)
+        time.sleep(0.02)
+
     def get_input(self, addr):
         if addr >= ADDR_AI_FIRST and addr <= ADDR_AI_LAST:
             return self.analogRead(addr)
         elif addr >= ADDR_DI_FIRST and addr <= ADDR_DI_LAST:
             return self.digitalRead(addr)
+        time.sleep(0.02)
 
     def set_output(self, addr, value):
         if addr >= ADDR_DO_FIRST and addr <= ADDR_DO_LAST:
             self.digitalWrite(addr, value)
+        time.sleep(0.02)

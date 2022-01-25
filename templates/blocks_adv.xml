@@ -334,6 +334,7 @@
     <category name="{% trans %}I/O Extensions{% endtrans %}" colour="240">
       <block type="coderbot_atmega_get_input"></block>
       <block type="coderbot_atmega_set_output"></block>
+      <block type="coderbot_atmega_set_led"></block>
     </category>
     <category name="{% trans %}Sound{% endtrans %}" colour="220">
       <block type="coderbot_audio_say"></block>
