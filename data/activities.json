@@ -1,1 +1,1 @@
-{"_default": {}}
+{"_default": {"1": {"exec": {"camera": true, "log": false}, "name": "aaa", "drawerEnabled": true, "showName": true, "buttons": [{"label": "Esegui", "icon": "play_arrow", "colorBtn": "green", "colorText": "white--text", "action": "runProgramLegacy", "notErasable": true}, {"label": "Salva", "icon": "save", "colorBtn": "blue", "colorText": "white--text", "action": "saveProgram"}], "description": "aaa", "fontSize": "Medio", "capsSwitch": true, "bodyFont": "Roboto", "codeFont": "robotomono"}}}

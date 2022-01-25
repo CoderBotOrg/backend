@@ -39,7 +39,7 @@ class AudioCtrl:
         return cls._instance
 
     def __init__(self):
-        self.mixer = alsaaudio.Mixer('Headphone')
+        self.mixer = alsaaudio.Mixer('PCM')
 
     def getVolume(self):
         print(self.mixer.getvolume())
