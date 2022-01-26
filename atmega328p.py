@@ -57,15 +57,20 @@ class ATMega328():
         return resp[3]
 
     def setLed(self, begin_led, end_led, red, green, blue):
-        resp = self.spi.xfer([START, CMD_SET_LED, begin_led, end_led, red,green, blue], BAUDRATE)
+        resp = self.spi.xfer([START, CMD_SET_LED, 
+                              min(max(begin_led, 0), 60),
+                              min(max(end_led, 0), 60),
+                              min(max(red, 0), 254),
+                              min(max(green, 0), 254),
+                              min(max(blue, 0), 254)], BAUDRATE)
         return resp[3]
 
     def set_led(self, begin_led, end_led, red, green, blue):
         begin = begin_led - 1
         end = end_led - 1
-        red = max(int(red * 255 / 100), 255)
-        green = max(int(green * 255 / 100), 255)
-        blue = max(int(blue * 255 / 100), 255)
+        red = int(red * 255 / 100)
+        green = int(green * 255 / 100)
+        blue = int(blue * 255 / 100)
         return self.setLed(begin, end, red, green, blue)
 
     def get_input(self, addr):
