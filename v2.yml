@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.2"
+  version: "0.3"
   title: OpenAPI 2.0 definition of Coderbot API v2
 
 consumes:
@@ -74,9 +74,17 @@ paths:
           description: "ok"
         400:
           description: "Failed to save the activity"
+  /listMusicPackages:
+    get:
+      operationId: "api.listMusicPackages"
+      summary: "List Music Packages"
+      responses:
+        200:
+          description: "ok"
   /updateFromPackage:
     post:
       operationId: "api.updateFromPackage"
+      summary: "Update CoderBot from package"
       consumes:
         - multipart/form-data
       parameters:

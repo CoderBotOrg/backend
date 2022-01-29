@@ -173,6 +173,7 @@ def restoreSettings():
     Config.get()
     return "ok"
 
+
 def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')
     file_to_upload = connexion.request.files['file_to_upload']
@@ -180,7 +181,15 @@ def updateFromPackage():
     os.system('sudo reboot')
     return 200
 
-def updatePackages():
+def listMusicPackages():
+    """
+    list available music packages
+    """
+    musicPkg = MusicPackageManager.get_instance()
+    response = musicPkg.listPackages()
+    return json.dumps(response)
+
+def updateMusicPackages():
     """
     Add a musical package an save the list of available packages on disk
     also add sounds and directory
@@ -196,9 +205,9 @@ def updatePackages():
     if response == 1:
         return 200
     elif response == 2:
-        return 2
+        return 400
     elif response == 3:
-        return 3
+        return 400
 
 
 ## Programs

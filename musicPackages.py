@@ -111,6 +111,9 @@ class MusicPackageManager:
                 if p not in self.packages:
                     self.packages[p] = mp
 
+    def listPackages(self):
+        return self.packages
+
     def updatePackages(self):
         newdict = { 'packages': {} }
         for element in self.packages:
