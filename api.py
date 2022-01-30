@@ -187,7 +187,7 @@ def listMusicPackages():
     """
     musicPkg = MusicPackageManager.get_instance()
     response = musicPkg.listPackages()
-    return json.dumps(response)
+    return json.dumps(response.__dict__)
 
 def updateMusicPackages():
     """

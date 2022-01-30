@@ -30,15 +30,8 @@ import json
 import os
 
 class MusicPackage:
-    name_IT = None
-    name_EN = None
-    category = None
-    version = None
-    date = None
-    interfaces = None
-    nameID = None
 
-    def __init__(self,nameID,category,name_IT,name_EN,version,date):
+    def __init__(self, nameID, category, name_IT,n ame_EN, version, date):
         self.nameID = nameID
         self.category = category
         self.name_IT = name_IT
@@ -49,26 +42,29 @@ class MusicPackage:
 
     def getNameID(self):
         return self.nameID
+
     def getCategory(self):
         return self.category
+
     def getNameIT(self):
         return self.name_IT
+
     def getNameEN(self):
         return self.name_EN
+
     def getVersion(self):
         return self.version
+
     def getDate(self):
         return self.date
+
     def getInterfaces(self):
         return self.interfaces
 
-    def addInterface(self,musicPackageInterface):
+    def addInterface(self, musicPackageInterface):
         self.interfaces.append(musicPackageInterface)
 
 class MusicPackageInterface:
-    interfaceName = None
-    available = None
-    icon = None
 
     def __init__(self,interfaceName,available,icon):
         self.interfaceName = interfaceName
@@ -86,7 +82,6 @@ class MusicPackageInterface:
 
 class MusicPackageManager:
     _instance = None
-    packages = None
 
     @classmethod
     def get_instance(cls):
