@@ -162,17 +162,6 @@ def handle_config():
     app.bot_config = Config.get()
     return "ok"
 
-@app.route("/deletepkg", methods=["POST"])
-def handle_packages():
-    """
-    Delete a musical package an save the list of available packages on disk
-    also delete package sounds and directory
-    """
-    packageName = request.form.get("nameID")
-    musicPkg = MusicPackageManager.get_instance()
-    musicPkg.deletePackage(packageName)
-    return "package deleted"
-
 @app.route("/config", methods=["GET"])
 def returnConfig():
     """

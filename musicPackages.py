@@ -28,10 +28,12 @@
 
 import json
 import os
+import logging
+import copy
 
 class MusicPackage:
 
-    def __init__(self, nameID, category, name_IT,n ame_EN, version, date):
+    def __init__(self, nameID, category, name_IT, name_EN, version, date):
         self.nameID = nameID
         self.category = category
         self.name_IT = name_IT
@@ -87,7 +89,6 @@ class MusicPackageManager:
     def get_instance(cls):
         if cls._instance is None:
             cls._instance = MusicPackageManager()
-            print("make MusicPackageManager")
         return cls._instance
 
     def __init__(self):
@@ -107,7 +108,14 @@ class MusicPackageManager:
                     self.packages[p] = mp
 
     def listPackages(self):
-        return self.packages
+        packages_serializable = dict()
+        for name, package in self.packages.items():
+            package_copy = copy.deepcopy(package)
+            packages_serializable[name] = package_copy.__dict__
+            packages_serializable[name]['interfaces'] = []
+            for i in package.interfaces:
+                packages_serializable[name]['interfaces'].append(i.__dict__)
+        return packages_serializable
 
     def updatePackages(self):
         newdict = { 'packages': {} }
@@ -128,25 +136,26 @@ class MusicPackageManager:
             newdict['packages'][nameID]['interface']['advanced']['icon'] = self.packages[element].getInterfaces()[2].getIcon()
 
         #json_packages = json.dumps(newdict)
-        with open('./dist/static/music_package.json', 'w', encoding='utf-8') as json_file:
+        with open('sounds/notes/music_package.json', 'w', encoding='utf-8') as json_file:
             json.dump(newdict, json_file, ensure_ascii=False, indent=4)
 
 
     def deletePackage(self, packageName):
-       if packageName in self.packages:
-           del self.packages[packageName]        
-           self.updatePackages()
-       else:
-          print("errore, il pacchetto " + packageName + " non è stato trovato")
-          return 2
+        logging.info("packageName: " + packageName)
+        if packageName in self.packages:
+            del self.packages[packageName]        
+            self.updatePackages()
+        else:
+            logging.error("errore, il pacchetto " + packageName + " non è stato trovato")
+            return 2
 
-       if os.path.exists('./sounds/notes/' + packageName):
-           os.system('rm -rf ./sounds/notes/' + packageName)
-           return 1
+        if os.path.exists('./sounds/notes/' + packageName):
+            os.system('rm -rf ./sounds/notes/' + packageName)
+            return 1
 
 
     def verifyVersion(self, packageName, version):
-        print("verifica pacchetto")
+        logging.info("verifica pacchetto")
         #newversionList = version.split('.')
         if packageName not in self.packages:
             return True
@@ -169,15 +178,15 @@ class MusicPackageManager:
     def addPackage(self, filename):
         pkgnames = filename.split('_')
         version = pkgnames[1].replace('.zip', '')
-        print(version)
+        logging.info("Music Package version: " + version)
         pkgname = pkgnames[0]
         pkgpath = './sounds/notes/' + pkgname
         if not self.verifyVersion(pkgname, version):
             if (version == self.packages[pkgname].getVersion()):
-                print("errore, il pacchetto " + pkgname + " ha versione identica a quello attualmente installato")
+                logging.error("errore, il pacchetto " + pkgname + " ha versione identica a quello attualmente installato")
                 return 3
             else:
-                print("errore, il pacchetto " + pkgname + " ha versione precendente a quello attualmente installato")
+                logging.info("errore, il pacchetto " + pkgname + " ha versione precendente a quello attualmente installato")
                 return 2
         else:
 
@@ -187,7 +196,7 @@ class MusicPackageManager:
             os.system('mv ./updatePackages/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
 
             with open('./updatePackages/' + pkgname + '/' + pkgname + '.json') as json_file:
-                print("adding " + pkgname + " package")
+                logging.info("adding " + pkgname + " package")
                 data = json.load(json_file)
                 for p in data['packages']:
                     package = data['packages'][p]

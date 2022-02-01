@@ -6,6 +6,7 @@ This file contains every method called by the API defined in v2.yml
 import os
 import subprocess
 import json
+import logging
 import connexion
 from tinydb import TinyDB, Query
 from tinydb.operations import delete
@@ -187,7 +188,7 @@ def listMusicPackages():
     """
     musicPkg = MusicPackageManager.get_instance()
     response = musicPkg.listPackages()
-    return json.dumps(response.__dict__)
+    return json.dumps(response)
 
 def updateMusicPackages():
     """
@@ -209,6 +210,14 @@ def updateMusicPackages():
     elif response == 3:
         return 400
 
+def deleteMusicPackage(package_data):
+    """
+    Delete a musical package an save the list of available packages on disk
+    also delete package sounds and directory
+    """
+    musicPkg = MusicPackageManager.get_instance()
+    musicPkg.deletePackage(package_data['package_name'])
+    return 200 
 
 ## Programs
 

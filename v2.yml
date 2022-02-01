@@ -81,6 +81,24 @@ paths:
       responses:
         200:
           description: "ok"
+  /deleteMusicPackage:
+    post:
+      operationId: "api.deleteMusicPackage"
+      summary: "Delete Music Package"
+      parameters:
+        - name: package_data
+          in: body
+          schema:
+            type: object
+            properties:
+              package_name:
+                type: string
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "not found"
+        
   /updateFromPackage:
     post:
       operationId: "api.updateFromPackage"
