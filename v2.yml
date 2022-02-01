@@ -302,3 +302,13 @@ paths:
       responses:
         200:
           description: Sent command to the bot GPIO.
+  /listCNNModels:
+    get:
+      operationId: "api.list_cnn_models"
+      summary: "list of CNN Models"
+      tags:
+        - CNN Models
+      responses:
+        200:
+          description: "CNN Models as JSON Object"
+

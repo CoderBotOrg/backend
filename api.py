@@ -15,6 +15,7 @@ from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
 from coderbotTestUnit import run_test as runCoderbotTestUnit
+from cnn_manager import CNNManager
 import pigpio
 from musicPackages import MusicPackageManager
 
@@ -291,3 +292,9 @@ def testCoderbot(data):
     # taking first JSON key value (varargin)
     tests_state = runCoderbotTestUnit(data[list(data.keys())[0]])
     return tests_state
+
+def list_cnn_models():
+    cnn = CNNManager.get_instance()
+    logging.info("cnn_models_list")
+    return json.dumps(cnn.get_models())
+
