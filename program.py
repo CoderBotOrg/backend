@@ -148,21 +148,19 @@ class Program:
         return self._dom_code
 
     def __init__(self, name, code=None, dom_code=None, default=False):
-        #super(Program, self).__init__()
         self._thread = None
         self.name = name
         self._dom_code = dom_code
         self._code = code
         self._default = default
 
-    def execute(self):
+    def execute(self, options={}):
         if self._running:
             raise RuntimeError('already running')
 
         self._running = True
-
         try:
-            self._thread = threading.Thread(target=self.run)
+            self._thread = threading.Thread(target=self.run, args=(options,))
             self._thread.start()
         except RuntimeError as re:
             logging.error("RuntimeError: %s", str(re))
@@ -187,15 +185,16 @@ class Program:
     def is_default(self):
         return self._default
 
-    def run(self):
+    def run(self, *args):
+        options = args[0]
         try:
             program = self
             try:
-                if config.Config.get().get("prog_video_rec") == "true":
-                    get_cam().video_rec(program.name)
+                if options.get("autoRecVideo") == True:
+                    get_cam().video_rec(program.name.replace(" ", "_"))
                     logging.debug("starting video")
-            except Exception:
-                logging.error("Camera not available")
+            except Exception as e:
+                logging.error("Camera not available: " + str(e))
 
             self._log = "" #clear log
             imports = "import json\n"

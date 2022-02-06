@@ -135,7 +135,8 @@ def turn(data):
 
 def exec(data):
     program = prog_engine.create(data["name"], data["code"])
-    return json.dumps(program.execute())
+    options = data["options"]
+    return json.dumps(program.execute(options))
 
 ## System
 
