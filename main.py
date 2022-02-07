@@ -57,7 +57,6 @@ CORS(app)
 babel = Babel(app)
 app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
-app.prog = None
 app.shutdown_requested = False
 
 
@@ -338,8 +337,8 @@ def handle_program_load():
     """
     logging.debug("program_load")
     name = request.args.get('name')
-    app.prog = app.prog_engine.load(name)
-    return jsonify(app.prog.as_dict())
+    prog = app.prog_engine.load(name)
+    return jsonify(prog.as_dict())
 
 @app.route("/program/save", methods=["POST"])
 def handle_program_save():
@@ -372,8 +371,8 @@ def handle_program_exec():
     logging.debug("program_exec")
     name = request.form.get('name')
     code = request.form.get('code')
-    app.prog = app.prog_engine.create(name, code)
-    return json.dumps(app.prog.execute())
+    prog = app.prog_engine.create(name, code)
+    return json.dumps(prog.execute())
 
 @app.route("/program/end", methods=["POST"])
 def handle_program_end():
@@ -381,9 +380,9 @@ def handle_program_end():
     Stop the program execution
     """
     logging.debug("program_end")
-    if app.prog:
-        app.prog.end()
-    app.prog = None
+    prog = app.prog_engine.get_current_program()
+    if prog:
+        prog.end()
     return "ok"
 
 @app.route("/program/status", methods=["GET"])
@@ -392,9 +391,9 @@ def handle_program_status():
     Expose the program status
     """
     logging.debug("program_status")
-    prog = Program("")
-    if app.prog:
-        prog = app.prog
+    prog = app.prog_engine.get_current_program()
+    if prog is None:
+        prog = Program("")
     return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
 
 @app.route("/cnnmodels", methods=["GET"])
@@ -451,10 +450,11 @@ def execute(command):
 
 def button_pushed():
     if app.bot_config.get('button_func') == "startstop":
-        if app.prog and app.prog.is_running():
-            app.prog.end()
-        elif app.prog and not app.prog.is_running():
-            app.prog.execute()
+        prog = app.prog_engine.get_current_prog()
+        if prog and prog.is_running():
+            prog.end()
+        elif prog and not prog.is_running():
+            prog.execute()
 
 def remove_doreset_file():
     try:
@@ -487,8 +487,8 @@ def run_server():
             EventManager.get_instance("coderbot")
 
             if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
-                app.prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
-                app.prog.execute()
+                prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
+                prog.execute()
         except ValueError as e:
             app.bot_config = {}
             logging.error(e)

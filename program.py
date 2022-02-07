@@ -140,6 +140,12 @@ class ProgramEngine:
     def get_log(self):
         return self._log
 
+    def set_log(self, log):
+        self._log = ""
+
+    def get_current_program(self):
+        return self._program
+
 class Program:
     _running = False
 
@@ -158,6 +164,7 @@ class Program:
         if self._running:
             raise RuntimeError('already running')
 
+        ProgramEngine.get_instance().set_log("")
         self._running = True
         try:
             self._thread = threading.Thread(target=self.run, args=(options,))
