@@ -43,7 +43,6 @@ fh.setFormatter(formatter)
 #logger.addHandler(sh)
 logger.addHandler(fh)
 
-
 ## (Connexion) Flask app configuration
 
 # Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
@@ -58,8 +57,6 @@ babel = Babel(app)
 app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
 app.shutdown_requested = False
-
-
 
 ## New API and web application
 
@@ -485,6 +482,16 @@ def run_server():
 
             CNNManager.get_instance()
             EventManager.get_instance("coderbot")
+
+            # Programs and Activities databases
+            activities = TinyDB("data/activities.json")
+            activities_collection = activities.search(query.stock == True)
+            if len(activities_collection) == 0:
+              activity = {
+                name: "default"
+                stock: True
+              }
+              activities.insert(activity)
 
             if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
                 prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
