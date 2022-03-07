@@ -32,6 +32,8 @@ from cnn_manager import CNNManager
 from event import EventManager
 from audioControls import AudioCtrl
 from musicPackages import MusicPackageManager
+from activity import Activities
+
 # Logging configuration
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -484,14 +486,8 @@ def run_server():
             EventManager.get_instance("coderbot")
 
             # Programs and Activities databases
-            activities = TinyDB("data/activities.json")
-            activities_collection = activities.search(query.stock == True)
-            if len(activities_collection) == 0:
-              activity = {
-                name: "default"
-                stock: True
-              }
-              activities.insert(activity)
+            activities = Activities.get_instance()
+            activities.init_default()
 
             if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
                 prog = app.prog_engine.load(app.bot_config.get('load_at_start'))

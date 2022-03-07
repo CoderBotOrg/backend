@@ -8,15 +8,14 @@ import subprocess
 import json
 import logging
 import connexion
-from tinydb import TinyDB, Query
-from tinydb.operations import delete
+import pigpio
 from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
+from activity import Activities
 from coderbotTestUnit import run_test as runCoderbotTestUnit
 from cnn_manager import CNNManager
-import pigpio
 from musicPackages import MusicPackageManager
 
 BUTTON_PIN = 16
@@ -26,8 +25,6 @@ bot = CoderBot.get_instance(
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
     encoder=bool(bot_config.get("encoder"))
 )
-
-query = Query()
 
 def get_serial():
     """
@@ -110,8 +107,7 @@ def get_info():
 prog = None
 prog_engine = ProgramEngine.get_instance()
 
-# Programs and Activities databases
-activities = TinyDB("data/activities.json")
+activities = Activities.get_instance()
 
 ## Robot control
 
@@ -247,23 +243,17 @@ def listPrograms():
 ## Activities
 
 def saveActivity(data):
-    data = data["activity"]
-    if activities.search(query.name == data["name"]) == []:
-        activities.insert(data)
-        return 200
-    else:
-        activities.update(data, query.name == data["name"])
-        return 200
+    activity = data["activity"]
+    activities.save(activity)
 
 def loadActivity(name):
-    return activities.search(query.name == name)[0], 200
+    return activities.load(name)
 
 def deleteActivity(data):
-    activities.remove(query.name == data["name"])
-
+    activities.delete(data), 200
 
 def listActivities():
-    return activities.all()
+    return activities.list()
 
 def resetDefaultPrograms():
     """
