@@ -146,7 +146,11 @@ paths:
         - name: name
           in: query
           type: string
-          required: true
+          required: false
+        - name: default
+          in: query
+          type: string
+          required: false
       tags:
         - Activity management
       responses:

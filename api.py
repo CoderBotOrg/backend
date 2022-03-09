@@ -246,8 +246,8 @@ def saveActivity(data):
     activity = data["activity"]
     activities.save(activity)
 
-def loadActivity(name):
-    return activities.load(name)
+def loadActivity(name=None, default=None):
+    return activities.load(name, default)
 
 def deleteActivity(data):
     activities.delete(data), 200
