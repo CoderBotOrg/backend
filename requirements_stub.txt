@@ -25,7 +25,7 @@ MarkupSafe==1.1.1
 numpy==1.21.4
 opencv-contrib-python==4.5.3.56
 pigpio==1.78
-Pillow==9.0.0
+Pillow==9.0.1
 protobuf==3.11.3
 Pypubsub==4.0.3
 pytz==2021.3
