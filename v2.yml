@@ -163,10 +163,6 @@ paths:
       tags:
         - Program management
       parameters:
-        - name: overwrite
-          in: query
-          required: false
-          type: string
         - in: body
           name: data
           schema:

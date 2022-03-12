@@ -219,7 +219,8 @@ def deleteMusicPackage(package_data):
 
 ## Programs
 
-def saveProgram(data, overwrite):
+def saveProgram(data):
+    overwrite = data["overwrite"]
     existing_program = prog_engine.load(data["name"])
     if existing_program and not overwrite:
         return "askOverwrite"

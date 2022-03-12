@@ -1,5 +1,6 @@
 from tinydb import TinyDB, Query
 from tinydb.operations import delete
+import json
 
 # Programs and Activities databases
 class Activities():
@@ -19,20 +20,25 @@ class Activities():
         if name:
             return self.activities.search(self.query.name == name)[0]
         elif default is not None:
-            return self.activities.search(self.query.default == True)[0]
+            default_Activities = self.activities.search(self.query.default == True)
+            if len(self.activities.search(self.query.default == True)) > 0:
+                return self.activities.search(self.query.default == True)[0]
+            else:
+                return None
 
     def save(self, activity):
         if self.activities.search(self.query.name == activity["name"]) == []:
             self.activities.insert(activity)
         else:
-            if activity["default"] == True:
-                default_activity = self.load(None, True)
-                default_activity["default"] = False
-                self.activities.update(default_activity, self.query.name == default_activity["name"])
+            if activity.get("default", False) == True:
+                self.activities.update({'default': False})
             self.activities.update(activity, self.query.name == activity["name"])
 
     def delete(self, activity):
-        activities.remove(self.query.name == activity["name"])
+        activity = self.activities.search(self.query.name == activity["name"])[0]
+        if activity.get("default", False) == True:
+            self.activities.update({'default': True}, self.query.stock == True)
+        self.activities.remove(self.query.name == activity["name"])
 
     def list(self):
         return self.activities.all()
@@ -40,8 +46,12 @@ class Activities():
     def init_default(self):
         activities_collection = self.activities.search(self.query.stock == True)
         if len(activities_collection) == 0:
+            f = open("activity_default.json", "r")
+            activity = json.load(f)
+            """
             activity = {
                 "name": "default",
+                "default": True,
                 "stock": True,
                 "codeFont": 'ubuntumono',
                 "description": None,
@@ -112,5 +122,6 @@ class Activities():
                     "type": 'text',
                 }],
             }
+            """
             self.save(activity)
  
