@@ -26,7 +26,11 @@ import logging
 import json
 import threading
 
-from cnn_train import CNNTrainer
+try:
+    from cnn_train import CNNTrainer
+except:
+    logging.warning("tensorflow not available (for training)")
+
 from cnn_classifier import CNNClassifier
 
 MODEL_PATH = "./cnn_models"
@@ -117,6 +121,7 @@ class CNNManager(object):
             return CNNClassifier(model_file=MODEL_PATH + "/" + model_name + ".tflite",
                                  label_file=MODEL_PATH + "/" + model_name + ".txt")
         return None
+
     class TrainThread(threading.Thread):
 
         def __init__(self, manager, model_name, architecture, image_tags, photos_metadata, training_steps, learning_rate):

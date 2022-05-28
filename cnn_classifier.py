@@ -23,7 +23,15 @@ using an existing and trained CNN model.
 import logging
 
 import numpy as np
-from tensorflow.lite.python.interpreter import Interpreter
+try:
+    from tensorflow.lite.python.interpreter import Interpreter
+except:
+    logging.warning("tensorflow not available (for inference)")
+try:
+    from tflite_runtime.interpreter import Interpreter
+except:
+    logging.warning("tflite not available")
+
 import cv2
 
 logger = logging.getLogger(__name__)
