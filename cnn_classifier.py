@@ -39,8 +39,7 @@ logger = logging.getLogger(__name__)
 class CNNClassifier(object):
     def __init__(self, model_file, label_file):
         logger.info(model_file)
-        self._interpreter = Interpreter(model_path=model_file)
-        self._interpreter.set_num_threads(4)
+        self._interpreter = Interpreter(model_path=model_file, num_threads=4)
         self._interpreter.allocate_tensors()
         self._labels = self.load_labels(label_file)
         self._input_details = self._interpreter.get_input_details()
