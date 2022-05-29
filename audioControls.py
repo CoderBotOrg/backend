@@ -39,7 +39,7 @@ class AudioCtrl:
         return cls._instance
 
     def __init__(self):
-        self.mixer = alsaaudio.Mixer('PCM')
+        self.mixer = alsaaudio.Mixer('Headphone')
 
     def getVolume(self):
         print(self.mixer.getvolume())
@@ -47,7 +47,6 @@ class AudioCtrl:
     def setVolume(self,valueVolume):
         self.mixer.setvolume(valueVolume)
 
-if __name__ == "__main__":
-    a = AudioCtrl()
-    a.setVolume(20)
-    #a.setVolume(100)
+# if __name__ == "__main__":
+#    a = AudioCtrl()
+#    a.setVolume(20)
