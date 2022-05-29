@@ -49,7 +49,8 @@ logger.addHandler(fh)
 
 # Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
 #  from the folder 'swagger-ui'. Clone the 'swagger-ui' repository inside the backend folder
-connexionApp = connexion.App(__name__, swagger_ui=True, swagger_path='swagger-ui/')
+options = {"swagger_ui": False}
+connexionApp = connexion.App(__name__, options=options)
 
 # Connexion wraps FlaskApp, so app becomes connexionApp.app
 app = connexionApp.app

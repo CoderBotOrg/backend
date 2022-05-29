@@ -217,7 +217,7 @@ paths:
           description: Components names to be tested
           schema:
             type: object
-            default: {'varargin': ['motors', 'sonar', 'speaker', 'ocr']}
+            # default: {'varargin': ['motors', 'sonar', 'speaker', 'ocr']}
             required:
               - varargin
             properties:
@@ -258,7 +258,7 @@ paths:
           description: Movement speed and duration
           schema:
             type: object
-            default: {'speed': 100, 'elapse':0, 'distance':0}
+            # default: {'speed': 100, 'elapse':0, 'distance':0}
             required:
               - speed
               - elapse
