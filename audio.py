@@ -35,7 +35,7 @@ from six.moves import queue
 # [END import_libraries]
 
 # Audio recording parameters
-RATE = 16000
+RATE = 44100
 CHUNK = int(RATE / 10)  # 100ms
 FORMAT = pyaudio.paInt16
 
