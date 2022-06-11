@@ -114,7 +114,8 @@ class ProgramEngine:
             logging.info(program_db_entries[0])
             f = open(program_db_entries[0]["filename"], 'r')
             self._program = Program.from_dict(json.load(f))
-        return self._program
+            return self._program
+        return None
 
     def delete(self, name):
         query = Query()
