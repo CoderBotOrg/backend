@@ -486,10 +486,6 @@ def run_server():
             CNNManager.get_instance()
             EventManager.get_instance("coderbot")
 
-            # Programs and Activities databases
-            activities = Activities.get_instance()
-            activities.init_default()
-
             if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
                 prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
                 prog.execute()
