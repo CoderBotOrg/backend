@@ -31,8 +31,6 @@ from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
 from audioControls import AudioCtrl
-from musicPackages import MusicPackageManager
-from activity import Activities
 
 # Logging configuration
 logger = logging.getLogger()
