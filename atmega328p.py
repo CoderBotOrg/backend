@@ -16,6 +16,8 @@ START           = 0xff
 CMD_RESET       = 0x00
 CMD_SET_DATA    = 0x01
 CMD_GET_DATA    = 0x02
+CMD_SET_MODE    = 0x03
+CMD_SET_LED     = 0x04
 
 ADDR_AI_FIRST   = 0x00
 ADDR_AI_LAST    = 0x01
@@ -35,7 +37,7 @@ class ATMega328():
         return cls._instance
 
     def __init__(self):
-        #Initialze the SPI 
+        # Initialze the SPI 
         self.spi = spidev.SpiDev()
         self.spi.open(0,0)
         self.spi.max_speed_hz = BAUDRATE_MAX
@@ -53,6 +55,23 @@ class ATMega328():
     def analogRead(self, addr):
         resp = self.spi.xfer([START, CMD_GET_DATA, addr, 0, 0], BAUDRATE)
         return resp[3]
+
+    def setLed(self, begin_led, end_led, red, green, blue):
+        resp = self.spi.xfer([START, CMD_SET_LED, 
+                              min(max(begin_led, 0), 60),
+                              min(max(end_led, 0), 60),
+                              min(max(red, 0), 254),
+                              min(max(green, 0), 254),
+                              min(max(blue, 0), 254)], BAUDRATE)
+        return resp[3]
+
+    def set_led(self, begin_led, end_led, red, green, blue):
+        begin = begin_led - 1
+        end = end_led - 1
+        red = int(red * 255 / 100)
+        green = int(green * 255 / 100)
+        blue = int(blue * 255 / 100)
+        return self.setLed(begin, end, red, green, blue)
 
     def get_input(self, addr):
         if addr >= ADDR_AI_FIRST and addr <= ADDR_AI_LAST:

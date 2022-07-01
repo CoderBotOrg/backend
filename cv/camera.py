@@ -29,7 +29,7 @@ import picamera
 
 class Camera(object):
 
-    FFMPEG_CMD = 'MP4Box'
+    FFMPEG_CMD = 'ffmpeg'
     PHOTO_FILE_EXT = ".jpg"
     VIDEO_FILE_EXT = ".mp4"
     VIDEO_FILE_EXT_H264 = '.h264'
@@ -90,7 +90,10 @@ class Camera(object):
         self.camera.stop_recording(2)
 
         # pack in mp4 container
-        params = " -fps " + str(self.camera.framerate) + " -add "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + "  " + self.video_filename + self.VIDEO_FILE_EXT
+        params = " -loglevel quiet -stats -framerate " + str(self.camera.framerate) + \
+                 " -i "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + \
+                 " -c copy " + self.video_filename + self.VIDEO_FILE_EXT
+
         os.system(self.FFMPEG_CMD + params)
         # remove h264 file
         os.remove(self.video_filename + self.VIDEO_FILE_EXT_H264)

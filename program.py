@@ -114,7 +114,8 @@ class ProgramEngine:
             logging.info(program_db_entries[0])
             f = open(program_db_entries[0]["filename"], 'r')
             self._program = Program.from_dict(json.load(f))
-        return self._program
+            return self._program
+        return None
 
     def delete(self, name):
         query = Query()
@@ -140,6 +141,12 @@ class ProgramEngine:
     def get_log(self):
         return self._log
 
+    def set_log(self, log):
+        self._log = ""
+
+    def get_current_program(self):
+        return self._program
+
 class Program:
     _running = False
 
@@ -148,21 +155,20 @@ class Program:
         return self._dom_code
 
     def __init__(self, name, code=None, dom_code=None, default=False):
-        #super(Program, self).__init__()
         self._thread = None
         self.name = name
         self._dom_code = dom_code
         self._code = code
         self._default = default
 
-    def execute(self):
+    def execute(self, options={}):
         if self._running:
             raise RuntimeError('already running')
 
+        ProgramEngine.get_instance().set_log("")
         self._running = True
-
         try:
-            self._thread = threading.Thread(target=self.run)
+            self._thread = threading.Thread(target=self.run, args=(options,))
             self._thread.start()
         except RuntimeError as re:
             logging.error("RuntimeError: %s", str(re))
@@ -187,15 +193,16 @@ class Program:
     def is_default(self):
         return self._default
 
-    def run(self):
+    def run(self, *args):
+        options = args[0]
         try:
             program = self
             try:
-                if config.Config.get().get("prog_video_rec") == "true":
-                    get_cam().video_rec(program.name)
+                if options.get("autoRecVideo") == True:
+                    get_cam().video_rec(program.name.replace(" ", "_"))
                     logging.debug("starting video")
-            except Exception:
-                logging.error("Camera not available")
+            except Exception as e:
+                logging.error("Camera not available: " + str(e))
 
             self._log = "" #clear log
             imports = "import json\n"

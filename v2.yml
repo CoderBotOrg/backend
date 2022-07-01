@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.2"
+  version: "0.3"
   title: OpenAPI 2.0 definition of Coderbot API v2
 
 consumes:
@@ -74,9 +74,35 @@ paths:
           description: "ok"
         400:
           description: "Failed to save the activity"
+  /listMusicPackages:
+    get:
+      operationId: "api.listMusicPackages"
+      summary: "List Music Packages"
+      responses:
+        200:
+          description: "ok"
+  /deleteMusicPackage:
+    post:
+      operationId: "api.deleteMusicPackage"
+      summary: "Delete Music Package"
+      parameters:
+        - name: package_data
+          in: body
+          schema:
+            type: object
+            properties:
+              package_name:
+                type: string
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "not found"
+        
   /updateFromPackage:
     post:
       operationId: "api.updateFromPackage"
+      summary: "Update CoderBot from package"
       consumes:
         - multipart/form-data
       parameters:
@@ -120,7 +146,11 @@ paths:
         - name: name
           in: query
           type: string
-          required: true
+          required: false
+        - name: default
+          in: query
+          type: string
+          required: false
       tags:
         - Activity management
       responses:
@@ -133,10 +163,6 @@ paths:
       tags:
         - Program management
       parameters:
-        - name: overwrite
-          in: query
-          required: false
-          type: string
         - in: body
           name: data
           schema:
@@ -191,7 +217,7 @@ paths:
           description: Components names to be tested
           schema:
             type: object
-            default: {'varargin': ['motors', 'sonar', 'speaker', 'ocr']}
+            # default: {'varargin': ['motors', 'sonar', 'speaker', 'ocr']}
             required:
               - varargin
             properties:
@@ -232,7 +258,7 @@ paths:
           description: Movement speed and duration
           schema:
             type: object
-            default: {'speed': 100, 'elapse':0, 'distance':0}
+            # default: {'speed': 100, 'elapse':0, 'distance':0}
             required:
               - speed
               - elapse
@@ -276,3 +302,13 @@ paths:
       responses:
         200:
           description: Sent command to the bot GPIO.
+  /listCNNModels:
+    get:
+      operationId: "api.list_cnn_models"
+      summary: "list of CNN Models"
+      tags:
+        - CNN Models
+      responses:
+        200:
+          description: "CNN Models as JSON Object"
+

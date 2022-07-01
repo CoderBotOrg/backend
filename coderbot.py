@@ -93,12 +93,11 @@ class CoderBot(object):
     def __init__(self, motor_trim_factor=1.0, encoder=True):
         try:
             self._mpu = mpu.AccelGyroMag()
-            self.GPIOS = GPIO_CODERBOT_V_5()
             logging.info("MPU available")
         except:
             logging.info("MPU not available")
-            self.GPIOS = GPIO_CODERBOT_V_4()
 
+        self.GPIOS = GPIO_CODERBOT_V_5()
         self._pin_out = [self.GPIOS.PIN_LEFT_FORWARD, self.GPIOS.PIN_RIGHT_FORWARD, self.GPIOS.PIN_LEFT_BACKWARD, self.GPIOS.PIN_RIGHT_BACKWARD, self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
         self.pi = pigpio.pi('localhost')
         self.pi.set_mode(self.GPIOS.PIN_PUSHBUTTON, pigpio.INPUT)

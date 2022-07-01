@@ -1274,3 +1274,47 @@ Blockly.Python['coderbot_atmega_set_output'] = function(block) {
   var code = 'get_atmega().set_output(' + output + ', ' + value + ')\n';
   return code;
 };
+
+Blockly.Blocks['coderbot_atmega_set_led'] = {
+  /**
+   * Block for set_output function.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.setColour(240);
+    this.appendDummyInput()
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_LED_SET)
+    this.appendValueInput('BEGIN')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_LED_BEGIN);
+    this.appendValueInput('END')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_LED_END);
+    this.appendValueInput('RED')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_LED_RED);
+    this.appendValueInput('GREEN')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_LED_GREEN);
+    this.appendValueInput('BLUE')
+        .setCheck('Number')
+        .appendField(Blockly.Msg.CODERBOT_ATMEGA_LED_BLUE);
+    this.setInputsInline(true);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+  }
+};
+
+Blockly.Python['coderbot_atmega_set_led'] = function(block) {
+  // input index: 0, 10 are Digital
+  var begin = Blockly.Python.valueToCode(block, 'BEGIN', Blockly.Python.ORDER_NONE);
+  var end = Blockly.Python.valueToCode(block, 'END', Blockly.Python.ORDER_NONE);
+  var red = Blockly.Python.valueToCode(block, 'RED', Blockly.Python.ORDER_NONE);
+  var green = Blockly.Python.valueToCode(block, 'GREEN', Blockly.Python.ORDER_NONE);
+  var blue = Blockly.Python.valueToCode(block, 'BLUE', Blockly.Python.ORDER_NONE);
+  var code = 'get_atmega().set_led(' + begin + ', ' + end + ', ' + red + ', ' + green + ', ' + blue + ')\n';
+
+  return code;
+};

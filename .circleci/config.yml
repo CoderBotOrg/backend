@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: coderbot/python-gpac:3.7
+      - image: coderbot/coderbot-ci:3.9-bullseye-ffmpeg
       
     working_directory: ~/repo
 
