@@ -54,6 +54,8 @@ class GPIO_CODERBOT_V_4():
     PIN_ENCODER_RIGHT_A = 15
     PIN_ENCODER_RIGHT_B = 12
 
+    HAS_ENCODER = False
+
 class GPIO_CODERBOT_V_5():
     # motors
     PIN_MOTOR_ENABLE = None #22
@@ -82,29 +84,36 @@ class GPIO_CODERBOT_V_5():
     PIN_ENCODER_RIGHT_A = 24 #15
     PIN_ENCODER_RIGHT_B = 25 #12
 
+    HAS_ENCODER = True
+
 # PWM
 PWM_FREQUENCY = 100 #Hz
 PWM_RANGE = 100 #0-100
+
+HW_VERSIONS = {
+  "4": GPIO_CODERBOT_V_4(),
+  "5": GPIO_CODERBOT_V_5()
+}
 
 class CoderBot(object):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, motor_trim_factor=1.0, encoder=True):
+    def __init__(self, motor_trim_factor=1.0, hw_version="5"):
         try:
             self._mpu = mpu.AccelGyroMag()
             logging.info("MPU available")
         except:
             logging.info("MPU not available")
 
-        self.GPIOS = GPIO_CODERBOT_V_5()
+        self.GPIOS = HW_VERSIONS.get(hw_version, GPIO_CODERBOT_V_5())
         self._pin_out = [self.GPIOS.PIN_LEFT_FORWARD, self.GPIOS.PIN_RIGHT_FORWARD, self.GPIOS.PIN_LEFT_BACKWARD, self.GPIOS.PIN_RIGHT_BACKWARD, self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
         self.pi = pigpio.pi('localhost')
         self.pi.set_mode(self.GPIOS.PIN_PUSHBUTTON, pigpio.INPUT)
         self._cb = dict()
         self._cb_last_tick = dict()
         self._cb_elapse = dict()
-        self._encoder = encoder
+        self._encoder = self.GPIOS.HAS_ENCODER
         self._motor_trim_factor = motor_trim_factor
         self._twin_motors_enc = WheelsAxel(
             self.pi,
