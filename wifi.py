@@ -136,6 +136,16 @@ class WiFi():
             os.system("sudo sed -i s/wpa_passphrase=.*$/wpa_passphrase=" + wpsk + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
 
     @classmethod
+    def get_ap_params(cls):
+        adapter = cls.get_adapter_type()
+        ap_conf = {}
+        with open("/etc/hostapd/" + cls.hostapds.get(adapter) + ".conf", "r") as hostapd_conf:
+            for l in hostapd_conf.readlines():
+                ls = l.split("=")
+                ap_conf[ls[0]] = ls[1]
+        return ap_conf
+
+    @classmethod
     def set_start_as_client(cls):
         cls._config["wifi_mode"] = "client"
         cls.save_config()
@@ -238,24 +248,29 @@ class WiFi():
 
 def main():
     parser = argparse.ArgumentParser(description="CoderBot wifi config manager and daemon initializer", prog="wifi.py")
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='subparser_name')
     up = subparsers.add_parser('updatecfg', help="update configuration")
     up.add_argument('-m', '--mode', choices=['ap', 'client'], help='wifi mode')
     up.add_argument('-s', '--ssid', help='wifi ssid')
     up.add_argument('-p', '--pwd', help='wifi password')
     up.add_argument('-n', '--name', help='coderbot unique id')
+    get = subparsers.add_parser('getcfg', help="get configuration")
+    get.add_argument('-s', '--ssid', nargs="*", help='wifi mode')
     args = vars(parser.parse_args())
-    print(args)
     w = WiFi()
     if args:
-        if args['mode'] == 'ap':
-            w.set_start_as_ap()
-            w.set_ap_params(args['ssid'], args['pwd'])
-        elif args['mode'] == 'client':
-            w.set_start_as_client()
-            w.set_client_params(args['ssid'], args['pwd'])
-        if args['name']:
-            w.set_bot_name(args['name'])
+      if args["subparser_name"] == "updatecfg":
+          if args['mode'] == 'ap':
+              w.set_start_as_ap()
+              w.set_ap_params(args['ssid'], args['pwd'])
+          elif args['mode'] == 'client':
+              w.set_start_as_client()
+              w.set_client_params(args['ssid'], args['pwd'])
+          if args['name']:
+              w.set_bot_name(args['name'])
+      if args["subparser_name"] == "getcfg":
+          if "ssid" in args:
+              print(w.get_ap_params()["ssid"])
     else:
         w.set_unique_ssid()
         w.start_service()
