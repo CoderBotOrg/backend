@@ -259,21 +259,21 @@ def main():
     args = vars(parser.parse_args())
     w = WiFi()
     if args:
-      if args["subparser_name"] == "updatecfg":
-          if args['mode'] == 'ap':
-              w.set_start_as_ap()
-              w.set_ap_params(args['ssid'], args['pwd'])
-          elif args['mode'] == 'client':
-              w.set_start_as_client()
-              w.set_client_params(args['ssid'], args['pwd'])
-          if args['name']:
-              w.set_bot_name(args['name'])
-      if args["subparser_name"] == "getcfg":
-          if "ssid" in args:
-              print(w.get_ap_params()["ssid"])
-    else:
-        w.set_unique_ssid()
-        w.start_service()
+        if args["subparser_name"] == "updatecfg":
+            if args['mode'] == 'ap':
+                w.set_start_as_ap()
+                w.set_ap_params(args['ssid'], args['pwd'])
+            elif args['mode'] == 'client':
+                w.set_start_as_client()
+                w.set_client_params(args['ssid'], args['pwd'])
+            if 'name' in args:
+                w.set_bot_name(args['name'])
+        elif args["subparser_name"] == "getcfg":
+            if "ssid" in args:
+                print(w.get_ap_params()["ssid"])
+        else:
+            w.set_unique_ssid()
+            w.start_service()
 
 if __name__ == "__main__":
     main()
