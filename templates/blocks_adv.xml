@@ -304,7 +304,6 @@
       <block type="coderbot_cam_average"></block>
       <block type="coderbot_adv_pathAhead"></block>
       <block type="coderbot_adv_findLine"></block>
-      <block type="coderbot_adv_findSignal"></block>
       <block type="coderbot_adv_findFace"></block>
       <block type="coderbot_adv_findColor">
         <value name="COLOR">
