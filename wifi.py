@@ -148,6 +148,7 @@ class WiFi():
     @classmethod
     def set_start_as_client(cls):
         cls._config["wifi_mode"] = "client"
+        os.system("sudo sed -i s/^disabled_network=/network=/ /etc/wpa_supplicant/wpa_supplicant.conf")
         cls.save_config()
 
     @classmethod
@@ -157,13 +158,8 @@ class WiFi():
 
     @classmethod
     def start_as_client(cls):
-        cls.stop_dnsmasq()
-        cls.stop_hostapd()
         try:
             time.sleep(1.0)
-            out = os.system("wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null 2>&1")
-            out += os.system("dhclient -1 wlan0")
-            print("start_as_client: " + str(out))
             ipaddr = cls.get_ipaddr("wlan0")
             if ipaddr is None or "169.254" in ipaddr:
                 os.system("sudo pkill wpa_supplicant")
@@ -180,6 +176,7 @@ class WiFi():
     @classmethod
     def set_start_as_ap(cls):
         cls._config["wifi_mode"] = "ap"
+        os.system("sudo sed -i s/^network=/disabled_network=/ /etc/wpa_supplicant/wpa_supplicant.conf")
         cls.save_config()
 
     @classmethod
