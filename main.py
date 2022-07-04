@@ -461,7 +461,7 @@ def remove_doreset_file():
         pass
 
 def align_wifi_config():
-    if app.bot_config["wifi_ssid"] == "coderbot_CHANGEATFIRSTRUN":
+    if app.bot_config["wifi_ssid"] == "coderbot_CHANGEMEATFIRSTRUN":
         out = os.popen("sudo ./wifi.py getcfg --ssid").read()
         if "coderbot_" in out:
             app.bot_config["wifi_ssid"] = out.split()[0]
