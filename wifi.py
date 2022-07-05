@@ -148,7 +148,9 @@ class WiFi():
     @classmethod
     def set_start_as_client(cls):
         cls._config["wifi_mode"] = "client"
-        os.system("sudo sed -i s/^disabled_network=/network=/ /etc/wpa_supplicant/wpa_supplicant.conf")
+        os.system("sudo systemctl disable hostapd")
+        os.system("sudo systemctl disable dnsmasq")
+        os.system("sudo cp /etc/dhcpcd.conf.client /etc/dhcpcd.conf")
         cls.save_config()
 
     @classmethod
@@ -162,13 +164,7 @@ class WiFi():
             time.sleep(1.0)
             ipaddr = cls.get_ipaddr("wlan0")
             if ipaddr is None or "169.254" in ipaddr:
-                os.system("sudo pkill wpa_supplicant")
                 raise Exception()
-            try:
-                cls.register_ipaddr(cls.get_macaddr("wlan0"), cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"), "roberto.previtera@gmail.com")
-                print("registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot')))
-            except:
-                pass
         except subprocess.CalledProcessError as e:
             print(e.output)
             raise
@@ -176,19 +172,10 @@ class WiFi():
     @classmethod
     def set_start_as_ap(cls):
         cls._config["wifi_mode"] = "ap"
-        os.system("sudo sed -i s/^network=/disabled_network=/ /etc/wpa_supplicant/wpa_supplicant.conf")
+        os.system("sudo systemctl enable hostapd")
+        os.system("sudo systemctl enable dnsmasq")
+        os.system("sudo cp /etc/dhcpcd.conf.ap /etc/dhcpcd.conf")
         cls.save_config()
-
-    @classmethod
-    def start_as_ap(cls):
-        time.sleep(1.0)
-        out = str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"]))
-        out += str(subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"]))
-        out += str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"]))
-        out += str(subprocess.check_output(["ifconfig"]))
-        print("start_as_ap: " + str(out))
-        cls.start_hostapd()
-        cls.start_dnsmasq()
 
     @classmethod
     def start_service(cls):
@@ -202,7 +189,8 @@ class WiFi():
                 cls.start_as_client()
             except:
                 print("Unable to register ip, revert to ap mode")
-                cls.start_as_ap()
+                cls.set_start_as_ap()
+                os.system("sudo reboot")
 
     @classmethod
     def get_hostapd_config_file(cls):
