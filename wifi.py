@@ -241,6 +241,7 @@ def main():
     up.add_argument('-n', '--name', help='coderbot unique id')
     get = subparsers.add_parser('getcfg', help="get configuration")
     get.add_argument('-s', '--ssid', nargs="*", help='wifi mode')
+    get = subparsers.add_parser('setuniquessid', help="set unique ssid")
     args = vars(parser.parse_args())
     w = WiFi()
     if args:
@@ -256,8 +257,9 @@ def main():
         elif args["subparser_name"] == "getcfg":
             if "ssid" in args:
                 print(w.get_ap_params()["ssid"])
-        else:
+        elif args["subparser_name"] == "setuniquessid":
             w.set_unique_ssid()
+        else:
             w.start_service()
 
 if __name__ == "__main__":
