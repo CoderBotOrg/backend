@@ -572,27 +572,6 @@ Blockly.Python['coderbot_adv_findLine'] = function(block) {
   return [code, Blockly.Python.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['coderbot_adv_findSignal'] = {
-  /**
-   * Block for findSignal function.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(250);
-    this.appendDummyInput()
-        .appendField(Blockly.Msg.CODERBOT_SENSOR_FINDSIGNAL);
-    this.setOutput(true, 'Number');
-    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
-  }
-};
-
-Blockly.Python['coderbot_adv_findSignal'] = function(block) {
-  // Boolean values true and false.
-  var code = 'get_cam().find_signal()';
-  return [code, Blockly.Python.ORDER_ATOMIC];
-};
-
 Blockly.Blocks['coderbot_adv_findFace'] = {
   /**
    * Block for findSignal function.

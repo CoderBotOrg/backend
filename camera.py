@@ -49,7 +49,6 @@ class Camera(object):
     # pylint: disable=too-many-public-methods
 
     _instance = None
-    _img_template = image.Image.load("static/media/coderdojo-logo.png")
 
     @classmethod
     def get_instance(cls):
@@ -251,18 +250,6 @@ class Camera(object):
                 img.draw_rect(blb.left, y_offset[idx] + blb.top, blb.right, y_offset[idx] + blb.bottom, (0, 255, 0), 5)
         self.set_image_cv(img)
         return coords
-
-    def find_signal(self):
-        angle = None
-        ts = time.time()
-        img = self.get_image()
-        signals = img.find_template(self._img_template)
-
-        logging.info("signal: %s", str(time.time() - ts))
-        if signals:
-            angle = signals[0].angle
-
-        return angle
 
     def find_face(self):
         face_x = face_y = face_size = None

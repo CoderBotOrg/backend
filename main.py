@@ -460,6 +460,14 @@ def remove_doreset_file():
     except OSError:
         pass
 
+def align_wifi_config():
+    if app.bot_config["wifi_ssid"] == "coderbot_CHANGEMEATFIRSTRUN":
+        out = os.popen("sudo ./wifi.py getcfg --ssid").read()
+        if "coderbot_" in out:
+            app.bot_config["wifi_ssid"] = out.split()[0]
+            Config.write(app.bot_config)
+            app.bot_config = Config.get()
+
 # Finally, get the server running
 def run_server():
     bot = None
@@ -467,8 +475,9 @@ def run_server():
     try:
         try:
             app.bot_config = Config.read()
+            align_wifi_config()
             bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
-                                        encoder=bool(app.bot_config.get('encoder')))
+                                        hw_version=app.bot_config.get('hardware_version'))
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
 

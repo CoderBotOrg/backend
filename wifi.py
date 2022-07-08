@@ -136,8 +136,21 @@ class WiFi():
             os.system("sudo sed -i s/wpa_passphrase=.*$/wpa_passphrase=" + wpsk + "/ /etc/hostapd/" + cls.hostapds.get(adapter) + ".conf")
 
     @classmethod
+    def get_ap_params(cls):
+        adapter = cls.get_adapter_type()
+        ap_conf = {}
+        with open("/etc/hostapd/" + cls.hostapds.get(adapter) + ".conf", "r") as hostapd_conf:
+            for l in hostapd_conf.readlines():
+                ls = l.split("=")
+                ap_conf[ls[0]] = ls[1]
+        return ap_conf
+
+    @classmethod
     def set_start_as_client(cls):
         cls._config["wifi_mode"] = "client"
+        os.system("sudo systemctl disable hostapd")
+        os.system("sudo systemctl disable dnsmasq")
+        os.system("sudo cp /etc/dhcpcd.conf.client /etc/dhcpcd.conf")
         cls.save_config()
 
     @classmethod
@@ -147,22 +160,11 @@ class WiFi():
 
     @classmethod
     def start_as_client(cls):
-        cls.stop_dnsmasq()
-        cls.stop_hostapd()
         try:
-            time.sleep(1.0)
-            out = os.system("wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf > /dev/null 2>&1")
-            out += os.system("dhclient -1 wlan0")
-            print("start_as_client: " + str(out))
+            time.sleep(30.0)
             ipaddr = cls.get_ipaddr("wlan0")
             if ipaddr is None or "169.254" in ipaddr:
-                os.system("sudo pkill wpa_supplicant")
                 raise Exception()
-            try:
-                cls.register_ipaddr(cls.get_macaddr("wlan0"), cls.get_config().get('bot_name', 'CoderBot'), cls.get_ipaddr("wlan0"), "roberto.previtera@gmail.com")
-                print("registered bot, ip: " + str(cls.get_ipaddr("wlan0") + " name: " + cls.get_config().get('bot_name', 'CoderBot')))
-            except:
-                pass
         except subprocess.CalledProcessError as e:
             print(e.output)
             raise
@@ -170,18 +172,10 @@ class WiFi():
     @classmethod
     def set_start_as_ap(cls):
         cls._config["wifi_mode"] = "ap"
+        os.system("sudo systemctl enable hostapd")
+        os.system("sudo systemctl enable dnsmasq")
+        os.system("sudo cp /etc/dhcpcd.conf.ap /etc/dhcpcd.conf")
         cls.save_config()
-
-    @classmethod
-    def start_as_ap(cls):
-        time.sleep(1.0)
-        out = str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "down"]))
-        out += str(subprocess.check_output(["ip", "a", "add", "10.0.0.1/24", "dev", "wlan0"]))
-        out += str(subprocess.check_output(["ip", "link", "set", "dev", "wlan0", "up"]))
-        out += str(subprocess.check_output(["ifconfig"]))
-        print("start_as_ap: " + str(out))
-        cls.start_hostapd()
-        cls.start_dnsmasq()
 
     @classmethod
     def start_service(cls):
@@ -195,7 +189,8 @@ class WiFi():
                 cls.start_as_client()
             except:
                 print("Unable to register ip, revert to ap mode")
-                cls.start_as_ap()
+                cls.set_start_as_ap()
+                os.system("sudo reboot")
 
     @classmethod
     def get_hostapd_config_file(cls):
@@ -238,27 +233,34 @@ class WiFi():
 
 def main():
     parser = argparse.ArgumentParser(description="CoderBot wifi config manager and daemon initializer", prog="wifi.py")
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='subparser_name')
     up = subparsers.add_parser('updatecfg', help="update configuration")
     up.add_argument('-m', '--mode', choices=['ap', 'client'], help='wifi mode')
     up.add_argument('-s', '--ssid', help='wifi ssid')
     up.add_argument('-p', '--pwd', help='wifi password')
     up.add_argument('-n', '--name', help='coderbot unique id')
+    get = subparsers.add_parser('getcfg', help="get configuration")
+    get.add_argument('-s', '--ssid', nargs="*", help='wifi mode')
+    get = subparsers.add_parser('setuniquessid', help="set unique ssid")
     args = vars(parser.parse_args())
-    print(args)
     w = WiFi()
     if args:
-        if args['mode'] == 'ap':
-            w.set_start_as_ap()
-            w.set_ap_params(args['ssid'], args['pwd'])
-        elif args['mode'] == 'client':
-            w.set_start_as_client()
-            w.set_client_params(args['ssid'], args['pwd'])
-        if args['name']:
-            w.set_bot_name(args['name'])
-    else:
-        w.set_unique_ssid()
-        w.start_service()
+        if args["subparser_name"] == "updatecfg":
+            if args['mode'] == 'ap':
+                w.set_start_as_ap()
+                w.set_ap_params(args['ssid'], args['pwd'])
+            elif args['mode'] == 'client':
+                w.set_start_as_client()
+                w.set_client_params(args['ssid'], args['pwd'])
+            if 'name' in args:
+                w.set_bot_name(args['name'])
+        elif args["subparser_name"] == "getcfg":
+            if "ssid" in args:
+                print(w.get_ap_params()["ssid"])
+        elif args["subparser_name"] == "setuniquessid":
+            w.set_unique_ssid()
+        else:
+            w.start_service()
 
 if __name__ == "__main__":
     main()

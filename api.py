@@ -23,7 +23,7 @@ BUTTON_PIN = 16
 bot_config = Config.get()
 bot = CoderBot.get_instance(
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
-    encoder=bool(bot_config.get("encoder"))
+    hw_version=bot_config.get("hw_version")
 )
 
 def get_serial():
