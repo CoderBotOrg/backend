@@ -161,7 +161,7 @@ class WiFi():
     @classmethod
     def start_as_client(cls):
         try:
-            time.sleep(5.0)
+            time.sleep(30.0)
             ipaddr = cls.get_ipaddr("wlan0")
             if ipaddr is None or "169.254" in ipaddr:
                 raise Exception()
