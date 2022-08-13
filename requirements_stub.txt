@@ -27,7 +27,7 @@ opencv-contrib-python==4.5.3.56
 pigpio==1.78
 Pillow==9.1.1
 protobuf==4.21.1
-Pypubsub==4.0.3
+event-channel==0.4.3
 pytz==2022.1
 pyyaml==6.0
 pyzbar==0.1.9

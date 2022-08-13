@@ -1,5 +1,5 @@
 import threading
-from pubsub import pub
+from event_channel.threaded_event_channel import ThreadedEventChannel
 
 class EventManager(object):
     _instance = None
@@ -10,14 +10,18 @@ class EventManager(object):
         return cls._instance
 
     def __init__(self, node_name):
+        self._channel = ThreadedEventChannel(blocking=False)
+        self._publisher_threads = None 
+        self._subscribers = [] 
         self._node_name = node_name
         self._event_generators = []
 
     def publish(self, topic, msg):
-        pub.sendMessage(topic, message=msg)
+        self._publisher_threads = self._channel.publish(topic, msg)
 
     def register_event_listener(self, topic, callback):
-        pub.subscribe(callback, topic)
+        self._channel.subscribe(topic, callback)
+        self._subscribers.append((topic, callback))
 
     def register_event_generator(self, generator_func):
         generator = threading.Thread(target=generator_func)
@@ -25,10 +29,14 @@ class EventManager(object):
         generator.start()
 
     def unregister_listeners(self):
-        pub.unsubAll()
-
+        for l in self._subscribers:
+            self._channel.unsubscribe(l[0], l[1]) 
+        self._subscribers = []
+	
     def unregister_publishers(self):
-        pass
+        if self._publisher_threads:
+            for t in self._publisher_threads:
+                t.join()
 
     def start_event_generators(self):
         for g in self._event_generators:
@@ -37,3 +45,4 @@ class EventManager(object):
     def wait_event_generators(self):
         for g in self._event_generators:
             g.join()
+        self._event_generators = []

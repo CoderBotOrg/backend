@@ -221,8 +221,8 @@ class Program:
                 get_event().wait_event_generators()
                 get_event().unregister_listeners()
                 get_event().unregister_publishers()
-            except Exception:
-                logging.error("error polishing event system")
+            except Exception as e:
+                logging.error("error polishing event system: %s", str(e))
             try:
                 get_bot().stop()
                 get_cam().video_stop() #if video is running, stop it
