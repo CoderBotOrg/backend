@@ -1,6 +1,0 @@
-  <xml id="toolbox" style="display: none">
-      <block type="coderbot_moveForward"></block>
-      <block type="coderbot_moveBackward"></block>
-      <block type="coderbot_turnLeft"></block>
-      <block type="coderbot_turnRight"></block>
-  </xml>
