@@ -17,7 +17,7 @@ class Activities():
         self.query = Query()
 
     def load(self, name, default):
-        if name:
+        if name and default is None:
             return self.activities.search(self.query.name == name)[0]
         elif default is not None:
             default_Activities = self.activities.search(self.query.default == True)
@@ -26,16 +26,16 @@ class Activities():
             else:
                 return None
 
-    def save(self, activity):
-        if self.activities.search(self.query.name == activity["name"]) == []:
+    def save(self, name, activity):
+        if self.activities.search(self.query.name == name) == []:
             self.activities.insert(activity)
         else:
             if activity.get("default", False) == True:
                 self.activities.update({'default': False})
             self.activities.update(activity, self.query.name == activity["name"])
 
-    def delete(self, activity):
-        activity = self.activities.search(self.query.name == activity["name"])[0]
+    def delete(self, name):
+        activity = self.activities.search(self.query.name == name)[0]
         if activity.get("default", False) == True:
             self.activities.update({'default': True}, self.query.stock == True)
         self.activities.remove(self.query.name == activity["name"])

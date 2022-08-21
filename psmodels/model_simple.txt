@@ -1,8 +1,0 @@
-coderbot
-move straight
-move back
-move left
-move right
-stop
-take a picture
-say hi

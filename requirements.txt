@@ -1,5 +1,4 @@
 # If you need to run the backend only in STUB mode, you don't need these packages, just the set in `requirements_stub.txt`
 
 picamera==1.13
-PyAudio==0.2.11
 pycairo==1.17.0
