@@ -3,24 +3,15 @@ This module provides the http web server exposing the
 CoderBot REST API and static resources
 """
 import os
-import json
 import logging
 import logging.handlers
 import subprocess
 import picamera
 import connexion
 
-from flask import (render_template,
-                   request,
-                   send_file,
-                   Response,
-                   jsonify,
-                   send_from_directory,
-                   redirect)
+from flask import (send_from_directory, redirect)
 
-from flask_babel import Babel
 from flask_cors import CORS
-from werkzeug.datastructures import Headers
 
 from coderbot import CoderBot
 from camera import Camera
@@ -54,15 +45,13 @@ connexionApp = connexion.App(__name__, options=options)
 app = connexionApp.app
 # Access-Control-Allow-Origin
 CORS(app)
-babel = Babel(app)
 app.debug = False
 app.prog_engine = ProgramEngine.get_instance()
-app.shutdown_requested = False
 
 ## New API and web application
 
-# API v2 is defined in v2.yml and its methods are in api.py
-connexionApp.add_api('v2.yml')
+# API v1 is defined in v1.yml and its methods are in api.py
+connexionApp.add_api('v1.yml')
 
 @app.route('/vue/<path:filename>')
 def serve_vue_app(filename):
@@ -91,360 +80,6 @@ def serve_docs_app(subpath):
 def redirect_vue_app():
     return redirect('/vue/index.html', code=302)
 
-## Legacy API and web application
-
-@app.route("/old")
-def serve_legacy():
-    """
-    Serve the the legacy web application
-    """
-    return render_template('main.html',
-                           host=request.host[:request.host.find(':')],
-                           locale=get_locale(),
-                           config=app.bot_config,
-                           program_level=app.bot_config.get("prog_level", "std"),
-                           cam=Camera.get_instance() != None,
-                           cnn_model_names=json.dumps([[name, name] for name in CNNManager.get_instance().get_models().keys()]))
-
-@babel.localeselector
-def get_locale():
-    # otherwise try to guess the language from the user accept
-    # header the browser transmits.
-    loc = request.accept_languages.best_match(['it', 'en', 'fr', 'es'])
-    if loc is None:
-        loc = 'en'
-    return loc
-
-# Workaround: serve the 'static' subfolders with 'send_from_directory'
-# (connexion wrapper ignores `static_url_path`)
-
-@app.route('/css/<path:filename>')
-def render_static_assets0(filename):
-    return send_from_directory('static/css', filename)
-
-@app.route('/fonts/<path:filename>')
-def render_static_assets1(filename):
-    return send_from_directory('static/fonts', filename)
-
-@app.route('/images/<path:filename>')
-def render_static_assets2(filename):
-    return send_from_directory('static/images', filename)
-
-@app.route('/js/<path:filename>')
-def render_static_assets3(filename):
-    return send_from_directory('static/js', filename)
-
-@app.route('/media/<path:filename>')
-def render_static_assets4(filename):
-    return send_from_directory('static/media', filename)
-
-def updateDict(oldDict, updatedValues):
-    """
-    Update the keys of oldDict appearing in updatedValues with the values in
-    updatedValues
-    """
-    result = oldDict
-    for key, value in updatedValues.items():
-        result[key] = value
-    return result
-
-@app.route("/config", methods=["POST"])
-def handle_config():
-    """
-    Overwrite configuration file on disk and reload it
-    """
-    audioCtrl = AudioCtrl.get_instance()
-    audioCtrl.setVolume(int(request.form['audio_volume_level']))
-    Config.write(updateDict(app.bot_config, request.form))
-    app.bot_config = Config.get()
-    return "ok"
-
-@app.route("/config", methods=["GET"])
-def returnConfig():
-    """
-    Expose configuration as JSON
-    """
-    app.bot_config = Config.get()
-    return jsonify(app.bot_config)
-
-@app.route("/wifi", methods=["POST"])
-def handle_wifi():
-    """
-    Passes the received Wi-Fi configuration to the wifi.py script, applying it.
-    Then reboots
-    """
-    mode = request.form.get("wifi_mode")
-    ssid = request.form.get("wifi_ssid")
-    psk = request.form.get("wifi_psk")
-
-    logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
-    client_params = " --ssid \"" + ssid + "\" --pwd \"" + psk + "\"" if ssid != "" and psk != "" else ""
-    logging.info(client_params)
-    os.system("sudo ./wifi.py updatecfg --mode " + mode + client_params)
-    os.system("sudo reboot")
-    if mode == "ap":
-        return "http://coder.bot"
-    return "http://coderbot.local"
-
-@app.route("/bot", methods=["GET"])
-def handle_bot():
-    """
-    Execute a bot command
-    """
-    bot = CoderBot.get_instance()
-    try:
-        cam = Camera.get_instance()
-        motion = Motion.get_instance()
-    except:
-        cam = None
-        motion = None
-
-    audio = Audio.get_instance()
-
-    cmd = request.args.get('cmd')
-    param1 = request.args.get('param1')
-    param2 = request.args.get('param2')
-    print('/bot', json.dumps(request.args))
-    if cmd == "move":
-        bot.move(speed=int(param1), elapse=float(param2))
-    elif cmd == "turn":
-        bot.turn(speed=int(param1), elapse=float(param2))
-    elif cmd == "move_motion":
-        motion.move(dist=float(param2))
-    elif cmd == "turn_motion":
-        motion.turn(angle=float(param2))
-    elif cmd == "stop":
-        bot.stop()
-        try:
-            motion.stop()
-        except Exception:
-            logging.warning("Camera not present")
-
-    elif cmd == "take_photo":
-        try:
-            cam.photo_take()
-            audio.say(app.bot_config.get("sound_shutter"))
-        except Exception:
-            logging.warning("Camera not present")
-
-    elif cmd == "video_rec":
-        try:
-            cam.video_rec()
-            audio.say(app.bot_config.get("sound_shutter"))
-        except Exception:
-            logging.warning("Camera not present")
-
-    elif cmd == "video_stop":
-        try:
-            cam.video_stop()
-            audio.say(app.bot_config.get("sound_shutter"))
-        except Exception:
-            logging.warning("Camera not present")
-
-    elif cmd == "say":
-        logging.info("say: " + str(param1) + " in: " + str(get_locale()))
-        audio.say(param1, get_locale())
-
-    elif cmd == "halt":
-        logging.info("shutting down")
-        audio.say(app.bot_config.get("sound_stop"))
-        bot.halt()
-
-    elif cmd == "restart":
-        logging.info("restarting bot")
-        bot.restart()
-    elif cmd == "reboot":
-        logging.info("rebooting")
-        bot.reboot()
-    return "ok"
-
-@app.route("/bot/status", methods=["GET"])
-def handle_bot_status():
-    return json.dumps({'status': 'ok'})
-
-def video_stream(a_cam):
-    while not app.shutdown_requested:
-        frame = a_cam.get_image_jpeg()
-        yield ("--BOUNDARYSTRING\r\n" +
-               "Content-type: image/jpeg\r\n" +
-               "Content-Length: " + str(len(frame)) + "\r\n\r\n")
-        yield frame
-        yield "\r\n"
-
-# Render cam stream
-@app.route("/video/stream")
-def handle_video_stream():
-    try:
-        cam = Camera.get_instance()
-        h = Headers()
-        h.add('Age', 0)
-        h.add('Cache-Control', 'no-cache, private')
-        h.add('Pragma', 'no-cache')
-        return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
-    except Exception:
-        pass
-
-@app.route("/photos", methods=["GET"])
-def handle_photos():
-    """
-    Expose the list of taken photos
-    """
-    cam = Camera.get_instance()
-    logging.info("photos")
-    return json.dumps(cam.get_photo_list())
-
-@app.route("/photos/<filename>", methods=["GET"])
-def handle_photo_get(filename):
-    cam = Camera.get_instance()
-    logging.info("media filename: %s", filename)
-    mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
-    try:
-        media_file = cam.get_photo_file(filename)
-        return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
-    except picamera.exc.PiCameraError as e:
-        logging.error("Error: %s", str(e))
-
-@app.route("/photos/<filename>", methods=["PUT"])
-def handle_photo_put(filename):
-    cam = Camera.get_instance()
-    logging.info("photo update")
-    data = request.get_data(as_text=True)
-    data = json.loads(data)
-    cam.update_photo({"name": filename, "tag": data["tag"]})
-    return jsonify({"res":"ok"})
-
-@app.route("/photos/<filename>", methods=["DELETE"])
-def handle_photo_cmd(filename):
-    cam = Camera.get_instance()
-    logging.debug("photo delete")
-    cam.delete_photo(filename)
-    return "ok"
-
-@app.route("/program/list", methods=["GET"])
-def handle_program_list():
-    """
-    Expose the list of saved programs
-    """
-    logging.debug("program_list")
-    return json.dumps(app.prog_engine.prog_list())
-
-@app.route("/program/load", methods=["GET"])
-def handle_program_load():
-    """
-    Expose a saved program as JSON
-    """
-    logging.debug("program_load")
-    name = request.args.get('name')
-    prog = app.prog_engine.load(name)
-    return jsonify(prog.as_dict())
-
-@app.route("/program/save", methods=["POST"])
-def handle_program_save():
-    """
-    Save the given program
-    """
-    logging.debug("program_save")
-    name = request.form.get('name')
-    dom_code = request.form.get('dom_code')
-    code = request.form.get('code')
-    prog = Program(name, dom_code=dom_code, code=code)
-    app.prog_engine.save(prog)
-    return "ok"
-
-@app.route("/program/delete", methods=["POST"])
-def handle_program_delete():
-    """
-    Delete the given saved program
-    """
-    logging.debug("program_delete")
-    name = request.form.get('name')
-    app.prog_engine.delete(name)
-    return jsonify({"status":"ok"})
-
-@app.route("/program/exec", methods=["POST"])
-def handle_program_exec():
-    """
-    Execute the given program
-    """
-    logging.debug("program_exec")
-    name = request.form.get('name')
-    code = request.form.get('code')
-    prog = app.prog_engine.create(name, code)
-    return json.dumps(prog.execute())
-
-@app.route("/program/end", methods=["POST"])
-def handle_program_end():
-    """
-    Stop the program execution
-    """
-    logging.debug("program_end")
-    prog = app.prog_engine.get_current_program()
-    if prog:
-        prog.end()
-    return "ok"
-
-@app.route("/program/status", methods=["GET"])
-def handle_program_status():
-    """
-    Expose the program status
-    """
-    logging.debug("program_status")
-    prog = app.prog_engine.get_current_program()
-    if prog is None:
-        prog = Program("")
-    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
-
-@app.route("/cnnmodels", methods=["GET"])
-def handle_cnn_models_list():
-    cnn = CNNManager.get_instance()
-    logging.info("cnn_models_list")
-    return json.dumps(cnn.get_models())
-
-@app.route("/cnnmodels", methods=["POST"])
-def handle_cnn_models_new():
-    cam = Camera.get_instance()
-    cnn = CNNManager.get_instance()
-    logging.info("cnn_models_new")
-    data = json.loads(request.get_data(as_text=True))
-    cnn.train_new_model(model_name=data["model_name"],
-                        architecture=data["architecture"],
-                        image_tags=data["image_tags"],
-                        photos_meta=cam.get_photo_list(),
-                        training_steps=data["training_steps"],
-                        learning_rate=data["learning_rate"])
-
-    return json.dumps({"name": data["model_name"], "status": 0})
-
-@app.route("/cnnmodels/<model_name>", methods=["GET"])
-def handle_cnn_models_status(model_name):
-    cnn = CNNManager.get_instance()
-    logging.info("cnn_models_status")
-    model_status = cnn.get_models().get(model_name)
-
-    return json.dumps(model_status)
-
-@app.route("/cnnmodels/<model_name>", methods=["DELETE"])
-def handle_cnn_models_delete(model_name):
-    cnn = CNNManager.get_instance()
-    logging.info("cnn_models_delete")
-    model_status = cnn.delete_model(model_name=model_name)
-
-    return json.dumps(model_status)
-
-# Spawn a sub-process and execute things there
-def execute(command):
-    """
-    Spawn a sub-process and execute the program there, then poll it until
-    it has finished
-    """
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-    while True:
-        nextline = process.stdout.readline()
-        if nextline == '' and process.poll() != None:
-            break
-        logging.info(nextline)
-        yield nextline
 
 def button_pushed():
     if app.bot_config.get('button_func') == "startstop":
@@ -513,7 +148,6 @@ def run_server():
             cam.exit()
         if bot:
             bot.exit()
-        app.shutdown_requested = True
 
 if __name__ == "__main__":
-    main.run_server()
+    run_server()

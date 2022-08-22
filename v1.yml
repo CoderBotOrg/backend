@@ -4,10 +4,34 @@ info:
   title: OpenAPI 3.0 definition of Coderbot API v3
 
 servers:
+<<<<<<< HEAD
   - url: http://coderbot.local/v2
   
 # Paths supported by the server application
 paths:
+=======
+  - url: http://coderbot.local/v1
+  
+# Paths supported by the server application
+paths:
+  /settings:
+    get:
+      operationId: "api.loadSettings"
+      summary: "Load settings"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - CoderBot configuration
+    put:
+      operationId: "api.saveSettings"
+      summary: "Load settings"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - CoderBot configuration
+>>>>>>> origin/remove_old_ui
   /settings/restore:
     post:
       operationId: "api.restoreSettings"
@@ -17,15 +41,30 @@ paths:
           description: "ok"
       tags:
         - CoderBot configuration
+<<<<<<< HEAD
   /settings:
     get:
       operationId: "api.settingsLoad"
       summary: "Load settings"
+=======
+  /settings/wifi:
+    put:
+      operationId: "api.saveWifiSettings"
+      summary: "Save Wifi settings"
+      requestBody:
+        description: Save Wifi Settings
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WifiSettings'
+>>>>>>> origin/remove_old_ui
       responses:
         200:
           description: "ok"
       tags:
         - CoderBot configuration
+<<<<<<< HEAD
     put:
       operationId: "api.settingsSave"
       summary: "Load settings"
@@ -34,6 +73,108 @@ paths:
           description: "ok"
       tags:
         - CoderBot configuration
+=======
+  /photos:
+    get:
+      operationId: "api.listPhotos"
+      summary: "Get the list of all photos"
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
+    post:
+      operationId: "api.takePhoto"
+      summary: "take a new photo"
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
+  /photos/{name}:
+    get:
+      operationId: "api.getPhoto"
+      summary: "Get photo by name"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
+    put:
+      operationId: "api.savePhoto"
+      summary: "Save photo by name"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Save Photo metadata
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Photo'
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
+    delete:
+      operationId: "api.deletePhoto"
+      summary: "Delete photo by name"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
+  /video/stream:
+    get:
+      operationId: "api.streamVideo"
+      summary: "Stream video"
+      tags:
+        - Video management
+      responses:
+        200:
+          description: Video stream as images in JPEG format
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+  /video/rec:
+    get:
+      operationId: "api.recVideo"
+      summary: "Rec video"
+      tags:
+        - Video management
+      responses:
+        200:
+          description: "ok"
+  /video/stop:
+    get:
+      operationId: "api.stopVideo"
+      summary: "Stop rec video"
+      tags:
+        - Video management
+      responses:
+        200:
+          description: "ok"
+  
+>>>>>>> origin/remove_old_ui
   /programs:
     get:
       operationId: "api.listPrograms"
@@ -44,7 +185,11 @@ paths:
         200:
           description: "ok"
     post:
+<<<<<<< HEAD
       operationId: "api.saveNewProgram"
+=======
+      operationId: "api.saveAsNewProgram"
+>>>>>>> origin/remove_old_ui
       summary: "Save a new program"
       tags:
         - Program management
@@ -113,9 +258,15 @@ paths:
         400:
           description: "Failed to save the program"
 
+<<<<<<< HEAD
   /programs/{name}/exec:
     post:
       operationId: "api.exec"
+=======
+  /programs/{name}/run:
+    post:
+      operationId: "api.runProgram"
+>>>>>>> origin/remove_old_ui
       summary: "Execute the given program"
       tags:
         - Program management
@@ -146,7 +297,11 @@ paths:
         200:
           description: "ok"
     post:
+<<<<<<< HEAD
       operationId: "api.saveNewActivity"
+=======
+      operationId: "api.saveAsNewActivity"
+>>>>>>> origin/remove_old_ui
       summary: "Save a new activity"
       tags:
         - Activity management
@@ -225,6 +380,11 @@ paths:
       responses:
         200:
           description: "ok"
+<<<<<<< HEAD
+=======
+      tags:
+        - Music extensions
+>>>>>>> origin/remove_old_ui
   /music/packages/{name}:
     delete:
       operationId: "api.deleteMusicPackage"
@@ -235,13 +395,22 @@ paths:
           required: true
           schema:
             type: string
+<<<<<<< HEAD
+=======
+      tags:
+        - Music extensions
+>>>>>>> origin/remove_old_ui
       responses:
         200:
           description: "ok"
         400:
           description: "not found"
         
+<<<<<<< HEAD
   /coderbot/update:
+=======
+  /system/update:
+>>>>>>> origin/remove_old_ui
     post:
       operationId: "api.updateFromPackage"
       summary: "Update CoderBot from package"
@@ -252,35 +421,64 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               type: object
+<<<<<<< HEAD
+=======
+      tags:
+        - System operations
+>>>>>>> origin/remove_old_ui
       responses:
         200:
           description: "ok"
         400:
           description: "upload failed"
+<<<<<<< HEAD
   /coderbot/status:
+=======
+  /system/status:
+>>>>>>> origin/remove_old_ui
     get:
       operationId: "api.status"
       summary: "Bot general informations, execution status and reset log file"
       tags:
+<<<<<<< HEAD
         - CoderBot status informations
       responses:
         200:
           description: "Bot status"
   /coderbot/reset:
+=======
+        - System operations
+      responses:
+        200:
+          description: "Bot status"
+  /system/reset:
+>>>>>>> origin/remove_old_ui
     post:
       operationId: "api.reset"
       summary: "Reset coderbot by restoring boot partition"
       tags:
+<<<<<<< HEAD
         - CoderBot reset
       responses:
         200:
           description: "resets coderbot entirely"
   /coderbot/test:
+=======
+        - System operations
+      responses:
+        200:
+          description: "resets coderbot entirely"
+  /system/test:
+>>>>>>> origin/remove_old_ui
     post:
       summary: Tests CoderBot components.
       operationId: "api.testCoderbot"
       tags:
+<<<<<<< HEAD
         - CoderBot test
+=======
+        - System operations
+>>>>>>> origin/remove_old_ui
       requestBody:
         description: Update Activity
         required: true
@@ -291,16 +489,29 @@ paths:
       responses:
         200:
           description: Test ended.
+<<<<<<< HEAD
   /coderbot/info:
+=======
+  /system/info:
+>>>>>>> origin/remove_old_ui
     get:
       operationId: "api.info"
       summary: "Bot general informations and execution status"
       tags:
+<<<<<<< HEAD
         - CoderBot system informations
       responses:
         200:
           description: "Bot status"
   /coderbot/stop:
+=======
+        - System operations
+      responses:
+        200:
+          description: "Bot status"
+
+  /control/stop:
+>>>>>>> origin/remove_old_ui
     post:
       operationId: "api.stop"
       summary: Stops the bot motors
@@ -309,7 +520,11 @@ paths:
       responses:
         200:
           description: "Successfully stopped the motors"
+<<<<<<< HEAD
   /coderbot/move:
+=======
+  /control/move:
+>>>>>>> origin/remove_old_ui
     post:
       summary: Moves the bot forward or backward.
       operationId: "api.move"
@@ -335,7 +550,11 @@ paths:
       responses:
         200:
           description: Sent command to the bot GPIO.
+<<<<<<< HEAD
   /coderbot/turn:
+=======
+  /control/turn:
+>>>>>>> origin/remove_old_ui
     post:
       summary: Make a turn with the motors
       operationId: "api.turn"
@@ -358,18 +577,127 @@ paths:
       responses:
         200:
           description: Sent command to the bot GPIO.
+<<<<<<< HEAD
   /cnnmodels:
     get:
       operationId: "api.list_cnn_models"
+=======
+  /control/speak:
+    post:
+      operationId: "api.speak"
+      summary: Pronounce a phrase
+      tags:
+        - Direct control
+      responses:
+        200:
+          description: "phrase received"
+  /system/halt:
+    post:
+      operationId: "api.halt"
+      summary: Pronounce a phrase
+      tags:
+        - System operations
+      responses:
+        200:
+          description: "phrase received"
+  /system/restart:
+    post:
+      operationId: "api.restart"
+      summary: Pronounce a phrase
+      tags:
+        - System operations
+      responses:
+        200:
+          description: "phrase received"
+  /system/reboot:
+    post:
+      operationId: "api.reboot"
+      summary: Pronounce a phrase
+      tags:
+        - System operations
+      responses:
+        200:
+          description: "phrase received"
+
+  /cnnmodels:
+    get:
+      operationId: "api.listCNNModels"
+>>>>>>> origin/remove_old_ui
       summary: "list of CNN Models"
       tags:
         - CNN Models
       responses:
         200:
           description: "CNN Models as JSON Object"
+<<<<<<< HEAD
 
 components:
   schemas:
+=======
+    post:
+      operationId: "api.trainCNNModel"
+      summary: "train new CNN Model"
+      requestBody:
+        description: CNN Model parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      tags:
+        - CNN Models
+      responses:
+        200:
+          description: "CNN Models as JSON Object"
+  /cnnmodels/{name}:
+    get:
+      operationId: "api.getCNNModel"
+      summary: "get CNN Model"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - CNN Models
+      responses:
+        200:
+          description: "CNN Model as JSON Object"
+    delete:
+      operationId: "api.deleteCNNModel"
+      summary: "delete CNN Model"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - CNN Models
+      responses:
+        200:
+          description: "CNN Model deleted"
+
+components:
+  schemas:
+    WifiSettings:
+      type: object
+      properties:
+        wifi_mode:
+          type: string
+        wifi_ssid:
+          type: string
+        wifi_psk:
+          type: string
+    Photo:
+      type: object
+      properties:
+        name:
+          type: string
+        tag:
+          type: string
+>>>>>>> origin/remove_old_ui
     Program:
       type: object
       properties:
