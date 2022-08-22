@@ -59,6 +59,14 @@ paths:
       responses:
         200:
           description: "ok"
+    post:
+      operationId: "api.takePhoto"
+      summary: "take a new photo"
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
   /photos/{name}:
     get:
       operationId: "api.getPhoto"

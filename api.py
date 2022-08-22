@@ -199,12 +199,10 @@ def listPhotos():
     Expose the list of taken photos
     """
     cam = Camera.get_instance()
-    logging.info("photos")
     return json.dumps(cam.get_photo_list())
 
 def getPhoto(filename):
     cam = Camera.get_instance()
-    logging.info("media filename: %s", filename)
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
         media_file = cam.get_photo_file(filename)
@@ -212,9 +210,15 @@ def getPhoto(filename):
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
 
+def takePhoto():
+    cam = Camera.get_instance()
+    try:
+        cam.photo_take()
+    except picamera.exc.PiCameraError as e:
+        logging.error("Error: %s", str(e))
+
 def savePhoto(filename):
     cam = Camera.get_instance()
-    logging.info("photo update")
     data = request.get_data(as_text=True)
     data = json.loads(data)
     cam.update_photo({"name": filename, "tag": data["tag"]})
@@ -442,7 +446,6 @@ def testCoderbot(body):
 
 def listCNNModels():
     cnn = CNNManager.get_instance()
-    logging.info("cnn_models_list")
     return json.dumps(cnn.get_models())
 
 def trainCNNModel():
@@ -461,14 +464,12 @@ def trainCNNModel():
 
 def getCNNModel(model_name):
     cnn = CNNManager.get_instance()
-    logging.info("cnn_models_status")
     model_status = cnn.get_models().get(model_name)
 
     return json.dumps(model_status)
 
 def deleteCNNModel(model_name):
     cnn = CNNManager.get_instance()
-    logging.info("cnn_models_delete")
     model_status = cnn.delete_model(model_name=model_name)
 
     return json.dumps(model_status)
