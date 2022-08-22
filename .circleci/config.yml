@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: coderbot/coderbot-ci:3.9-bullseye-ffmpeg
+      - image: coderbot/coderbot-ci:3.9-bullseye
       
     working_directory: ~/repo
 
