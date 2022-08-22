@@ -514,3 +514,6 @@ def run_server():
         if bot:
             bot.exit()
         app.shutdown_requested = True
+
+if __name__ == "__main__":
+    main.run_server()
