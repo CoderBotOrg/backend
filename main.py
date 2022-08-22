@@ -145,3 +145,6 @@ def run_server():
             cam.exit()
         if bot:
             bot.exit()
+
+if __name__ == "__main__":
+    run_server()
