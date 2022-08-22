@@ -481,8 +481,11 @@ def run_server():
             audio = Audio.get_instance()
             audio.say(app.bot_config.get("sound_start"))
 
-            audioCtrl = AudioCtrl.get_instance()
-            audioCtrl.setVolume(int(app.bot_config.get('audio_volume_level')))
+            try:
+                audioCtrl = AudioCtrl.get_instance()
+                audioCtrl.setVolume(int(app.bot_config.get('audio_volume_level')))
+            except Exception as e:
+                logging.warning("error initialising AudioCtrl: %s", str(e))
 
             try:
                 cam = Camera.get_instance()

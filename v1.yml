@@ -1,0 +1,391 @@
+openapi: "3.0.0"
+info:
+  version: "1.0"
+  title: OpenAPI 3.0 definition of Coderbot API v3
+
+servers:
+  - url: http://coderbot.local/v2
+  
+# Paths supported by the server application
+paths:
+  /settings/restore:
+    post:
+      operationId: "api.restoreSettings"
+      summary: "Restore settings to default"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - CoderBot configuration
+  /settings:
+    get:
+      operationId: "api.settingsLoad"
+      summary: "Load settings"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - CoderBot configuration
+    put:
+      operationId: "api.settingsSave"
+      summary: "Load settings"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - CoderBot configuration
+  /programs:
+    get:
+      operationId: "api.listPrograms"
+      summary: "Get the list of all the saved programs"
+      tags:
+        - Program management
+      responses:
+        200:
+          description: "ok"
+    post:
+      operationId: "api.saveNewProgram"
+      summary: "Save a new program"
+      tags:
+        - Program management
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Program'
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "Failed to save the program"
+  /programs/{name}:
+    get:
+      operationId: "api.loadProgram"
+      summary: "Get the program with the specified name"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Program management
+      responses:
+        200:
+          description: "ok"
+    delete:
+      operationId: "api.deleteProgram"
+      summary: "Delete a program"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Program management
+    put:
+      operationId: "api.saveProgram"
+      summary: "Save an existing program"
+      tags:
+        - Program management
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Program'
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "Failed to save the program"
+
+  /programs/{name}/exec:
+    post:
+      operationId: "api.exec"
+      summary: "Execute the given program"
+      tags:
+        - Program management
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Program'
+      responses:
+        200:
+          description: "ok"
+
+  /activities:
+    get:
+      operationId: "api.listActivities"
+      summary: "Get the list of all the saved activities"
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+    post:
+      operationId: "api.saveNewActivity"
+      summary: "Save a new activity"
+      tags:
+        - Activity management
+      requestBody:
+        description: Create new Activity
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "Failed to save the activity"
+  /activities/{name}:
+    get:
+      operationId: "api.loadActivity"
+      summary: "Get the activity with the specified name"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: default
+          in: query
+          schema:
+            type: string
+          required: false
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+    put:
+      operationId: "api.saveActivity"
+      summary: "Save the activity with the specified name"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update Activity
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+      tags:
+        - Activity management
+      responses:
+        200:
+          description: "ok"
+    delete:
+      operationId: "api.deleteActivity"
+      summary: "Delete an activity"
+      tags:
+        - Activity management
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "ok"
+
+  /music/packages:
+    get:
+      operationId: "api.listMusicPackages"
+      summary: "List Music Packages"
+      responses:
+        200:
+          description: "ok"
+  /music/packages/{name}:
+    delete:
+      operationId: "api.deleteMusicPackage"
+      summary: "Delete Music Package"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "not found"
+        
+  /coderbot/update:
+    post:
+      operationId: "api.updateFromPackage"
+      summary: "Update CoderBot from package"
+      requestBody:
+        description: Update Activity
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "upload failed"
+  /coderbot/status:
+    get:
+      operationId: "api.status"
+      summary: "Bot general informations, execution status and reset log file"
+      tags:
+        - CoderBot status informations
+      responses:
+        200:
+          description: "Bot status"
+  /coderbot/reset:
+    post:
+      operationId: "api.reset"
+      summary: "Reset coderbot by restoring boot partition"
+      tags:
+        - CoderBot reset
+      responses:
+        200:
+          description: "resets coderbot entirely"
+  /coderbot/test:
+    post:
+      summary: Tests CoderBot components.
+      operationId: "api.testCoderbot"
+      tags:
+        - CoderBot test
+      requestBody:
+        description: Update Activity
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+      responses:
+        200:
+          description: Test ended.
+  /coderbot/info:
+    get:
+      operationId: "api.info"
+      summary: "Bot general informations and execution status"
+      tags:
+        - CoderBot system informations
+      responses:
+        200:
+          description: "Bot status"
+  /coderbot/stop:
+    post:
+      operationId: "api.stop"
+      summary: Stops the bot motors
+      tags:
+        - Direct control
+      responses:
+        200:
+          description: "Successfully stopped the motors"
+  /coderbot/move:
+    post:
+      summary: Moves the bot forward or backward.
+      operationId: "api.move"
+      tags:
+        - Direct control
+      requestBody:
+        description: Movement speed and duration
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                speed:
+                  type: number
+                  description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+                elapse:
+                  type: number
+                  description: Duration of the movement. 0 doesn't move the coderbot.
+                distance:
+                  type: number
+                  description: Target distance for the bot to travel
+      responses:
+        200:
+          description: Sent command to the bot GPIO.
+  /coderbot/turn:
+    post:
+      summary: Make a turn with the motors
+      operationId: "api.turn"
+      tags:
+        - Direct control
+      requestBody:
+        description: Movemen Speed and duration
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                speed:
+                  type: number
+                  description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+                elapse:
+                  type: number
+                  description: Duration of the movement. 0 doesn't move the coderbot.
+      responses:
+        200:
+          description: Sent command to the bot GPIO.
+  /cnnmodels:
+    get:
+      operationId: "api.list_cnn_models"
+      summary: "list of CNN Models"
+      tags:
+        - CNN Models
+      responses:
+        200:
+          description: "CNN Models as JSON Object"
+
+components:
+  schemas:
+    Program:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+        codeBlocks:
+          type: string
+        isDefualt:
+          type: boolean
+    Activity:
+      type: object
+      properties:
+        name:
+          type: string
+        isDefualt:
+          type: boolean
+    
