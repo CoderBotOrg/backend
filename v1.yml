@@ -10,7 +10,7 @@ servers:
 paths:
   /settings:
     get:
-      operationId: "api.settings.loadSettings"
+      operationId: "api.loadSettings"
       summary: "Load settings"
       responses:
         200:
@@ -36,7 +36,7 @@ paths:
         - CoderBot configuration
   /settings/wifi:
     put:
-      operationId: "api.settings.saveWifiSettings"
+      operationId: "api.saveWifiSettings"
       summary: "Save Wifi settings"
       requestBody:
         description: Save Wifi Settings
