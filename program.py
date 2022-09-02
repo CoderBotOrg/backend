@@ -110,7 +110,7 @@ class ProgramEngine:
     def load(self, name):
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
-        if program_db_entries != []:
+        if len(program_db_entries) > 0:
             logging.info(program_db_entries[0])
             f = open(program_db_entries[0]["filename"], 'r')
             self._program = Program.from_dict(json.load(f))
@@ -177,14 +177,14 @@ class Program:
 
         return "ok"
 
-    def end(self):
+    def stop(self):
         if self._running:
             self._running = False
             self._thread.join()
 
     def check_end(self):
         if self._running is False:
-            raise RuntimeError('end requested')
+            raise RuntimeError('stop requested')
         return None
 
     def is_running(self):

@@ -20,6 +20,7 @@
 import json
 
 CONFIG_FILE = "coderbot.cfg"
+CONFIG_DEFAULT_FILE = "data/defaults/config.json"
 
 class Config(object):
 
@@ -42,3 +43,9 @@ class Config(object):
         f = open(CONFIG_FILE, 'w')
         json.dump(cls._config, f)
         return cls._config
+
+    @classmethod
+    def restore(cls):
+        with open(CONFIG_DEFAULT_FILE) as f:
+            cls.write(json.loads(f.read()))
+

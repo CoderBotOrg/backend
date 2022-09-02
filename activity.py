@@ -18,7 +18,9 @@ class Activities():
 
     def load(self, name, default):
         if name and default is None:
-            return self.activities.search(self.query.name == name)[0]
+            activities = self.activities.search(self.query.name == name)
+            if len(activities) > 0:
+                return activities[0]
         elif default is not None:
             default_Activities = self.activities.search(self.query.default == True)
             if len(self.activities.search(self.query.default == True)) > 0:
@@ -35,10 +37,12 @@ class Activities():
             self.activities.update(activity, self.query.name == activity["name"])
 
     def delete(self, name):
-        activity = self.activities.search(self.query.name == name)[0]
-        if activity.get("default", False) == True:
-            self.activities.update({'default': True}, self.query.stock == True)
-        self.activities.remove(self.query.name == activity["name"])
+        activities = self.activities.search(self.query.name == name)
+        if len(activities) > 0:
+            activity = activities[0]
+            if activity.get("default", False) == True:
+                self.activities.update({'default': True}, self.query.stock == True)
+            self.activities.remove(self.query.name == activity["name"])
 
     def list(self):
         return self.activities.all()
