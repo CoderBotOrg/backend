@@ -687,7 +687,7 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[a-zA-ZA-zÀ-ú0-9 _-]$'
+          pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
           minLength: 1
           maxLength: 128
         code:
