@@ -235,11 +235,11 @@ class Image():
                                          int(min(image_size[0], -border+center[1]+(size[1]-5)/2)))
         return rect_image
 
-    def find_text(self):
-        #wlist = tesseract_whitelists.get(accept, None)
-        #ocr.setWhiteList(wlist)
-        #text = ocr.run(self._data, 60)
-        text = pytesseract.image_to_string(self._data)
+    def find_text(self, lang, timeout):
+        try:
+            text = pytesseract.image_to_string(self._data, lang, timeout)
+        except RuntimeError as e:
+            pass
         return text
 
     def find_qr_code(self):
