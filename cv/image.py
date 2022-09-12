@@ -236,6 +236,7 @@ class Image():
         return rect_image
 
     def find_text(self, lang, timeout):
+        text = '?'
         try:
             text = pytesseract.image_to_string(self._data, lang, timeout)
         except RuntimeError as e:

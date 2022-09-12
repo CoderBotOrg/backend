@@ -316,7 +316,7 @@ class Camera(object):
         #print "object: " + str(time.time() - ts)
         return [dist, angle]
 
-    def find_text(self, lang="en", timeout=-1):
+    def find_text(self, lang="en", timeout=0):
         t1 = time.time()
         text = None
         #color = (int(back_color[1:3], 16), int(back_color[3:5], 16), int(back_color[5:7], 16))

@@ -157,13 +157,13 @@ class CoderBot(object):
             cls.the_bot = CoderBot(motor_trim_factor=motor_trim_factor, hw_version=hw_version)
         return cls.the_bot
 
-    def move(self, speed=100, elapse=0, distance=0):
+    def move(self, speed=100, elapse=None, distance=None):
         self._motor_trim_factor = 1.0
         speed_left = min(100, max(-100, speed * self._motor_trim_factor))
         speed_right = min(100, max(-100, speed / self._motor_trim_factor))
         self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse, target_distance=distance)
 
-    def turn(self, speed=100, elapse=0):
+    def turn(self, speed=100, elapse=-1):
         speed_left = min(100, max(-100, speed * self._motor_trim_factor))
         speed_right = -min(100, max(-100, speed / self._motor_trim_factor))
         self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse)
@@ -176,16 +176,16 @@ class CoderBot(object):
             logging.info(self._mpu.get_gyro()[2])
         self.stop()
 
-    def forward(self, speed=100, elapse=0, distance=0):
+    def forward(self, speed=100, elapse=None, distance=None):
         self.move(speed=speed, elapse=elapse, distance=distance)
 
-    def backward(self, speed=100, elapse=0, distance=0):
+    def backward(self, speed=100, elapse=None, distance=None):
         self.move(speed=-speed, elapse=elapse, distance=distance)
 
-    def left(self, speed=100, elapse=0):
+    def left(self, speed=100, elapse=-1):
         self.turn(speed=-speed, elapse=elapse)
 
-    def right(self, speed=100, elapse=0):
+    def right(self, speed=100, elapse=-1):
         self.turn(speed=speed, elapse=elapse)
 
     def servo(self, servo, angle):
@@ -223,7 +223,7 @@ class CoderBot(object):
         self.pi.set_PWM_frequency(pin, 50)
         self.pi.set_PWM_dutycycle(pin, duty)
 
-    def _dc_enc_motor(self, speed_left=100, speed_right=100, time_elapse=0, target_distance=0):
+    def _dc_enc_motor(self, speed_left=100, speed_right=100, time_elapse=None, target_distance=None):
         self._twin_motors_enc.control(power_left=speed_left,
                                       power_right=speed_right,
                                       time_elapse=time_elapse,

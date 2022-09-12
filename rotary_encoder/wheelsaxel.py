@@ -72,17 +72,17 @@ class WheelsAxel:
         if time is specified and distance is not, control_time is called
         if distance is specified and time is not, control_distance is called
         if both distance and time are specified, control_velocity is called """
-    def control(self, power_left=100, power_right=100, time_elapse=0, target_distance=0):
+    def control(self, power_left=100, power_right=100, time_elapse=None, target_distance=None):
         if(time_elapse is not None and target_distance is None): # time
             self.control_time(power_left, power_right, time_elapse)
-        elif(time_elapse is None and target_distance != 0): # distance
+        elif(time_elapse is None and target_distance is not None): # distance
             self.control_distance(power_left, power_right, target_distance)
         else: # velocity
             self.control_velocity(time_elapse, target_distance)
 
     """ Motor time control allows the motors
         to run for a certain amount of time """
-    def control_time(self, power_left=100, power_right=100, time_elapse=0):
+    def control_time(self, power_left=100, power_right=100, time_elapse=-1):
         #self._wheelsAxle_lock.acquire() # wheelsAxle lock acquire
 
         # applying tension to motors
