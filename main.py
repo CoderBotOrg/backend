@@ -109,12 +109,8 @@ def run_server():
     cam = None
     try:
         try:
-            try:
-                app.bot_config = Config.read()
-            except OSError:
-                Config.restore()
-                app.bot_config = Config.read()
-                
+            app.bot_config = Config.read()
+
             align_wifi_config()
             bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
                                         hw_version=app.bot_config.get('hardware_version'))

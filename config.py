@@ -17,6 +17,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
 
+import os
 import json
 
 CONFIG_FILE = "data/config.json"
@@ -32,6 +33,8 @@ class Config(object):
 
     @classmethod
     def read(cls):
+        if not os.path.exists(CONFIG_FILE):
+            cls.restore()
         with open(CONFIG_FILE, 'r') as f:
           cls._config = json.load(f)
           f.close()
