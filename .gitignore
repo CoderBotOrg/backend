@@ -87,3 +87,6 @@ updatePackages
 # firmware
 firmware/
 
+# test
+cassette.yaml
+.hypothesis
