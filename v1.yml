@@ -19,7 +19,12 @@ paths:
         - CoderBot configuration
     put:
       operationId: "api.saveSettings"
-      summary: "Load settings"
+      summary: "Save settings"
+      requestBody:
+        description: Save Settings
+        required: true
+        content:
+          application/json:
       responses:
         200:
           description: "ok"

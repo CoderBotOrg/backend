@@ -270,8 +270,8 @@ def restoreSettings():
 def loadSettings():
     return Config.get()
 
-def saveSettings():
-    Config.write()
+def saveSettings(body):
+    Config.write(body)
 
 def saveWifiSettings(data):
     """
