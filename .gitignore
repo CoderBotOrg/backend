@@ -33,21 +33,21 @@
 *.sqlite
 
 # Pictures taken
-photos
+photos/*.jpeg
+photos/*.mp4
 saved_photos
 
 #cnn models
-cnn_models
+cnn_models/*
 
 # Sounds recorded
 sounds/*.wav
 
 # Logs
-logs
+logs/*.log
 
 # User programs
-data
-
+data/*.json
 
 # OS generated files #
 ######################
