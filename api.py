@@ -5,13 +5,14 @@ This file contains every method called by the API defined in v2.yml
 
 import os
 import subprocess
-import json
 import logging
+import connexion
 from werkzeug.datastructures import Headers
 from flask import (request,
                    send_file,
-                   Response,
-                   jsonify)
+                   Response)
+import connexion
+import picamera
 from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
@@ -24,6 +25,7 @@ from audio import Audio
 from event import EventManager
 from audioControls import AudioCtrl
 from coderbotTestUnit import run_test as runCoderbotTestUnit
+import pigpio
 
 BUTTON_PIN = 16
 
@@ -32,6 +34,7 @@ bot = CoderBot.get_instance(
     motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
     hw_version=bot_config.get("hw_version")
 )
+audio_device = Audio.get_instance()
 
 def get_serial():
     """
@@ -123,47 +126,52 @@ def stop():
     return 200
 
 def move(body):
-    try:
-        bot.move(speed=body["speed"], elapse=body["elapse"], distance=body["distance"])
-    except Exception as e:
-        bot.move(speed=body["speed"], elapse=body["elapse"], distance=0)
+    speed=body.get("speed")
+    elapse=body.get("elapse")
+    distance=body.get("distance")
+    if (speed is None or speed == 0) or (elapse is not None and distance is not None):
+        return 400
+    bot.move(speed=speed, elapse=elapse, distance=distance)
     return 200
 
-def turn(data):
-    try:
-        bot.turn(speed=data["speed"], elapse=data["elapse"])
-    except Exception as e:
-        bot.turn(speed=data["speed"], elapse=-1)
+def turn(body):
+    speed=body.get("speed")
+    elapse=body.get("elapse")
+    if speed is None or speed == 0:
+        return 400
+    bot.turn(speed=speed, elapse=elapse)
     return 200
 
 def takePhoto():
     try:
         cam.photo_take()
-        audio.say(app.bot_config.get("sound_shutter"))
+        Audio.say(bot_config.get("sound_shutter"))
     except Exception:
         logging.warning("Camera not present")
 
 def recVideo():
     try:
         cam.video_rec()
-        audio.say(app.bot_config.get("sound_shutter"))
+        audio_device.say(bot_config.get("sound_shutter"))
     except Exception:
         logging.warning("Camera not present")
 
 def stopVideo():
     try:
         cam.video_stop()
-        audio.say(app.bot_config.get("sound_shutter"))
+        audio_device.say(bot_config.get("sound_shutter"))
     except Exception:
         logging.warning("Camera not present")
 
-def speak():
-    logging.info("say: " + str(param1) + " in: " + str(get_locale()))
-    audio.say(param1, get_locale())
+def speak(body):
+    text = body.get("text", "")
+    locale = body.get("locale", "")
+    logging.info("say: " + text + " in: " + locale)
+    audio_device.say(text, locale)
 
 def halt():
     logging.info("shutting down")
-    audio.say(app.bot_config.get("sound_stop"))
+    audio_device.say(what=bot_config.get("sound_stop"))
     bot.halt()
 
 def restart():
@@ -199,16 +207,19 @@ def listPhotos():
     Expose the list of taken photos
     """
     cam = Camera.get_instance()
-    return json.dumps(cam.get_photo_list())
+    return cam.get_photo_list()
 
-def getPhoto(filename):
+def getPhoto(name):
     cam = Camera.get_instance()
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
-        media_file = cam.get_photo_file(filename)
+        media_file = cam.get_photo_file(name)
         return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
+        return 503
+    except FileNotFoundError:
+        return 404
 
 def takePhoto():
     cam = Camera.get_instance()
@@ -217,18 +228,20 @@ def takePhoto():
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
 
-def savePhoto(filename):
+def savePhoto(name, body):
     cam = Camera.get_instance()
-    data = request.get_data(as_text=True)
-    data = json.loads(data)
-    cam.update_photo({"name": filename, "tag": data["tag"]})
-    return jsonify({"res":"ok"})
+    try:
+        cam.update_photo({"name": name, "tag": body.get("tag")})
+    except FileNotFoundError:
+        return 404
 
-def deletePhoto(filename):
+def deletePhoto(name):
     cam = Camera.get_instance()
     logging.debug("photo delete")
-    cam.delete_photo(filename)
-    return "ok"
+    try:
+        cam.delete_photo(name)
+    except FileNotFoundError:
+        return 404
 
 ## System
 
@@ -263,9 +276,7 @@ def info():
     }
 
 def restoreSettings():
-    with open("data/defaults/config.json") as f:
-        Config.write(json.loads(f.read()))
-    Config.get()
+    Config.restore()
 
 def loadSettings():
     return Config.get()
@@ -273,23 +284,23 @@ def loadSettings():
 def saveSettings(body):
     Config.write(body)
 
-def saveWifiSettings(data):
+def saveWifiSettings(body):
     """
     Passes the received Wi-Fi configuration to the wifi.py script, applying it.
     Then reboots
     """
-    mode = data.get("wifi_mode")
-    ssid = data.get("wifi_ssid")
-    psk = data.get("wifi_psk")
+    mode = body.get("wifi_mode", "")
+    ssid = body.get("wifi_ssid", "")
+    psk = body.get("wifi_psk", "")
 
     logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
     client_params = " --ssid \"" + ssid + "\" --pwd \"" + psk + "\"" if ssid != "" and psk != "" else ""
-    logging.info(client_params)
+    logging.info("sudo ./wifi.py updatecfg --mode " + mode + client_params)
     os.system("sudo ./wifi.py updatecfg --mode " + mode + client_params)
     os.system("sudo reboot")
     if mode == "ap":
-        return "http://coder.bot"
-    return "http://coderbot.local"
+        return {"base_url": "http://coder.bot"}
+    return {"base_url": "http://coderbot.local"}
 
 def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')
@@ -304,7 +315,7 @@ def listMusicPackages():
     """
     musicPkg = MusicPackageManager.get_instance()
     response = musicPkg.listPackages()
-    return json.dumps(response)
+    return response
 
 def addMusicPackage():
     """
@@ -326,42 +337,45 @@ def addMusicPackage():
     elif response == 3:
         return 400
 
-def deleteMusicPackage(package_data):
+def deleteMusicPackage(name):
     """
     Delete a musical package an save the list of available packages on disk
     also delete package sounds and directory
     """
     musicPkg = MusicPackageManager.get_instance()
-    musicPkg.deletePackage(package_data['package_name'])
+    musicPkg.deletePackage(name)
     return 200 
 
 ## Programs
 
-def saveAsNewProgram(data):
-    overwrite = data["overwrite"]
-    existing_program = prog_engine.load(data["name"])
+def saveAsNewProgram(body):
+    overwrite = body.get("overwrite")
+    existing_program = prog_engine.load(body.get("name"))
     if existing_program and not overwrite:
         return "askOverwrite"
     elif existing_program and existing_program.is_default() == True:
         return "defaultOverwrite"
-    program = Program(name=data["name"], code=data["code"], dom_code=data["dom_code"])
+    program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"))
     prog_engine.save(program)
     return 200
 
-def saveProgram(name, data):
-    overwrite = data["overwrite"]
+def saveProgram(name, body):
+    overwrite = body.get("overwrite")
     existing_program = prog_engine.load(name)
     if existing_program and not overwrite:
         return "askOverwrite"
     elif existing_program and existing_program.is_default() == True:
         return "defaultOverwrite"
-    program = Program(name=data["name"], code=data["code"], dom_code=data["dom_code"])
+    program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"))
     prog_engine.save(program)
     return 200
 
 def loadProgram(name):
     existing_program = prog_engine.load(name)
-    return existing_program.as_dict(), 200
+    if existing_program:
+        return existing_program.as_dict(), 200
+    else:
+        return 404
 
 def deleteProgram(name):
     prog_engine.delete(name)
@@ -369,46 +383,45 @@ def deleteProgram(name):
 def listPrograms():
     return prog_engine.prog_list()
 
-def runProgram(name):
+def runProgram(name, body):
     """
     Execute the given program
     """
     logging.debug("program_exec")
-    name = request.form.get('name')
-    code = request.form.get('code')
-    prog = app.prog_engine.create(name, code)
-    return json.dumps(prog.execute())
+    code = body.get('code')
+    prog = prog_engine.create(name, code)
+    return prog.execute()
 
 def stopProgram(name):
     """
     Stop the program execution
     """
     logging.debug("program_end")
-    prog = app.prog_engine.get_current_program()
+    prog = prog_engine.get_current_program()
     if prog:
-        prog.end()
+        prog.stop()
     return "ok"
 
-def statusProgram():
+def statusProgram(name):
     """
     Expose the program status
     """
     logging.debug("program_status")
-    prog = app.prog_engine.get_current_program()
+    prog = prog_engine.get_current_program()
     if prog is None:
         prog = Program("")
-    return json.dumps({'name': prog.name, "running": prog.is_running(), "log": app.prog_engine.get_log()})
+    return {'name': prog.name, "running": prog.is_running(), "log": prog_engine.get_log()}
 
 
 ## Activities
 
 def saveActivity(name, body):
-    activity = body["activity"]
-    activities.save(activity)
+    activity = body
+    activities.save(activity.get("name"), activity)
 
 def saveAsNewActivity(body):
-    activity = body["activity"]
-    activities.save(activity["name"], activity)
+    activity = body
+    activities.save(activity.get("name"), activity)
 
 def loadActivity(name=None, default=None):
     return activities.load(name, default)
@@ -441,35 +454,37 @@ def reset():
 ## Test
 def testCoderbot(body):
     # taking first JSON key value (varargin)
-    tests_state = runCoderbotTestUnit(body[list(data.keys())[0]])
-    return tests_state
+    if len(body.keys()) > 0:
+        tests_state = runCoderbotTestUnit(body[list(body.keys())[0]])
+        return tests_state
+    else:
+        return 404
 
 def listCNNModels():
     cnn = CNNManager.get_instance()
-    return json.dumps(cnn.get_models())
+    return cnn.get_models()
 
-def trainCNNModel():
+def trainCNNModel(body):
     cam = Camera.get_instance()
     cnn = CNNManager.get_instance()
     logging.info("cnn_models_new")
-    data = json.loads(request.get_data(as_text=True))
-    cnn.train_new_model(model_name=data["model_name"],
-                        architecture=data["architecture"],
-                        image_tags=data["image_tags"],
+    cnn.train_new_model(model_name=body.get("model_name"),
+                        architecture=body.get("architecture"),
+                        image_tags=body.get("image_tags"),
                         photos_meta=cam.get_photo_list(),
-                        training_steps=data["training_steps"],
-                        learning_rate=data["learning_rate"])
+                        training_steps=body.get("training_steps"),
+                        learning_rate=body.get("learning_rate"))
 
-    return json.dumps({"name": data["model_name"], "status": 0})
+    return {"name": body.get("model_name"), "status": 0}
 
-def getCNNModel(model_name):
+def getCNNModel(name):
     cnn = CNNManager.get_instance()
-    model_status = cnn.get_models().get(model_name)
+    model_status = cnn.get_models().get(name)
 
-    return json.dumps(model_status)
+    return model_status
 
-def deleteCNNModel(model_name):
+def deleteCNNModel(name):
     cnn = CNNManager.get_instance()
-    model_status = cnn.delete_model(model_name=model_name)
+    model_status = cnn.delete_model(model_name=name)
 
-    return json.dumps(model_status)
+    return model_status

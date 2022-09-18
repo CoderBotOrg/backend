@@ -4,7 +4,7 @@ info:
   title: OpenAPI 3.0 definition of Coderbot API v3
 
 servers:
-  - url: http://coderbot.local/v1
+  - url: http://coderbot.local/api/v1
   
 # Paths supported by the server application
 paths:
@@ -64,6 +64,14 @@ paths:
       responses:
         200:
           description: "ok"
+    post:
+      operationId: "api.takePhoto"
+      summary: "take a new photo"
+      tags:
+        - Photos management
+      responses:
+        200:
+          description: "ok"
   /photos/{name}:
     get:
       operationId: "api.getPhoto"
@@ -74,11 +82,19 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 16
+            pattern: '^[a-zA-Z0-9 _-]$'
       tags:
         - Photos management
       responses:
         200:
-          description: "ok"
+          description: Image in JPEG format
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
     put:
       operationId: "api.savePhoto"
       summary: "Save photo by name"
@@ -88,6 +104,9 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 16
+            pattern: '^[a-zA-Z0-9 _-]$'
       requestBody:
         description: Save Photo metadata
         required: true
@@ -109,6 +128,9 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 16
+            pattern: '^[a-zA-Z0-9 _-]$'
       tags:
         - Photos management
       responses:
@@ -240,6 +262,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Program'
+      responses:
+        200:
+          description: "ok"
+
+  /programs/{name}/status:
+    get:
+      operationId: "api.statusProgram"
+      summary: "Get the status of the given program"
+      tags:
+        - Program management
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "ok"
+
+  /programs/{name}/stop:
+    patch:
+      operationId: "api.stopProgram"
+      summary: "Stop the given program"
+      tags:
+        - Program management
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: "ok"
@@ -434,19 +488,11 @@ paths:
         description: Movement speed and duration
         required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              type: object
-              properties:
-                speed:
-                  type: number
-                  description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
-                elapse:
-                  type: number
-                  description: Duration of the movement. 0 doesn't move the coderbot.
-                distance:
-                  type: number
-                  description: Target distance for the bot to travel
+              oneOf:
+                - $ref: '#/components/schemas/MoveParamsElapse'
+                - $ref: '#/components/schemas/MoveParamsDistance'
       responses:
         200:
           description: Sent command to the bot GPIO.
@@ -457,19 +503,12 @@ paths:
       tags:
         - Direct control
       requestBody:
-        description: Movemen Speed and duration
+        description: Movement Speed and duration
         required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              type: object
-              properties:
-                speed:
-                  type: number
-                  description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
-                elapse:
-                  type: number
-                  description: Duration of the movement. 0 doesn't move the coderbot.
+              $ref: '#/components/schemas/TurnParams'
       responses:
         200:
           description: Sent command to the bot GPIO.
@@ -479,6 +518,28 @@ paths:
       summary: Pronounce a phrase
       tags:
         - Direct control
+      requestBody:
+        description: Movemen Speed and duration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  minLength: 1
+                  maxLength: 256
+                  description: text to be "spoken"
+                locale:
+                  type: string
+                  minLength: 1
+                  maxLength: 2
+                  pattern: '^[a-zA-Z]$'
+                  description: locale of text to be "spoken"
+              required:
+                - text
+                - locale
       responses:
         200:
           description: "phrase received"
@@ -566,15 +627,67 @@ paths:
 
 components:
   schemas:
+    MoveParamsElapse:
+      type: object
+      properties:
+        speed:
+          type: number
+          minimum: -100.0
+          maximum: 100.0
+          description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+        elapse:
+          type: number
+          minimum: -1.0
+          maximum: 10.0
+          description: Duration of the movement. 0 doesn't move the coderbot.
+      required:
+        - speed
+        - elapse
+    MoveParamsDistance:
+      type: object
+      properties:
+        speed:
+          type: number
+          minimum: -100.0
+          maximum: 100.0
+          description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+        distance:
+          type: number
+          minimum: 0.0
+          maximum: 1000.0
+          description: Target distqnce in mm.
+      required:
+        - speed
+        - distance
+    TurnParams:
+      type: object
+      properties:
+        speed:
+          type: number
+          minimum: -100.0
+          maximum: 100.0
+          description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+        elapse:
+          type: number
+          minimum: -1.0
+          maximum: 1.0
+          description: Duration of the movement. 0 doesn't move the coderbot.
+      required:
+        - speed
+        - elapse
     WifiSettings:
       type: object
       properties:
         wifi_mode:
           type: string
+          minLength: 1
+          maxLength: 10
         wifi_ssid:
           type: string
         wifi_psk:
           type: string
+      required:
+        - mode
     Photo:
       type: object
       properties:
@@ -587,17 +700,40 @@ components:
       properties:
         name:
           type: string
+          pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
+          minLength: 1
+          maxLength: 128
         code:
           type: string
-        codeBlocks:
+          minLength: 1
+        dom_code:
           type: string
         isDefualt:
           type: boolean
+        overwrite:
+          type: boolean
+      required:
+        - name
+        - code
+
     Activity:
       type: object
       properties:
         name:
           type: string
-        isDefualt:
+          minLength: 1
+          maxLength: 128
+        description:
+          type: string
+          minLength: 0
+          maxLength: 256
+        default:
           type: boolean
+        stock:
+          type: boolean
+      required:
+        - name
+        - description
+        - default
+        - stock
     
