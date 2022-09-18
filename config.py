@@ -32,10 +32,10 @@ class Config(object):
 
     @classmethod
     def read(cls):
-        f = open(CONFIG_FILE, 'r')
-        cls._config = json.load(f)
-        f.close()
-        return cls._config
+        with open(CONFIG_FILE, 'r') as f:
+          cls._config = json.load(f)
+          f.close()
+          return cls._config
 
     @classmethod
     def write(cls, config):
