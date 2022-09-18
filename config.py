@@ -19,8 +19,8 @@
 
 import json
 
-CONFIG_FILE = "coderbot.cfg"
-CONFIG_DEFAULT_FILE = "data/defaults/config.json"
+CONFIG_FILE = "data/config.json"
+CONFIG_DEFAULT_FILE = "defaults/config.json"
 
 class Config(object):
 

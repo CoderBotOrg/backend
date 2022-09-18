@@ -33,28 +33,21 @@
 *.sqlite
 
 # Pictures taken
-photos/*.jpg
-photos/*.mp4
-photos/*.h264
-photos/*.json
+photos
 saved_photos
 
 #cnn models
-cnn_models/*
-cnn_models/cache/*
+cnn_models
 
 # Sounds recorded
 sounds/*.wav
 
 # Logs
-logs/*.log
-logs/*.log.*
+logs
 
 # User programs
-data/*.data
+data
 
-# Tutorial
-static/blockly-tutorial
 
 # OS generated files #
 ######################
@@ -88,11 +81,8 @@ coderbot.cfg
 
 swagger-ui/
 
-# Photos
-photos/metadata.json
-
 # Uploaded updates folder
-updatePackages/
+updatePackages
 
 # firmware
 firmware/

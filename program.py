@@ -20,6 +20,7 @@
 import os
 import threading
 import json
+import shutil
 import logging
 
 import math
@@ -38,6 +39,7 @@ import atmega328p
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".json"
+PROGRAMS_DB = "data/programs.json"
 
 musicPackageManager = musicPackages.MusicPackageManager.get_instance()
 
@@ -74,7 +76,7 @@ class ProgramEngine:
     def __init__(self):
         self._program = None
         self._log = ""
-        self._programs = TinyDB("data/programs.json")
+        self._programs = TinyDB(PROGRAMS_DB)
         query = Query()
         for dirname, dirnames, filenames, in os.walk(PROGRAM_PATH):
             dirnames
@@ -83,7 +85,7 @@ class ProgramEngine:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
                     if self._programs.search(query.name == program_name) == []:
                         logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
-                        self._programs.insert({"name": program_name, "filename": os.path.join(dirname, filename), "default": str("default" in dirname)})
+                        self._programs.insert({"name": program_name, "filename": os.path.join(dirname, filename), "default": "default" in dirname})
 
     @classmethod
     def get_instance(cls):

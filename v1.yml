@@ -4,7 +4,7 @@ info:
   title: OpenAPI 3.0 definition of Coderbot API v3
 
 servers:
-  - url: http://coderbot.local/v1
+  - url: http://coderbot.local/api/v1
   
 # Paths supported by the server application
 paths:
