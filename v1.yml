@@ -25,6 +25,8 @@ paths:
         required: true
         content:
           application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
       responses:
         200:
           description: "ok"
@@ -675,6 +677,8 @@ components:
       required:
         - speed
         - elapse
+    Settings:
+      type: object
     WifiSettings:
       type: object
       properties:
