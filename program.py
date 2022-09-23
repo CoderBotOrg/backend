@@ -80,7 +80,7 @@ class ProgramEngine:
         self._programs = TinyDB(PROGRAMS_DB)
         # initialise DB from default programs
         query = Query()
-        for dirname, dirnames, filenames, in os.walk(query):
+        for dirname, dirnames, filenames, in os.walk(PROGRAMS_DB_DEFAULTS):
             dirnames
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
