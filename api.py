@@ -29,10 +29,10 @@ import pigpio
 
 BUTTON_PIN = 16
 
-bot_config = Config.get()
+config = Config.read()
 bot = CoderBot.get_instance(
-    motor_trim_factor=float(bot_config.get("move_motor_trim", 1.0)),
-    hw_version=bot_config.get("hw_version")
+    motor_trim_factor=float(config.get("move_motor_trim", 1.0)),
+    hw_version=config.get("hw_version")
 )
 audio_device = Audio.get_instance()
 cam = Camera.get_instance()
@@ -146,21 +146,21 @@ def turn(body):
 def takePhoto():
     try:
         cam.photo_take()
-        Audio.say(bot_config.get("sound_shutter"))
+        Audio.say(config.get("sound_shutter"))
     except Exception as e:
         logging.warning("Error: %s", e)
 
 def recVideo():
     try:
         cam.video_rec()
-        audio_device.say(bot_config.get("sound_shutter"))
+        audio_device.say(config.get("sound_shutter"))
     except Exception as e:
         logging.warning("Error: %s", e)
 
 def stopVideo():
     try:
         cam.video_stop()
-        audio_device.say(bot_config.get("sound_shutter"))
+        audio_device.say(config.get("sound_shutter"))
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -172,7 +172,7 @@ def speak(body):
 
 def halt():
     logging.info("shutting down")
-    audio_device.say(what=bot_config.get("sound_stop"))
+    audio_device.say(what=config.get("sound_stop"))
     bot.halt()
 
 def restart():
