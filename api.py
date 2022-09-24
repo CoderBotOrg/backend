@@ -212,7 +212,7 @@ def getPhoto(name):
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
         media_file = cam.get_photo_file(name)
-        return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), cache_timeout=0)
+        return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), max_age=0)
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
         return 503
