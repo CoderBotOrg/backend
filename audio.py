@@ -53,7 +53,7 @@ class Audio:
         return cls._instance
 
     def __init__(self):
-        self.pyaudio = pyaudio.PyAudio()
+        self.pa = pyaudio.PyAudio()
         try:
             self.stream_in = self.MicrophoneStream(FORMAT, RATE, CHUNK)
         except Exception:
@@ -107,8 +107,8 @@ class Audio:
         wf = wave.open(SOUNDDIR + filename, 'rb')
 
         # open stream based on the wave object which has been input.
-        stream = self.pyaudio.open(format =
-                    self.pyaudio.get_format_from_width(wf.getsampwidth()),
+        stream = self.pa.open(format =
+                    self.pa.get_format_from_width(wf.getsampwidth()),
                     channels = wf.getnchannels(),
                     rate = wf.getframerate(),
                     output = True)
