@@ -53,24 +53,14 @@ class Audio:
         return cls._instance
 
     def __init__(self):
-        #self.pyaudio = pyaudio.PyAudio()
+        self.pyaudio = pyaudio.PyAudio()
         try:
-            #self.stream_in = self.pyaudio.open(format=FORMAT,
-            #  channels=1, rate=RATE,
-            #  input=True,
-            #  frames_per_buffer=CHUNK)
-            #self.stream_in.start_stream()
             self.stream_in = self.MicrophoneStream(FORMAT, RATE, CHUNK)
         except Exception:
             logging.info("Audio: input stream not available")
 
-        #self._google_speech_client = speech.SpeechClient()
-
     def exit(self):
        pass
-        # cleanup stuff.
-        #self.stream_in.close()
-        #self.pyaudio.terminate()
 
     def say(self, what, locale='en'):
         if what and "$" in what:
