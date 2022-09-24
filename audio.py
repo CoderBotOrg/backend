@@ -112,9 +112,9 @@ class Audio:
 
         # play stream (looping from beginning of file to the end)
         while len(data) > 0:
-          # writing to the stream is what *actually* plays the sound.
-          stream.write(data)
-          data = wf.readframes(CHUNK)
+            # writing to the stream is what *actually* plays the sound.
+            stream.write(data)
+            data = wf.readframes(CHUNK)
 
         # cleanup stuff.
         stream.close()
