@@ -74,7 +74,7 @@ class Audio:
 
     def say(self, what, locale='en'):
         if what and "$" in what:
-            os.system('omxplayer sounds/' + what[1:])
+            self.play('sounds/' + what[1:])
         elif what and what:
             os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -D hw:1,0')
 
@@ -113,9 +113,6 @@ class Audio:
         wf.close()
 
     def play(self, filename):
-        os.system('omxplayer sounds/' + filename)
-
-        """
         # open the file for reading.
         wf = wave.open(SOUNDDIR + filename, 'rb')
 
@@ -138,7 +135,6 @@ class Audio:
 
         # cleanup stuff.
         stream.close()
-        """
 
     def hear(self, level, elapse=1.0):
         t = time.time()
