@@ -74,7 +74,7 @@ class Audio:
 
     def say(self, what, locale='en'):
         if what and "$" in what:
-            self.play('sounds/' + what[1:])
+            self.play(what[1:])
         elif what and what:
             os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -D hw:1,0')
 
