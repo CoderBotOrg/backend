@@ -25,12 +25,6 @@ import wave
 import audioop
 import pyaudio
 
-try:
-    from pocketsphinx.pocketsphinx import Decoder
-    from sphinxbase.sphinxbase import *
-except Exception:
-    logging.info("pocketsphinx not available")
-
 from six.moves import queue
 # [END import_libraries]
 
@@ -117,11 +111,10 @@ class Audio:
         data = wf.readframes(CHUNK)
 
         # play stream (looping from beginning of file to the end)
-        while data != '':
+        while len(data) > 0:
           # writing to the stream is what *actually* plays the sound.
           stream.write(data)
           data = wf.readframes(CHUNK)
-          logging.info("play")
 
         # cleanup stuff.
         stream.close()
@@ -137,33 +130,6 @@ class Audio:
                 if time.time() - t >= elapse:
                     return False
         return False
-
-    def speech_recog(self, model):
-        # Create a decoder with certain model
-        config = Decoder.default_config()
-        config.set_string('-hmm', '/usr/local/share/pocketsphinx/model/en-us/en-us')
-        config.set_int('-ds', 2)
-        config.set_int('-topn', 3)
-        config.set_int('-maxwpf', 5)
-        #config.set_string('-kws', MODELDIR + model + '.txt')
-        config.set_string('-lm', MODELDIR + model + '.lm')
-        config.set_string('-dict', MODELDIR + model + '.dict')
-        decoder = Decoder(config)
-
-        decoder.start_utt()
-        recog_text = ''
-
-        with self.stream_in as stream:
-            audio_generator = stream.generator()
-            for content in audio_generator:
-                decoder.process_raw(content, False, False)
-                if decoder.hyp() and decoder.hyp().hypstr != '':
-                    recog_text += decoder.hyp().hypstr
-                    if len(recog_text) > 1:
-                        decoder.end_utt()
-                        logging.info("recog text: %s", recog_text)
-                        return recog_text
-        return recog_text
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""
