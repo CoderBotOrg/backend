@@ -86,7 +86,7 @@ paths:
             type: string
             minLength: 1
             maxLength: 16
-            pattern: '^[a-zA-Z0-9 _-]$'
+            pattern: '^(DSC)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
       tags:
         - Photos management
       responses:
@@ -108,7 +108,7 @@ paths:
             type: string
             minLength: 1
             maxLength: 16
-            pattern: '^[a-zA-Z0-9 _-]$'
+            pattern: '^(DSC)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
       requestBody:
         description: Save Photo metadata
         required: true
@@ -132,7 +132,7 @@ paths:
             type: string
             minLength: 1
             maxLength: 16
-            pattern: '^[a-zA-Z0-9 _-]$'
+            pattern: '^(DSC)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
       tags:
         - Photos management
       responses:
@@ -148,7 +148,7 @@ paths:
         200:
           description: "ok"
   /video/rec:
-    get:
+    post:
       operationId: "api.recVideo"
       summary: "Rec video"
       tags:
@@ -157,7 +157,7 @@ paths:
         200:
           description: "ok"
   /video/stop:
-    get:
+    post:
       operationId: "api.stopVideo"
       summary: "Stop rec video"
       tags:
@@ -521,7 +521,7 @@ paths:
       tags:
         - Direct control
       requestBody:
-        description: Movemen Speed and duration
+        description: Movement Speed and duration
         required: true
         content:
           application/json:
@@ -537,7 +537,7 @@ paths:
                   type: string
                   minLength: 1
                   maxLength: 2
-                  pattern: '^[a-zA-Z]$'
+                  pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
                   description: locale of text to be "spoken"
               required:
                 - text
