@@ -40,7 +40,7 @@ PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".json"
 PROGRAMS_DB = "data/programs.json"
-PROGRAMS_DB_DEFAULTS = "defaults/programs.json"
+PROGRAMS_PATH_DEFAULTS = "defaults/programs/"
 
 musicPackageManager = musicPackages.MusicPackageManager.get_instance()
 
@@ -80,7 +80,7 @@ class ProgramEngine:
         self._programs = TinyDB(PROGRAMS_DB)
         # initialise DB from default programs
         query = Query()
-        for dirname, dirnames, filenames, in os.walk(PROGRAMS_DB_DEFAULTS):
+        for dirname, dirnames, filenames, in os.walk(PROGRAMS_PATH_DEFAULTS):
             dirnames
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
