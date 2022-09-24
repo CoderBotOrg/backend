@@ -86,7 +86,7 @@ paths:
             type: string
             minLength: 1
             maxLength: 16
-            pattern: '^(DSC)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
+            pattern: '^(DSC|VID)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
       tags:
         - Photos management
       responses:
@@ -108,7 +108,7 @@ paths:
             type: string
             minLength: 1
             maxLength: 16
-            pattern: '^(DSC)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
+            pattern: '^(DSC|VID)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
       requestBody:
         description: Save Photo metadata
         required: true
@@ -132,7 +132,7 @@ paths:
             type: string
             minLength: 1
             maxLength: 16
-            pattern: '^(DSC)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
+            pattern: '^(DSC|VID)+[0-9]+(_thumb)?\.?(jpg|mp4)?$'
       tags:
         - Photos management
       responses:
