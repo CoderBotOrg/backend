@@ -57,7 +57,7 @@ paths:
           description: "ok"
       tags:
         - CoderBot configuration
-  /photos:
+  /media:
     get:
       operationId: "api.listPhotos"
       summary: "Get the list of all photos"
@@ -74,7 +74,7 @@ paths:
       responses:
         200:
           description: "ok"
-  /photos/{name}:
+  /media/{name}:
     get:
       operationId: "api.getPhoto"
       summary: "Get photo by name"

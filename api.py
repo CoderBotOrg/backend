@@ -35,6 +35,7 @@ bot = CoderBot.get_instance(
     hw_version=bot_config.get("hw_version")
 )
 audio_device = Audio.get_instance()
+cam = Camera.get_instance()
 
 def get_serial():
     """
@@ -146,22 +147,22 @@ def takePhoto():
     try:
         cam.photo_take()
         Audio.say(bot_config.get("sound_shutter"))
-    except Exception:
-        logging.warning("Camera not present")
+    except Exception as e:
+        logging.warning("Error: %s", e)
 
 def recVideo():
     try:
         cam.video_rec()
         audio_device.say(bot_config.get("sound_shutter"))
     except Exception as e:
-        logging.warning("Camera not present: %s", e)
+        logging.warning("Error: %s", e)
 
 def stopVideo():
     try:
         cam.video_stop()
         audio_device.say(bot_config.get("sound_shutter"))
-    except Exception:
-        logging.warning("Camera not present")
+    except Exception as e:
+        logging.warning("Error: %s", e)
 
 def speak(body):
     text = body.get("text", "")
@@ -193,7 +194,6 @@ def video_stream(a_cam):
 
 def streamVideo():
     try:
-        cam = Camera.get_instance()
         h = Headers()
         h.add('Age', 0)
         h.add('Cache-Control', 'no-cache, private')
@@ -206,15 +206,13 @@ def listPhotos():
     """
     Expose the list of taken photos
     """
-    cam = Camera.get_instance()
     return cam.get_photo_list()
 
 def getPhoto(name):
-    cam = Camera.get_instance()
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
         media_file = cam.get_photo_file(name)
-        return send_file(media_file, mimetype=mimetype.get(filename[:-3], 'image/jpeg'), cache_timeout=0)
+        return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), cache_timeout=0)
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
         return 503
@@ -222,21 +220,18 @@ def getPhoto(name):
         return 404
 
 def takePhoto():
-    cam = Camera.get_instance()
     try:
         cam.photo_take()
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
 
 def savePhoto(name, body):
-    cam = Camera.get_instance()
     try:
         cam.update_photo({"name": name, "tag": body.get("tag")})
     except FileNotFoundError:
         return 404
 
 def deletePhoto(name):
-    cam = Camera.get_instance()
     logging.debug("photo delete")
     try:
         cam.delete_photo(name)
