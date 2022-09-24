@@ -35,8 +35,8 @@ from cnn_manager import CNNManager
 import config
 
 MAX_IMAGE_AGE = 0.0
-PHOTO_PATH = "./photos"
-PHOTO_METADATA_FILE = "./photos/metadata.json"
+PHOTO_PATH = "data/media"
+PHOTO_METADATA_FILE = "data/media/metadata.json"
 PHOTO_PREFIX = "DSC"
 VIDEO_PREFIX = "VID"
 PHOTO_THUMB_SUFFIX = "_thumb"

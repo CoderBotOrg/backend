@@ -153,8 +153,8 @@ def recVideo():
     try:
         cam.video_rec()
         audio_device.say(bot_config.get("sound_shutter"))
-    except Exception:
-        logging.warning("Camera not present")
+    except Exception as e:
+        logging.warning("Camera not present: %s", e)
 
 def stopVideo():
     try:

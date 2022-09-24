@@ -36,7 +36,7 @@ from cnn_classifier import CNNClassifier
 MODEL_PATH = "./cnn_models"
 MODEL_TMP_PATH = "/tmp/images"
 MODEL_METADATA = "./cnn_models/models.json"
-PHOTO_PATH = "./photos"
+PHOTO_PATH = "./media"
 
 logger = logging.getLogger(__name__)
 

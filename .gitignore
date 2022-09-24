@@ -33,8 +33,8 @@
 *.sqlite
 
 # Pictures taken
-photos/*.jpeg
-photos/*.mp4
+media/*.jpeg
+media/*.mp4
 saved_photos
 
 #cnn models

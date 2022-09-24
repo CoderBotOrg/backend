@@ -29,13 +29,13 @@ class CameraTest(unittest.TestCase):
         self.cam.video_rec(video_filename)
         time.sleep(5)
         self.cam.video_stop()
-        v = open("photos/VID" + video_filename + ".mp4")
-        t = open("photos/VID" + video_filename + "_thumb.jpg")
+        v = open("data/media/VID" + video_filename + ".mp4")
+        t = open("data/media/VID" + video_filename + "_thumb.jpg")
         self.assertTrue(v is not None and t is not None)
         v.close()
         t.close()
-        os.remove("photos/VID" + video_filename + ".mp4")
-        os.remove("photos/VID" + video_filename + "_thumb.jpg")
+        os.remove("data/media/VID" + video_filename + ".mp4")
+        os.remove("data/media/VID" + video_filename + "_thumb.jpg")
 
     def test_find_color(self):
         color = 'ff0000'
