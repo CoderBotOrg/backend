@@ -60,7 +60,7 @@ class Audio:
         if what and "$" in what:
             self.play(what[1:])
         elif what and what:
-            os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -D hw:1,0')
+            os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | paplay')
 
     def normalize(self, snd_data):
         "Average the volume out"
