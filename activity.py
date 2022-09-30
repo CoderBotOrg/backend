@@ -29,11 +29,12 @@ class Activities():
                 return None
 
     def save(self, name, activity):
+        # if saved activity is "default", reset existing default activity to "non-default"
+        if activity.get("default", False) == True:
+            self.activities.update({'default': False})
         if self.activities.search(self.query.name == name) == []:
             self.activities.insert(activity)
         else:
-            if activity.get("default", False) == True:
-                self.activities.update({'default': False})
             self.activities.update(activity, self.query.name == activity["name"])
 
     def delete(self, name):
