@@ -37,6 +37,9 @@ FORMAT = pyaudio.paInt16
 MODELDIR = "/home/pi/coderbot/psmodels/"
 SOUNDDIR = "./sounds/"
 
+SINK_OUTPUT = 0
+SINK_INPUT = 1
+
 class Audio:
 
     _instance = None
@@ -134,23 +137,29 @@ class Audio:
 
     def get_volume(self):
         with Pulse('volume') as pulse:
-            sink_input = pulse.sink_input_list()[0] # first random sink-input stream
+            sink = pulse.sink_list()[0] # first random sink-input stream
 
-            volume = sink_input.volume
+            volume = sink.volume
             logging.info(volume.values) # list of per-channel values (floats)
             return volume
     
-    def set_volume(self, volume_new_value):
+    def set_volume(self, volume_output, volume_input):
         with Pulse('volume') as pulse:
-            sink_input = pulse.sink_input_list()[0] # first random sink-input stream
+            sinks= pulse.sink_list() # first random sink-input stream
 
-            volume = sink_input.volume
+            volume = sinks[SINK_OUTPUT].volume
             logging.info(volume.values) # list of per-channel values (floats)
             logging.info(volume.value_flat) # average level across channels (float)
 
-            volume.value_flat = volume_new_value # sets all volume.values to volume_new_value
-            pulse.volume_set(sink_input, volume) # applies the change
+            volume.value_flat = volume_output # sets all volume.values to volume_new_value
+            pulse.volume_set(sinks[SINK_OUTPUT], volume) # applies the change
 
+            volume = sinks[SINK_INPUT].volume
+            logging.info(volume.values) # list of per-channel values (floats)
+            logging.info(volume.value_flat) # average level across channels (float)
+
+            volume.value_flat = volume_input # sets all volume.values to volume_new_value
+            pulse.volume_set(sinks[SINK_INPUT], volume) # applies the change
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""

@@ -115,7 +115,7 @@ def run_server():
                                         hw_version=app.bot_config.get('hardware_version'))
 
             audio_device = Audio.get_instance()
-            # audio_device.set_volume(int(app.bot_config.get('audio_volume_level')))
+            audio_device.set_volume(int(app.bot_config.get('audio_volume_level')), 100)
             audio_device.say(app.bot_config.get("sound_start"))
 
             try:
