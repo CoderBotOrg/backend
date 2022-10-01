@@ -23,7 +23,6 @@ from cnn_manager import CNNManager
 from musicPackages import MusicPackageManager
 from audio import Audio
 from event import EventManager
-from audioControls import AudioCtrl
 from coderbotTestUnit import run_test as runCoderbotTestUnit
 import pigpio
 

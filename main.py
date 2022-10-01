@@ -21,7 +21,6 @@ from program import ProgramEngine, Program
 from config import Config
 from cnn_manager import CNNManager
 from event import EventManager
-from audioControls import AudioCtrl
 
 # Logging configuration
 logger = logging.getLogger()
@@ -114,14 +113,10 @@ def run_server():
             align_wifi_config()
             bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
                                         hw_version=app.bot_config.get('hardware_version'))
-            audio = Audio.get_instance()
-            audio.say(app.bot_config.get("sound_start"))
 
-            try:
-                audioCtrl = AudioCtrl.get_instance()
-                audioCtrl.setVolume(int(app.bot_config.get('audio_volume_level')))
-            except Exception as e:
-                logging.warning("error initialising AudioCtrl: %s", str(e))
+            audio_device = Audio.get_instance()
+            audio_device.set_volume(int(app.bot_config.get('audio_volume_level')))
+            audio_device.say(app.bot_config.get("sound_start"))
 
             try:
                 cam = Camera.get_instance()

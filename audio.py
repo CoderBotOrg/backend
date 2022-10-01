@@ -24,6 +24,7 @@ import logging
 import wave
 import audioop
 import pyaudio
+from pulsectl import Pulse, PulseVolumeInfo
 
 from six.moves import queue
 # [END import_libraries]
@@ -130,6 +131,26 @@ class Audio:
                 if time.time() - t >= elapse:
                     return False
         return False
+
+    def get_volume(self):
+        with Pulse('volume') as pulse:
+            sink_input = pulse.sink_input_list()[0] # first random sink-input stream
+
+            volume = sink_input.volume
+            logging.info(volume.values) # list of per-channel values (floats)
+            return volume
+    
+    def set_volume(self, volume_new_value):
+        with Pulse('volume') as pulse:
+            sink_input = pulse.sink_input_list()[0] # first random sink-input stream
+
+            volume = sink_input.volume
+            logging.info(volume.values) # list of per-channel values (floats)
+            logging.info(volume.value_flat) # average level across channels (float)
+
+            volume.value_flat = volume_new_value # sets all volume.values to volume_new_value
+            pulse.volume_set(sink_input, volume) # applies the change
+
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""
