@@ -1,7 +1,7 @@
 import unittest
 import time
 import os
-import test.picamera_mock
+import picamera_mock
 import picamera
 import camera
 import config

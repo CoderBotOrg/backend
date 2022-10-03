@@ -65,7 +65,7 @@ def get_status():
         temp = "undefined"
 
     uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
-    internet_status = subprocess.check_output(["./utils/check_conn.sh"]).decode('utf-8').replace('\n', '')
+    internet_status = False #subprocess.check_output(["./utils/check_conn.sh"]).decode('utf-8').replace('\n', '')
     return {'internet_status': internet_status,
             'temp': temp,
             'uptime': uptime}

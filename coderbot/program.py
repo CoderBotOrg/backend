@@ -34,7 +34,7 @@ import audio
 import event
 import music
 import musicPackages
-import atmega328p 
+import hw.atmega328p 
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"

@@ -22,7 +22,7 @@ import time
 import logging
 import pigpio
 import sonar
-import mpu
+import hw.mpu
 from rotary_encoder.wheelsaxel import WheelsAxel
 
 # GPIO

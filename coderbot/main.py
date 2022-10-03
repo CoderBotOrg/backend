@@ -19,7 +19,7 @@ from motion import Motion
 from audio import Audio
 from program import ProgramEngine, Program
 from config import Config
-from cnn_manager import CNNManager
+from cnn.cnn_manager import CNNManager
 from event import EventManager
 
 # Logging configuration

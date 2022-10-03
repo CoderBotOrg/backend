@@ -3,7 +3,7 @@ import time
 import os
 import config
 import camera
-import cnn_manager
+import cnn.cnn_manager
 
 class CNNTest(unittest.TestCase):
     def setUp(self):
