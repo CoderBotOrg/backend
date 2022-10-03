@@ -27,11 +27,11 @@ import json
 import threading
 
 try:
-    from cnn_train import CNNTrainer
+    from cnn.cnn_train import CNNTrainer
 except:
     logging.warning("tensorflow not available (for training)")
 
-from cnn_classifier import CNNClassifier
+from cnn.cnn_classifier import CNNClassifier
 
 MODEL_PATH = "./cnn_models"
 MODEL_TMP_PATH = "/tmp/images"

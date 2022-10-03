@@ -1,6 +1,6 @@
 import time
 
-import lsm9ds1
+import hw.lsm9ds1
 
 class SimpleExample:
     X_IND = 0

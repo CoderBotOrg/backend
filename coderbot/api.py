@@ -19,7 +19,7 @@ from program import ProgramEngine, Program
 from config import Config
 from activity import Activities
 from camera import Camera
-from cnn_manager import CNNManager
+from cnn.cnn_manager import CNNManager
 from musicPackages import MusicPackageManager
 from audio import Audio
 from event import EventManager
