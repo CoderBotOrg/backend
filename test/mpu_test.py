@@ -1,6 +1,6 @@
 import unittest
-import test.pigpio_mock
-import hw.mpu
+import pigpio_mock
+from hw import mpu
 import logging
 
 logger = logging.getLogger()

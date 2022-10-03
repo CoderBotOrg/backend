@@ -9,7 +9,7 @@ import config
 class CameraTest(unittest.TestCase):
     def setUp(self):
         config.Config.read()
-        picamera.PiCamera = test.picamera_mock.PiCameraMock
+        picamera.PiCamera = picamera_mock.PiCameraMock
         self.cam = camera.Camera.get_instance()
    
     def tearDown(self):

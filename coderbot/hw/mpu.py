@@ -1,4 +1,4 @@
-import hw.lsm9ds1
+from hw import lsm9ds1
 import time
 
 class AccelGyroMag:

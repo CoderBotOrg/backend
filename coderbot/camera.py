@@ -30,7 +30,7 @@ except ImportError:
 
 from cv import camera, image, blob
 
-from cnn_manager import CNNManager
+from cnn.cnn_manager import CNNManager
 
 import config
 
