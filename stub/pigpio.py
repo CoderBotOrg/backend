@@ -1,4 +1,4 @@
-from test.pigpio_mock import PIGPIOMock
+from pigpio_mock import PIGPIOMock
 
 pi = PIGPIOMock
 
