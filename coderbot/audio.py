@@ -102,7 +102,7 @@ class Audio:
 
     def play(self, filename):	
 
-        f = wave.open(filename, 'rb')
+        f = wave.open(SOUNDDIR + filename, 'rb')
 
         format = None
 
