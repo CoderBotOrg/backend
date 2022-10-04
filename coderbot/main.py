@@ -52,34 +52,6 @@ app.prog_engine = ProgramEngine.get_instance()
 # API v1 is defined in v1.yml and its methods are in api.py
 connexionApp.add_api('v1.yml')
 
-@app.route('/vue/<path:filename>')
-def serve_vue_app(filename):
-    """
-    Serve (a build of) the new Vue application
-    "dist" is the output of `npm run build` from the 'vue-app' repository
-    """
-    return send_from_directory('dist', filename)
-
-@app.route('/docs/')
-def redirect_docs_app():
-    return redirect('/docs/index.html', code=302)
-
-@app.route('/docs/<path:subpath>')
-def serve_docs_app(subpath):
-    """
-    Serve (a build of) the documentation
-    'cb_docs' is the output of `npx vuepress build pages/`
-    from the 'docs' repository
-    """
-    if (subpath[-1] == '/'):
-        subpath = subpath + 'index.html'
-    return send_from_directory('cb_docs', subpath)
-
-@app.route('/')
-def redirect_vue_app():
-    return redirect('/vue/index.html', code=302)
-
-
 def button_pushed():
     if app.bot_config.get('button_func') == "startstop":
         prog = app.prog_engine.get_current_prog()
