@@ -147,13 +147,13 @@ class Audio:
         return False
 
     def get_volume(self):
-        volume = alsaaudio.Mixer('Master').getvolume()
+        volume = alsaaudio.Mixer('Headphone', cardindex=0).getvolume()
         logging.info(volume) # list of per-channel values (floats)
         return volume
     
     def set_volume(self, volume_output, volume_input):
-        alsaaudio.Mixer('Master').setvolume(volume_output)
-        alsaaudio.Mixer('Capture').setvolume(volume_input)
+        alsaaudio.Mixer('Headphone', cardindex=0).setvolume(volume_output)
+        alsaaudio.Mixer('Mic', cardindex=1).setvolume(volume_input)
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""
