@@ -36,6 +36,7 @@ FORMAT = pyaudio.paInt16
 
 MODELDIR = "/home/pi/coderbot/psmodels/"
 SOUNDDIR = "./sounds/"
+SOUNDEXT = ".wav"
 
 SOURCE_OUTPUT = 0
 SOURCE_INPUT = 1
@@ -62,9 +63,9 @@ class Audio:
 
     def say(self, what, locale='en'):
         if what and "$" in what:
-            self.play(what[1:])
+            self.play(what[1:] + SOUNDEXT)
         elif what and what:
-            os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | paplay')
+            os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -q')
 
     def normalize(self, snd_data):
         "Average the volume out"
