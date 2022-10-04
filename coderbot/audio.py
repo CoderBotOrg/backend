@@ -24,7 +24,7 @@ import logging
 import wave
 import audioop
 import pyaudio
-from pulsectl import Pulse, PulseVolumeInfo
+import alsaaudio
 
 from six.moves import queue
 # [END import_libraries]
@@ -37,8 +37,8 @@ FORMAT = pyaudio.paInt16
 MODELDIR = "/home/pi/coderbot/psmodels/"
 SOUNDDIR = "./sounds/"
 
-SINK_OUTPUT = 0
-SINK_INPUT = 1
+SOURCE_OUTPUT = 0
+SOURCE_INPUT = 1
 
 class Audio:
 
@@ -100,28 +100,39 @@ class Audio:
         wf.writeframes(data)
         wf.close()
 
-    def play(self, filename):
-        # open the file for reading.
-        wf = wave.open(SOUNDDIR + filename, 'rb')
+    def play(self, filename):	
 
-        # open stream based on the wave object which has been input.
-        stream = self.pa.open(format =
-                    self.pa.get_format_from_width(wf.getsampwidth()),
-                    channels = wf.getnchannels(),
-                    rate = wf.getframerate(),
-                    output = True)
+        f = open(filename, 'rb')
 
-        # read data (based on the chunk size)
-        data = wf.readframes(CHUNK)
+        format = None
 
-        # play stream (looping from beginning of file to the end)
-        while len(data) > 0:
-            # writing to the stream is what *actually* plays the sound.
-            stream.write(data)
-            data = wf.readframes(CHUNK)
+        # 8bit is unsigned in wav files
+        if f.getsampwidth() == 1:
+            format = alsaaudio.PCM_FORMAT_U8
+        # Otherwise we assume signed data, little endian
+        elif f.getsampwidth() == 2:
+            format = alsaaudio.PCM_FORMAT_S16_LE
+        elif f.getsampwidth() == 3:
+            format = alsaaudio.PCM_FORMAT_S24_3LE
+        elif f.getsampwidth() == 4:
+            format = alsaaudio.PCM_FORMAT_S32_LE
+        else:
+            raise ValueError('Unsupported format')
 
-        # cleanup stuff.
-        stream.close()
+        periodsize = f.getframerate() // 8
+
+        logging.info('%d channels, %d sampling rate, format %d, periodsize %d\n' % (f.getnchannels(),
+                                                                            f.getframerate(),
+                                                                            format,
+                                                                            periodsize))
+
+        device = alsaaudio.PCM(channels=f.getnchannels(), rate=f.getframerate(), format=format, periodsize=periodsize)
+        
+        data = f.readframes(periodsize)
+        while data:
+            # Read data from stdin
+            device.write(data)
+            data = f.readframes(periodsize)
 
     def hear(self, level, elapse=1.0):
         t = time.time()
@@ -136,30 +147,13 @@ class Audio:
         return False
 
     def get_volume(self):
-        with Pulse('volume') as pulse:
-            sink = pulse.sink_list()[0] # first random sink-input stream
-
-            volume = sink.volume
-            logging.info(volume.values) # list of per-channel values (floats)
-            return volume
+        volume = alsaaudio.Mixer('Master').getvolume()
+        logging.info(volume) # list of per-channel values (floats)
+        return volume
     
     def set_volume(self, volume_output, volume_input):
-        with Pulse('volume') as pulse:
-            sinks= pulse.sink_list() # first random sink-input stream
-
-            volume = sinks[SINK_OUTPUT].volume
-            logging.info(volume.values) # list of per-channel values (floats)
-            logging.info(volume.value_flat) # average level across channels (float)
-
-            volume.value_flat = volume_output # sets all volume.values to volume_new_value
-            pulse.volume_set(sinks[SINK_OUTPUT], volume) # applies the change
-
-            volume = sinks[SINK_INPUT].volume
-            logging.info(volume.values) # list of per-channel values (floats)
-            logging.info(volume.value_flat) # average level across channels (float)
-
-            volume.value_flat = volume_input # sets all volume.values to volume_new_value
-            pulse.volume_set(sinks[SINK_INPUT], volume) # applies the change
+        alsaaudio.Mixer('Master').setvolume(volume_output)
+        alsaaudio.Mixer('Capture').setvolume(volume_input)
 
     class MicrophoneStream(object):
         """Opens a recording stream as a generator yielding the audio chunks."""
