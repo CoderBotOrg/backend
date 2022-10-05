@@ -177,6 +177,7 @@ class Audio:
                 # https://goo.gl/z757pE
                 channels=1, rate=self._rate,
                 input=True, frames_per_buffer=self._chunk,
+                input_device_index=1,
                 # Run the audio stream asynchronously to fill the buffer object.
                 # This is necessary so that the input device's buffer doesn't
                 # overflow while the calling thread makes network requests, etc.
