@@ -34,7 +34,7 @@
   "move_power_angle_2":"60",
   "ctrl_hud_image":"",
   "load_at_start":"",
-  "sound_start":"$startup.wav",
+  "sound_start":"$startup",
   "hw_version":"5",
   "audio_volume_level":"100",
   "wifi_mode":"ap",
