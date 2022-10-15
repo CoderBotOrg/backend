@@ -278,24 +278,6 @@ def loadSettings():
 def saveSettings(body):
     Config.write(body)
 
-def saveWifiSettings(body):
-    """
-    Passes the received Wi-Fi configuration to the wifi.py script, applying it.
-    Then reboots
-    """
-    mode = body.get("wifi_mode", "")
-    ssid = body.get("wifi_ssid", "")
-    psk = body.get("wifi_psk", "")
-
-    logging.info("mode " + mode +" ssid: " + ssid + " psk: " + psk)
-    client_params = " --ssid \"" + ssid + "\" --pwd \"" + psk + "\"" if ssid != "" and psk != "" else ""
-    logging.info("sudo ./wifi.py updatecfg --mode " + mode + client_params)
-    os.system("sudo ./wifi.py updatecfg --mode " + mode + client_params)
-    os.system("sudo reboot")
-    if mode == "ap":
-        return {"base_url": "http://coder.bot"}
-    return {"base_url": "http://coderbot.local"}
-
 def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')
     file_to_upload = connexion.request.files['file_to_upload']
