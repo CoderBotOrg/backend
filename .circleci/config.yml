@@ -45,6 +45,16 @@ jobs:
             python3 -m unittest test/camera_test.py 2>&1 | tee test-reports/test_report.txt
             #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
             echo "test complete"
+      - run:
+          name: run openapi tests
+          command: |
+            . venv/bin/activate
+            export PYTHONPATH=./coderbot:./stub:./test
+            python3 coderbot/main.py &&
+            pip install schemathesis
+            st run --entry-point "^(?!.*(\/video\/stream)).*" https://localhost:5000/api/v1/openapi.json
+            pkill python3
+            echo "openapi test complete"
       - store_artifacts:
           path: test-reports/
           destination: tr1
@@ -52,3 +62,45 @@ jobs:
       - store_test_results:
           path: test-reports/
 
+  build-container:
+    docker:
+      - image: docker:20.10.19-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache py-pip
+            pip install docker-compose
+      - restore_cache:
+          keys:
+            - v1-{{ .Branch }}
+          paths:
+            - /caches/app.tar
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i /caches/app.tar | true
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build --cache-from=app -t "ghcr.io/coderbotorg/backend:${CIRCLE_SHA1}" . -f docker/Dockerfile
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p /caches
+            docker save -o /caches/app.tar app
+      - save_cache:
+          key: v1-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /caches/app.tar
+      - deploy:
+          name: Push application Docker image
+          command: |
+            #if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            docker login ghcr.io -u previ -p $GITHUB_CR_TOKEN
+            docker tag "ghcr.io/coderbotorg/backend:${CIRCLE_SHA1}"
+            docker push "ghcr.io/coderbotorg/backend:${CIRCLE_SHA1}"
+            #fi
