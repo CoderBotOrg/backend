@@ -48,6 +48,7 @@ jobs:
       - run:
           name: run openapi tests
           command: |
+            . venv/bin/activate
             pip install schemathesis
             export PYTHONPATH=./coderbot:./stub:./test
             python3 coderbot/main.py &&
