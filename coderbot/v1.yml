@@ -41,22 +41,6 @@ paths:
           description: "ok"
       tags:
         - CoderBot configuration
-  /settings/wifi:
-    put:
-      operationId: "api.saveWifiSettings"
-      summary: "Save Wifi settings"
-      requestBody:
-        description: Save Wifi Settings
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WifiSettings'
-      responses:
-        200:
-          description: "ok"
-      tags:
-        - CoderBot configuration
   /media:
     get:
       operationId: "api.listPhotos"
@@ -679,19 +663,6 @@ components:
         - elapse
     Settings:
       type: object
-    WifiSettings:
-      type: object
-      properties:
-        wifi_mode:
-          type: string
-          minLength: 1
-          maxLength: 10
-        wifi_ssid:
-          type: string
-        wifi_psk:
-          type: string
-      required:
-        - mode
     Photo:
       type: object
       properties:
