@@ -33,6 +33,7 @@ jobs:
         echo "openapi test complete"
 
   release-backend:
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2 # Checking out the repo
@@ -52,7 +53,8 @@ jobs:
       with:
           push: true
           platforms: linux/arm/v7
-          tags: ghcr.io/coderbotorg/containers/backend:latest
-          context: backend
+          tags: ghcr.io/coderbotorg/backend:latest
+          context: .
+          file: docker/Dockerfile
           #cache-from: type=registry,ref=ghcr.io/coderbotorg/containers/backend:latest
           #cache-to: type=inline
