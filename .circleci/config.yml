@@ -48,10 +48,9 @@ jobs:
       - run:
           name: run openapi tests
           command: |
-            . venv/bin/activate
+            pip install schemathesis
             export PYTHONPATH=./coderbot:./stub:./test
             python3 coderbot/main.py &&
-            pip install schemathesis
             st run --entry-point "^(?!.*(\/video\/stream)).*" https://localhost:5000/api/v1/openapi.json
             pkill python3
             echo "openapi test complete"
