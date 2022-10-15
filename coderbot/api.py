@@ -84,6 +84,12 @@ def get_info():
     Expose informations about the CoderBot system.
     (Cached method)
     """
+    backend_commit = "undefined"
+    coderbot_version = "undefined"
+    update_status = "ok"
+    kernel = 'undefined'
+    motors = 'undefined'
+    
     try:
         # manifest.json is generated while building/copying the backend
         with open('manifest.json', 'r') as f:
@@ -91,12 +97,12 @@ def get_info():
             backend_commit = metadata["backend_commit"][0:7]
             coderbot_version = metadata["backend_version"][0:7]
     except Exception:
-        backend_commit = "undefined"
+        pass
 
     try:
         kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
     except Exception:
-        kernel = 'undefined'
+        pass
 
     try:
         encoder = bool(Config.read().get('encoder'))
@@ -105,7 +111,7 @@ def get_info():
         else:
             motors = 'DC motors'
     except Exception:
-        motors = 'undefined'
+        pass
 
     serial = get_serial()
 
