@@ -13,6 +13,9 @@ from flask import (request,
                    Response)
 import connexion
 import picamera
+import pigpio
+import urllib
+
 from cachetools import cached, TTLCache
 from coderbot import CoderBot
 from program import ProgramEngine, Program
@@ -24,7 +27,6 @@ from musicPackages import MusicPackageManager
 from audio import Audio
 from event import EventManager
 from coderbotTestUnit import run_test as runCoderbotTestUnit
-import pigpio
 
 BUTTON_PIN = 16
 
@@ -65,7 +67,13 @@ def get_status():
         temp = "undefined"
 
     uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
-    internet_status = False #subprocess.check_output(["./utils/check_conn.sh"]).decode('utf-8').replace('\n', '')
+    internet_status = False
+    try:
+        urllib.request.urlopen("https://coderbot.org") 
+        internet_status = True
+    except:
+        pass
+
     return {'internet_status': internet_status,
             'temp': temp,
             'uptime': uptime}
@@ -80,22 +88,16 @@ def get_info():
         # manifest.json is generated while building/copying the backend
         with open('manifest.json', 'r') as f:
             metadata = json.load(f)
-        backend_commit = metadata["backendCommit"][0:7]
+            backend_commit = metadata["backend_commit"][0:7]
+            coderbot_version = metadata["backend_version"][0:7]
     except Exception:
         backend_commit = "undefined"
 
     try:
-        coderbot_version = subprocess.check_output(["cat", "/etc/coderbot/version"]).decode('utf-8').replace('\n', '')
-    except Exception:
-        coderbot_version = 'undefined'
-    try:
         kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
     except Exception:
         kernel = 'undefined'
-    try:
-        update_status = subprocess.check_output(["cat", "/etc/coderbot/update_status"]).decode('utf-8').replace('\n', '')
-    except Exception:
-        update_status = 'undefined'
+
     try:
         encoder = bool(Config.read().get('encoder'))
         if(encoder):
