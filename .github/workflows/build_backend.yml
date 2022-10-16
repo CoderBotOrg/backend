@@ -25,7 +25,7 @@ jobs:
         echo "test complete" 
     - run: |
         export PYTHONPATH=./coderbot:./stub:./test
-        python3 coderbot/main.py &
+        python3 coderbot/main.py > coderbot.log &
         sleep 30
         apt-get install -y python3-venv
         mkdir -p schemathesis
@@ -39,6 +39,23 @@ jobs:
     #needs: [test]
     runs-on: ubuntu-latest
     steps:
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        # list of Docker images to use as base name for tags
+        images: ghcr.io/coderbotorg/backend
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          type=raw,value=latest
+          # branch event
+          type=ref,event=branch
+          # tag event
+          type=ref,event=tag
+          # pull request event
+          type=ref,event=pr
+          # push event
+          type=ref,event=push,format=short
     - uses: actions/checkout@v2 # Checking out the repo
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -56,8 +73,8 @@ jobs:
       with:
           push: true
           platforms: linux/arm/v7
-          tags: ghcr.io/coderbotorg/backend:latest
+          tags: ${{ steps.meta.outputs.tags }}
           context: .
           file: docker/Dockerfile
-          #cache-from: type=registry,ref=ghcr.io/coderbotorg/containers/backend:latest
-          #cache-to: type=inline
+          cache-from: type=registry,ref=ghcr.io/coderbotorg/backend:latest
+          cache-to: type=inline
