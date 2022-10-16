@@ -26,9 +26,8 @@ jobs:
     - run: |
         python3 coderbot/main.py &
         sleep 30
-        pip install schemathesis
         curl https://localhost:5000/api/v1/openapi.json
-        st run --entry-point --endpoint '^(?!(\/api\/v1\/video\/stream)$).*$' --hypothesis-max-examples=10 https://localhost:5000/api/v1/openapi.json
+        docker run schemathesis/schemathesis:stable st run --entry-point --endpoint '^(?!(\/api\/v1\/video\/stream)$).*$' --hypothesis-max-examples=10 https://localhost:5000/api/v1/openapi.json
         sleep 5
         pkill python3
         echo "openapi test complete"
