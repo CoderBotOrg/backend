@@ -32,7 +32,7 @@ jobs:
         python3 -m venv schemathesis
         . schemathesis/bin/activate
         pip install schemathesis 
-        st run --entry-point --endpoint '^(?!(\/api\/v1\/video\/stream)$).*$' --hypothesis-max-examples=10 https://localhost:5000/api/v1/openapi.json
+        st run --endpoint '^(?!(\/api\/v1\/video\/stream)$).*$' --hypothesis-max-examples=10 https://localhost:5000/api/v1/openapi.json
         echo "openapi test complete"
 
   release-backend:
