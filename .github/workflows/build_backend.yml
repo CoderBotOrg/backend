@@ -12,9 +12,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: coderbot/coderbot-ci:3.9-bullseye-arm
+    container: coderbot/coderbot-ci:3.9-bullseye
     steps:
-    - run: pip install -r requirements.txt
+    - uses: actions/checkout@v2 # Checking out the repo
+    - run: pip install -r requirements_stub.txt
     - run: |
         export PYTHONPATH=./coderbot:./stub:./test
         mkdir test-reports
@@ -23,10 +24,11 @@ jobs:
         #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
         echo "test complete" 
     - run: |
-        python3 coderbot/main.py &&
+        python3 coderbot/main.py &
         sleep 30
+        pip install schemathesis
         curl https://localhost:5000/api/v1/openapi.json
-        st run --entry-point "^(?!.*(\/video\/stream)).*" https://localhost:5000/api/v1/openapi.json
+        st run --entry-point --endpoint '^(?!(\/api\/v1\/video\/stream)$).*$' --hypothesis-max-examples=10 https://localhost:5000/api/v1/openapi.json
         sleep 5
         pkill python3
         echo "openapi test complete"
