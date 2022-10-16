@@ -1,5 +1,5 @@
 class Mixer():
-    def __init__(self, device):
+    def __init__(self, device, cardindex):
         pass
     
     def getvolume(self):
