@@ -12,7 +12,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: coderbot/coderbot-ci:3.9-bullseye
+    container: coderbot/coderbot-ci:3.9-bullseye-slim
     steps:
     - uses: actions/checkout@v2 # Checking out the repo
     - run: pip install -r requirements_stub.txt
