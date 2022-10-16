@@ -47,6 +47,7 @@ jobs:
         images: ghcr.io/coderbotorg/backend
         # generate Docker tags based on the following events/attributes
         tags: |
+          # always latest
           type=raw,value=latest
           # branch event
           type=ref,event=branch
@@ -55,7 +56,7 @@ jobs:
           # pull request event
           type=ref,event=pr
           # push event
-          type=ref,event=push,format=short
+          type=sha,format=short
     - uses: actions/checkout@v2 # Checking out the repo
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
