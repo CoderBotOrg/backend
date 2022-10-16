@@ -1,9 +1,9 @@
-class Mixer():
+PCM_FORMAT_U8 = 1
+PCM_FORMAT_S16_LE = 2
+PCM_FORMAT_S24_3LE = 3
+PCM_FORMAT_S32_LE = 4
 
-    PCM_FORMAT_U8 = 1
-    PCM_FORMAT_S16_LE = 2
-    PCM_FORMAT_S24_3LE = 3
-    PCM_FORMAT_S32_LE = 4
+class Mixer():
 
     def __init__(self, device, cardindex):
         pass
