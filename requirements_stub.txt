@@ -49,6 +49,3 @@ pytesseract==0.3.10
 pyzbar==0.1.9
 
 #picamera==1.13
-
-# test
-schemathesis==3.17.3
