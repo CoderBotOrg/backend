@@ -56,7 +56,7 @@ ADD coderbot /coderbot/.
 ADD defaults /coderbot/.
 ADD sounds /coderbot/.
 
-ADD scripts/*.sh /tmp/.
+ADD docker/scripts/*.sh /tmp/.
 RUN /tmp/install_generic_cnn_models.sh
 RUN /tmp/install_lib_firmware.sh
 
