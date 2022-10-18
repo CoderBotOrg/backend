@@ -101,6 +101,7 @@ class CNNManager(object):
                         training_steps,
                         learning_rate):
         try:
+            CNNManager
             logging.info("starting")
             trainer = self.TrainThread(self, model_name, architecture, image_tags, photos_meta, training_steps, learning_rate)
             trainer.start()
