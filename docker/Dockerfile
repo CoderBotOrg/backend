@@ -51,10 +51,14 @@ RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \
 mkdir -p /coderbot/logs && \
 mkdir -p /coderbot/updatePackages && \
-mkdir -p /coderbot/cnn_modules
-ADD coderbot /coderbot/.
-ADD defaults /coderbot/.
-ADD sounds /coderbot/.
+mkdir -p /coderbot/cnn_modules && \
+mkdir -p /coderbot/coderbot && \
+mkdir -p /coderbot/defaults && \
+mkdir -p /coderbot/sounds
+
+ADD coderbot /coderbot/coderbot/.
+ADD defaults /coderbot/defaults/.
+ADD sounds /coderbot/sounds/.
 
 ADD docker/scripts/*.sh /tmp/.
 RUN /tmp/install_generic_cnn_models.sh
