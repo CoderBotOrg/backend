@@ -61,10 +61,12 @@ def get_status():
     temperature, uptime, and internet connectivity status.
     (Cached method)
     """
+
+    temp = "undefined"
     try:
         temp = os.popen("vcgencmd measure_temp").readline().replace("temp=", "")
     except Exception:
-        temp = "undefined"
+        pass
 
     uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
     internet_status = False
@@ -225,12 +227,6 @@ def getPhoto(name):
         return 503
     except FileNotFoundError:
         return 404
-
-def takePhoto():
-    try:
-        cam.photo_take()
-    except picamera.exc.PiCameraError as e:
-        logging.error("Error: %s", str(e))
 
 def savePhoto(name, body):
     try:
