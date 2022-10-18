@@ -100,11 +100,13 @@ class CNNManager(object):
                         photos_meta,
                         training_steps,
                         learning_rate):
-
-        logging.info("starting")
-        trainer = self.TrainThread(self, model_name, architecture, image_tags, photos_meta, training_steps, learning_rate)
-        trainer.start()
-        self._trainers[model_name] = trainer
+        try:
+            logging.info("starting")
+            trainer = self.TrainThread(self, model_name, architecture, image_tags, photos_meta, training_steps, learning_rate)
+            trainer.start()
+            self._trainers[model_name] = trainer
+        except NameError:
+            logging.warning("tensorflow not available (for training)")
 
     def save_model_status(self, model_name, architecture, status):
         model_info = self.get_model_info(architecture)
