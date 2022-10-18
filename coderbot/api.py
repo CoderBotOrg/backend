@@ -68,7 +68,12 @@ def get_status():
     except Exception:
         pass
 
-    uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
+    uptime = 0
+    try:
+        uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
+    except:
+        pass
+
     internet_status = False
     try:
         urllib.request.urlopen("https://coderbot.org") 
@@ -246,11 +251,12 @@ def deletePhoto(name):
 def status():
     sts = get_status()
     # getting reset log file
+    data = []
     try:
         with open('/home/pi/coderbot/logs/reset_trigger_service.log', 'r') as log_file:
             data = [x for x in log_file.read().split('\n') if x]
     except Exception: # direct control case
-        data = [] # if file doesn't exist, no restore as ever been performed. return empty data
+        pass # if file doesn't exist, no restore as ever been performed. return empty data
 
 
     return {
