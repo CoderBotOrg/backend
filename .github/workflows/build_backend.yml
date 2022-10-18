@@ -28,7 +28,7 @@ jobs:
         python3 -m venv schemathesis
         . schemathesis/bin/activate
         pip install schemathesis 
-        st run --endpoint '^(?!(\/api\/v1\/video\/stream|\/api\/v1\/control\/move)$).*$' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint '^(?!(\/api\/v1\/video\/stream|\/api\/v1\/control\/move|\/api\/v1\/video\/rec|\/api\/v1\/video\/stop)$).*$' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         echo "openapi test complete"
 
   release-backend:
