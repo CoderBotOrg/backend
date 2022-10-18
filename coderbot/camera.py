@@ -117,10 +117,10 @@ class Camera(object):
 
     def load_photo_metadata(self):
         try:
-            f = open(PHOTO_METADATA_FILE, "rt")
-            self._photos = json.load(f)
-            f.close()
-        except IOError:
+            with open(PHOTO_METADATA_FILE, "rt") as f:
+                self._photos = json.load(f)
+                f.close()
+        except Exception:
             logging.warning("no metadata file, starting from empty")
             self._photos = []
 
