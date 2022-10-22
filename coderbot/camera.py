@@ -22,6 +22,7 @@ import os
 import math
 import json
 import logging
+import pathlib
 from PIL import Image as PILImage
 try:
     from BytesIO import BytesIO
@@ -75,7 +76,7 @@ class Camera(object):
         self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
         self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
         self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
-        self._photos = []
+        self.init_metadata()
         self.load_photo_metadata()
         if not self._photos:
             self._photos = []
@@ -122,7 +123,9 @@ class Camera(object):
                 f.close()
         except Exception:
             logging.warning("no metadata file, starting from empty")
+            pathlib.Path(PHOTO_METADATA).mkdir(parents=True, exist_ok=True)
             self._photos = []
+            self.save_photo_metadata()
 
     def save_photo_metadata(self):
         f = open(PHOTO_METADATA_FILE, "wt")
