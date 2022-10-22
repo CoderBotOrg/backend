@@ -24,14 +24,11 @@ from event import EventManager
 
 # Logging configuration
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
 sh = logging.StreamHandler()
-fh = logging.handlers.RotatingFileHandler('./logs/coderbot.log', maxBytes=1000000, backupCount=5)
 formatter = logging.Formatter('%(message)s')
 sh.setFormatter(formatter)
-fh.setFormatter(formatter)
-#logger.addHandler(sh)
-logger.addHandler(fh)
+logger.addHandler(sh)
 
 ## (Connexion) Flask app configuration
 
@@ -77,15 +74,18 @@ def run_server():
             bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
                                         hw_version=app.bot_config.get('hardware_version'))
 
-            audio_device = Audio.get_instance()
-            audio_device.set_volume(int(app.bot_config.get('audio_volume_level')), 100)
-            audio_device.say(app.bot_config.get("sound_start"))
+            try:
+                audio_device = Audio.get_instance()
+                audio_device.set_volume(int(app.bot_config.get('audio_volume_level')), 100)
+                audio_device.say(app.bot_config.get("sound_start"))
+            except Exception:
+                logging.warning("Audio not present")
 
             try:
                 cam = Camera.get_instance()
                 Motion.get_instance()
             except picamera.exc.PiCameraError:
-                logging.error("Camera not present")
+                logging.warning("Camera not present")
 
             CNNManager.get_instance()
             EventManager.get_instance("coderbot")
