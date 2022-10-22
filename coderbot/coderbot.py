@@ -18,6 +18,7 @@
 ############################################################################
 
 import os
+import sys
 import time
 import logging
 import pigpio
@@ -271,7 +272,7 @@ class CoderBot(object):
         os.system('sudo halt')
 
     def restart(self):
-        os.system('sudo /etc/init.d/coderbot restart')
+        sys.exit()
 
     def reboot(self):
         os.system('sudo reboot')
