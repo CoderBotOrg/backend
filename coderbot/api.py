@@ -5,6 +5,7 @@ This file contains every method called by the API defined in v2.yml
 
 import os
 import subprocess
+import shutil
 import logging
 import connexion
 from werkzeug.datastructures import Headers
@@ -181,20 +182,25 @@ def stopVideo():
 def speak(body):
     text = body.get("text", "")
     locale = body.get("locale", "")
-    logging.info("say: " + text + " in: " + locale)
+    logging.debug("say: " + text + " in: " + locale)
     audio_device.say(text, locale)
 
+def reset():
+    logging.debug("reset bot")
+    shutil.rmtree("data/*")
+    bot.restart()
+
 def halt():
-    logging.info("shutting down")
+    logging.debug("shutting down")
     audio_device.say(what=config.get("sound_stop"))
     bot.halt()
 
 def restart():
-    logging.info("restarting bot")
+    logging.debug("restarting bot")
     bot.restart()
 
 def reboot():
-    logging.info("rebooting")
+    logging.debug("rebooting")
     bot.reboot()
 
 def video_stream(a_cam):
@@ -281,6 +287,7 @@ def info():
 
 def restoreSettings():
     Config.restore()
+    restart()
 
 def loadSettings():
     return Config.get()
@@ -428,14 +435,6 @@ def resetDefaultPrograms():
             with open("data/defaults/programs/" + filename) as p:
                 q = p.read()
                 programs.insert(json.loads(q))
-
-## Reset
-def reset():
-    pi = pigpio.pi('localhost')
-    #simulating FALLING EDGE
-    # it triggers the reset by using the service altready running on the system that detects a button press (3 sec).
-    pi.write(BUTTON_PIN, 1)
-    pi.write(BUTTON_PIN, 0)
 
 ## Test
 def testCoderbot(body):

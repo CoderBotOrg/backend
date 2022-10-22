@@ -420,15 +420,6 @@ paths:
       responses:
         200:
           description: "Bot status"
-  /system/reset:
-    post:
-      operationId: "api.reset"
-      summary: "Reset coderbot by restoring boot partition"
-      tags:
-        - System operations
-      responses:
-        200:
-          description: "resets coderbot entirely"
   /system/test:
     post:
       summary: Tests CoderBot components.
@@ -532,30 +523,39 @@ paths:
   /system/halt:
     post:
       operationId: "api.halt"
-      summary: Pronounce a phrase
+      summary: Halt system (system shutdown)
       tags:
         - System operations
       responses:
         200:
-          description: "phrase received"
+          description: "accepted"
+  /system/reset:
+    post:
+      operationId: "api.reset"
+      summary: Reset all local configuration to factory state
+      tags:
+        - System operations
+      responses:
+        200:
+          description: ""
   /system/restart:
     post:
       operationId: "api.restart"
-      summary: Pronounce a phrase
+      summary: Restart backend
       tags:
         - System operations
       responses:
         200:
-          description: "phrase received"
+          description: "accepted"
   /system/reboot:
     post:
       operationId: "api.reboot"
-      summary: Pronounce a phrase
+      summary: Reboot all device
       tags:
         - System operations
       responses:
         200:
-          description: "phrase received"
+          description: "accepted"
 
   /cnnmodels:
     get:
