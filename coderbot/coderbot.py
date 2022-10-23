@@ -269,11 +269,12 @@ class CoderBot(object):
                 cb()
 
     def halt(self):
-        os.system('sudo halt')
+        logging.info("halt requested")
+        pass
 
     def restart(self):
         sys.exit()
 
     def reboot(self):
-        os.system('sudo reboot')
+        logging.info("reboot requested")
 
