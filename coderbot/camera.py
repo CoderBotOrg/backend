@@ -76,7 +76,6 @@ class Camera(object):
         self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
         self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
         self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
-        self.init_metadata()
         self.load_photo_metadata()
         if not self._photos:
             self._photos = []
