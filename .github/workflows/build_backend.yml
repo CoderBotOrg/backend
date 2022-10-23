@@ -1,0 +1,77 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: build CoderBot backend
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: coderbot/coderbot-ci:3.9-bullseye-slim
+    steps:
+    - uses: actions/checkout@v3 # Checking out the repo
+    - run: pip install -r requirements_stub.txt
+    - run: |
+        export PYTHONPATH=./coderbot:./stub:./test
+        mkdir test-reports
+        python3 -m unittest test/coderbot_test.py 2>&1 | tee test-reports/test_report.txt
+        python3 -m unittest test/camera_test.py 2>&1 | tee test-reports/test_report.txt
+        #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
+        echo "test complete" 
+    - run: |
+        export PYTHONPATH=./coderbot:./stub:./test
+        python3 coderbot/main.py > coderbot.log &
+        sleep 30
+        apt-get install -y python3-venv
+        mkdir -p schemathesis
+        python3 -m venv schemathesis
+        . schemathesis/bin/activate
+        pip install schemathesis 
+        st run --endpoint '^(?!(\/api\/v1\/video\/stream|\/api\/v1\/control\/move|\/api\/v1\/video\/rec|\/api\/v1\/video\/stop)$).*$' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        echo "openapi test complete"
+
+  release-backend:
+    #needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        # list of Docker images to use as base name for tags
+        images: ghcr.io/coderbotorg/backend
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          # always latest
+          type=raw,value=latest
+          # branch event
+          type=ref,event=branch
+          # tag event
+          type=ref,event=tag
+          # pull request event
+          type=ref,event=pr
+          # push event
+          type=sha,enable=true,prefix=git-,format=short
+    - uses: actions/checkout@v2 # Checking out the repo
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+          push: true
+          platforms: linux/arm/v7
+          tags: ${{ steps.meta.outputs.tags }}
+          context: .
+          file: docker/Dockerfile
+          cache-from: type=registry,ref=ghcr.io/coderbotorg/backend:latest
+          cache-to: type=inline

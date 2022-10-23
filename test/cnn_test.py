@@ -3,7 +3,7 @@ import time
 import os
 import config
 import camera
-import cnn_manager
+import cnn.cnn_manager
 
 class CNNTest(unittest.TestCase):
     def setUp(self):
@@ -41,19 +41,19 @@ class CNNTest(unittest.TestCase):
             time.sleep(1)
         self.assertTrue(cnn.get_models().get(name).get("status") == 1.0)
         mod = cnn.load_model(name)
-        result = mod.classify_image("photos/DSC1.jpg")
+        result = mod.classify_image("data/media/DSC1.jpg")
         print("result: " + str(result))
         self.assertTrue(result[0][0] == "orange" and result[0][1] > 40)
-        result = mod.classify_image("photos/DSC201.jpg")
+        result = mod.classify_image("data/media/DSC201.jpg")
         print("result: " + str(result))
         #self.assertTrue(result[0][0] == "apple" and result[0][1] > 40)
-        result = mod.classify_image("photos/DSC301.jpg")
+        result = mod.classify_image("data/media/DSC301.jpg")
         print("result: " + str(result))
         #self.assertTrue(result[0][0] == "other" and result[0][1] > 40)
         t1 = time.time()
         iterations = 20
         for x in range(iterations):
-            result = mod.classify_image("photos/DSC1.jpg")
+            result = mod.classify_image("data/media/DSC1.jpg")
         print("result: " + str(result) + " fps: " + str(1.0*iterations/(time.time()-t1)))
         cnn.delete_model(name)
         self.assertTrue(cnn.get_models().get(name) is None)
@@ -77,7 +77,7 @@ class CNNTest(unittest.TestCase):
         self.assertTrue(cnn.get_models().get(name).get("status") == 1.0)
 
         mod = cnn.load_model(name)
-        result = mod.classify_image("photos/DSC1.jpg")
+        result = mod.classify_image("data/media/DSC1.jpg")
         print("result: " + str(result))
         self.assertTrue(result[0][0] == "orange" and result[0][1] > 40)
 
@@ -87,7 +87,7 @@ class CNNTest(unittest.TestCase):
         t1 = time.time()
         iterations = 20
         for x in range(iterations):
-            result = mod.classify_image("photos/DSC201.jpg")
+            result = mod.classify_image("data/media/DSC201.jpg")
         print("result: " + str(result) + " fps: " + str(1.0*iterations/(time.time()-t1)))
         self.assertTrue(len(result) and result[0][0] == "Granny Smith" and result[0][1] > 50)
 
@@ -97,7 +97,7 @@ class CNNTest(unittest.TestCase):
         t1 = time.time()
         iterations = 20
         for x in range(iterations):
-            result = mod.classify_image("photos/DSC201.jpg")
+            result = mod.classify_image("data/media/DSC201.jpg")
         print("result: " + str(result) + " fps: " + str(1.0*iterations/(time.time()-t1)))
         self.assertTrue(len(result) and result[0][0] == "Granny Smith" and result[0][1] > 50)
 
@@ -107,6 +107,6 @@ class CNNTest(unittest.TestCase):
         t1 = time.time()
         iterations = 20
         for x in range(iterations):
-            result = mod.detect_objects("photos/DSC201.jpg")
+            result = mod.detect_objects("data/media/DSC201.jpg")
         print("result: " + str(result) + " fps: " + str(1.0*iterations/(time.time()-t1)))
         self.assertTrue(len(result) and result[0] == ('apple', 78, (18, 10, 72, 82)))
