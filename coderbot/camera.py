@@ -122,7 +122,7 @@ class Camera(object):
                 f.close()
         except Exception:
             logging.warning("no metadata file, starting from empty")
-            pathlib.Path(PHOTO_METADATA).mkdir(parents=True, exist_ok=True)
+            pathlib.Path(PHOTO_PATH).mkdir(parents=True, exist_ok=True)
             self._photos = []
             self.save_photo_metadata()
 
