@@ -196,6 +196,7 @@ def restart():
     Balena.get_instance().restart()
 
 def reboot():
+    audio_device.say(what=config.get("sound_stop"))
     Balena.get_instance().reboot()
 
 def video_stream(a_cam):
