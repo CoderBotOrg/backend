@@ -38,7 +38,7 @@
   "hw_version":"5",
   "audio_volume_level":"100",
   "wifi_mode":"ap",
-  "wifi_ssid":"coderbot_CHANGEMEATFIRSTRUN",
+  "wifi_ssid":"coderbot",
   "wifi_psk":"coderbot",
   "packages_installed":"",
   "admin_password":"",

@@ -268,13 +268,3 @@ class CoderBot(object):
                 logging.info("pushed: %d, %d", level, tick)
                 cb()
 
-    def halt(self):
-        logging.info("halt requested")
-        pass
-
-    def restart(self):
-        sys.exit()
-
-    def reboot(self):
-        logging.info("reboot requested")
-

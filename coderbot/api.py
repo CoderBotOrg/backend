@@ -28,6 +28,7 @@ from musicPackages import MusicPackageManager
 from audio import Audio
 from event import EventManager
 from coderbotTestUnit import run_test as runCoderbotTestUnit
+from balena import Balena
 
 BUTTON_PIN = 16
 
@@ -95,7 +96,7 @@ def get_info():
     backend_commit = "undefined"
     coderbot_version = "undefined"
     update_status = "ok"
-    kernel = 'undefined'
+    device = {}
     motors = 'undefined'
     
     try:
@@ -104,11 +105,6 @@ def get_info():
             metadata = json.load(f)
             backend_commit = metadata["backend_commit"][0:7]
             coderbot_version = metadata["backend_version"][0:7]
-    except Exception:
-        pass
-
-    try:
-        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
     except Exception:
         pass
 
@@ -123,12 +119,16 @@ def get_info():
 
     serial = get_serial()
 
-    return {'backend_commit': backend_commit,
-            'coderbot_version': coderbot_version,
-            'update_status': update_status,
-            'kernel': kernel,
-            'serial': serial,
-            'motors': motors}
+    try:
+        device = Baleba.get_instance().device()
+    except Exception:
+        pass
+    return { 'backend_commit': device.get("commit"),
+             'coderbot_version': coderbot_version,
+             'update_status': device.get("status"),
+             'kernel': device.get("os_version"),
+             'serial': serial,
+             'motors': motors }
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -186,22 +186,17 @@ def speak(body):
     audio_device.say(text, locale)
 
 def reset():
-    logging.debug("reset bot")
-    shutil.rmtree("data/*")
-    bot.restart()
+    Balena.get_instance().purge()
 
 def halt():
-    logging.debug("shutting down")
     audio_device.say(what=config.get("sound_stop"))
-    bot.halt()
+    Balena.get_instance().shutdown()
 
 def restart():
-    logging.debug("restarting bot")
-    bot.restart()
+    Balena.get_instance().restart()
 
 def reboot():
-    logging.debug("rebooting")
-    bot.reboot()
+    Balena.get_instance().reboot()
 
 def video_stream(a_cam):
     while True:
