@@ -13,7 +13,7 @@ class Balena():
         return cls._instance
 
     def __init__(self):
-        self.supervisor_address = os.environ["BALENA_SUPERVISOR_ADDRES"]
+        self.supervisor_address = os.environ["BALENA_SUPERVISOR_ADDRESS"]
         self.supervisor_key = os.environ["BALENA_SUPERVISOR_API_KEY"]
         self.headers = { 'Content-Type': 'application/json' }
 
