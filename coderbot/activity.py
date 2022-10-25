@@ -20,8 +20,8 @@ class Activities():
             if len(activities) > 0:
                 return activities[0]
         elif default is not None:
-            if len(self.activities.search(self.query.default is True)) > 0:
-                return self.activities.search(self.query.default is True)[0]
+            if len(self.activities.search(self.query.default == True)) > 0:
+                return self.activities.search(self.query.default == True)[0]
             return None
         return None
 
@@ -39,7 +39,7 @@ class Activities():
         if len(activities) > 0:
             activity = activities[0]
             if activity.get("default", False) is True:
-                self.activities.update({'default': True}, self.query.stock is True)
+                self.activities.update({'default': True}, self.query.stock == True)
             self.activities.remove(self.query.name == activity["name"])
 
     def list(self):
