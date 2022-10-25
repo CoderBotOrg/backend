@@ -161,7 +161,7 @@ def turn(body):
 def takePhoto():
     try:
         cam.photo_take()
-        Audio.say(config.get("sound_shutter"))
+        audio_device.say(config.get("sound_shutter"))
     except Exception as e:
         logging.warning("Error: %s", e)
 
