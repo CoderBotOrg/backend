@@ -162,6 +162,7 @@ def takePhoto():
     try:
         cam.photo_take()
         audio_device.say(config.get("sound_shutter"))
+        return 200
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -169,6 +170,7 @@ def recVideo():
     try:
         cam.video_rec()
         audio_device.say(config.get("sound_shutter"))
+        return 200
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -176,6 +178,7 @@ def stopVideo():
     try:
         cam.video_stop()
         audio_device.say(config.get("sound_shutter"))
+        return 200
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -184,13 +187,16 @@ def speak(body):
     locale = body.get("locale", "")
     logging.debug("say: " + text + " in: " + locale)
     audio_device.say(text, locale)
+    return 200
 
 def reset():
     Balena.get_instance().purge()
+    return 200
 
 def halt():
     audio_device.say(what=config.get("sound_stop"))
     Balena.get_instance().shutdown()
+    return 200
 
 def restart():
     Balena.get_instance().restart()
@@ -198,6 +204,7 @@ def restart():
 def reboot():
     audio_device.say(what=config.get("sound_stop"))
     Balena.get_instance().reboot()
+    return 200
 
 def video_stream(a_cam):
     while True:
@@ -283,13 +290,14 @@ def info():
 
 def restoreSettings():
     Config.restore()
-    restart()
+    return restart()
 
 def loadSettings():
     return Config.get()
 
 def saveSettings(body):
     Config.write(body)
+    return 200
 
 def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')
