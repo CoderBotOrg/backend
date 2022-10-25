@@ -15,7 +15,7 @@ class Balena():
     def __init__(self):
         self.supervisor_address = os.environ["BALENA_SUPERVISOR_ADDRESS"]
         self.supervisor_key = os.environ["BALENA_SUPERVISOR_API_KEY"]
-        self.app_id_data = json.dumps({ "appId": os.environ["BALENA_APP_ID"] })
+        self.app_id_data = json.dumps({ "appId": os.environ["BALENA_APP_ID"] }).encode("utf-8")
         self.headers = { 'Content-Type': 'application/json' }
 
     def purge(self):
