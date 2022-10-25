@@ -37,7 +37,7 @@ jobs:
         echo "openapi test complete"
 
   release-backend:
-    #needs: [test]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
     - name: Docker meta

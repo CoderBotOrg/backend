@@ -1,14 +1,12 @@
 from tinydb import TinyDB, Query
-from tinydb.operations import delete
-import json
 
 # Programs and Activities databases
 class Activities():
     _instance = None
-        
+
     @classmethod
     def get_instance(cls):
-        if cls._instance == None:
+        if cls._instance is None:
             cls._instance = Activities()
         return cls._instance
 
@@ -22,15 +20,14 @@ class Activities():
             if len(activities) > 0:
                 return activities[0]
         elif default is not None:
-            default_Activities = self.activities.search(self.query.default == True)
-            if len(self.activities.search(self.query.default == True)) > 0:
-                return self.activities.search(self.query.default == True)[0]
-            else:
-                return None
+            if len(self.activities.search(self.query.default is True)) > 0:
+                return self.activities.search(self.query.default is True)[0]
+            return None
+        return None
 
     def save(self, name, activity):
         # if saved activity is "default", reset existing default activity to "non-default"
-        if activity.get("default", False) == True:
+        if activity.get("default", False) is True:
             self.activities.update({'default': False})
         if self.activities.search(self.query.name == name) == []:
             self.activities.insert(activity)
@@ -41,10 +38,9 @@ class Activities():
         activities = self.activities.search(self.query.name == name)
         if len(activities) > 0:
             activity = activities[0]
-            if activity.get("default", False) == True:
-                self.activities.update({'default': True}, self.query.stock == True)
+            if activity.get("default", False) is True:
+                self.activities.update({'default': True}, self.query.stock is True)
             self.activities.remove(self.query.name == activity["name"])
 
     def list(self):
         return self.activities.all()
-   
