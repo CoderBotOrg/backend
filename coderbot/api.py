@@ -199,8 +199,6 @@ def reboot():
     audio_device.say(what=config.get("sound_stop"))
     Balena.get_instance().reboot()
 
-Balena.get_instance().reboot()
-
 def video_stream(a_cam):
     while True:
         frame = a_cam.get_image_jpeg()
