@@ -23,7 +23,7 @@ import time
 import logging
 import pigpio
 import sonar
-import hw.mpu
+from hw import mpu
 from rotary_encoder.wheelsaxel import WheelsAxel
 
 # GPIO
@@ -267,14 +267,4 @@ class CoderBot(object):
                 self._cb_last_tick[gpio] = tick
                 logging.info("pushed: %d, %d", level, tick)
                 cb()
-
-    def halt(self):
-        logging.info("halt requested")
-        pass
-
-    def restart(self):
-        sys.exit()
-
-    def reboot(self):
-        logging.info("reboot requested")
 

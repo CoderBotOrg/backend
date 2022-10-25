@@ -64,4 +64,4 @@ ADD docker/scripts/*.sh /tmp/.
 RUN /tmp/install_generic_cnn_models.sh
 RUN /tmp/install_lib_firmware.sh
 
-ENTRYPOINT cd /coderbot && python3 coderbot/main.py
+ENTRYPOINT cd /coderbot && modprobe i2c-dev && python3 coderbot/main.py

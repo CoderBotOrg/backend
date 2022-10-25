@@ -28,6 +28,7 @@ from musicPackages import MusicPackageManager
 from audio import Audio
 from event import EventManager
 from coderbotTestUnit import run_test as runCoderbotTestUnit
+from balena import Balena
 
 BUTTON_PIN = 16
 
@@ -95,7 +96,7 @@ def get_info():
     backend_commit = "undefined"
     coderbot_version = "undefined"
     update_status = "ok"
-    kernel = 'undefined'
+    device = {}
     motors = 'undefined'
     
     try:
@@ -104,11 +105,6 @@ def get_info():
             metadata = json.load(f)
             backend_commit = metadata["backend_commit"][0:7]
             coderbot_version = metadata["backend_version"][0:7]
-    except Exception:
-        pass
-
-    try:
-        kernel = subprocess.check_output(["uname", "-r"]).decode('utf-8').replace('\n', '')
     except Exception:
         pass
 
@@ -123,12 +119,16 @@ def get_info():
 
     serial = get_serial()
 
-    return {'backend_commit': backend_commit,
-            'coderbot_version': coderbot_version,
-            'update_status': update_status,
-            'kernel': kernel,
-            'serial': serial,
-            'motors': motors}
+    try:
+        device = Baleba.get_instance().device()
+    except Exception:
+        pass
+    return { 'backend_commit': device.get("commit"),
+             'coderbot_version': coderbot_version,
+             'update_status': device.get("status"),
+             'kernel': device.get("os_version"),
+             'serial': serial,
+             'motors': motors }
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -161,7 +161,8 @@ def turn(body):
 def takePhoto():
     try:
         cam.photo_take()
-        Audio.say(config.get("sound_shutter"))
+        audio_device.say(config.get("sound_shutter"))
+        return 200
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -169,6 +170,7 @@ def recVideo():
     try:
         cam.video_rec()
         audio_device.say(config.get("sound_shutter"))
+        return 200
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -176,6 +178,7 @@ def stopVideo():
     try:
         cam.video_stop()
         audio_device.say(config.get("sound_shutter"))
+        return 200
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -184,24 +187,24 @@ def speak(body):
     locale = body.get("locale", "")
     logging.debug("say: " + text + " in: " + locale)
     audio_device.say(text, locale)
+    return 200
 
 def reset():
-    logging.debug("reset bot")
-    shutil.rmtree("data/*")
-    bot.restart()
+    Balena.get_instance().purge()
+    return 200
 
 def halt():
-    logging.debug("shutting down")
     audio_device.say(what=config.get("sound_stop"))
-    bot.halt()
+    Balena.get_instance().shutdown()
+    return 200
 
 def restart():
-    logging.debug("restarting bot")
-    bot.restart()
+    Balena.get_instance().restart()
 
 def reboot():
-    logging.debug("rebooting")
-    bot.reboot()
+    audio_device.say(what=config.get("sound_stop"))
+    Balena.get_instance().reboot()
+    return 200
 
 def video_stream(a_cam):
     while True:
@@ -287,13 +290,14 @@ def info():
 
 def restoreSettings():
     Config.restore()
-    restart()
+    return restart()
 
 def loadSettings():
     return Config.get()
 
 def saveSettings(body):
     Config.write(body)
+    return 200
 
 def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')

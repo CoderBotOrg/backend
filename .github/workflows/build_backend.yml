@@ -20,7 +20,7 @@ jobs:
         #python3 -m unittest test/cnn_test.py 2>&1 | tee test-reports/test_report.txt
         echo "test complete" 
     - run: |
-        export PYTHONPATH=./coderbot:./stub:./test
+        export PYTHONPATH=./stub:./coderbot:./test
         python3 coderbot/main.py > coderbot.log &
         sleep 30
         apt-get install -y python3-venv
@@ -28,11 +28,16 @@ jobs:
         python3 -m venv schemathesis
         . schemathesis/bin/activate
         pip install schemathesis 
-        st run --endpoint '^(?!(\/api\/v1\/video\/stream|\/api\/v1\/control\/move|\/api\/v1\/video\/rec|\/api\/v1\/video\/stop)$).*$' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'activities' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'media' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'control/speak' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'control/stop' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'music' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'programs' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         echo "openapi test complete"
 
   release-backend:
-    #needs: [test]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
     - name: Docker meta

@@ -34,7 +34,7 @@ import audio
 import event
 import music
 import musicPackages
-import hw.atmega328p 
+from hw.atmega328p import ATMega328 
 
 PROGRAM_PATH = "./data/"
 PROGRAM_PREFIX = "program_"
@@ -66,7 +66,7 @@ def get_music():
     return music.Music.get_instance(musicPackageManager)
 
 def get_atmega():
-    return atmega328p.ATMega328.get_instance()
+    return ATMega328.get_instance()
 
 class ProgramEngine:
 

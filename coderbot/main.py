@@ -5,22 +5,19 @@ CoderBot REST API and static resources
 import os
 import logging
 import logging.handlers
-import subprocess
 import picamera
 import connexion
 
-from flask import (send_from_directory, redirect)
-
 from flask_cors import CORS
 
-from coderbot import CoderBot
 from camera import Camera
 from motion import Motion
 from audio import Audio
-from program import ProgramEngine, Program
+from program import ProgramEngine
 from config import Config
 from cnn.cnn_manager import CNNManager
 from event import EventManager
+from coderbot import CoderBot
 
 # Logging configuration
 logger = logging.getLogger()
