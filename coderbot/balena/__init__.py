@@ -28,7 +28,6 @@ class Balena():
         req = Request(f'{self.supervisor_address}/v1/shutdown?apikey={self.supervisor_key}', headers=self.headers, method='POST')
         return urlopen(req).read()
 
-
     def restart(self):
         logging.debug("restarting bot")
         req = Request(f'{self.supervisor_address}/v1/restart?apikey={self.supervisor_key}', data=self.app_id_data, headers=self.headers, method='POST')
