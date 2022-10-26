@@ -115,7 +115,7 @@ class ProgramEngine:
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
         if len(program_db_entries) > 0:
-            logging.info(program_db_entries[0])
+            logging.debug(program_db_entries[0])
             f = open(program_db_entries[0]["filename"], 'r')
             self._program = Program.from_dict(json.load(f))
             return self._program
