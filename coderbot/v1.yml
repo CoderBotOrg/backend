@@ -159,23 +159,7 @@ paths:
       responses:
         200:
           description: "ok"
-    post:
-      operationId: "api.saveAsNewProgram"
-      summary: "Save a new program"
-      tags:
-        - Program management
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Program'
-      responses:
-        200:
-          description: "ok"
-        400:
-          description: "Failed to save the program"
+
   /programs/{name}:
     get:
       operationId: "api.loadProgram"
@@ -217,7 +201,7 @@ paths:
           schema:
             type: string
       requestBody:
-        description: Optional description in *Markdown*
+        description: Program object
         required: true
         content:
           application/json:
@@ -242,7 +226,7 @@ paths:
           schema:
             type: string
       requestBody:
-        description: Optional description in *Markdown*
+        description: Program object
         required: true
         content:
           application/json:
@@ -683,7 +667,7 @@ components:
           minLength: 1
         dom_code:
           type: string
-        isDefualt:
+        default:
           type: boolean
         overwrite:
           type: boolean

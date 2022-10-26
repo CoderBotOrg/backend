@@ -345,21 +345,11 @@ def deleteMusicPackage(name):
 
 ## Programs
 
-def saveAsNewProgram(body):
-    overwrite = body.get("overwrite")
-    existing_program = prog_engine.load(body.get("name"))
-    if existing_program and not overwrite:
-        return "askOverwrite"
-    elif existing_program and existing_program.is_default() == True:
-        return "defaultOverwrite"
-    program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"))
-    prog_engine.save(program)
-    return 200
-
 def saveProgram(name, body):
     overwrite = body.get("overwrite")
     existing_program = prog_engine.load(name)
-    if existing_program and not overwrite:
+    logging.info("saving - name: %s, body: %s", name, str(existing_program))
+    if existing_program is not None and not overwrite:
         return "askOverwrite"
     elif existing_program and existing_program.is_default() == True:
         return "defaultOverwrite"
