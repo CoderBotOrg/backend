@@ -29,7 +29,7 @@ jobs:
         . schemathesis/bin/activate
         pip install schemathesis 
         st run --endpoint 'activities' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
-        st run --endpoint 'media' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        #st run --endpoint 'media' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         st run --endpoint 'control/speak' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         st run --endpoint 'control/stop' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         st run --endpoint 'music' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
