@@ -106,8 +106,6 @@ class ProgramEngine:
             self._programs.update(program_db_entry, query.name == program.name)
         else:
             self._programs.insert(program_db_entry)
-        json.dump(program.as_dict(), f)
-        f.close()
 
     def load(self, name):
         query = Query()
