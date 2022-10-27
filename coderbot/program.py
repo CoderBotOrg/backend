@@ -101,13 +101,11 @@ class ProgramEngine:
     def save(self, program):
         query = Query()
         self._program = program
-        program_db_entry = program.as_dict()
-        program_db_entry["filename"] = os.path.join(PROGRAM_PATH, PROGRAM_PREFIX + program.name + PROGRAM_SUFFIX)
+        program_db_entry = self._program.as_dict()
         if self._programs.search(query.name == program.name) != []:
             self._programs.update(program_db_entry, query.name == program.name)
         else:
             self._programs.insert(program_db_entry)
-        f = open(program_db_entry["filename"], 'w+')
         json.dump(program.as_dict(), f)
         f.close()
 
@@ -115,19 +113,16 @@ class ProgramEngine:
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
         if len(program_db_entries) > 0:
-            logging.debug(program_db_entries[0])
-            f = open(program_db_entries[0]["filename"], 'r')
-            self._program = Program.from_dict(json.load(f))
+            prog_db_entry = program_db_entries[0]
+            logging.debug(prog_db_entry)
+            self._program = Program.from_dict(prog_db_entry)
             return self._program
         return None
 
     def delete(self, name):
         query = Query()
         program_db_entries = self._programs.search(query.name == name)
-        logging.info("deleting: " + name + " program: " + str(program_db_entries))
-        if program_db_entries != []:
-            os.remove(program_db_entries[0]["filename"])
-            self._programs.remove(query.name == name)
+        self._programs.remove(query.name == name)
 
     def create(self, name, code):
         self._program = Program(name, code)

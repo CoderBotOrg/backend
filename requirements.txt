@@ -26,7 +26,6 @@ pybind11==2.10.0
 inflection==0.5.1
 event-channel==0.4.3
 pytz==2022.2.1
-cachetools==5.2.0
 
 # IO extensions
 pigpio==1.78

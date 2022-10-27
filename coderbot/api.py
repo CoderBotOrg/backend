@@ -5,20 +5,16 @@ This file contains every method called by the API defined in v2.yml
 
 import os
 import subprocess
-import shutil
 import logging
 import connexion
 from werkzeug.datastructures import Headers
 from flask import (request,
                    send_file,
                    Response)
-import connexion
 import picamera
-import pigpio
 import urllib
+import connexion
 
-from cachetools import cached, TTLCache
-from coderbot import CoderBot
 from program import ProgramEngine, Program
 from config import Config
 from activity import Activities
@@ -26,8 +22,8 @@ from camera import Camera
 from cnn.cnn_manager import CNNManager
 from musicPackages import MusicPackageManager
 from audio import Audio
-from event import EventManager
 from coderbotTestUnit import run_test as runCoderbotTestUnit
+from coderbot import CoderBot
 from balena import Balena
 
 BUTTON_PIN = 16
@@ -56,7 +52,6 @@ def get_serial():
 
     return cpuserial
 
-@cached(cache=TTLCache(maxsize=1, ttl=10))
 def get_status():
     """
     Expose CoderBot status:
@@ -87,7 +82,6 @@ def get_status():
             'temp': temp,
             'uptime': uptime}
 
-@cached(cache=TTLCache(maxsize=1, ttl=60))
 def get_info():
     """
     Expose informations about the CoderBot system.
