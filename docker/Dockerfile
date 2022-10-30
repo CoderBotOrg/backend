@@ -63,5 +63,9 @@ ADD sounds /coderbot/sounds/.
 ADD docker/scripts/*.sh /tmp/.
 RUN /tmp/install_generic_cnn_models.sh
 RUN /tmp/install_lib_firmware.sh
+ADD docker/start.sh /coderbot/.
 
-ENTRYPOINT cd /coderbot && modprobe i2c-dev && python3 coderbot/main.py
+ARG CODERBOT_VERSION
+ENV CODERBOT_VERSION=${CODERBOT_VERSION}
+
+ENTRYPOINT /coderbot/start.sh

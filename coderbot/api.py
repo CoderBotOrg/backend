@@ -87,42 +87,19 @@ def get_info():
     Expose informations about the CoderBot system.
     (Cached method)
     """
-    backend_commit = "undefined"
-    coderbot_version = "undefined"
-    update_status = "ok"
+    coderbot_version = os.getenv("CODERBOT_VERSION")
     device = {}
-    motors = 'undefined'
-    
-    try:
-        # manifest.json is generated while building/copying the backend
-        with open('manifest.json', 'r') as f:
-            metadata = json.load(f)
-            backend_commit = metadata["backend_commit"][0:7]
-            coderbot_version = metadata["backend_version"][0:7]
-    except Exception:
-        pass
-
-    try:
-        encoder = bool(Config.read().get('encoder'))
-        if(encoder):
-            motors = 'DC encoder motors'
-        else:
-            motors = 'DC motors'
-    except Exception:
-        pass
-
     serial = get_serial()
 
     try:
-        device = Baleba.get_instance().device()
+        device = Balena.get_instance().device()
     except Exception:
         pass
     return { 'backend_commit': device.get("commit"),
              'coderbot_version': coderbot_version,
              'update_status': device.get("status"),
              'kernel': device.get("os_version"),
-             'serial': serial,
-             'motors': motors }
+             'serial': serial }
 
 prog = None
 prog_engine = ProgramEngine.get_instance()

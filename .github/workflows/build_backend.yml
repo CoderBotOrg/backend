@@ -58,7 +58,7 @@ jobs:
           type=ref,event=pr
           # push event
           type=sha,enable=true,prefix=git-,format=short
-    - uses: actions/checkout@v2 # Checking out the repo
+    - uses: actions/checkout@v3 # Checking out the repo
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
     - name: Set up Docker Buildx
@@ -74,6 +74,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
           push: true
+          build-args: CODERBOT_VERSION=$GITHUB_REF-$GITHUB_SHA
           platforms: linux/arm/v7
           tags: ${{ steps.meta.outputs.tags }}
           context: .
