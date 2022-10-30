@@ -11,7 +11,7 @@ jobs:
     container: coderbot/coderbot-ci:3.9-bullseye-slim
     steps:
     - uses: actions/checkout@v3 # Checking out the repo
-    - run: pip install -r requirements_stub.txt
+    - run: pip install -r docker/stub/requirements.txt
     - run: |
         export PYTHONPATH=./coderbot:./stub:./test
         mkdir test-reports
@@ -58,7 +58,7 @@ jobs:
           type=ref,event=pr
           # push event
           type=sha,enable=true,prefix=git-,format=short
-    - uses: actions/checkout@v2 # Checking out the repo
+    - uses: actions/checkout@v3 # Checking out the repo
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
     - name: Set up Docker Buildx
@@ -74,9 +74,46 @@ jobs:
       uses: docker/build-push-action@v3
       with:
           push: true
+          build-args: CODERBOT_VERSION=${{github.ref_name}}-${{github.sha}}
           platforms: linux/arm/v7
           tags: ${{ steps.meta.outputs.tags }}
           context: .
           file: docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/coderbotorg/backend:latest
+          cache-to: type=inline
+
+  release-stub:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        # list of Docker images to use as base name for tags
+        images: ghcr.io/coderbotorg/backend
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          # always latest
+          type=raw,value=stub-latest
+    - uses: actions/checkout@v3 # Checking out the repo
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+          push: true
+          build-args: CODERBOT_VERSION=${{github.ref_name}}-${{github.sha}}
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          context: .
+          file: docker/stub/Dockerfile
+          cache-from: type=registry,ref=ghcr.io/coderbotorg/backend:stub-latest
           cache-to: type=inline

@@ -68,14 +68,14 @@ def get_status():
     uptime = 0
     try:
         uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
-    except:
+    except Exception:
         pass
 
     internet_status = False
     try:
         urllib.request.urlopen("https://coderbot.org") 
         internet_status = True
-    except:
+    except Exception:
         pass
 
     return {'internet_status': internet_status,
@@ -87,42 +87,20 @@ def get_info():
     Expose informations about the CoderBot system.
     (Cached method)
     """
-    backend_commit = "undefined"
-    coderbot_version = "undefined"
-    update_status = "ok"
     device = {}
-    motors = 'undefined'
-    
-    try:
-        # manifest.json is generated while building/copying the backend
-        with open('manifest.json', 'r') as f:
-            metadata = json.load(f)
-            backend_commit = metadata["backend_commit"][0:7]
-            coderbot_version = metadata["backend_version"][0:7]
-    except Exception:
-        pass
-
-    try:
-        encoder = bool(Config.read().get('encoder'))
-        if(encoder):
-            motors = 'DC encoder motors'
-        else:
-            motors = 'DC motors'
-    except Exception:
-        pass
-
     serial = get_serial()
 
     try:
-        device = Baleba.get_instance().device()
+        device = Balena.get_instance().device()
+        logging.info("device: %s", str(device))
     except Exception:
         pass
-    return { 'backend_commit': device.get("commit"),
-             'coderbot_version': coderbot_version,
+
+    return { 'release_commit': device.get("commit"),
+             'coderbot_version': os.getenv("CODERBOT_VERSION"),
              'update_status': device.get("status"),
              'kernel': device.get("os_version"),
-             'serial': serial,
-             'motors': motors }
+             'serial': serial }
 
 prog = None
 prog_engine = ProgramEngine.get_instance()
@@ -248,39 +226,6 @@ def deletePhoto(name):
         cam.delete_photo(name)
     except FileNotFoundError:
         return 404
-
-## System
-
-def status():
-    sts = get_status()
-    # getting reset log file
-    data = []
-    try:
-        with open('/home/pi/coderbot/logs/reset_trigger_service.log', 'r') as log_file:
-            data = [x for x in log_file.read().split('\n') if x]
-    except Exception: # direct control case
-        pass # if file doesn't exist, no restore as ever been performed. return empty data
-
-
-    return {
-        "status": "ok",
-        "internetConnectivity": sts["internet_status"],
-        "temp": sts["temp"],
-        "uptime": sts["uptime"],
-        "log": data
-    }
-
-def info():
-    inf = get_info()
-    return {
-        "model": 1,
-        "version": inf["coderbot_version"],
-        "backend commit build": inf["backend_commit"],
-        "kernel" : inf["kernel"],
-        "update status": inf["update_status"],
-        "serial": inf["serial"],
-        "motors": inf["motors"]
-    }
 
 def restoreSettings():
     Config.restore()

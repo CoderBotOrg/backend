@@ -1,10 +1,8 @@
-FROM coderbot/rpi-debian:bullseye-20220923
+FROM debian:bullseye-slim
 
-ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN install_packages \
- libraspberrypi0 \
+RUN apt-get update -y && apt-get install -y \
  procps \
  sudo \
  wget \
@@ -19,22 +17,18 @@ RUN install_packages \
  libatlas-base-dev \
  libhdf5-dev \
  alsa-utils \
- espeak
-RUN install_packages \
+ espeak \
  libharfbuzz-bin \
  libwebp6 \
- libjasper1 \
  libilmbase25 \
  libgstreamer1.0-0 \
  libavcodec-extra58 \
- libavformat58
-RUN install_packages \
+ libavformat58 \
  libopencv-dev \
  zbar-tools \
  libzbar0 \
  sox \
- libsox-fmt-all
-RUN install_packages \
+ libsox-fmt-all \
  avrdude \
  tesseract-ocr \
  tesseract-ocr-eng \
@@ -43,26 +37,27 @@ RUN install_packages \
  tesseract-ocr-spa \
  tesseract-ocr-deu
 
-ENV READTHEDOCS=True
-ADD requirements.txt /tmp/.
+ADD docker/stub/requirements.txt /tmp/.
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \
 mkdir -p /coderbot/logs && \
+mkdir -p /coderbot/updatePackages && \
 mkdir -p /coderbot/cnn_modules && \
 mkdir -p /coderbot/coderbot && \
 mkdir -p /coderbot/defaults && \
 mkdir -p /coderbot/sounds
 
 ADD coderbot /coderbot/coderbot/.
+ADD stub /coderbot/stub/.
+ADD test /coderbot/test/.
 ADD defaults /coderbot/defaults/.
 ADD sounds /coderbot/sounds/.
 
 ADD docker/scripts/*.sh /tmp/.
 RUN /tmp/install_generic_cnn_models.sh
-RUN /tmp/install_lib_firmware.sh
-ADD docker/start.sh /coderbot/.
+ADD docker/stub/start.sh /coderbot/.
 
 ARG CODERBOT_VERSION
 ENV CODERBOT_VERSION=${CODERBOT_VERSION}

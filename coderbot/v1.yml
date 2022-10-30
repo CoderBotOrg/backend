@@ -397,7 +397,7 @@ paths:
           description: "upload failed"
   /system/status:
     get:
-      operationId: "api.status"
+      operationId: "api.get_status"
       summary: "Bot general informations, execution status and reset log file"
       tags:
         - System operations
@@ -422,7 +422,7 @@ paths:
           description: Test ended.
   /system/info:
     get:
-      operationId: "api.info"
+      operationId: "api.get_info"
       summary: "Bot general informations and execution status"
       tags:
         - System operations

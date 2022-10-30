@@ -26,17 +26,9 @@ pybind11==2.10.0
 inflection==0.5.1
 event-channel==0.4.3
 pytz==2022.2.1
-cachetools==5.2.0
-
-# IO extensions
-pigpio==1.78
-smbus2==0.4.2
-spidev==3.5
 
 # Audio
 sox==1.4.1
-PyAudio==0.2.12
-pyalsaaudio==0.9.2
 
 # Computer Vision
 grpcio==1.48.1
@@ -48,4 +40,5 @@ tflite-runtime==2.10.0
 pytesseract==0.3.10
 pyzbar==0.1.9
 
-#picamera==1.13
+#I/O
+spidev==3.5
