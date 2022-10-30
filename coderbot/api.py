@@ -92,6 +92,7 @@ def get_info():
 
     try:
         device = Balena.get_instance().device()
+        logging.info("device: %s", str(device))
     except Exception:
         pass
 
