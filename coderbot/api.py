@@ -93,8 +93,8 @@ def get_info():
     try:
         device = Balena.get_instance().device()
         logging.info("device: %s", str(device))
-    except Exception as e:
-        logging.info("get_info error: %s", str(e))
+    except Exception:
+        pass
 
     return { 'release_commit': device.get("commit"),
              'coderbot_version': os.getenv("CODERBOT_VERSION"),

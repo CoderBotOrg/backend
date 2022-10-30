@@ -40,5 +40,5 @@ class Balena():
 
     def device(self):
         logging.debug("reboot bot", f'{self.supervisor_address}get?apikey={self.supervisor_key}')
-        req = Request(f'{self.supervisor_address}/device?apikey={self.supervisor_key}', headers=self.headers, method='GET')
+        req = Request(f'{self.supervisor_address}/v1/device?apikey={self.supervisor_key}', headers=self.headers, method='GET')
         return json.load(urlopen(req))
