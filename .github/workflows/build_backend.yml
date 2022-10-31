@@ -11,7 +11,7 @@ jobs:
     container: coderbot/coderbot-ci:3.9-bullseye-slim
     steps:
     - uses: actions/checkout@v3 # Checking out the repo
-    - run: pip install -r requirements_stub.txt
+    - run: pip install -r docker/stub/requirements.txt
     - run: |
         export PYTHONPATH=./coderbot:./stub:./test
         mkdir test-reports
