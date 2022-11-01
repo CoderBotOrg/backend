@@ -21,24 +21,24 @@ class Balena():
     def purge(self):
         logging.debug("reset bot")
         req = Request(f'{self.supervisor_address}/v1/purge?apikey={self.supervisor_key}', data=self.app_id_data, headers=self.headers, method='POST')
-        return urlopen(req).read()
+        return json.load(urlopen(req))
 
     def shutdown(self):
         logging.debug("shutdown bot")
         req = Request(f'{self.supervisor_address}/v1/shutdown?apikey={self.supervisor_key}', headers=self.headers, method='POST')
-        return urlopen(req).read()
+        return json.load(urlopen(req))
 
     def restart(self):
         logging.debug("restarting bot")
         req = Request(f'{self.supervisor_address}/v1/restart?apikey={self.supervisor_key}', data=self.app_id_data, headers=self.headers, method='POST')
-        return urlopen(req).read()
+        return json.load(urlopen(req))
 
     def reboot(self):
         logging.debug("reboot bot")
         req = Request(f'{self.supervisor_address}/v1/reboot?apikey={self.supervisor_key}', headers=self.headers, method='POST')
-        return urlopen(req).read()
+        return json.load(urlopen(req))
 
     def device(self):
         logging.debug("reboot bot", f'{self.supervisor_address}get?apikey={self.supervisor_key}')
-        req = Request(f'{self.supervisor_address}/device?apikey={self.supervisor_key}', headers=self.headers, method='GET')
+        req = Request(f'{self.supervisor_address}/v1/device?apikey={self.supervisor_key}', headers=self.headers, method='GET')
         return json.load(urlopen(req))
