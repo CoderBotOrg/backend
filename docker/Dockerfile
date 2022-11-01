@@ -50,7 +50,6 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \
 mkdir -p /coderbot/logs && \
-mkdir -p /coderbot/updatePackages && \
 mkdir -p /coderbot/cnn_modules && \
 mkdir -p /coderbot/coderbot && \
 mkdir -p /coderbot/defaults && \
