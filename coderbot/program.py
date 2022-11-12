@@ -25,6 +25,7 @@ import logging
 
 import math
 from tinydb import TinyDB, Query
+from threading import Lock
 
 import coderbot
 import camera
@@ -80,6 +81,7 @@ class ProgramEngine:
         self._programs = TinyDB(PROGRAMS_DB)
         # initialise DB from default programs
         query = Query()
+        self.lock = Lock()
         for dirname, dirnames, filenames, in os.walk(PROGRAMS_PATH_DEFAULTS):
             dirnames
             for filename in filenames:
@@ -102,28 +104,31 @@ class ProgramEngine:
         return self._programs.all()
 
     def save(self, program):
-        query = Query()
-        self._program = program
-        program_db_entry = self._program.as_dict()
-        if self._programs.search(query.name == program.name) != []:
-            self._programs.update(program_db_entry, query.name == program.name)
-        else:
-            self._programs.insert(program_db_entry)
+        with self.lock: 
+            query = Query()
+            self._program = program
+            program_db_entry = self._program.as_dict()
+            if self._programs.search(query.name == program.name) != []:
+                self._programs.update(program_db_entry, query.name == program.name)
+            else:
+                self._programs.insert(program_db_entry)
 
     def load(self, name):
-        query = Query()
-        program_db_entries = self._programs.search(query.name == name)
-        if len(program_db_entries) > 0:
-            prog_db_entry = program_db_entries[0]
-            logging.debug(prog_db_entry)
-            self._program = Program.from_dict(prog_db_entry)
-            return self._program
-        return None
+        with self.lock: 
+            query = Query()
+            program_db_entries = self._programs.search(query.name == name)
+            if len(program_db_entries) > 0:
+                prog_db_entry = program_db_entries[0]
+                logging.debug(prog_db_entry)
+                self._program = Program.from_dict(prog_db_entry)
+                return self._program
+            return None
 
     def delete(self, name):
-        query = Query()
-        program_db_entries = self._programs.search(query.name == name)
-        self._programs.remove(query.name == name)
+        with self.lock: 
+            query = Query()
+            program_db_entries = self._programs.search(query.name == name)
+            self._programs.remove(query.name == name)
 
     def create(self, name, code):
         self._program = Program(name, code)
