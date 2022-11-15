@@ -33,7 +33,7 @@ sox==1.4.1
 # Computer Vision
 grpcio==1.48.1
 numpy==1.23.2
-Pillow==9.2.0
+Pillow==9.3.0
 protobuf==4.21.8
 opencv-contrib-python==4.5.5.62
 tflite-runtime==2.10.0
