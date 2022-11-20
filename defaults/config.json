@@ -7,9 +7,10 @@
   "camera_framerate":"30",
   "prog_scrollbars":"true",
   "move_fw_speed":"100",
+  "motor_min_power":"0",
+  "motor_max_power":"100",
   "prog_level":"adv",
   "move_motor_trim":"1",
-  "move_motor_mode":"dc",
   "cv_image_factor":"2",
   "move_power_angle_1":"45",
   "camera_path_object_size_min":"4000",
@@ -42,5 +43,10 @@
   "wifi_psk":"coderbot",
   "packages_installed":"",
   "admin_password":"",
-  "hardware_version":"5"
+  "hardware_version":"5",
+  "pid_kp":"0.9",
+  "pid_kd":"0.1",
+  "pid_ki":"0.01",
+  "pid_max_speed":"200",
+  "pid_sample_time":"0.01"
 }

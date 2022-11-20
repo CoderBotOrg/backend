@@ -642,6 +642,11 @@ components:
           minimum: -1.0
           maximum: 1.0
           description: Duration of the movement. 0 doesn't move the coderbot.
+        distance:
+          type: number
+          minimum: 0.0
+          maximum: 1000.0
+          description: Target distqnce in mm.
       required:
         - speed
         - elapse

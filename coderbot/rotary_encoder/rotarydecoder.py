@@ -27,8 +27,8 @@ class RotaryDecoder:
         self._pi.set_pull_up_down(feedback_pin_B, pigpio.PUD_UP)
 
         # callback function on EITHER_EDGE for each pin
-        self._callback_triggerA = self._pi.callback(feedback_pin_A, pigpio.EITHER_EDGE, self._pulse)
-        self._callback_triggerB = self._pi.callback(feedback_pin_B, pigpio.EITHER_EDGE, self._pulse)
+        self._callback_triggerA = self._pi.callback(feedback_pin_A, pigpio.EITHER_EDGE, self._pulseA)
+        self._callback_triggerB = self._pi.callback(feedback_pin_B, pigpio.EITHER_EDGE, self._pulseA)
 
         self._lastGpio = None
 
@@ -90,6 +90,9 @@ class RotaryDecoder:
         direction = self._direction
         self._lock.release()
         self._callback(direction)
+
+    def _pulseA(self, gpio, level, tick):
+        self._callback(tick)
 
     def cancel(self):
 
