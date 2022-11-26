@@ -43,7 +43,6 @@
   "wifi_psk":"coderbot",
   "packages_installed":"",
   "admin_password":"",
-  "hardware_version":"5",
   "pid_kp":"8.0",
   "pid_kd":"0.0",
   "pid_ki":"0.0",
