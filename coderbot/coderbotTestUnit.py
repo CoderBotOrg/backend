@@ -12,13 +12,13 @@
     If no test was executed on that component, 0 is preserved.
 """
 from coderbot import CoderBot
-c = CoderBot.get_instance()
 
 # Single components tests
 
 # encoder motors
 def __test_encoder():
     try:
+        c = CoderBot.get_instance()
         # moving both wheels at speed 100 clockwise
         print("moving both wheels at speed 100 clockwise")
         assert(c.speed() == 0)

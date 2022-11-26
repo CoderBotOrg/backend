@@ -156,18 +156,19 @@ class MotorEncoder:
 
         # taking groups of n ticks each
         if (self._ticks_counter == 0):
-            self._start_timer = time()  # clock started
+            self._start_timer = tick  # clock started
         elif (abs(self._ticks_counter) == self._ticks_threshold):
-            self._current_timer = time()
-            elapse = self._current_timer - self._start_timer # calculating time elapse
+            self._current_timer = tick
+            elapse = (self._current_timer - self._start_timer) / 1000000.0 # calculating time elapse
             # calculating current speed
             self._encoder_speed = self._ticks_threshold * self._distance_per_tick / elapse  # (mm/s)
 
-        self._ticks += tick  # updating ticks
+        self._ticks += 1  # updating ticks
 
         if(abs(self._ticks_counter) < self._ticks_threshold):
             self._ticks_counter += 1
         else:
+            self._start_timer = tick  # clock started
             self._ticks_counter = 0
 
         # updating ticks counter using module

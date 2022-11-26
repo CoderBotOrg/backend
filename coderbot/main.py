@@ -22,10 +22,10 @@ from coderbot import CoderBot
 # Logging configuration
 logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
-sh = logging.StreamHandler()
-formatter = logging.Formatter('%(message)s')
-sh.setFormatter(formatter)
-logger.addHandler(sh)
+# sh = logging.StreamHandler()
+# formatter = logging.Formatter('%(message)s')
+# sh.setFormatter(formatter)
+# logger.addHandler(sh)
 
 ## (Connexion) Flask app configuration
 
@@ -68,8 +68,7 @@ def run_server():
         try:
             app.bot_config = Config.read()
 
-            bot = CoderBot.get_instance(motor_trim_factor=float(app.bot_config.get('move_motor_trim', 1.0)),
-                                        hw_version=app.bot_config.get('hardware_version'))
+            bot = CoderBot.get_instance()
 
             try:
                 audio_device = Audio.get_instance()

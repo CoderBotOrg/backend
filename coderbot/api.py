@@ -3,36 +3,40 @@ API methods implementation
 This file contains every method called by the API defined in v2.yml
 """
 
+import logging
 import os
 import subprocess
-import logging
-import connexion
-from werkzeug.datastructures import Headers
-from flask import (request,
-                   send_file,
-                   Response)
-import picamera
 import urllib
-import connexion
 
-from program import ProgramEngine, Program
+import connexion
+import picamera
+from flask import Response, request, send_file
+from werkzeug.datastructures import Headers
+
 from config import Config
 from activity import Activities
+from audio import Audio
 from camera import Camera
 from cnn.cnn_manager import CNNManager
-from musicPackages import MusicPackageManager
-from audio import Audio
 from coderbotTestUnit import run_test as runCoderbotTestUnit
-from coderbot import CoderBot
+from musicPackages import MusicPackageManager
+from program import Program, ProgramEngine
+
 from balena import Balena
+from coderbot import CoderBot
 
 BUTTON_PIN = 16
 
 config = Config.read()
-bot = CoderBot.get_instance(
-    motor_trim_factor=float(config.get("move_motor_trim", 1.0)),
-    hw_version=config.get("hw_version")
-)
+bot = CoderBot.get_instance(motor_trim_factor=float(config.get('move_motor_trim', 1.0)),
+                            motor_max_power=int(config.get('motor_max_power', 100)),
+                            motor_min_power=int(config.get('motor_min_power', 0)),
+                            hw_version=config.get('hardware_version'),
+                            pid_params=(float(config.get('pid_kp', 1.0)),
+                                        float(config.get('pid_kd', 0.1)),
+                                        float(config.get('pid_ki', 0.01)),
+                                        float(config.get('pid_max_speed', 200)),
+                                        float(config.get('pid_sample_time', 0.01))))
 audio_device = Audio.get_instance()
 cam = Camera.get_instance()
 
@@ -125,9 +129,10 @@ def move(body):
 def turn(body):
     speed=body.get("speed")
     elapse=body.get("elapse")
-    if speed is None or speed == 0:
+    distance=body.get("distance")
+    if (speed is None or speed == 0) or (elapse is not None and distance is not None):
         return 400
-    bot.turn(speed=speed, elapse=elapse)
+    bot.turn(speed=speed, elapse=elapse, distance=distance)
     return 200
 
 def takePhoto():

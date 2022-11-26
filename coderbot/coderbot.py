@@ -20,6 +20,7 @@
 import os
 import sys
 import time
+from math import copysign
 import logging
 import pigpio
 import sonar
@@ -100,7 +101,7 @@ class CoderBot(object):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, motor_trim_factor=1.0, hw_version="5"):
+    def __init__(self, motor_trim_factor=1.0, motor_min_power=0, motor_max_power=100, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
         try:
             self._mpu = mpu.AccelGyroMag()
             logging.info("MPU available")
@@ -116,6 +117,8 @@ class CoderBot(object):
         self._cb_elapse = dict()
         self._encoder = self.GPIOS.HAS_ENCODER
         self._motor_trim_factor = motor_trim_factor
+        self._motor_min_power = motor_min_power
+        self._motor_max_power = motor_max_power
         self._twin_motors_enc = WheelsAxel(
             self.pi,
             enable_pin=self.GPIOS.PIN_MOTOR_ENABLE,
@@ -126,7 +129,8 @@ class CoderBot(object):
             right_forward_pin=self.GPIOS.PIN_RIGHT_FORWARD,
             right_backward_pin=self.GPIOS.PIN_RIGHT_BACKWARD,
             right_encoder_feedback_pin_A=self.GPIOS.PIN_ENCODER_RIGHT_A,
-            right_encoder_feedback_pin_B=self.GPIOS.PIN_ENCODER_RIGHT_B)
+            right_encoder_feedback_pin_B=self.GPIOS.PIN_ENCODER_RIGHT_B,
+            pid_params=pid_params)
         self.motor_control = self._dc_enc_motor
 
         self._cb1 = self.pi.callback(self.GPIOS.PIN_PUSHBUTTON, pigpio.EITHER_EDGE, self._cb_button)
@@ -153,21 +157,23 @@ class CoderBot(object):
             s.cancel()
 
     @classmethod
-    def get_instance(cls, motor_trim_factor=1.0, hw_version="5", servo=False):
+    def get_instance(cls, motor_trim_factor=1.0, motor_max_power=100, motor_min_power=0, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
         if not cls.the_bot:
-            cls.the_bot = CoderBot(motor_trim_factor=motor_trim_factor, hw_version=hw_version)
+            cls.the_bot = CoderBot(motor_trim_factor=motor_trim_factor,  motor_max_power= motor_max_power, motor_min_power=motor_min_power, hw_version=hw_version, pid_params=pid_params)
         return cls.the_bot
 
+    def get_motor_power(self, speed):
+        return int(copysign(min(max(((self._motor_max_power - self._motor_min_power) * abs(speed) / 100) + self._motor_min_power, self._motor_min_power), self._motor_max_power), speed))
+
     def move(self, speed=100, elapse=None, distance=None):
-        self._motor_trim_factor = 1.0
-        speed_left = min(100, max(-100, speed * self._motor_trim_factor))
-        speed_right = min(100, max(-100, speed / self._motor_trim_factor))
+        speed_left = speed * self._motor_trim_factor
+        speed_right = speed / self._motor_trim_factor
         self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse, target_distance=distance)
 
-    def turn(self, speed=100, elapse=-1):
-        speed_left = min(100, max(-100, speed * self._motor_trim_factor))
-        speed_right = -min(100, max(-100, speed / self._motor_trim_factor))
-        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse)
+    def turn(self, speed=100, elapse=None, distance=None):
+        speed_left = speed * self._motor_trim_factor
+        speed_right = -speed / self._motor_trim_factor
+        self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse, target_distance=distance)
 
     def turn_angle(self, speed=100, angle=0):
         z = self._mpu.get_gyro()[2]
@@ -225,8 +231,8 @@ class CoderBot(object):
         self.pi.set_PWM_dutycycle(pin, duty)
 
     def _dc_enc_motor(self, speed_left=100, speed_right=100, time_elapse=None, target_distance=None):
-        self._twin_motors_enc.control(power_left=speed_left,
-                                      power_right=speed_right,
+        self._twin_motors_enc.control(power_left=self.get_motor_power(speed_left),
+                                      power_right=self.get_motor_power(speed_right),
                                       time_elapse=time_elapse,
                                       target_distance=target_distance)
 

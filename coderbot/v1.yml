@@ -446,7 +446,7 @@ paths:
       tags:
         - Direct control
       requestBody:
-        description: Movement speed and duration
+        description: Movement speed and duration or distance
         required: true
         content:
           application/json:
@@ -464,12 +464,14 @@ paths:
       tags:
         - Direct control
       requestBody:
-        description: Movement Speed and duration
+        description: Movement Speed and duration or distance
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TurnParams'
+              oneOf:
+                - $ref: '#/components/schemas/TurnParamsElapse'
+                - $ref: '#/components/schemas/TurnParamsDistance'
       responses:
         200:
           description: Sent command to the bot GPIO.
@@ -629,7 +631,7 @@ components:
       required:
         - speed
         - distance
-    TurnParams:
+    TurnParamsElapse:
       type: object
       properties:
         speed:
@@ -645,6 +647,22 @@ components:
       required:
         - speed
         - elapse
+    TurnParamsDistance:
+      type: object
+      properties:
+        speed:
+          type: number
+          minimum: -100.0
+          maximum: 100.0
+          description: 0 to 100 represent a forward movement (100 being the maximum speed), while 0 to -100 is a backward movement (-100 being the maximu speed)
+        distance:
+          type: number
+          minimum: 0.0
+          maximum: 100000.0
+          description: Target distqnce in mm.
+      required:
+        - speed
+        - distance
     Settings:
       type: object
     Photo:

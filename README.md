@@ -1,5 +1,5 @@
 # backend
-[![CoderBotOrg](https://circleci.com/gh/CoderBotOrg/backend.svg?style=svg)](https://circleci.com/gh/CoderBotOrg/backend/tree/master)
+[![Build CoderBot backend](https://github.com/CoderBotOrg/backend/actions/workflows/build_backend.yml/badge.svg)
 
 > CoderBot is a RaspberryPI-based programmable robot for educational purposes. Check the [project website](https://www.coderbot.org) for more information.
 >
