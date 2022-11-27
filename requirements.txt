@@ -14,7 +14,7 @@ urllib3==1.26.12
 Werkzeug==2.2.2
 
 # Misc utils
-setuptools==65.3.0
+setuptools==65.5.1
 certifi==2022.5.18.1
 absl-py==1.2.0
 chardet==3.0.4
@@ -40,7 +40,7 @@ pyalsaaudio==0.9.2
 # Computer Vision
 grpcio==1.48.1
 numpy==1.23.2
-Pillow==9.2.0
+Pillow==9.3.0
 protobuf==4.21.8
 opencv-contrib-python==4.5.5.62
 tflite-runtime==2.10.0
