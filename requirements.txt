@@ -14,7 +14,7 @@ urllib3==1.26.12
 Werkzeug==2.2.2
 
 # Misc utils
-setuptools==65.3.0
+setuptools==65.5.1
 certifi==2022.5.18.1
 absl-py==1.2.0
 chardet==3.0.4
