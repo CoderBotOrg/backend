@@ -359,6 +359,23 @@ paths:
           description: "ok"
       tags:
         - Music extensions
+    post:
+      operationId: "api.addMusicPackage"
+      summary: "Add Music Package"
+      requestBody:
+        description: Add a Music Package
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+      tags:
+        - System operations
+      responses:
+        200:
+          description: "ok"
+        400:
+          description: "upload failed"
   /music/packages/{name}:
     delete:
       operationId: "api.deleteMusicPackage"
@@ -376,25 +393,7 @@ paths:
           description: "ok"
         400:
           description: "not found"
-        
-  /system/update:
-    post:
-      operationId: "api.updateFromPackage"
-      summary: "Update CoderBot from package"
-      requestBody:
-        description: Update Activity
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-      tags:
-        - System operations
-      responses:
-        200:
-          description: "ok"
-        400:
-          description: "upload failed"
+       
   /system/status:
     get:
       operationId: "api.get_status"
@@ -404,6 +403,7 @@ paths:
       responses:
         200:
           description: "Bot status"
+
   /system/test:
     post:
       summary: Tests CoderBot components.
@@ -411,15 +411,19 @@ paths:
       tags:
         - System operations
       requestBody:
-        description: Update Activity
+        description: Performs onboard tests
         required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              type: object
+              type: array
+              items:
+                type: string
       responses:
         200:
           description: Test ended.
+
+
   /system/info:
     get:
       operationId: "api.get_info"
@@ -439,6 +443,7 @@ paths:
       responses:
         200:
           description: "Successfully stopped the motors"
+
   /control/move:
     post:
       summary: Moves the bot forward or backward.

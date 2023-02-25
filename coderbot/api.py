@@ -18,7 +18,7 @@ from activity import Activities
 from audio import Audio
 from camera import Camera
 from cnn.cnn_manager import CNNManager
-from coderbotTestUnit import run_test as runCoderbotTestUnit
+from runtime_test import run_test
 from musicPackages import MusicPackageManager
 from program import Program, ProgramEngine
 
@@ -262,15 +262,14 @@ def addMusicPackage():
     """
     Add a musical package an save the list of available packages on disk
     also add sounds and directory
-    """
-    """zipName = request.args.get("zipname")
+    zipName = request.args.get("zipname")
     """
     file_to_upload = connexion.request.files['file_to_upload']
-    print("adding " +str(file_to_upload))
-    print("adding " + file_to_upload.filename)
+    logging.info("adding " + str(file_to_upload))
+    logging.info("adding " + file_to_upload.filename)
     file_to_upload.save(os.path.join('./updatePackages/', file_to_upload.filename))
-    musicPkg = MusicPackageManager.get_instance()
-    response = musicPkg.addPackage(file_to_upload.filename)
+    music_pkg = MusicPackageManager.get_instance()
+    response = music_pkg.addPackage(file_to_upload.filename)
     if response == 1:
         return 200
     elif response == 2:
@@ -378,7 +377,7 @@ def resetDefaultPrograms():
 def testCoderbot(body):
     # taking first JSON key value (varargin)
     if len(body.keys()) > 0:
-        tests_state = runCoderbotTestUnit(body[list(body.keys())[0]])
+        tests_state = run_test(body[list(body.keys())[0]])
         return tests_state
     else:
         return 404
