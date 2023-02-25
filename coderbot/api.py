@@ -375,12 +375,7 @@ def resetDefaultPrograms():
 
 ## Test
 def testCoderbot(body):
-    # taking first JSON key value (varargin)
-    if len(body.keys()) > 0:
-        tests_state = run_test(body[list(body.keys())[0]])
-        return tests_state
-    else:
-        return 404
+    return run_test(body.get("tests", []))
 
 def listCNNModels():
     cnn = CNNManager.get_instance()

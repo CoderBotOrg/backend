@@ -416,13 +416,17 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
+              type: object
+              properties:
+                tests:
+                  type: array
+                  items:
+                    type: string
       responses:
         200:
           description: Test ended.
-
+        400:
+          description: Invalid input.
 
   /system/info:
     get:
