@@ -1,0 +1,25 @@
+{
+    "packages": {
+        "snake": {
+            "category": "animal",
+            "name_IT": "serpente",
+            "name_EN": "snake",
+            "version": "0.1",
+            "date": "2020-06-01",
+            "interface": {
+                "base": {
+                    "available": "TRUE",
+                    "icon": "snake.png"
+                },
+                "intermediate": {
+                    "available": "TRUE",
+                    "icon": "snake.png"
+                },
+                "advanced": {
+                    "available": "TRUE",
+                    "icon": "snake.png"
+                }
+            }
+        }
+    }
+}

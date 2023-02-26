@@ -184,18 +184,16 @@ class MusicPackageManager:
         if not self.verifyVersion(pkgname, version):
             if (version == self.packages[pkgname].getVersion()):
                 logging.error("errore, il pacchetto " + pkgname + " ha versione identica a quello attualmente installato")
-                return 3
+                raise ValueError()
             else:
                 logging.info("errore, il pacchetto " + pkgname + " ha versione precendente a quello attualmente installato")
-                return 2
+                raise ValueError()
         else:
-
-            os.system('unzip -o ' + './updatePackages/' + filename + " -d ./updatePackages")
-
+            os.system('unzip -o ' + '/tmp/' + filename + " -d /tmp")
             os.system('mkdir ' + pkgpath)
-            os.system('mv ./updatePackages/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
+            os.system('mv /tmp/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
 
-            with open('./updatePackages/' + pkgname + '/' + pkgname + '.json') as json_file:
+            with open('/tmp/' + pkgname + '/' + pkgname + '.json') as json_file:
                 logging.info("adding " + pkgname + " package")
                 data = json.load(json_file)
                 for p in data['packages']:
@@ -210,8 +208,7 @@ class MusicPackageManager:
 
             self.updatePackages()
 
-            os.system('rm -rf ./updatePackages/' + pkgname)
-            return 1
+            os.system('rm -rf /tmp/' + pkgname)
 
 
     def isPackageAvailable(self,namePackage):

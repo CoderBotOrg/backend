@@ -1,5 +1,5 @@
 # backend
-[![Build CoderBot backend](https://github.com/CoderBotOrg/backend/actions/workflows/build_backend.yml/badge.svg)
+![Build CoderBot backend](https://github.com/CoderBotOrg/backend/actions/workflows/build_backend.yml/badge.svg)
 
 > CoderBot is a RaspberryPI-based programmable robot for educational purposes. Check the [project website](https://www.coderbot.org) for more information.
 >
