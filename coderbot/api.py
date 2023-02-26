@@ -264,16 +264,16 @@ def addMusicPackage():
     also add sounds and directory
     zipName = request.args.get("zipname")
     """
-    file_to_upload = connexion.request.files['file_to_upload']
-    logging.info("adding " + file_to_upload.filename)
-    file_to_upload.save(os.path.join('/tmp/', file_to_upload.filename))
-    music_pkg = MusicPackageManager.get_instance()
-    response = music_pkg.addPackage(file_to_upload.filename)
-    if response == 1:
+    try:
+        file_to_upload = connexion.request.files['file_to_upload']
+        logging.info("adding " + file_to_upload.filename)
+        file_to_upload.save(os.path.join('/tmp/', file_to_upload.filename))
+        music_pkg = MusicPackageManager.get_instance()
+        music_pkg.addPackage(file_to_upload.filename)
         return 200
-    elif response == 2:
-        return 400
-    elif response == 3:
+    except ValueError:
+        return 409
+    except Exception:
         return 400
 
 def deleteMusicPackage(name):
