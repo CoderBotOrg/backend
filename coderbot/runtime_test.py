@@ -11,6 +11,7 @@
     If a test passes for correspondent component, a 1 is returned.
     If no test was executed on that component, 0 is preserved.
 """
+import logging
 from coderbot import CoderBot
 
 # Single components tests
@@ -20,70 +21,70 @@ def __test_encoder():
     try:
         c = CoderBot.get_instance()
         # moving both wheels at speed 100 clockwise
-        print("moving both wheels at speed 100 clockwise")
+        logging.info("moving both wheels at speed 100 clockwise")
         assert(c.speed() == 0)
         c.move(speed=100, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving both wheels at speed 40 clockwise
-        print("moving both wheels at speed 40 clockwise")
+        logging.info("moving both wheels at speed 40 clockwise")
         assert(c.speed() == 0)
         c.move(speed=40, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving both wheels at speed 100 counter-clockwise
-        print("moving both wheels at speed 100 counter-clockwise")
+        logging.info("moving both wheels at speed 100 counter-clockwise")
         assert(c.speed() == 0)
         c.move(speed=-100, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving both wheels at speed 40 counter-clockwise
-        print("moving both wheels at speed 40 counter-clockwise")
+        logging.info("moving both wheels at speed 40 counter-clockwise")
         assert(c.speed() == 0)
         c.move(speed=-40, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving forward
-        print("moving forward")
+        logging.info("moving forward")
         assert(c.speed() == 0)
         c.forward(speed=100, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving backwards
-        print("moving backwards")
+        logging.info("moving backwards")
         assert(c.speed() == 0)
         c.backward(speed=100, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving forward for 1 meter
-        print("moving forward for 1 meter")
+        logging.info("moving forward for 1 meter")
         assert(c.speed() == 0)
         c.forward(speed=100, distance=1000)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # moving backwards for 1 meter
-        print("moving backwards for 1 meter")
+        logging.info("moving backwards for 1 meter")
         assert(c.speed() == 0)
         c.backward(speed=100, distance=1000)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # turning left
-        print("turning left")
+        logging.info("turning left")
         assert(c.speed() == 0)
         c.left(speed=100, elapse=2)
         assert(c.distance() != 0)
         assert (c.speed() == 0)
 
         # turning right
-        print("turning right")
+        logging.info("turning right")
         assert(c.speed() == 0)
         c.right(speed=100, elapse=2)
         assert(c.distance() != 0)
