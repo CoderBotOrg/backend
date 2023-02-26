@@ -190,12 +190,12 @@ class MusicPackageManager:
                 return 2
         else:
 
-            os.system('unzip -o ' + './updatePackages/' + filename + " -d ./updatePackages")
+            os.system('unzip -o ' + '/tmp/' + filename + " -d ./tmp")
 
             os.system('mkdir ' + pkgpath)
-            os.system('mv ./updatePackages/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
+            os.system('mv /tmp/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
 
-            with open('./updatePackages/' + pkgname + '/' + pkgname + '.json') as json_file:
+            with open('/tmp/' + pkgname + '/' + pkgname + '.json') as json_file:
                 logging.info("adding " + pkgname + " package")
                 data = json.load(json_file)
                 for p in data['packages']:
@@ -210,7 +210,7 @@ class MusicPackageManager:
 
             self.updatePackages()
 
-            os.system('rm -rf ./updatePackages/' + pkgname)
+            os.system('rm -rf /tmp/' + pkgname)
             return 1
 
 

@@ -265,9 +265,8 @@ def addMusicPackage():
     zipName = request.args.get("zipname")
     """
     file_to_upload = connexion.request.files['file_to_upload']
-    logging.info("adding " + str(file_to_upload))
     logging.info("adding " + file_to_upload.filename)
-    file_to_upload.save(os.path.join('./updatePackages/', file_to_upload.filename))
+    file_to_upload.save(os.path.join('/tmp/', file_to_upload.filename))
     music_pkg = MusicPackageManager.get_instance()
     response = music_pkg.addPackage(file_to_upload.filename)
     if response == 1:
