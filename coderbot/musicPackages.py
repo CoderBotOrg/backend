@@ -190,7 +190,7 @@ class MusicPackageManager:
                 return 2
         else:
 
-            os.system('unzip -o ' + '/tmp/' + filename + " -d ./tmp")
+            os.system('unzip -o ' + '/tmp/' + filename + " -d /tmp")
 
             os.system('mkdir ' + pkgpath)
             os.system('mv /tmp/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
