@@ -270,11 +270,11 @@ def addMusicPackage():
         file_to_upload.save(os.path.join('/tmp/', file_to_upload.filename))
         music_pkg = MusicPackageManager.get_instance()
         music_pkg.addPackage(file_to_upload.filename)
-        return 200
+        return "{}", 200
     except ValueError:
-        return 409
+        return "{}", 409
     except Exception:
-        return 400
+        return "{}", 400
 
 def deleteMusicPackage(name):
     """
