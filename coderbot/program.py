@@ -22,8 +22,9 @@ import threading
 import json
 import shutil
 import logging
-
+from datetime import datetime
 import math
+
 from tinydb import TinyDB, Query
 from threading import Lock
 
@@ -159,12 +160,14 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, code=None, dom_code=None, default=False):
+    def __init__(self, name, code=None, dom_code=None, default=False, id=None, modified=None):
         self._thread = None
         self.name = name
         self._dom_code = dom_code
         self._code = code
         self._default = default
+        self._id = id
+        self._modified = modified
 
     def execute(self, options={}):
         if self._running:
@@ -242,8 +245,15 @@ class Program:
         return {'name': self.name,
                 'dom_code': self._dom_code,
                 'code': self._code,
-                'default': self._default}
+                'default': self._default,
+                'id': self._id,
+                'modified': self._modified.isoformat()}
 
     @classmethod
     def from_dict(cls, amap):
-        return Program(name=amap['name'], dom_code=amap['dom_code'], code=amap['code'], default=amap.get('default', False))
+        return Program(name=amap['name'], 
+                       dom_code=amap['dom_code'], 
+                       code=amap['code'], 
+                       default=amap.get('default', False), 
+                       id=amap.get('id', None),
+                       modified=datetime.fromisoformat(amap.get('modified', datetime.now().isoformat())))

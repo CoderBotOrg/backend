@@ -52,3 +52,6 @@ class Config(object):
         with open(CONFIG_DEFAULT_FILE) as f:
             cls.write(json.loads(f.read()))
 
+    @classmethod
+    def modified(cls):
+        return os.stat(CONFIG_FILE).st_mtime

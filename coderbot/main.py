@@ -18,6 +18,7 @@ from config import Config
 from cnn.cnn_manager import CNNManager
 from event import EventManager
 from coderbot import CoderBot
+from cloud import CloudManager
 
 # Logging configuration
 logger = logging.getLogger()
@@ -89,6 +90,9 @@ def run_server():
             if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
                 prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
                 prog.execute()
+
+            CloudManager.get_instance()
+            
         except ValueError as e:
             app.bot_config = {}
             logging.error(e)
