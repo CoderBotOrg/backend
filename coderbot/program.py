@@ -43,6 +43,8 @@ PROGRAM_PREFIX = "program_"
 PROGRAM_SUFFIX = ".json"
 PROGRAMS_DB = "data/programs.json"
 PROGRAMS_PATH_DEFAULTS = "defaults/programs/"
+PROGRAM_STATUS_ACTIVE = "active"
+PROGRAM_STATUS_DELETED = "deleted"
 
 musicPackageManager = musicPackages.MusicPackageManager.get_instance()
 
@@ -80,20 +82,22 @@ class ProgramEngine:
         self._program = None
         self._log = ""
         self._programs = TinyDB(PROGRAMS_DB)
+
         # initialise DB from default programs
         query = Query()
         self.lock = Lock()
         for dirname, dirnames, filenames, in os.walk(PROGRAMS_PATH_DEFAULTS):
-            dirnames
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
-                    logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
-                    with open(os.path.join(dirname, filename), "r") as f:
-                        program_dict = json.load(f)
-                        program_dict["default"] = "default" in dirname
-                        program = Program.from_dict(program_dict)
-                        self.save(program)
+                    if self.load(program_name) is None:
+                        logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
+                        with open(os.path.join(dirname, filename), "r") as f:
+                            program_dict = json.load(f)
+                            program_dict["default"] = "default" in dirname
+                            program_dict["status"] = PROGRAM_STATUS_ACTIVE
+                            program = Program.from_dict(program_dict)
+                            self.save(program)
 
     @classmethod
     def get_instance(cls):
@@ -101,12 +105,19 @@ class ProgramEngine:
             cls._instance = ProgramEngine()
         return cls._instance
 
-    def prog_list(self):
-        return self._programs.all()
+    def prog_list(self, active_only = True):
+        programs = None 
+        query = Query()
+        if active_only:
+            programs = self._programs.search(query.status == PROGRAM_STATUS_ACTIVE)
+        else:
+            programs = self._programs.all()
+        return programs
 
     def save(self, program):
         with self.lock: 
             query = Query()
+            program._modified = datetime.now()
             self._program = program
             program_db_entry = self._program.as_dict()
             if self._programs.search(query.name == program.name) != []:
@@ -120,19 +131,27 @@ class ProgramEngine:
             program_db_entries = self._programs.search(query.name == name)
             if len(program_db_entries) > 0:
                 prog_db_entry = program_db_entries[0]
-                logging.debug(prog_db_entry)
+                #logging.debug(prog_db_entry)
                 self._program = Program.from_dict(prog_db_entry)
                 return self._program
             return None
 
-    def delete(self, name):
+    def delete(self, name, logical = True):
         with self.lock: 
             query = Query()
-            program_db_entries = self._programs.search(query.name == name)
-            self._programs.remove(query.name == name)
+            program_db_entries = self._programs.search((query.name == name) & (query.default == False) & (query.status == PROGRAM_STATUS_ACTIVE))
+            if len(program_db_entries) > 0:
+                program_db_entry = program_db_entries[0]
+                if logical:
+                    program_db_entry["status"] = PROGRAM_STATUS_DELETED
+                    program_db_entry["modified"] = datetime.now().isoformat()
+                    self._programs.update(program_db_entry, query.name == name)
+                else:
+                    self._programs.remove(query.name == name)
+        return None
 
     def create(self, name, code):
-        self._program = Program(name, code)
+        self._program = Program(name, code, modified=datetime.now())
         return self._program
 
     def is_running(self, name):
@@ -160,7 +179,7 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, code=None, dom_code=None, default=False, id=None, modified=None):
+    def __init__(self, name, code=None, dom_code=None, default=False, id=None, modified=None, status=None):
         self._thread = None
         self.name = name
         self._dom_code = dom_code
@@ -168,6 +187,7 @@ class Program:
         self._default = default
         self._id = id
         self._modified = modified
+        self._status = status
 
     def execute(self, options={}):
         if self._running:
@@ -247,7 +267,8 @@ class Program:
                 'code': self._code,
                 'default': self._default,
                 'id': self._id,
-                'modified': self._modified.isoformat()}
+                'modified': self._modified.isoformat(),
+                'status': self._status}
 
     @classmethod
     def from_dict(cls, amap):
@@ -256,4 +277,5 @@ class Program:
                        code=amap['code'], 
                        default=amap.get('default', False), 
                        id=amap.get('id', None),
-                       modified=datetime.fromisoformat(amap.get('modified', datetime.now().isoformat())))
+                       modified=datetime.fromisoformat(amap.get('modified', datetime.now().isoformat())),
+                       status=amap.get('status', None),)

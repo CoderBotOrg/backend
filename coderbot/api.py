@@ -7,6 +7,7 @@ import logging
 import os
 import subprocess
 import urllib
+from datetime import datetime
 
 import connexion
 import picamera
@@ -295,7 +296,7 @@ def saveProgram(name, body):
         return "askOverwrite"
     elif existing_program is not None and existing_program.is_default() == True:
         return "defaultCannotOverwrite", 400
-    program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"))
+    program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"), modified=datetime.now(), status="active")
     prog_engine.save(program)
     return 200
 
@@ -307,10 +308,10 @@ def loadProgram(name):
         return 404
 
 def deleteProgram(name):
-    prog_engine.delete(name)
+    prog_engine.delete(name, logical=True)
 
 def listPrograms():
-    return prog_engine.prog_list()
+    return prog_engine.prog_list(active_only=True)
 
 def runProgram(name, body):
     """
