@@ -50,5 +50,11 @@
   "pid_sample_time":"0.05",
   "movement_use_mpu": "false",
   "movement_use_motion": "false",
-  "movement_use_encoder": "true"
+  "movement_use_encoder": "true",
+  "sync_modes": {
+    "activities":"b",
+    "programs":"b",
+    "settings":"b"
+  },
+  "sync_period":"60"
 }

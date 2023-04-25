@@ -57,7 +57,7 @@ class CloudManager(threading.Thread):
             logging.info("run.sync.begin")
             settings = Config.read()
             syncmodes = settings.get("syncmodes", {"settings": "n", "activities": "n", "programs": "n"})
-            sync_period = settings.get("sync_period", 10)
+            sync_period = int(settings.get("sync_period", "60"))
 
             # Enter a context with an instance of the API client
             with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
