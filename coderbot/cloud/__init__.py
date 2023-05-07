@@ -56,7 +56,7 @@ class CloudManager(threading.Thread):
         while(True):
             logging.info("run.sync.begin")
             settings = Config.read()
-            syncmodes = settings.get("syncmodes", {"settings": "n", "activities": "n", "programs": "n"})
+            sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
             sync_period = int(settings.get("sync_period", "60"))
 
             # Enter a context with an instance of the API client
@@ -64,14 +64,14 @@ class CloudManager(threading.Thread):
                 # Create an instance of the API class
                 api_instance = robot_sync_api.RobotSyncApi(api_client)
                 
-                self.sync_settings(api_instance, syncmodes["settings"])
-                self.sync_activities(api_instance, syncmodes["activities"])
-                self.sync_programs(api_instance, syncmodes["programs"])
+                self.sync_settings(api_instance, sync_modes["settings"])
+                self.sync_activities(api_instance, sync_modes["activities"])
+                self.sync_programs(api_instance, sync_modes["programs"])
 
             sleep(sync_period)
             logging.info("run.sync.end")
 
-    def sync_settings(self, api_instance, syncmode):
+    def sync_settings(self, api_instance, sync_mode):
         try:
             # Create an instance of the API class
             api_response = api_instance.get_robot_setting()
@@ -81,7 +81,7 @@ class CloudManager(threading.Thread):
             local_most_recent = datetime.fromisoformat(cloud_setting_object["modified"]).timestamp() < Config.modified()
             logging.info("settings.syncing: " + cloud_setting_object.get("id") + " name: " + cloud_setting_object.get("id"))
             if cloud_setting != local_setting:
-                if syncmode == SYNC_UPSTREAM or (syncmode == SYNC_BIDIRECTIONAL and local_most_recent):
+                if sync_mode == SYNC_UPSTREAM or (sync_mode == SYNC_BIDIRECTIONAL and local_most_recent):
                     body = Setting(
                         id = cloud_setting_object.get('id'),
                         org_id = cloud_setting_object.get('org_id'),
@@ -93,13 +93,13 @@ class CloudManager(threading.Thread):
                     )
                     api_response = api_instance.set_robot_setting(body)
                     logging.info("settings.upstream")
-                if syncmode == SYNC_DOWNSTREAM: # setting, down
+                if sync_mode == SYNC_DOWNSTREAM: # setting, down
                     Config.write(cloud_setting.data.setting) 
                     logging.info("settings.downstream")
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling settings RobotSyncApi: %s\n" % e)
 
-    def sync_activities(self, api_instance, syncmode):
+    def sync_activities(self, api_instance, sync_mode):
         activities = Activities.get_instance().list()
         try:
             # Get robot activities
@@ -123,7 +123,7 @@ class CloudManager(threading.Thread):
                 if ac is not None and ac.get("data") != al.get("data"):
                     al["modified"] = al.get("modified", datetime.now(tz=timezone.utc).isoformat()) 
                     local_activity_more_recent = datetime.fromisoformat(ac.get("modified")).timestamp() < datetime.fromisoformat(al.get("modified")).timestamp()
-                    if syncmode == SYNC_UPSTREAM or (local_activity_more_recent and syncmode == SYNC_BIDIRECTIONAL):
+                    if sync_mode == SYNC_UPSTREAM or (local_activity_more_recent and sync_mode == SYNC_BIDIRECTIONAL):
                         ac["data"] = al.get("data")
                         ac["modified"] = al.get("modified")
                         body = Activity(
@@ -138,12 +138,12 @@ class CloudManager(threading.Thread):
                         #logging.info("run.activities.cloud.saving")
                         api_response = api_instance.set_robot_activity(ac.get("id"), body)
                         logging.info("activities.update.upstream: " + al.get("name"))
-                    elif syncmode == "d" or (not local_activity_more_recent and syncmode == SYNC_BIDIRECTIONAL):
+                    elif sync_mode == "d" or (not local_activity_more_recent and sync_mode == SYNC_BIDIRECTIONAL):
                         al["data"] = ac.get("data")
                         al["modified"] = ac.get("modified")
                         Activities.get_instance().save(al.get("name"), al)
                         logging.info("activities.update.downstream: " + al.get("name"))
-                elif ac is None and syncmode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
+                elif ac is None and sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
                     body = Activity(
                         id="",
                         org_id="",
@@ -158,18 +158,18 @@ class CloudManager(threading.Thread):
                     al["org_id"] = api_response.body["org_id"]
                     Activities.get_instance().save(al.get("name"), al)
                     logging.info("activities.create.upstream: " + al.get("name"))
-                elif ac is None and syncmode in [SYNC_DOWNSTREAM]:
+                elif ac is None and sync_mode in [SYNC_DOWNSTREAM]:
                     Activities.get_instance().delete(al.get("name"))
                     logging.info("activities.delete.downstream: " + al.get("name"))
             for k, ac in a_c_m.items():
-                if a_l_m.get(k) is None and syncmode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
+                if a_l_m.get(k) is None and sync_mode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
                     Activities.get_instance().save(ac.get("name"), ac)
                     logging.info("activities.create.downstream: " + ac.get("name"))
 
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling activities RobotSyncApi: %s\n" % e)
 
-    def sync_programs(self, api_instance, syncmode):
+    def sync_programs(self, api_instance, sync_mode):
         programs = list()
         programs_to_be_deleted = list()
         for p in ProgramEngine.get_instance().prog_list(active_only=False):
@@ -204,12 +204,12 @@ class CloudManager(threading.Thread):
                                 pc.get("code") == pl.get("code") and 
                                 pc.get("dom_code") == pl.get("dom_code") and
                                 pc.get("status") == pl.get("status"))
-                logging.info("programs.syncing: " + str(pl.get("id")) + " name: " + pl.get("name"))
+                logging.info("programs.syncing: " + str(pl.get("id")) + " name: " + pl.get("name") + " sync_mode: " + sync_mode + " pc: " + str(pc))
 
                 if pc is not None and not pc_pl_equals:
                     pl["modified"] = pl.get("modified", datetime.now(tz=timezone.utc).isoformat()) 
                     local_program_more_recent = datetime.fromisoformat(pc.get("modified")).timestamp() < datetime.fromisoformat(pl.get("modified")).timestamp()
-                    if syncmode == SYNC_UPSTREAM or (local_program_more_recent and syncmode == SYNC_BIDIRECTIONAL) and not to_be_deleted:
+                    if sync_mode == SYNC_UPSTREAM or (local_program_more_recent and sync_mode == SYNC_BIDIRECTIONAL) and not to_be_deleted:
                         pc["data"] = pl.get("data")
                         pc["modified"] = pl.get("modified")
                         body = Program(
@@ -225,12 +225,12 @@ class CloudManager(threading.Thread):
                         #logging.info("run.activities.cloud.saving")
                         api_response = api_instance.set_robot_program(pc.get("id"), body)
                         logging.info("programs.update.upstream: " + pl.get("name"))
-                    elif syncmode == "d" or (not local_program_more_recent and syncmode == SYNC_BIDIRECTIONAL):
+                    elif sync_mode == SYNC_DOWNSTREAM or (not local_program_more_recent and sync_mode == SYNC_BIDIRECTIONAL):
                         pl["data"] = pc.get("data")
                         pl["modified"] = pc.get("modified")
                         ProgramEngine.get_instance().save(program.Program.from_dict(pl))
                         logging.info("programs.update.downstream: " + pl.get("name"))
-                elif pc is None and syncmode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
+                elif pc is None and sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
                     body = Program(
                         id="",
                         org_id="",
@@ -246,13 +246,13 @@ class CloudManager(threading.Thread):
                     pl["org_id"] = api_response.body["org_id"]
                     ProgramEngine.get_instance().save(program.Program.from_dict(pl))
                     logging.info("programs.create.upstream: " + pl.get("name"))
-                elif pc is None and syncmode in [SYNC_DOWNSTREAM]:
+                elif pc is None and sync_mode in [SYNC_DOWNSTREAM]:
                     ProgramEngine.get_instance().delete(pl.get("name"))
                     logging.info("programs.delete.downstream: " + pl.get("name"))
 
             # manage programs not present locally in "active" status
             for k, pc in p_c_m.items():
-                if p_l_m.get(k) is None and syncmode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
+                if p_l_m.get(k) is None and sync_mode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
                     pl = program.Program(name=pc.get("name"), 
                                          code=pc.get("code"), 
                                          dom_code=pc.get("dom_code"), 
