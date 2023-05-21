@@ -27,13 +27,37 @@ from cloud_api_robot_client.model.activity import Activity
 from cloud_api_robot_client.model.program import Program
 from cloud_api_robot_client.model.robot_data import RobotData
 from cloud_api_robot_client.model.setting import Setting
+from cloud_api_robot_client.model.robot_register_data import RobotRegisterData
+from cloud_api_robot_client.model.robot_credentials import RobotCredentials
 
 SYNC_UPSTREAM = 'u'
 SYNC_DOWNSTREAM = 'd'
 SYNC_BIDIRECTIONAL = 'b'
 
+AUTH_FILE = "data/auth.json"
+
 class CloudManager(threading.Thread):
     _instance = None
+
+    _auth = {}
+
+    @classmethod
+    def get_auth(cls):
+        return cls._auth
+
+    @classmethod
+    def read_auth(cls):
+        with open(AUTH_FILE, 'r') as f:
+          cls._auth = json.load(f)
+          f.close()
+          return cls._auth
+
+    @classmethod
+    def write_auth(cls, auth):
+        cls._auth = auth
+        f = open(AUTH_FILE, 'w')
+        json.dump(cls._auth, f)
+        return cls._auth
 
     @classmethod
     def get_instance(cls):
@@ -48,16 +72,21 @@ class CloudManager(threading.Thread):
         self.configuration = cloud_api_robot_client.Configuration(
             host = "http://192.168.1.7:8090/api/v1",
         )
-        # Configure Bearer authorization: coderbot_auth
-        self.configuration.access_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IkNaMVFtVGM1WGZIV2NfQ1dPVG9kcm1QaXZFNFJ2ckFXaFZ3T28yTm85eDAifQ.eyJpc3MiOiJDb2RlckJvdCBDbG91ZCBBUEkiLCJpYXQiOjE2Nzc3MDI4NjIsImV4cCI6MTcwOTIzODg2MiwiYXVkIjoic3QtYXBpLmNvZGVyYm90Lm9yZyIsInN1YiI6InRwWkpYNFlsNElZd21QSzhEd2JmIiwiZW1haWwiOiJ0cFpKWDRZbDRJWXdtUEs4RHdiZkBib3RzLmNvZGVyYm90Lm9yZyIsInBpY3R1cmUiOiJodHRwczovL3N0LWFwcC5jb2RlcmJvdC5vcmcvcGljdHVyZXMvbm9waWMifQ.WlrYd-n6-WWHUxlz1kqnGl8TkjspVWn1UhKK_RIWyIJVlczD1GkqT4uqkHl2aGnp9I_E2SETUvC3dWkkUBG7qHvUIIZVaVhGpfiQy7WMekEdMnXtsPxK8NsWjHYUTbqz2dyz2Z1eQi5Ydhj4niEWsKCAT2BG-nwTIDxu-uxKrah6AtCGGyGKCQu0qje-qUNCxT5S1Y5RT10XS4Ewl2ROsMr1M6P3EVa0VoSJ26QZlh5jIz-8fhyGspxBHFEnZF-p95vEGCQp6M7epwoesDGVlX4AxEEpPk7c_Pd4c2gNLx1nhpkV26sT_c_NESNTM42tVyH9ZjQ5fxCUOEi_ELJ2vQ'
+        try:
+            self.read_auth()
+        except FileNotFoundError:
+            self.write_auth({})
         self.start()
 
     def run(self):
         while(True):
-            logging.info("run.sync.begin")
             settings = Config.read()
+            logging.info("run.sync.begin")
             sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
             sync_period = int(settings.get("sync_period", "60"))
+
+            token = self.get_token_or_register(settings)
+            self.configuration.access_token = token
 
             # Enter a context with an instance of the API client
             with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
@@ -71,15 +100,36 @@ class CloudManager(threading.Thread):
             sleep(sync_period)
             logging.info("run.sync.end")
 
+    def get_token_or_register(self, settings):
+        logging.info("run.check.token")
+        token = self.get_auth().get("token")
+        reg_otp = settings.get("reg_otp")
+        logging.info("otp_reg:" + reg_otp)
+        try:
+            if token is None and reg_otp is not None:
+                with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
+                    api_instance = robot_sync_api.RobotSyncApi(api_client)
+                    body = RobotRegisterData(
+                        otp=reg_otp,
+                    )
+                    api_response = api_instance.register_robot(body=body)
+                    logging.info(api_response.body)
+                    token = api_response.body.get("token")
+                    self.write_auth({"token":token})
+            return token
+        except cloud_api_robot_client.ApiException as e:
+            logging.warn("Exception when calling register_robot RobotSyncApi: %s\n" % e)
+
     def sync_settings(self, api_instance, sync_mode):
         try:
             # Create an instance of the API class
             api_response = api_instance.get_robot_setting()
             cloud_setting_object = api_response.body
             cloud_setting = json.loads(cloud_setting_object.get('data'))
+
             local_setting = Config.read()
-            local_most_recent = datetime.fromisoformat(cloud_setting_object["modified"]).timestamp() < Config.modified()
-            logging.info("settings.syncing: " + cloud_setting_object.get("id") + " name: " + cloud_setting_object.get("id"))
+            local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified", "2000-01-01T00:00:00.000000")).timestamp() < Config.modified()
+            logging.info("settings.syncing: " + cloud_setting_object.get("id", "") + " name: " + cloud_setting_object.get("name", ""))
             if cloud_setting != local_setting:
                 if sync_mode == SYNC_UPSTREAM or (sync_mode == SYNC_BIDIRECTIONAL and local_most_recent):
                     body = Setting(
@@ -184,7 +234,7 @@ class CloudManager(threading.Thread):
             api_response = api_instance.get_robot_programs()
             cloud_programs = api_response.body
             # cloud activities
-            p_c_m = {} # activities_cloud_map 
+            p_c_m = {} # programs_cloud_map 
             for p in cloud_programs:
                 if p.get("status") == program.PROGRAM_STATUS_ACTIVE:
                     p_c_m[p.get("id")] = p
