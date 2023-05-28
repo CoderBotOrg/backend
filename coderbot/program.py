@@ -45,6 +45,8 @@ PROGRAMS_DB = "data/programs.json"
 PROGRAMS_PATH_DEFAULTS = "defaults/programs/"
 PROGRAM_STATUS_ACTIVE = "active"
 PROGRAM_STATUS_DELETED = "deleted"
+PROGRAM_KIND_STOCK = "stock"
+PROGRAM_KIND_USER = "user"
 
 musicPackageManager = musicPackages.MusicPackageManager.get_instance()
 
@@ -94,7 +96,7 @@ class ProgramEngine:
                         logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
                         with open(os.path.join(dirname, filename), "r") as f:
                             program_dict = json.load(f)
-                            program_dict["default"] = "default" in dirname
+                            program_dict["kind"] = PROGRAM_KIND_STOCK
                             program_dict["status"] = PROGRAM_STATUS_ACTIVE
                             program = Program.from_dict(program_dict)
                             self.save(program)
@@ -139,7 +141,7 @@ class ProgramEngine:
     def delete(self, name, logical = True):
         with self.lock: 
             query = Query()
-            program_db_entries = self._programs.search((query.name == name) & (query.default == False) & (query.status == PROGRAM_STATUS_ACTIVE))
+            program_db_entries = self._programs.search(query.name == name)
             if len(program_db_entries) > 0:
                 program_db_entry = program_db_entries[0]
                 if logical:
@@ -179,12 +181,12 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, code=None, dom_code=None, default=False, id=None, modified=None, status=None):
+    def __init__(self, name, code=None, dom_code=None, kind=PROGRAM_KIND_USER, id=None, modified=None, status=None):
         self._thread = None
         self.name = name
         self._dom_code = dom_code
         self._code = code
-        self._default = default
+        self._kind = kind
         self._id = id
         self._modified = modified
         self._status = status
@@ -218,8 +220,8 @@ class Program:
     def is_running(self):
         return self._running
 
-    def is_default(self):
-        return self._default
+    def is_stock(self):
+        return self._kind == PROGRAM_KIND_STOCK
 
     def run(self, *args):
         options = args[0]
@@ -265,7 +267,7 @@ class Program:
         return {'name': self.name,
                 'dom_code': self._dom_code,
                 'code': self._code,
-                'default': self._default,
+                'kind': self._kind,
                 'id': self._id,
                 'modified': self._modified.isoformat(),
                 'status': self._status}
@@ -275,7 +277,7 @@ class Program:
         return Program(name=amap['name'], 
                        dom_code=amap['dom_code'], 
                        code=amap['code'], 
-                       default=amap.get('default', False), 
+                       kind=amap.get('kind', PROGRAM_KIND_USER), 
                        id=amap.get('id', None),
                        modified=datetime.fromisoformat(amap.get('modified', datetime.now().isoformat())),
                        status=amap.get('status', None),)
