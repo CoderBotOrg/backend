@@ -1,6 +1,12 @@
 from tinydb import TinyDB, Query
 from threading import Lock
 # Programs and Activities databases
+
+ACTIVITY_STATUS_DELETED = "deleted"
+ACTIVITY_STATUS_ACTIVE = "active"
+ACTIVITY_KIND_STOCK = "stock"
+ACTIVITY_KIND_USER = "user"
+
 class Activities():
     _instance = None
 
@@ -37,15 +43,21 @@ class Activities():
             else:
                 self.activities.update(activity, self.query.name == activity["name"])
 
-    def delete(self, name):
+    def delete(self, name, logical = True):
         with self.lock: 
             activities = self.activities.search(self.query.name == name)
             if len(activities) > 0:
                 activity = activities[0]
                 if activity.get("default", False) is True:
                     self.activities.update({'default': True}, self.query.stock == True)
-                self.activities.remove(self.query.name == activity["name"])
+                if logical:
+                    activity["status"] = ACTIVITY_STATUS_DELETED
+                    activity["modified"] = datetime.now().isoformat()
+                    self.activities.update(activity, query.name == name)
+                else:
+                    self.activities.remove(self.query.name == activity["name"])
 
-    def list(self):
+
+    def list(self, active_only = True):
         with self.lock: 
             return self.activities.all()
