@@ -17,7 +17,7 @@ import json
 from time import sleep
 
 from config import Config
-from activity import Activities
+from activity import Activities, ACTIVITY_KIND_USER, ACTIVITY_KIND_STOCK, ACTIVITY_STATUS_ACTIVE, ACTIVITY_STATUS_DELETED
 from program import ProgramEngine
 import program
 import activity
@@ -94,7 +94,7 @@ class CloudManager(threading.Thread):
                 # Create an instance of the API class
                 api_instance = robot_sync_api.RobotSyncApi(api_client)
                 
-                #self.sync_settings(api_instance, sync_modes["settings"])
+                self.sync_settings(api_instance, sync_modes["settings"])
                 self.sync_activities(api_instance, sync_modes["activities"])
                 self.sync_programs(api_instance, sync_modes["programs"])
 
@@ -130,7 +130,7 @@ class CloudManager(threading.Thread):
 
             local_setting = Config.read()
             local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified", "2000-01-01T00:00:00.000000")).timestamp() < Config.modified()
-            logging.info("settings.syncing: " + cloud_setting_object.get("id", "") + " name: " + cloud_setting_object.get("name", ""))
+            # logging.info("settings.syncing: " + cloud_setting_object.get("id", "") + " name: " + cloud_setting_object.get("name", ""))
             if cloud_setting != local_setting:
                 if sync_mode == SYNC_UPSTREAM or (sync_mode == SYNC_BIDIRECTIONAL and local_most_recent):
                     body = Setting(
@@ -155,14 +155,19 @@ class CloudManager(threading.Thread):
         activities_local_user = list()
         activities_local_stock = list()
         activities_local_to_be_deleted = list()
-        for p in Activities.get_instance().list(active_only=False):
-            if p.get("kind") == activity.ACTIVITY_KIND_USER:
-                if p.get("status") == activity.ACTIVITY_STATUS_ACTIVE:
-                    activities_local_user.append(p)
-                elif p.get("status") == activity.ACTIVITY_STATUS_ACTIVE:
-                    activities_local_to_be_deleted.append(p)
+        activities_local_map = {}
+        for a in Activities.get_instance().list(active_only=False):
+            if a.get("kind") == ACTIVITY_KIND_USER:
+                if a.get("status") == ACTIVITY_STATUS_ACTIVE:
+                    activities_local_user.append(a)
+                    if a.get("id") is not None:
+                        activities_local_map[a.get("id")] = a
+                elif a.get("status") == ACTIVITY_STATUS_DELETED:
+                    activities_local_to_be_deleted.append(a)
             else:
-                activities_local_stock.append(p)
+                activities_local_stock.append(a)
+                if a.get("id") is not None:
+                    activities_local_map[a.get("id")] = a
         try:
             # Get robot activities
             api_response = api_instance.get_robot_activities()
@@ -170,20 +175,15 @@ class CloudManager(threading.Thread):
             # cloud activities
             activities_cloud_map = {}
             for a in cloud_activities:
-               if a.get("status") == activity.ACTIVITY_STATUS_ACTIVE:
+               if a.get("status") == ACTIVITY_STATUS_ACTIVE:
                     activities_cloud_map[a.get("id")] = a
-
-            activities_local_map = {} 
-            # local activities no id
-            for a in activities_local_user:
-                if a.get("id") is not None:
-                    activities_local_map[a.get("id")] = a
 
             # loop through local
             for al in activities_local_user:
                 logging.info("activities.syncing: " + str(al.get("id")) + " name: " + str(al.get("name")))
                 ac = activities_cloud_map.get(al.get("id"))
-                if ac is not None and ac.get("data") != al.get("data"):
+                ac_al_equals = (ac is not None and ac.get("data") == al.get("data"))
+                if ac is not None and not ac_al_equals:
                     al["modified"] = al.get("modified", datetime.now(tz=timezone.utc).isoformat()) 
                     local_activity_more_recent = datetime.fromisoformat(ac.get("modified")).timestamp() < datetime.fromisoformat(al.get("modified")).timestamp()
                     if sync_mode == SYNC_UPSTREAM or (local_activity_more_recent and sync_mode == SYNC_BIDIRECTIONAL):
@@ -229,8 +229,15 @@ class CloudManager(threading.Thread):
 
             for k, ac in activities_cloud_map.items():
                 if activities_local_map.get(k) is None and sync_mode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
-                    Activities.get_instance().save(ac.get("name"), ac)
                     logging.info("activities.create.downstream: " + ac.get("name"))
+                    activity = json.loads(ac.get("data"))
+                    activity["id"] = ac.get("id")
+                    activity["org_id"] = ac.get("org_id")
+                    activity["name"] = ac.get("name")
+                    activity["description"] = ac.get("description")
+                    activity["kind"] = ac.get("kind")
+                    activity["status"] = ac.get("status")
+                    Activities.get_instance().save(ac.get("name"), activity)
 
             # manage local user activities to be deleted locally and upstream
             for al in activities_local_to_be_deleted:
@@ -242,7 +249,7 @@ class CloudManager(threading.Thread):
 
             # manage local stock activities to be deleted locally
             for al in activities_local_stock:
-                # logging.info("programs.check.stock.locally: " + pl.get("name") + " id: " + str(pl.get("id")))
+                # logging.info("activities.check.stock.locally: " + al.get("name") + " id: " + str(al.get("id")))
                 if al.get("id") is not None and activities_cloud_map.get(al.get("id")) is None:
                     logging.info("activities.delete.stock.locally: " + al.get("name"))
                     # delete locally permanently
@@ -254,15 +261,20 @@ class CloudManager(threading.Thread):
     def sync_programs(self, api_instance, sync_mode):
         programs_local_user = list()
         programs_local_stock = list()
+        programs_local_map = {}  
         programs_local_to_be_deleted = list()
         for p in ProgramEngine.get_instance().prog_list(active_only=False):
             if p.get("kind") == program.PROGRAM_KIND_USER:
                 if p.get("status") == program.PROGRAM_STATUS_ACTIVE:
                     programs_local_user.append(p)
+                    if p.get("id") is not None:
+                        programs_local_map[p.get("id")] = p
                 elif p.get("status") == program.PROGRAM_STATUS_DELETED:
                     programs_local_to_be_deleted.append(p)
             else:
                 programs_local_stock.append(p)
+                if p.get("id") is not None:
+                    programs_local_map[p.get("id")] = p
                 
         try:
             # Get cloud programs
@@ -274,14 +286,6 @@ class CloudManager(threading.Thread):
                 if p.get("status") == program.PROGRAM_STATUS_ACTIVE:
                     programs_cloud_map[p.get("id")] = p
 
-            # local programs, stock, in a map id : program
-            programs_local_stock_map = {} # activities_local_map 
-            # local activities no id
-            for p in programs_local_stock:
-                #logging.info("programs.local: " + str(p.get("id")) + " name: " + p.get("name"))
-                if p.get("id") is not None:
-                    programs_local_stock_map[p.get("id")] = p
-
             # sync local user programs
             # manage user programs present locally and in "active" status
             for pl in programs_local_user:
@@ -291,7 +295,7 @@ class CloudManager(threading.Thread):
                                 pc.get("code") == pl.get("code") and 
                                 pc.get("dom_code") == pl.get("dom_code") and
                                 pc.get("status") == pl.get("status"))
-                logging.info("programs.syncing: " + str(pl.get("id")) + " name: " + pl.get("name") + " sync_mode: " + sync_mode + " pc: " + str(pc))
+                logging.info("programs.syncing: " + str(pl.get("id")) + " name: " + pl.get("name"))
 
                 if pc is not None and not pc_pl_equals:
                     # cloud program exists and is different from local
@@ -346,7 +350,7 @@ class CloudManager(threading.Thread):
 
             # manage cloud programs not present locally in "active" status
             for k, pc in programs_cloud_map.items():
-                if programs_local_stock_map.get(k) is None and sync_mode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
+                if programs_local_map.get(k) is None and sync_mode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]:
                     pl = program.Program(name=pc.get("name"), 
                                          code=pc.get("code"), 
                                          dom_code=pc.get("dom_code"), 
@@ -367,7 +371,7 @@ class CloudManager(threading.Thread):
 
             # manage local stock programs to be deleted locally
             for pl in programs_local_stock:
-                ##logging.info("programs.check.stock.locally: " + pl.get("name") + " id: " + str(pl.get("id")))
+                # logging.info("programs.check.stock.locally: " + pl.get("name") + " id: " + str(pl.get("id")))
                 if pl.get("id") is not None and programs_cloud_map.get(pl.get("id")) is None:
                     logging.info("programs.delete.stock.locally: " + pl.get("name"))
                     # delete locally permanently

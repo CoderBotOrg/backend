@@ -715,11 +715,11 @@ components:
           maxLength: 256
         default:
           type: boolean
-        stock:
-          type: boolean
+        kind:
+          type: string
       required:
         - name
         - description
         - default
-        - stock
+        - kind
     

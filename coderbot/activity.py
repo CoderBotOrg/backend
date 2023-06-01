@@ -7,6 +7,14 @@ ACTIVITY_STATUS_ACTIVE = "active"
 ACTIVITY_KIND_STOCK = "stock"
 ACTIVITY_KIND_USER = "user"
 
+class Activity():
+    def __init__(self, name, description, data, kind, status):
+        self._name = name
+        self._description = description
+        self._data = data
+        self._kind = kind
+        self._status = status
+    
 class Activities():
     _instance = None
 

@@ -122,8 +122,8 @@ class ProgramEngine:
             program._modified = datetime.now()
             self._program = program
             program_db_entry = self._program.as_dict()
-            if self._programs.search(query.name == program.name) != []:
-                self._programs.update(program_db_entry, query.name == program.name)
+            if self._programs.search(query.name == program._name) != []:
+                self._programs.update(program_db_entry, query.name == program._name)
             else:
                 self._programs.insert(program_db_entry)
 
@@ -157,7 +157,7 @@ class ProgramEngine:
         return self._program
 
     def is_running(self, name):
-        return self._program.is_running() and self._program.name == name
+        return self._program.is_running() and self._program._name == name
 
     def check_end(self):
         return self._program.check_end()
@@ -181,9 +181,10 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, code=None, dom_code=None, kind=PROGRAM_KIND_USER, id=None, modified=None, status=None):
+    def __init__(self, name, description=None, code=None, dom_code=None, kind=PROGRAM_KIND_USER, id=None, modified=None, status=None):
         self._thread = None
-        self.name = name
+        self._name = name
+        self._description = description
         self._dom_code = dom_code
         self._code = code
         self._kind = kind
@@ -229,7 +230,7 @@ class Program:
             program = self
             try:
                 if options.get("autoRecVideo") == True:
-                    get_cam().video_rec(program.name.replace(" ", "_"))
+                    get_cam().video_rec(program._name.replace(" ", "_"))
                     logging.debug("starting video")
             except Exception as e:
                 logging.error("Camera not available: " + str(e))
@@ -264,7 +265,7 @@ class Program:
 
 
     def as_dict(self):
-        return {'name': self.name,
+        return {'name': self._name,
                 'dom_code': self._dom_code,
                 'code': self._code,
                 'kind': self._kind,
