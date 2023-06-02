@@ -35,6 +35,9 @@ SYNC_UPSTREAM = 'u'
 SYNC_DOWNSTREAM = 'd'
 SYNC_BIDIRECTIONAL = 'b'
 
+ENTITY_KIND_USER = "user"
+ENTITY_KIND_STOCK = "stock"
+
 AUTH_FILE = "data/auth.json"
 
 class CloudManager(threading.Thread):
@@ -86,17 +89,20 @@ class CloudManager(threading.Thread):
             sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
             sync_period = int(settings.get("sync_period", "60"))
 
-            token = self.get_token_or_register(settings)
-            self.configuration.access_token = token
+            try:
+                token = self.get_token_or_register(settings)
+                self.configuration.access_token = token
 
-            # Enter a context with an instance of the API client
-            with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
-                # Create an instance of the API class
-                api_instance = robot_sync_api.RobotSyncApi(api_client)
-                
-                self.sync_settings(api_instance, sync_modes["settings"])
-                self.sync_activities(api_instance, sync_modes["activities"])
-                self.sync_programs(api_instance, sync_modes["programs"])
+                # Enter a context with an instance of the API client
+                with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
+                    # Create an instance of the API class
+                    api_instance = robot_sync_api.RobotSyncApi(api_client)
+                    
+                    self.sync_settings(api_instance, sync_modes["settings"])
+                    self.sync_activities(api_instance, sync_modes["activities"])
+                    self.sync_programs(api_instance, sync_modes["programs"])
+            except Exception as e:
+                logging.warn("run.sync.api_not_available: " + str(e))
 
             sleep(sync_period)
             logging.info("run.sync.end")
@@ -105,9 +111,9 @@ class CloudManager(threading.Thread):
         logging.info("run.check.token")
         token = self.get_auth().get("token")
         reg_otp = settings.get("reg_otp")
-        logging.info("otp_reg:" + reg_otp)
         try:
             if token is None and reg_otp is not None:
+                logging.info("run.get_token_or_register.get_token")
                 with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
                     api_instance = robot_sync_api.RobotSyncApi(api_client)
                     body = RobotRegisterData(
@@ -121,33 +127,36 @@ class CloudManager(threading.Thread):
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling register_robot RobotSyncApi: %s\n" % e)
 
+    # sync settings
     def sync_settings(self, api_instance, sync_mode):
+        # Sync settings is different from syncing other entities, like activities and programs, since there can only
+        # be a single entity for each robot (both device and cloud twin).
+        # So the algo is simpler and favorites the "stock" entity over the "user" entity, if available.
         try:
-            # Create an instance of the API class
             api_response = api_instance.get_robot_setting()
             cloud_setting_object = api_response.body
             cloud_setting = json.loads(cloud_setting_object.get('data'))
 
             local_setting = Config.read()
-            local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified", "2000-01-01T00:00:00.000000")).timestamp() < Config.modified()
+            local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified")).timestamp() < Config.modified()
+            cloud_kind_user = cloud_setting_object.get("kind") == ENTITY_KIND_USER
             # logging.info("settings.syncing: " + cloud_setting_object.get("id", "") + " name: " + cloud_setting_object.get("name", ""))
-            if cloud_setting != local_setting:
-                if sync_mode == SYNC_UPSTREAM or (sync_mode == SYNC_BIDIRECTIONAL and local_most_recent):
-                    body = Setting(
-                        id = cloud_setting_object.get('id'),
-                        org_id = cloud_setting_object.get('org_id'),
-                        name = cloud_setting_object.get('name'),
-                        description = cloud_setting_object.get('description'),
-                        data = json.dumps(local_setting),
-                        kind = local_setting.get("kind", "stock"),
-                        modified = datetime.now().isoformat(),
-                        status = cloud_setting_object.get('status'),
-                    )
-                    api_response = api_instance.set_robot_setting(body)
-                    logging.info("settings.upstream")
-                if sync_mode == SYNC_DOWNSTREAM: # setting, down
-                    Config.write(cloud_setting.data.setting) 
-                    logging.info("settings.downstream")
+            if cloud_kind_user and cloud_setting != local_setting and local_most_recent:
+                body = Setting(
+                    id = cloud_setting_object.get('id'),
+                    org_id = cloud_setting_object.get('org_id'),
+                    name = cloud_setting_object.get('name'),
+                    description = cloud_setting_object.get('description'),
+                    data = json.dumps(local_setting),
+                    kind = local_setting.get("kind", ENTITY_KIND_STOCK),
+                    modified = datetime.now().isoformat(),
+                    status = cloud_setting_object.get('status'),
+                )
+                api_response = api_instance.set_robot_setting(body)
+                logging.info("settings.upstream")
+            elif cloud_setting != local_setting: # setting, down
+                Config.write(cloud_setting.data.setting) 
+                logging.info("settings.downstream")
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling settings RobotSyncApi: %s\n" % e)
 
@@ -195,7 +204,7 @@ class CloudManager(threading.Thread):
                             name=al.get("name"),
                             description=al.get("description"),
                             data=json.dumps(al.get("data")),
-                            kind = al.get("kind", "stock"),
+                            kind = al.get("kind", ENTITY_KIND_STOCK),
                             modified=al.get("modified").isoformat(),
                             status='active',
                         )
@@ -214,7 +223,7 @@ class CloudManager(threading.Thread):
                         name=al.get("name"),
                         description=al.get("description"),
                         data=json.dumps(al),
-                        kind=al.get("kind", "stock"),
+                        kind=al.get("kind", ENTITY_KIND_STOCK),
                         modified=al.get("modified", datetime.now(tz=timezone.utc).isoformat()),
                         status="active",
                     )
