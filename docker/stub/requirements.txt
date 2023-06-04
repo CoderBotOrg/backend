@@ -4,6 +4,7 @@ Flask==2.2.3
 Flask-Cors==3.0.10
 tinydb==4.7.1
 Werkzeug==2.2.3
+cloud_api_robot_client @ git+https://github.com/CoderBotOrg/cloud_api_robot_client.git
 
 # Misc utils
 setuptools==67.4.0
