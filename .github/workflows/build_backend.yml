@@ -13,7 +13,6 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GHCR_READ }}
-
     steps:
     - uses: actions/checkout@v3 # Checking out the repo
     - run: pip install -r docker/stub/requirements.txt
