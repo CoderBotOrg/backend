@@ -62,7 +62,7 @@ class Activities():
                 if logical:
                     activity["status"] = ACTIVITY_STATUS_DELETED
                     activity["modified"] = datetime.now().isoformat()
-                    self.activities.update(activity, query.name == name)
+                    self.activities.update(activity, self.query.name == name)
                 else:
                     self.activities.remove(self.query.name == activity["name"])
 
