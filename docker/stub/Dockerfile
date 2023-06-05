@@ -18,6 +18,7 @@ RUN apt-get update -y && apt-get install -y \
  libhdf5-dev \
  alsa-utils \
  espeak \
+ git \
  libharfbuzz-bin \
  libwebp6 \
  libilmbase25 \

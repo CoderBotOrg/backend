@@ -340,7 +340,7 @@ def statusProgram(name):
     prog = prog_engine.get_current_program()
     if prog is None:
         prog = Program("")
-    return {'name': prog._name, "running": prog.is_running(), "log": prog_engine.get_log()}
+    return {'name': prog.name, "running": prog.is_running(), "log": prog_engine.get_log()}
 
 
 ## Activities

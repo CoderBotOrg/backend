@@ -122,8 +122,8 @@ class ProgramEngine:
             program._modified = datetime.now()
             self._program = program
             program_db_entry = self._program.as_dict()
-            if self._programs.search(query.name == program._name) != []:
-                self._programs.update(program_db_entry, query.name == program._name)
+            if self._programs.search(query.name == program.name) != []:
+                self._programs.update(program_db_entry, query.name == program.name)
             else:
                 self._programs.insert(program_db_entry)
 
@@ -157,7 +157,7 @@ class ProgramEngine:
         return self._program
 
     def is_running(self, name):
-        return self._program.is_running() and self._program._name == name
+        return self._program.is_running() and self._program.name == name
 
     def check_end(self):
         return self._program.check_end()
@@ -230,7 +230,7 @@ class Program:
             program = self
             try:
                 if options.get("autoRecVideo") == True:
-                    get_cam().video_rec(program._name.replace(" ", "_"))
+                    get_cam().video_rec(program.name.replace(" ", "_"))
                     logging.debug("starting video")
             except Exception as e:
                 logging.error("Camera not available: " + str(e))
@@ -263,6 +263,10 @@ class Program:
                 logging.error("Camera not available")
             self._running = False
 
+
+    @property
+    def name(self):
+        return self._name
 
     def as_dict(self):
         return {'name': self._name,
