@@ -8,7 +8,11 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: ghcr.io/coderbotorg/coderbot-ci:stub-latest
+    container: 
+      image: ghcr.io/coderbotorg/coderbot-ci:stub-latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
     steps:
     - uses: actions/checkout@v3 # Checking out the repo
     - run: pip install -r docker/stub/requirements.txt
