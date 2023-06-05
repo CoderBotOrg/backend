@@ -8,7 +8,7 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: coderbot/coderbot-ci:3.9-bullseye-slim
+    container: ghcr.io/coderbotorg/coderbot-ci:stub-latest
     steps:
     - uses: actions/checkout@v3 # Checking out the repo
     - run: pip install -r docker/stub/requirements.txt
