@@ -12,7 +12,7 @@ jobs:
       image: ghcr.io/coderbotorg/coderbot-ci:stub-latest
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.github_token }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v3 # Checking out the repo
     - run: pip install -r docker/stub/requirements.txt
