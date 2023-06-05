@@ -1,4 +1,4 @@
-FROM coderbot/rpi-debian:bullseye-20220923
+FROM coderbot/rpi-debian:bullseye-20230530
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
@@ -19,7 +19,8 @@ RUN install_packages \
  libatlas-base-dev \
  libhdf5-dev \
  alsa-utils \
- espeak
+ espeak \
+ git
 RUN install_packages \
  libharfbuzz-bin \
  libwebp6 \
