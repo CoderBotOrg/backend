@@ -70,6 +70,12 @@ class CloudManager(threading.Thread):
         return cls._instance
 
     def __init__(self):
+        self._syncing = False
+        self._sync_status = {
+            "settings": "",
+            "activities": "",
+            "programs": ""
+        }
         threading.Thread.__init__(self)
         # Defining the host is optional and defaults to https://api.coderbot.org/api/v1
         # See configuration.py for a list of all supported configuration parameters.
@@ -84,28 +90,42 @@ class CloudManager(threading.Thread):
 
     def run(self):
         while(True):
-            settings = Config.read()
-            logging.info("run.sync.begin")
-            sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
-            sync_period = int(settings.get("sync_period", "60"))
-
-            try:
-                token = self.get_token_or_register(settings)
-                self.configuration.access_token = token
-
-                # Enter a context with an instance of the API client
-                with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
-                    # Create an instance of the API class
-                    api_instance = robot_sync_api.RobotSyncApi(api_client)
-                    
-                    self.sync_settings(api_instance, sync_modes["settings"])
-                    self.sync_activities(api_instance, sync_modes["activities"])
-                    self.sync_programs(api_instance, sync_modes["programs"])
-            except Exception as e:
-                logging.warn("run.sync.api_not_available: " + str(e))
-
+            sync_period = int(Config.read().get("sync_period", "60"))
+            self.sync()
             sleep(sync_period)
-            logging.info("run.sync.end")
+
+    def syncing(self):
+        return self._syncing
+
+    def sync_status(self):
+        return self._sync_status
+
+    def sync(self):
+        if self._syncing == True:
+            return
+        self._syncing = True
+
+        settings = Config.read()
+        logging.info("run.sync.begin")
+        sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
+
+        try:
+            token = self.get_token_or_register(settings)
+            self.configuration.access_token = token
+
+            # Enter a context with an instance of the API client
+            with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
+                # Create an instance of the API class
+                api_instance = robot_sync_api.RobotSyncApi(api_client)
+                
+                self.sync_settings(api_instance, sync_modes["settings"])
+                self.sync_activities(api_instance, sync_modes["activities"])
+                self.sync_programs(api_instance, sync_modes["programs"])
+        except Exception as e:
+            logging.warn("run.sync.api_not_available: " + str(e))
+       
+        logging.info("run.sync.end")
+        self._syncing = False
 
     def get_token_or_register(self, settings):
         logging.info("run.check.token")
@@ -133,6 +153,7 @@ class CloudManager(threading.Thread):
         # be a single entity for each robot (both device and cloud twin).
         # So the algo is simpler and favorites the "stock" entity over the "user" entity, if available.
         try:
+            self._sync_status["settings"] = "syncing"
             api_response = api_instance.get_robot_setting()
             cloud_setting_object = api_response.body
             cloud_setting = json.loads(cloud_setting_object.get('data'))
@@ -155,29 +176,31 @@ class CloudManager(threading.Thread):
                 api_response = api_instance.set_robot_setting(body)
                 logging.info("settings.upstream")
             elif cloud_setting != local_setting: # setting, down
-                Config.write(cloud_setting.data.setting) 
+                Config.write(cloud_setting) 
                 logging.info("settings.downstream")
+            self._sync_status["settings"] = "synced"
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling settings RobotSyncApi: %s\n" % e)
 
     def sync_activities(self, api_instance, sync_mode):
-        activities_local_user = list()
-        activities_local_stock = list()
-        activities_local_to_be_deleted = list()
-        activities_local_map = {}
-        for a in Activities.get_instance().list(active_only=False):
-            if a.get("kind") == ACTIVITY_KIND_USER:
-                if a.get("status") == ACTIVITY_STATUS_ACTIVE:
-                    activities_local_user.append(a)
+        try:
+            self._sync_status["activities"] = "syncing"
+            activities_local_user = list()
+            activities_local_stock = list()
+            activities_local_to_be_deleted = list()
+            activities_local_map = {}
+            for a in Activities.get_instance().list(active_only=False):
+                if a.get("kind") == ACTIVITY_KIND_USER:
+                    if a.get("status") == ACTIVITY_STATUS_ACTIVE:
+                        activities_local_user.append(a)
+                        if a.get("id") is not None:
+                            activities_local_map[a.get("id")] = a
+                    elif a.get("status") == ACTIVITY_STATUS_DELETED:
+                        activities_local_to_be_deleted.append(a)
+                else:
+                    activities_local_stock.append(a)
                     if a.get("id") is not None:
                         activities_local_map[a.get("id")] = a
-                elif a.get("status") == ACTIVITY_STATUS_DELETED:
-                    activities_local_to_be_deleted.append(a)
-            else:
-                activities_local_stock.append(a)
-                if a.get("id") is not None:
-                    activities_local_map[a.get("id")] = a
-        try:
             # Get robot activities
             api_response = api_instance.get_robot_activities()
             cloud_activities = api_response.body
@@ -264,28 +287,31 @@ class CloudManager(threading.Thread):
                     # delete locally permanently
                     Activities.get_instance().delete(al.get("name"), logical=False)
 
+            self._sync_status["activities"] = "synced"
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling activities RobotSyncApi: %s\n" % e)
+            self._sync_status["activities"] = "failed"
 
     def sync_programs(self, api_instance, sync_mode):
-        programs_local_user = list()
-        programs_local_stock = list()
-        programs_local_map = {}  
-        programs_local_to_be_deleted = list()
-        for p in ProgramEngine.get_instance().prog_list(active_only=False):
-            if p.get("kind") == program.PROGRAM_KIND_USER:
-                if p.get("status") == program.PROGRAM_STATUS_ACTIVE:
-                    programs_local_user.append(p)
+        try:
+            self._sync_status["programs"] = "syncing"
+            programs_local_user = list()
+            programs_local_stock = list()
+            programs_local_map = {}  
+            programs_local_to_be_deleted = list()
+            for p in ProgramEngine.get_instance().prog_list(active_only=False):
+                if p.get("kind") == program.PROGRAM_KIND_USER:
+                    if p.get("status") == program.PROGRAM_STATUS_ACTIVE:
+                        programs_local_user.append(p)
+                        if p.get("id") is not None:
+                            programs_local_map[p.get("id")] = p
+                    elif p.get("status") == program.PROGRAM_STATUS_DELETED:
+                        programs_local_to_be_deleted.append(p)
+                else:
+                    programs_local_stock.append(p)
                     if p.get("id") is not None:
                         programs_local_map[p.get("id")] = p
-                elif p.get("status") == program.PROGRAM_STATUS_DELETED:
-                    programs_local_to_be_deleted.append(p)
-            else:
-                programs_local_stock.append(p)
-                if p.get("id") is not None:
-                    programs_local_map[p.get("id")] = p
-                
-        try:
+
             # Get cloud programs
             api_response = api_instance.get_robot_programs()
             cloud_programs = api_response.body
@@ -385,6 +411,7 @@ class CloudManager(threading.Thread):
                     logging.info("programs.delete.stock.locally: " + pl.get("name"))
                     # delete locally permanently
                     ProgramEngine.get_instance().delete(pl.get("name"), logical=False)
-
+            self._sync_status["programs"] = "synced"
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling programs RobotSyncApi: %s\n" % e)
+            self._sync_status["programs"] = "failed"

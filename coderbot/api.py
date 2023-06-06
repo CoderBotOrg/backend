@@ -22,6 +22,7 @@ from cnn.cnn_manager import CNNManager
 from runtime_test import run_test
 from musicPackages import MusicPackageManager
 from program import Program, ProgramEngine
+from cloud import CloudManager
 
 from balena import Balena
 from coderbot import CoderBot
@@ -405,3 +406,10 @@ def deleteCNNModel(name):
     model_status = cnn.delete_model(model_name=name)
 
     return model_status
+
+def cloudSyncRequest():
+    CloudManager.get_instance().sync()
+    return 200
+
+def cloudSyncStatus():
+    return CloudManager.get_instance().sync_status()

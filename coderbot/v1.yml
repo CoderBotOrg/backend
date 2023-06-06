@@ -605,6 +605,27 @@ paths:
       responses:
         200:
           description: "CNN Model deleted"
+  /cloud/sync:
+    post:
+      operationId: "api.cloudSyncRequest"
+      summary: "request a Sync activity"
+      tags:
+        - Cloud Sync
+      responses:
+        200:
+          description: "Cloud Sync request"
+    get:
+      operationId: "api.cloudSyncStatus"
+      summary: "request a Sync activity"
+      tags:
+        - Cloud Sync
+      responses:
+        200:
+          description: "Cloud Sync request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudSyncStatus'
 
 components:
   schemas:
@@ -723,3 +744,13 @@ components:
         - default
         - kind
     
+    CloudSyncStatus:
+      type: object
+      properties:
+        settings:
+          type: string
+        activities:
+          type: string
+        programs:
+          type: string
+
