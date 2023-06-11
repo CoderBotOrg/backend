@@ -605,6 +605,49 @@ paths:
       responses:
         200:
           description: "CNN Model deleted"
+
+  /cloud/registration:
+    post:
+      operationId: "api.cloudRegistrationRequest"
+      summary: "request a Registration activity"
+      tags:
+        - Cloud Sync
+      requestBody:
+        description: Registration Request parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudRegistrationRequest'
+      responses:
+        200:
+          description: "Cloud Sync request"
+    get:
+      operationId: "api.cloudRegistrationStatus"
+      summary: "get status of a Registration activity"
+      tags:
+        - Cloud Sync
+      responses:
+        200:
+          description: "Cloud Sync request"
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/CloudRegistrationStatus'
+
+    delete:
+      operationId: "api.cloudRegistrationDelete"
+      summary: "get status of a Registration activity"
+      tags:
+        - Cloud Sync
+      responses:
+        200:
+          description: "Cloud Sync request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudRegistrationStatus'
+
   /cloud/sync:
     post:
       operationId: "api.cloudSyncRequest"
@@ -743,7 +786,41 @@ components:
         - description
         - default
         - kind
-    
+
+    CloudRegistrationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 4
+          maxLength: 64          
+        description:
+          type: string
+          minLength: 4
+          maxLength: 256      
+        otp:
+          type: string
+          minLength: 8
+          maxLength: 8          
+
+    CloudRegistrationStatus:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64          
+        description:
+          type: string
+          minLength: 0
+          maxLength: 256      
+        org_id:
+          type: string
+        org_name:
+          type: string
+        org_description:
+          type: string
+
     CloudSyncStatus:
       type: object
       properties:

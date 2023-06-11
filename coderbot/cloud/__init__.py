@@ -88,6 +88,36 @@ class CloudManager(threading.Thread):
             self.write_auth({})
         self.start()
 
+    def register(self, registration_request):
+        logging.info("register.check.token")
+        token = self.get_auth().get("token")
+        if token:
+            logging.warn("register.check.token_already_there")
+            return
+        reg_otp = registration_request.get("otp")
+        try:
+            self._sync_status["registration"] = "registering"
+            logging.info("register.get_token")
+            with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
+                api_instance = robot_sync_api.RobotSyncApi(api_client)
+                body = RobotRegisterData(
+                    otp=reg_otp,
+                )
+                api_response = api_instance.register_robot(body=body)
+                logging.info(api_response.body)
+                token = api_response.body.get("token")
+                self.write_auth({"token":token})
+            self._sync_status["registration"] = "registered"
+        except cloud_api_robot_client.ApiException as e:
+            logging.warn("Exception when calling register_robot RobotSyncApi: %s\n" % e)
+            raise
+
+    def unregister(self):
+        self.write_auth({ "token": None })
+
+    def registration_status(self):
+        return self._auth.get("token") is not None
+
     def run(self):
         while(True):
             sync_period = int(Config.read().get("sync_period", "60"))
@@ -109,20 +139,21 @@ class CloudManager(threading.Thread):
         logging.info("run.sync.begin")
         sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
 
-        try:
-            token = self.get_token_or_register(settings)
-            self.configuration.access_token = token
+        token = self.get_auth().get("token")
+        if token is not None:
+            try:
+                self.configuration.access_token = token
 
-            # Enter a context with an instance of the API client
-            with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
-                # Create an instance of the API class
-                api_instance = robot_sync_api.RobotSyncApi(api_client)
-                
-                self.sync_settings(api_instance, sync_modes["settings"])
-                self.sync_activities(api_instance, sync_modes["activities"])
-                self.sync_programs(api_instance, sync_modes["programs"])
-        except Exception as e:
-            logging.warn("run.sync.api_not_available: " + str(e))
+                # Enter a context with an instance of the API client
+                with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
+                    # Create an instance of the API class
+                    api_instance = robot_sync_api.RobotSyncApi(api_client)
+                    
+                    self.sync_settings(api_instance, sync_modes["settings"])
+                    self.sync_activities(api_instance, sync_modes["activities"])
+                    self.sync_programs(api_instance, sync_modes["programs"])
+            except Exception as e:
+                logging.warn("run.sync.api_not_available: " + str(e))
        
         logging.info("run.sync.end")
         self._syncing = False
@@ -133,6 +164,7 @@ class CloudManager(threading.Thread):
         reg_otp = settings.get("reg_otp")
         try:
             if token is None and reg_otp is not None:
+                self._sync_status["registration"] = "registering"
                 logging.info("run.get_token_or_register.get_token")
                 with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
                     api_instance = robot_sync_api.RobotSyncApi(api_client)
@@ -143,6 +175,7 @@ class CloudManager(threading.Thread):
                     logging.info(api_response.body)
                     token = api_response.body.get("token")
                     self.write_auth({"token":token})
+            self._sync_status["registration"] = "registered"
             return token
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling register_robot RobotSyncApi: %s\n" % e)
@@ -181,6 +214,7 @@ class CloudManager(threading.Thread):
             self._sync_status["settings"] = "synced"
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling settings RobotSyncApi: %s\n" % e)
+            self._sync_status["registration"] = "failed"
 
     def sync_activities(self, api_instance, sync_mode):
         try:

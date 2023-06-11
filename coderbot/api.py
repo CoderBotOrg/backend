@@ -413,3 +413,21 @@ def cloudSyncRequest():
 
 def cloudSyncStatus():
     return CloudManager.get_instance().sync_status()
+
+def cloudRegistrationRequest():
+    CloudManager.get_instance().register()
+    return 200
+
+def cloudRegistrationDelete():
+    CloudManager.get_instance().unregister()
+    return 200
+
+def cloudRegistrationStatus():
+    return {
+        "registered": CloudManager.get_instance().registration_status(),
+        "name": config.get('coderbot_name', ""),
+        "description": config.get('coderbot_description', ""),
+        "org_id": config.get('org_id', ""),
+        "org_name": config.get('org_name', ""),
+        "org_description": config.get('org_description', "")
+    }
