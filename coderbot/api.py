@@ -31,6 +31,9 @@ from coderbot import CoderBot
 BUTTON_PIN = 16
 
 settings = Config.read().get("settings")
+network_settings = Config.read().get("network")
+cloud_settings = Config.read().get("cloud")
+
 bot = CoderBot.get_instance(settings=settings, motor_trim_factor=float(settings.get('move_motor_trim', 1.0)),
                             motor_max_power=int(settings.get('motor_max_power', 100)),
                             motor_min_power=int(settings.get('motor_min_power', 0)),
@@ -426,10 +429,10 @@ def cloudRegistrationDelete():
     return 200
 
 def cloudRegistrationStatus():
-    registration = settings.get('cloud_registration', {})
+    registration = cloud_settings.get('registration', {})
     return {
         "registered": CloudManager.get_instance().registration_status(),
-        "name": registration.get('name', {}),
+        "name": registration.get('name', ""),
         "description": registration.get('description', ""),
         "org_id": registration.get('org_id', ""),
         "org_name": registration.get('org_name', ""),
