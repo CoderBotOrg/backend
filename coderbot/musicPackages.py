@@ -68,7 +68,7 @@ class MusicPackage:
 
 class MusicPackageInterface:
 
-    def __init__(self,interfaceName,available,icon):
+    def __init__(self, interfaceName, available,icon):
         self.interfaceName = interfaceName
         self.available = available
         self.icon = icon
@@ -86,12 +86,12 @@ class MusicPackageManager:
     _instance = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, settings=None):
         if cls._instance is None:
-            cls._instance = MusicPackageManager()
+            cls._instance = MusicPackageManager(settings)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, settings):
         self.packages = dict()
         with open('./sounds/notes/music_package.json') as json_file:
             data = json.load(json_file)

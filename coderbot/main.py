@@ -48,7 +48,7 @@ app.prog_engine = ProgramEngine.get_instance()
 connexionApp.add_api('v1.yml')
 
 def button_pushed():
-    if app.bot_config.get('button_func') == "startstop":
+    if app.settings.get('button_func') == "startstop":
         prog = app.prog_engine.get_current_prog()
         if prog and prog.is_running():
             prog.end()
@@ -67,14 +67,14 @@ def run_server():
     cam = None
     try:
         try:
-            app.bot_config = Config.read()
+            app.settings = Config.read().get("settings")
 
             bot = CoderBot.get_instance()
 
             try:
                 audio_device = Audio.get_instance()
-                audio_device.set_volume(int(app.bot_config.get('audio_volume_level')), 100)
-                audio_device.say(app.bot_config.get("sound_start"))
+                audio_device.set_volume(int(app.settings.get('audio_volume_level')), 100)
+                audio_device.say(app.settings.get("sound_start"))
             except Exception:
                 logging.warning("Audio not present")
 
@@ -84,17 +84,17 @@ def run_server():
             except picamera.exc.PiCameraError:
                 logging.warning("Camera not present")
 
-            CNNManager.get_instance()
+            CNNManager.get_instance(app.settings)
             EventManager.get_instance("coderbot")
 
-            if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
-                prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
+            if app.settings.get('load_at_start') and app.settings.get('load_at_start'):
+                prog = app.prog_engine.load(app.settings.get('load_at_start'))
                 prog.execute()
 
             CloudManager.get_instance()
             
         except ValueError as e:
-            app.bot_config = {}
+            app.settings = {}
             logging.error(e)
 
         bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)

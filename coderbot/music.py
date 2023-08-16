@@ -29,6 +29,7 @@
 import os
 import sox
 import time
+import logging
 
 class Music:
     _instance = None
@@ -42,17 +43,17 @@ class Music:
     
 
     @classmethod
-    def get_instance(cls,managerPackage):
+    def get_instance(cls, managerPackage, settings=None):
         if cls._instance is None:
-            cls._instance = Music(managerPackage)
+            cls._instance = Music(managerPackage, settings)
         return cls._instance
 
-    def __init__(self,managerPackage):
+    def __init__(self, managerPackage, settings):
         
         #os.putenv('AUDIODRIVER', 'alsa')
         #os.putenv('AUDIODEV', 'hw:1,0')
         self.managerPackage = managerPackage
-        print("We have create a class: MUSICAL")
+        logging.info("We have created a class: MUSICAL")
 
     def test(self):
         tfm = sox.Transformer()
@@ -71,7 +72,7 @@ class Music:
     # @para alteration: if it is a diesis or a bemolle
     # @param time: duration of the note in seconds
     def play_note(self, note, instrument='piano', alteration='none', duration=1.0):
-        print(note)
+        logging.info("play_note: %s", note)
         tfm = sox.Transformer()
         
         duration = float(duration)
@@ -85,7 +86,7 @@ class Music:
         if note in self.noteDict :
             shift = self.noteDict[note]+ alt
         else:
-            print('note not exist')            
+            logging.error('note does not exist')            
             return
 
         tfm.pitch(shift, quick=False)
@@ -93,7 +94,7 @@ class Music:
         if self.managerPackage.isPackageAvailable(instrument):
             tfm.preview('./sounds/notes/' + instrument + '/audio.wav')            
         else:
-            print("no instrument:"+str(instrument)+" present in this coderbot!")
+            logging.error("no instrument:"+str(instrument)+" present in this coderbot!")
         
     def play_animal(self, instrument, note='G2', alteration='none', duration=1.0):
         tfm = sox.Transformer()
@@ -138,13 +139,13 @@ class Music:
         if note in self.noteDict :
             shift = self.noteDict[note]+ alt
         else:
-            print('note not exist')            
+            logging.error('note does not exist')            
             return
 
         if self.managerPackage.isPackageAvailable(instrument):
             tfm.preview('./sounds/notes/' + instrument + '/audio.wav')            
         else:
-            print("no animal verse:"+str(instrument)+" present in this coderbot!")
+            logging.error("no animal verse:"+str(instrument)+" present in this coderbot!")
             return 
         tfm.pitch(shift, quick=False)
         tfm.trim(0.0, end_time=0.5*duration)

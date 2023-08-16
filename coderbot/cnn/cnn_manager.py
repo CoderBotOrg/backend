@@ -44,13 +44,13 @@ class CNNManager(object):
     instance = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, settings=None):
         if cls.instance is None:
-            cls.instance = CNNManager()
+            cls.instance = CNNManager(settings)
         return cls.instance
 
 
-    def __init__(self):
+    def __init__(self, settings):
         try:
             f = open(MODEL_METADATA, "r")
             self._models = json.load(f)

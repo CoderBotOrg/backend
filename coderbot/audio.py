@@ -46,12 +46,12 @@ class Audio:
     _instance = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, settings=None):
         if cls._instance is None:
-            cls._instance = Audio()
+            cls._instance = Audio(settings)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, settings):
         self.pa = pyaudio.PyAudio()
         try:
             self.stream_in = self.MicrophoneStream(FORMAT, RATE, CHUNK)

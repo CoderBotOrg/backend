@@ -22,6 +22,7 @@ from cnn.cnn_manager import CNNManager
 from runtime_test import run_test
 from musicPackages import MusicPackageManager
 from program import Program, ProgramEngine
+from motion import Motion
 from cloud import CloudManager
 
 from balena import Balena
@@ -29,18 +30,20 @@ from coderbot import CoderBot
 
 BUTTON_PIN = 16
 
-config = Config.read()
-bot = CoderBot.get_instance(motor_trim_factor=float(config.get('move_motor_trim', 1.0)),
-                            motor_max_power=int(config.get('motor_max_power', 100)),
-                            motor_min_power=int(config.get('motor_min_power', 0)),
-                            hw_version=config.get('hardware_version'),
-                            pid_params=(float(config.get('pid_kp', 1.0)),
-                                        float(config.get('pid_kd', 0.1)),
-                                        float(config.get('pid_ki', 0.01)),
-                                        float(config.get('pid_max_speed', 200)),
-                                        float(config.get('pid_sample_time', 0.01))))
-audio_device = Audio.get_instance()
-cam = Camera.get_instance()
+settings = Config.read().get("settings")
+bot = CoderBot.get_instance(settings=settings, motor_trim_factor=float(settings.get('move_motor_trim', 1.0)),
+                            motor_max_power=int(settings.get('motor_max_power', 100)),
+                            motor_min_power=int(settings.get('motor_min_power', 0)),
+                            hw_version=settings.get('hardware_version'),
+                            pid_params=(float(settings.get('pid_kp', 1.0)),
+                                        float(settings.get('pid_kd', 0.1)),
+                                        float(settings.get('pid_ki', 0.01)),
+                                        float(settings.get('pid_max_speed', 200)),
+                                        float(settings.get('pid_sample_time', 0.01))))
+audio_device = Audio.get_instance(settings)
+cam = Camera.get_instance(settings)
+Motion.get_instance(settings)
+CNNManager.get_instance(settings)
 
 def get_serial():
     """
@@ -140,7 +143,7 @@ def turn(body):
 def takePhoto():
     try:
         cam.photo_take()
-        audio_device.say(config.get("sound_shutter"))
+        audio_device.say(settings.get("sound_shutter"))
         return 200
     except Exception as e:
         logging.warning("Error: %s", e)
@@ -148,7 +151,7 @@ def takePhoto():
 def recVideo():
     try:
         cam.video_rec()
-        audio_device.say(config.get("sound_shutter"))
+        audio_device.say(settings.get("sound_shutter"))
         return 200
     except Exception as e:
         logging.warning("Error: %s", e)
@@ -156,7 +159,7 @@ def recVideo():
 def stopVideo():
     try:
         cam.video_stop()
-        audio_device.say(config.get("sound_shutter"))
+        audio_device.say(settings.get("sound_shutter"))
         return 200
     except Exception as e:
         logging.warning("Error: %s", e)
@@ -173,7 +176,7 @@ def reset():
     return 200
 
 def halt():
-    audio_device.say(what=config.get("sound_stop"))
+    audio_device.say(what=settings.get("sound_stop"))
     Balena.get_instance().shutdown()
     return 200
 
@@ -181,7 +184,7 @@ def restart():
     Balena.get_instance().restart()
 
 def reboot():
-    audio_device.say(what=config.get("sound_stop"))
+    audio_device.say(what=settings.get("sound_stop"))
     Balena.get_instance().reboot()
     return 200
 
@@ -414,8 +417,8 @@ def cloudSyncRequest():
 def cloudSyncStatus():
     return CloudManager.get_instance().sync_status()
 
-def cloudRegistrationRequest():
-    CloudManager.get_instance().register()
+def cloudRegistrationRequest(body):
+    CloudManager.get_instance().register(body)
     return 200
 
 def cloudRegistrationDelete():
@@ -423,11 +426,12 @@ def cloudRegistrationDelete():
     return 200
 
 def cloudRegistrationStatus():
+    registration = settings.get('cloud_registration', {})
     return {
         "registered": CloudManager.get_instance().registration_status(),
-        "name": config.get('coderbot_name', ""),
-        "description": config.get('coderbot_description', ""),
-        "org_id": config.get('org_id', ""),
-        "org_name": config.get('org_name', ""),
-        "org_description": config.get('org_description', "")
+        "name": registration.get('name', {}),
+        "description": registration.get('description', ""),
+        "org_id": registration.get('org_id', ""),
+        "org_name": registration.get('org_name', ""),
+        "org_description": registration.get('org_description', "")
     }

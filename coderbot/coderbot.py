@@ -101,7 +101,7 @@ class CoderBot(object):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, motor_trim_factor=1.0, motor_min_power=0, motor_max_power=100, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
+    def __init__(self, settings, motor_trim_factor=1.0, motor_min_power=0, motor_max_power=100, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
         try:
             self._mpu = mpu.AccelGyroMag()
             logging.info("MPU available")
@@ -157,9 +157,9 @@ class CoderBot(object):
             s.cancel()
 
     @classmethod
-    def get_instance(cls, motor_trim_factor=1.0, motor_max_power=100, motor_min_power=0, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
+    def get_instance(cls, settings=None, motor_trim_factor=1.0, motor_max_power=100, motor_min_power=0, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
         if not cls.the_bot:
-            cls.the_bot = CoderBot(motor_trim_factor=motor_trim_factor,  motor_max_power= motor_max_power, motor_min_power=motor_min_power, hw_version=hw_version, pid_params=pid_params)
+            cls.the_bot = CoderBot(settings=settings, motor_trim_factor=motor_trim_factor,  motor_max_power= motor_max_power, motor_min_power=motor_min_power, hw_version=hw_version, pid_params=pid_params)
         return cls.the_bot
 
     def get_motor_power(self, speed):

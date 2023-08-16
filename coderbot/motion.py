@@ -43,9 +43,9 @@ PI_CAM_FOV_V_CM = 100.0
 class Motion:
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self):
-        self.bot = CoderBot.get_instance()
-        self.cam = Camera.get_instance()
+    def __init__(self, settings):
+        self.bot = CoderBot.get_instance(settings)
+        self.cam = Camera.get_instance(settings)
         self.track_len = 2
         self.detect_interval = 5
         self.tracks = []
@@ -59,20 +59,19 @@ class Motion:
         self.target_dist = 0.0
         self.delta_angle = 0.0
         self.target_angle = 0.0
-        cfg = Config.get()
-        self.power_angles = [[15, (int(cfg.get("move_power_angle_1")), -1)],
-                             [4, (int(cfg.get("move_power_angle_2")), 0.05)],
-                             [1, (int(cfg.get("move_power_angle_3")), 0.02)],
+        self.power_angles = [[15, (int(settings.get("move_power_angle_1")), -1)],
+                             [4, (int(settings.get("move_power_angle_2")), 0.05)],
+                             [1, (int(settings.get("move_power_angle_3")), 0.02)],
                              [0, (0, 0)]]
-        self.image_width = 640 / int(cfg.get("cv_image_factor"))
-        self.image_heigth = 480 / int(cfg.get("cv_image_factor"))
+        self.image_width = 640 / int(settings.get("cv_image_factor"))
+        self.image_heigth = 480 / int(settings.get("cv_image_factor"))
         self.transform = image.Image.get_transform(self.image_width)
     _motion = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, settings=None):
         if not cls._motion:
-            cls._motion = Motion()
+            cls._motion = Motion(settings)
         return cls._motion
 
     def move(self, dist):

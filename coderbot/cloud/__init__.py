@@ -10,6 +10,7 @@
 #     compare entity, if different, take most recent and push/pull changes
 #
 
+import os
 import threading
 from datetime import datetime, timezone
 import logging
@@ -80,7 +81,7 @@ class CloudManager(threading.Thread):
         # Defining the host is optional and defaults to https://api.coderbot.org/api/v1
         # See configuration.py for a list of all supported configuration parameters.
         self.configuration = cloud_api_robot_client.Configuration(
-            host = "http://192.168.1.7:8090/api/v1",
+            host = os.getenv("CODERBOT_CLOUD_API_ENDPOINT") + "/api/v1",
         )
         try:
             self.read_auth()
@@ -136,8 +137,9 @@ class CloudManager(threading.Thread):
         self._syncing = True
 
         settings = Config.read()
+        cloud_settings = settings.get("cloud")
         logging.info("run.sync.begin")
-        sync_modes = settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
+        sync_modes = cloud_settings.get("sync_modes", {"settings": "n", "activities": "n", "programs": "n"})
 
         token = self.get_auth().get("token")
         if token is not None:
@@ -158,27 +160,27 @@ class CloudManager(threading.Thread):
         logging.info("run.sync.end")
         self._syncing = False
 
-    def get_token_or_register(self, settings):
-        logging.info("run.check.token")
-        token = self.get_auth().get("token")
-        reg_otp = settings.get("reg_otp")
-        try:
-            if token is None and reg_otp is not None:
-                self._sync_status["registration"] = "registering"
-                logging.info("run.get_token_or_register.get_token")
-                with cloud_api_robot_client.ApiClient(self.configuration) as api_client:
-                    api_instance = robot_sync_api.RobotSyncApi(api_client)
-                    body = RobotRegisterData(
-                        otp=reg_otp,
-                    )
-                    api_response = api_instance.register_robot(body=body)
-                    logging.info(api_response.body)
-                    token = api_response.body.get("token")
-                    self.write_auth({"token":token})
-            self._sync_status["registration"] = "registered"
-            return token
-        except cloud_api_robot_client.ApiException as e:
-            logging.warn("Exception when calling register_robot RobotSyncApi: %s\n" % e)
+    # def get_token_or_register(self, cloud_settings):
+    #     logging.info("run.check.token")
+    #     token = self.get_auth().get("token")
+    #     reg_otp = cloud_settings.get("reg_otp")
+    #     try:
+    #         if token is None and reg_otp is not None:
+    #             self._sync_status["registration"] = "registering"
+    #             logging.info("run.get_token_or_register.get_token")
+    #             with cloud_api_robßot_client.ApiClient(self.configuration) as api_client:
+    #                 api_instance = robot_sync_api.RobotSyncApi(api_client)
+    #                 body = RobotRegisterData(
+    #                     otp=reg_otp,
+    #                 )
+    #                 api_response = api_instance.register_robot(body=body)
+    #                 logging.info(api_response.body)
+    #                 token = api_response.body.get("token")
+    #                 self.write_auth({"token":token})
+    #         self._sync_status["registration"] = "registered"
+    #         return token
+    #     except cloud_api_robot_client.ApiException as e:
+    #         logging.warn("Exception when calling register_robot RobotSyncApi: %s\n" % e)
 
     # sync settings
     def sync_settings(self, api_instance, sync_mode):
@@ -191,7 +193,12 @@ class CloudManager(threading.Thread):
             cloud_setting_object = api_response.body
             cloud_setting = json.loads(cloud_setting_object.get('data'))
 
-            local_setting = Config.read()
+            # sync only the "settings" and "cloud" sections, do not sync "network"
+            config = Config.read()
+            local_setting = {
+                "settings": config.get("settings"),
+                "cloud": config.get("cloud")
+            }
             local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified")).timestamp() < Config.modified()
             cloud_kind_user = cloud_setting_object.get("kind") == ENTITY_KIND_USER
             # logging.info("settings.syncing: " + cloud_setting_object.get("id", "") + " name: " + cloud_setting_object.get("name", ""))
@@ -209,7 +216,9 @@ class CloudManager(threading.Thread):
                 api_response = api_instance.set_robot_setting(body)
                 logging.info("settings.upstream")
             elif cloud_setting != local_setting: # setting, down
-                Config.write(cloud_setting) 
+                config["settings"] = cloud_setting["settings"]
+                config["cloud"] = cloud_setting["cloud"]
+                Config.write(config) 
                 logging.info("settings.downstream")
             self._sync_status["settings"] = "synced"
         except cloud_api_robot_client.ApiException as e:

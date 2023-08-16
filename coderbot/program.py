@@ -80,7 +80,7 @@ class ProgramEngine:
 
     _instance = None
 
-    def __init__(self):
+    def __init__(self, settings):
         self._program = None
         self._log = ""
         self._programs = TinyDB(PROGRAMS_DB)
@@ -102,9 +102,9 @@ class ProgramEngine:
                             self.save(program)
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, settings=None):
         if not cls._instance:
-            cls._instance = ProgramEngine()
+            cls._instance = ProgramEngine(settings)
         return cls._instance
 
     def prog_list(self, active_only = True):
