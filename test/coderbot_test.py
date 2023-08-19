@@ -45,7 +45,8 @@ class CoderBotServoMotorTestCase(unittest.TestCase):
     def setUp(self):
         coderbot.pigpio.pi = test.pigpio_mock.PIGPIOMock
         coderbot.CoderBot._instance = None
-        self.bot = coderbot.CoderBot.get_instance(servo=True)
+        settings = config.Config.read().get('settings')
+        self.bot = coderbot.CoderBot.get_instance(settings, Servo=True)
 
     def test_motor_forward(self):
         self.bot.forward(speed=100, elapse=0.1)
@@ -72,7 +73,8 @@ class CoderBotSonarTestCase(unittest.TestCase):
     def setUp(self):
         coderbot.pigpio.pi = test.pigpio_mock.PIGPIOMock
         coderbot.CoderBot._instance = None
-        self.bot = coderbot.CoderBot.get_instance()
+        settings = config.Config.read().get('settings')
+        self.bot = coderbot.CoderBot.get_instance(settings)
 
     def test_sonar(self):
         for i in range(0, 3):
