@@ -1,6 +1,7 @@
 import unittest
 import test.pigpio_mock
 import coderbot
+import config
 import logging
 
 logger = logging.getLogger()
@@ -17,7 +18,8 @@ class CoderBotDCMotorTestCase(unittest.TestCase):
     def setUp(self):
         coderbot.pigpio.pi = test.pigpio_mock.PIGPIOMock
         coderbot.CoderBot._instance = None
-        self.bot = coderbot.CoderBot.get_instance()
+        settings = config.Config.read().get('settings')
+        self.bot = coderbot.CoderBot.get_instance(settings)
 
     def test_motor_forward(self):
         self.bot.forward(speed=100, elapse=0.1)
