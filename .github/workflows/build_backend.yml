@@ -26,7 +26,7 @@ jobs:
     - run: |
         export PYTHONPATH=./stub:./coderbot:./test
         python3 coderbot/main.py > coderbot.log &
-        sleep 60
+        sleep 120
         apt-get install -y python3-venv
         mkdir -p schemathesis
         python3 -m venv schemathesis
