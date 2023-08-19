@@ -46,7 +46,7 @@ class CoderBotServoMotorTestCase(unittest.TestCase):
         coderbot.pigpio.pi = test.pigpio_mock.PIGPIOMock
         coderbot.CoderBot._instance = None
         settings = config.Config.read().get('settings')
-        self.bot = coderbot.CoderBot.get_instance(settings, Servo=True)
+        self.bot = coderbot.CoderBot.get_instance(settings, servo=True)
 
     def test_motor_forward(self):
         self.bot.forward(speed=100, elapse=0.1)
