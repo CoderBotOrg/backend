@@ -8,9 +8,9 @@ import config
 
 class CameraTest(unittest.TestCase):
     def setUp(self):
-        config.Config.read()
+        settings = config.Config.read().get('settings')
         picamera.PiCamera = picamera_mock.PiCameraMock
-        self.cam = camera.Camera.get_instance(config.get('settings'))
+        self.cam = camera.Camera.get_instance(settings)
    
     def tearDown(self):
         self.cam.exit()
