@@ -62,5 +62,6 @@ ADD docker/stub/start.sh /coderbot/.
 
 ARG CODERBOT_VERSION
 ENV CODERBOT_VERSION=${CODERBOT_VERSION}
+ENV CODERBOT_CLOUD_API_ENDPOINT=http://localhost:5000
 
 ENTRYPOINT /coderbot/start.sh
