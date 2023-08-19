@@ -25,6 +25,7 @@ jobs:
         echo "test complete" 
     - run: |
         export PYTHONPATH=./stub:./coderbot:./test
+        export CODERBOT_CLOUD_API_ENDPOINT=http://localhost:5000
         python3 coderbot/main.py > coderbot.log &
         sleep 60
         cat coderbot.log
@@ -34,7 +35,7 @@ jobs:
         python3 -m venv schemathesis
         . schemathesis/bin/activate
         pip install schemathesis 
-        #st run --endpoint 'activities' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
+        st run --endpoint 'activities' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         #st run --endpoint 'media' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         #st run --endpoint 'control/speak' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         #st run --endpoint 'control/stop' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
