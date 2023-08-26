@@ -127,10 +127,14 @@ class ProgramEngine:
             else:
                 self._programs.insert(program_db_entry)
 
-    def load(self, name):
+    def load(self, name, active_only=True):
         with self.lock: 
             query = Query()
-            program_db_entries = self._programs.search(query.name == name)
+            program_db_entries = None
+            if active_only:
+                program_db_entries = self._programs.search((query.name == name) & (query.status == PROGRAM_STATUS_ACTIVE)) 
+            else:
+                program_db_entries = self._programs.search(query.name == name)
             if len(program_db_entries) > 0:
                 prog_db_entry = program_db_entries[0]
                 #logging.debug(prog_db_entry)

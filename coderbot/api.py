@@ -301,7 +301,7 @@ def saveProgram(name, body):
     logging.info("saving - name: %s, body: %s", name, str(existing_program))
     if existing_program is not None and not overwrite:
         return "askOverwrite"
-    elif existing_program is not None and existing_program.is_default() == True:
+    elif existing_program is not None and existing_program.is_stock() == True:
         return "defaultCannotOverwrite", 400
     program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"), modified=datetime.now(), status="active")
     prog_engine.save(program)

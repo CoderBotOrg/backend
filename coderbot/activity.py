@@ -69,4 +69,4 @@ class Activities():
 
     def list(self, active_only = True):
         with self.lock: 
-            return self.activities.all()
+            return self.activities.search(self.query.status == ACTIVITY_STATUS_ACTIVE)
