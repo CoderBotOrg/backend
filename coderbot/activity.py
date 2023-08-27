@@ -51,7 +51,7 @@ class Activities():
     def save(self, name, activity):
         with self.lock: 
             # if saved activity is "default", reset existing default activity to "non-default"
-            if self.query.get("default", False) is True:
+            if activity.get("default", False) is True:
                 self.activities.update({'default': False})
             if self.activities.search(self.query.name == name) == []:
                 self.activities.insert(activity)
