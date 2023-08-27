@@ -37,9 +37,9 @@ class Activities():
             if name and default is None:
                 activities = []
                 if active_only:
-                    self.activities.search((self.query.name == name) & (self.query.status == ACTIVITY_STATUS_ACTIVE))
+                    activities = self.activities.search((self.query.name == name) & (self.query.status == ACTIVITY_STATUS_ACTIVE))
                 else:
-                    self.activities.search(self.query.name == name)
+                    activities = self.activities.search(self.query.name == name)
                 if len(activities) > 0:
                     return activities[0]
             elif default is not None:
@@ -51,26 +51,26 @@ class Activities():
     def save(self, name, activity):
         with self.lock: 
             # if saved activity is "default", reset existing default activity to "non-default"
-            if activity.get("default", False) is True:
+            if self.query.get("default", False) is True:
                 self.activities.update({'default': False})
             if self.activities.search(self.query.name == name) == []:
                 self.activities.insert(activity)
             else:
-                self.activities.update(activity, self.query.name == activity["name"])
+                self.activities.update(activity, self.query.name == self.query._name)
 
     def delete(self, name, logical = True):
         with self.lock: 
             activities = self.activities.search(self.query.name == name)
             if len(activities) > 0:
                 activity = activities[0]
-                if activity.get("default", False) is True:
+                if self.query.get("default", False) is True:
                     self.activities.update({'default': True}, self.query.stock == True)
                 if logical:
-                    activity["status"] = ACTIVITY_STATUS_DELETED
+                    self.query._status = ACTIVITY_STATUS_DELETED
                     activity["modified"] = datetime.now().isoformat()
-                    self.activities.update(activity, self.query.name == name)
+                    self.activities.update(activity, self.self.query.name == name)
                 else:
-                    self.activities.remove(self.query.name == activity["name"])
+                    self.activities.remove(self.query.name == self.query._name)
 
     def permanentlyRemoveDeletedActivities(self):
         for a in self.list(active_only=False):
