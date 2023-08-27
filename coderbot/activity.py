@@ -56,7 +56,7 @@ class Activities():
             if self.activities.search(self.query.name == name) == []:
                 self.activities.insert(activity)
             else:
-                self.activities.update(activity, self.query.name == self.query._name)
+                self.activities.update(activity, self.query.name == name)
 
     def delete(self, name, logical = True):
         with self.lock: 
@@ -70,7 +70,7 @@ class Activities():
                     activity["modified"] = datetime.now().isoformat()
                     self.activities.update(activity, self.self.query.name == name)
                 else:
-                    self.activities.remove(self.query.name == self.query._name)
+                    self.activities.remove(self.query.name == name)
 
     def permanentlyRemoveDeletedActivities(self):
         for a in self.list(active_only=False):
