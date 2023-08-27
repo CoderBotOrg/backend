@@ -1,3 +1,4 @@
+import logging
 from tinydb import TinyDB, Query
 from threading import Lock
 from datetime import datetime
@@ -29,11 +30,16 @@ class Activities():
         self.activities = TinyDB("data/activities.json")
         self.query = Query()
         self.lock = Lock()
+        self.permanentlyRemoveDeletedActivities()
 
-    def load(self, name, default):
+    def load(self, name, default, active_only=True):
         with self.lock: 
             if name and default is None:
-                activities = self.activities.search(self.query.name == name)
+                activities = []
+                if active_only:
+                    self.activities.search((self.query.name == name) & (self.query.status == ACTIVITY_STATUS_ACTIVE))
+                else:
+                    self.activities.search(self.query.name == name)
                 if len(activities) > 0:
                     return activities[0]
             elif default is not None:
@@ -66,7 +72,16 @@ class Activities():
                 else:
                     self.activities.remove(self.query.name == activity["name"])
 
+    def permanentlyRemoveDeletedActivities(self):
+        for a in self.list(active_only=False):
+            logging.info("checking: " + a["name"])
+            if a["status"] == ACTIVITY_STATUS_DELETED:
+                logging.info("deleting: " + a["name"])
+                self.delete(a["name"], logical=False)
 
     def list(self, active_only = True):
         with self.lock: 
-            return self.activities.search(self.query.status == ACTIVITY_STATUS_ACTIVE)
+            if active_only:
+                return self.activities.search(self.query.status == ACTIVITY_STATUS_ACTIVE)
+            else:
+                return self.activities.all()
