@@ -3,7 +3,7 @@ connexion==2.14.2
 Flask==2.2.3
 Flask-Cors==3.0.10
 tinydb==4.7.1
-Werkzeug==2.2.3
+Werkzeug==3.0.1
 
 # Misc utils
 setuptools==67.4.0
