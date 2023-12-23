@@ -64,7 +64,7 @@ class Activities():
             if len(activities) > 0:
                 activity = activities[0]
                 if activity.get("default", False) is True:
-                    self.activities.update({'default': True}, self.query.stock == True)
+                    self.activities.update({'default': True}, self.query.kind == ACTIVITY_KIND_STOCK)
                 if logical:
                     activity["status"] = ACTIVITY_STATUS_DELETED
                     activity["modified"] = datetime.now().isoformat()

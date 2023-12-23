@@ -30,6 +30,10 @@ paths:
       responses:
         200:
           description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
       tags:
         - CoderBot configuration
   /settings/restore:

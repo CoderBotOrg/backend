@@ -123,31 +123,31 @@ activities = Activities.get_instance()
 
 def stop():
     bot.stop()
-    return 200
+    return {}
 
 def move(body):
     speed=body.get("speed")
     elapse=body.get("elapse")
     distance=body.get("distance")
     if (speed is None or speed == 0) or (elapse is not None and distance is not None):
-        return 400
+        return None, 400
     bot.move(speed=speed, elapse=elapse, distance=distance)
-    return 200
+    return {}
 
 def turn(body):
     speed=body.get("speed")
     elapse=body.get("elapse")
     distance=body.get("distance")
     if (speed is None or speed == 0) or (elapse is not None and distance is not None):
-        return 400
+        return None, 400
     bot.turn(speed=speed, elapse=elapse, distance=distance)
-    return 200
+    return {}
 
 def takePhoto():
     try:
         cam.photo_take()
         audio_device.say(settings.get("sound_shutter"))
-        return 200
+        return {}
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -155,7 +155,7 @@ def recVideo():
     try:
         cam.video_rec()
         audio_device.say(settings.get("sound_shutter"))
-        return 200
+        return {}
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -163,7 +163,7 @@ def stopVideo():
     try:
         cam.video_stop()
         audio_device.say(settings.get("sound_shutter"))
-        return 200
+        return {}
     except Exception as e:
         logging.warning("Error: %s", e)
 
@@ -172,16 +172,16 @@ def speak(body):
     locale = body.get("locale", "")
     logging.debug("say: " + text + " in: " + locale)
     audio_device.say(text, locale)
-    return 200
+    return {}
 
 def reset():
     Balena.get_instance().purge()
-    return 200
+    return {}
 
 def halt():
     audio_device.say(what=settings.get("sound_stop"))
     Balena.get_instance().shutdown()
-    return 200
+    return {}
 
 def restart():
     Balena.get_instance().restart()
@@ -189,7 +189,7 @@ def restart():
 def reboot():
     audio_device.say(what=settings.get("sound_stop"))
     Balena.get_instance().reboot()
-    return 200
+    return {}
 
 def video_stream(a_cam):
     while True:
@@ -223,22 +223,22 @@ def getPhoto(name):
         return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), max_age=0)
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
-        return 503
+        return {"exception": str(e)}, 503
     except FileNotFoundError:
-        return 404
+        return None, 404
 
 def savePhoto(name, body):
     try:
         cam.update_photo({"name": name, "tag": body.get("tag")})
     except FileNotFoundError:
-        return 404
+        return None, 404
 
 def deletePhoto(name):
     logging.debug("photo delete")
     try:
         cam.delete_photo(name)
     except FileNotFoundError:
-        return 404
+        return None, 404
 
 def restoreSettings():
     Config.restore()
@@ -249,14 +249,14 @@ def loadSettings():
 
 def saveSettings(body):
     Config.write(body)
-    return 200
+    return Config.write(body)
 
 def updateFromPackage():
     os.system('sudo bash /home/pi/clean-update.sh')
     file_to_upload = connexion.request.files['file_to_upload']
     file_to_upload.save(os.path.join('/home/pi/', 'update.tar'))
     os.system('sudo reboot')
-    return 200
+    return {}
 
 def listMusicPackages():
     """
@@ -291,7 +291,7 @@ def deleteMusicPackage(name):
     """
     musicPkg = MusicPackageManager.get_instance()
     musicPkg.deletePackage(name)
-    return 200 
+    return {} 
 
 ## Programs
 
@@ -305,14 +305,14 @@ def saveProgram(name, body):
         return "defaultCannotOverwrite", 400
     program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"), modified=datetime.now(), status="active")
     prog_engine.save(program)
-    return 200
+    return {}
 
 def loadProgram(name):
     existing_program = prog_engine.load(name)
     if existing_program:
         return existing_program.as_dict(), 200
     else:
-        return 404
+        return None, 404
 
 def deleteProgram(name):
     prog_engine.delete(name, logical=True)
@@ -415,18 +415,18 @@ def deleteCNNModel(name):
 
 def cloudSyncRequest():
     CloudManager.get_instance().sync()
-    return 200
+    return {}
 
 def cloudSyncStatus():
     return CloudManager.get_instance().sync_status()
 
 def cloudRegistrationRequest(body):
     CloudManager.get_instance().register(body)
-    return 200
+    return {}
 
 def cloudRegistrationDelete():
     CloudManager.get_instance().unregister()
-    return 200
+    return {}
 
 def cloudRegistrationStatus():
     registration = cloud_settings.get('registration', {})
