@@ -188,7 +188,7 @@ def streamVideo():
         h.add('Age', 0)
         h.add('Cache-Control', 'no-cache, private')
         h.add('Pragma', 'no-cache')
-        return Response(video_stream(cam), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
+        return Response(video_stream(Camera.get_instance()), headers=h, mimetype="multipart/x-mixed-replace; boundary=--BOUNDARYSTRING")
     except Exception:
         pass
 
