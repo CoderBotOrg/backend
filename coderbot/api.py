@@ -67,7 +67,7 @@ def get_status():
 
     internet_status = False
     try:
-        urllib.request.urlopen("https://coderbot.org") 
+        urllib.request.urlopen("https://coderCoderBot.get_instance().org") 
         internet_status = True
     except Exception:
         pass
@@ -104,7 +104,7 @@ activities = Activities.get_instance()
 ## Robot control
 
 def stop():
-    bot.stop()
+    CoderBot.get_instance().stop()
     return {}
 
 def move(body):
@@ -113,7 +113,7 @@ def move(body):
     distance=body.get("distance")
     if (speed is None or speed == 0) or (elapse is not None and distance is not None):
         return None, 400
-    bot.move(speed=speed, elapse=elapse, distance=distance)
+    CoderBot.get_instance().move(speed=speed, elapse=elapse, distance=distance)
     return {}
 
 def turn(body):
@@ -122,12 +122,12 @@ def turn(body):
     distance=body.get("distance")
     if (speed is None or speed == 0) or (elapse is not None and distance is not None):
         return None, 400
-    bot.turn(speed=speed, elapse=elapse, distance=distance)
+    CoderBot.get_instance().turn(speed=speed, elapse=elapse, distance=distance)
     return {}
 
 def takePhoto():
     try:
-        cam.photo_take()
+        Camera.get_instance().photo_take()
         Audio.get_instance().say(settings.get("sound_shutter"))
         return {}
     except Exception as e:
@@ -135,7 +135,7 @@ def takePhoto():
 
 def recVideo():
     try:
-        cam.video_rec()
+        Camera.get_instance().video_rec()
         Audio.get_instance().say(settings.get("sound_shutter"))
         return {}
     except Exception as e:
@@ -143,7 +143,7 @@ def recVideo():
 
 def stopVideo():
     try:
-        cam.video_stop()
+        Camera.get_instance().video_stop()
         Audio.get_instance().say(settings.get("sound_shutter"))
         return {}
     except Exception as e:
@@ -196,12 +196,12 @@ def listPhotos():
     """
     Expose the list of taken photos
     """
-    return cam.get_photo_list()
+    return Camera.get_instance().get_photo_list()
 
 def getPhoto(name):
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
     try:
-        media_file = cam.get_photo_file(name)
+        media_file = Camera.get_instance().get_photo_file(name)
         return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), max_age=0)
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
@@ -211,14 +211,14 @@ def getPhoto(name):
 
 def savePhoto(name, body):
     try:
-        cam.update_photo({"name": name, "tag": body.get("tag")})
+        Camera.get_instance().update_photo({"name": name, "tag": body.get("tag")})
     except FileNotFoundError:
         return None, 404
 
 def deletePhoto(name):
     logging.debug("photo delete")
     try:
-        cam.delete_photo(name)
+        Camera.get_instance().delete_photo(name)
     except FileNotFoundError:
         return None, 404
 
@@ -377,7 +377,7 @@ def trainCNNModel(body):
     cnn.train_new_model(model_name=body.get("model_name"),
                         architecture=body.get("architecture"),
                         image_tags=body.get("image_tags"),
-                        photos_meta=cam.get_photo_list(),
+                        photos_meta=Camera.get_instance().get_photo_list(),
                         training_steps=body.get("training_steps"),
                         learning_rate=body.get("learning_rate"))
 
