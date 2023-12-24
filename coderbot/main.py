@@ -7,8 +7,9 @@ import logging
 import logging.handlers
 import picamera
 import connexion
-
-from flask_cors import CORS
+from connexion.options import SwaggerUIOptions
+from connexion.middleware import MiddlewarePosition
+from starlette.middleware.cors import CORSMiddleware
 
 from camera import Camera
 from motion import Motion
@@ -23,29 +24,26 @@ from cloud import CloudManager
 # Logging configuration
 logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
-# sh = logging.StreamHandler()
-# formatter = logging.Formatter('%(message)s')
-# sh.setFormatter(formatter)
-# logger.addHandler(sh)
 
 ## (Connexion) Flask app configuration
-
 # Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
 #  from the folder 'swagger-ui'. Clone the 'swagger-ui' repository inside the backend folder
-options = {"swagger_ui": True}
-connexionApp = connexion.App(__name__, options=options)
-
-# Connexion wraps FlaskApp, so app becomes connexionApp.app
-app = connexionApp.app
-# Access-Control-Allow-Origin
-CORS(app)
-app.debug = False
+swagger_ui_options = SwaggerUIOptions(swagger_ui=True)
+app = connexion.App(__name__, swagger_ui_options=swagger_ui_options)
+app.add_middleware(
+    CORSMiddleware,
+    position=MiddlewarePosition.BEFORE_EXCEPTION,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.prog_engine = ProgramEngine.get_instance()
 
 ## New API and web application
 
 # API v1 is defined in v1.yml and its methods are in api.py
-connexionApp.add_api('v1.yml')
+app.add_api('v1.yml')
 
 def button_pushed():
     if app.settings.get('button_func') == "startstop":
@@ -67,41 +65,50 @@ def run_server():
     cam = None
     try:
         try:
-            app.settings = Config.read().get("settings")
+            settings = Config.read().get("settings")
+            app.settings = settings
+            network_settings = Config.read().get("network")
+            cloud_settings = Config.read().get("cloud")
 
-            bot = CoderBot.get_instance()
-
+            bot = CoderBot.get_instance(settings=settings, motor_trim_factor=float(settings.get('move_motor_trim', 1.0)),
+                                        motor_max_power=int(settings.get('motor_max_power', 100)),
+                                        motor_min_power=int(settings.get('motor_min_power', 0)),
+                                        hw_version=settings.get('hardware_version'),
+                                        pid_params=(float(settings.get('pid_kp', 1.0)),
+                                                    float(settings.get('pid_kd', 0.1)),
+                                                    float(settings.get('pid_ki', 0.01)),
+                                                    float(settings.get('pid_max_speed', 200)),
+                                                    float(settings.get('pid_sample_time', 0.01))))
             try:
-                audio_device = Audio.get_instance()
-                audio_device.set_volume(int(app.settings.get('audio_volume_level')), 100)
-                audio_device.say(app.settings.get("sound_start"))
+                audio_device = Audio.get_instance(settings)
+                audio_device.set_volume(int(settings.get('audio_volume_level')), 100)
+                audio_device.say(settings.get("sound_start"))
             except Exception:
                 logging.warning("Audio not present")
-
             try:
-                cam = Camera.get_instance()
-                Motion.get_instance()
+                cam = Camera.get_instance(settings)
+                Motion.get_instance(settings)
             except picamera.exc.PiCameraError:
                 logging.warning("Camera not present")
 
-            CNNManager.get_instance(app.settings)
+            CNNManager.get_instance(settings)
             EventManager.get_instance("coderbot")
 
-            if app.settings.get('load_at_start') and app.settings.get('load_at_start'):
-                prog = app.prog_engine.load(app.settings.get('load_at_start'))
+            if settings.get('load_at_start') and settings.get('load_at_start'):
+                prog = app.prog_engine.load(settings.get('load_at_start'))
                 prog.execute()
 
             CloudManager.get_instance()
             
         except ValueError as e:
-            app.settings = {}
+            settings = {}
             logging.error(e)
 
         bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)
 
         remove_doreset_file()
 
-        app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False, threaded=True)
+        app.run(host="0.0.0.0", port=5000)
     finally:
         if cam:
             cam.exit()

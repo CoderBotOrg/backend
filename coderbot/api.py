@@ -30,24 +30,6 @@ from coderbot import CoderBot
 
 BUTTON_PIN = 16
 
-settings = Config.read().get("settings")
-network_settings = Config.read().get("network")
-cloud_settings = Config.read().get("cloud")
-
-bot = CoderBot.get_instance(settings=settings, motor_trim_factor=float(settings.get('move_motor_trim', 1.0)),
-                            motor_max_power=int(settings.get('motor_max_power', 100)),
-                            motor_min_power=int(settings.get('motor_min_power', 0)),
-                            hw_version=settings.get('hardware_version'),
-                            pid_params=(float(settings.get('pid_kp', 1.0)),
-                                        float(settings.get('pid_kd', 0.1)),
-                                        float(settings.get('pid_ki', 0.01)),
-                                        float(settings.get('pid_max_speed', 200)),
-                                        float(settings.get('pid_sample_time', 0.01))))
-audio_device = Audio.get_instance(settings)
-cam = Camera.get_instance(settings)
-Motion.get_instance(settings)
-CNNManager.get_instance(settings)
-
 def get_serial():
     """
     Extract serial from cpuinfo file
