@@ -128,7 +128,7 @@ def turn(body):
 def takePhoto():
     try:
         cam.photo_take()
-        audio_device.say(settings.get("sound_shutter"))
+        Audio.get_instance().say(settings.get("sound_shutter"))
         return {}
     except Exception as e:
         logging.warning("Error: %s", e)
@@ -136,7 +136,7 @@ def takePhoto():
 def recVideo():
     try:
         cam.video_rec()
-        audio_device.say(settings.get("sound_shutter"))
+        Audio.get_instance().say(settings.get("sound_shutter"))
         return {}
     except Exception as e:
         logging.warning("Error: %s", e)
@@ -144,7 +144,7 @@ def recVideo():
 def stopVideo():
     try:
         cam.video_stop()
-        audio_device.say(settings.get("sound_shutter"))
+        Audio.get_instance().say(settings.get("sound_shutter"))
         return {}
     except Exception as e:
         logging.warning("Error: %s", e)
@@ -153,7 +153,7 @@ def speak(body):
     text = body.get("text", "")
     locale = body.get("locale", "")
     logging.debug("say: " + text + " in: " + locale)
-    audio_device.say(text, locale)
+    Audio.get_instance().say(text, locale)
     return {}
 
 def reset():
@@ -161,7 +161,7 @@ def reset():
     return {}
 
 def halt():
-    audio_device.say(what=settings.get("sound_stop"))
+    Audio.get_instance().say(what=settings.get("sound_stop"))
     Balena.get_instance().shutdown()
     return {}
 
@@ -169,7 +169,7 @@ def restart():
     Balena.get_instance().restart()
 
 def reboot():
-    audio_device.say(what=settings.get("sound_stop"))
+    Audio.get_instance().say(what=settings.get("sound_stop"))
     Balena.get_instance().reboot()
     return {}
 
