@@ -1,5 +1,5 @@
 # API framework
-connexion[uvicorn,swagger-ui]==3.0.5
+connexion[uvicorn,flask,swagger-ui]==3.0.5
 tinydb==4.8.0
 cloud_api_robot_client @ git+https://github.com/CoderBotOrg/cloud_api_robot_client.git
 
