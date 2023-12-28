@@ -326,7 +326,10 @@ def runProgram(id):
     """
     logging.debug("program_exec")
     prog = prog_engine.load(id)
-    return prog.execute()
+    if prog is not None:
+        return prog.execute()
+    else:
+        return {}, 404
 
 def stopProgram(id):
     """
