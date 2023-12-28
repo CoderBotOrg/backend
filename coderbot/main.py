@@ -68,7 +68,6 @@ def run_server():
             settings = Config.read().get("settings")
             app.settings = settings
             network_settings = Config.read().get("network")
-            cloud_settings = Config.read().get("cloud")
 
             bot = CoderBot.get_instance(settings=settings, motor_trim_factor=float(settings.get('move_motor_trim', 1.0)),
                                         motor_max_power=int(settings.get('motor_max_power', 100)),

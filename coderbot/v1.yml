@@ -155,6 +155,27 @@ paths:
           description: "ok"
   
   /programs:
+    post:
+      operationId: "api.saveNewProgram"
+      summary: "Save a new program"
+      tags:
+        - Program management
+      requestBody:
+        description: Program object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Program'
+      responses:
+        200:
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        400:
+          description: "Failed to save the program"
     get:
       operationId: "api.listPrograms"
       summary: "Get the list of all the saved programs"
@@ -164,12 +185,12 @@ paths:
         200:
           description: "ok"
 
-  /programs/{name}:
+  /programs/{id}:
     get:
       operationId: "api.loadProgram"
       summary: "Get the program with the specified name"
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -183,7 +204,7 @@ paths:
       operationId: "api.deleteProgram"
       summary: "Delete a program"
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -199,7 +220,7 @@ paths:
       tags:
         - Program management
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -217,37 +238,30 @@ paths:
         400:
           description: "Failed to save the program"
 
-  /programs/{name}/run:
+  /programs/{id}/run:
     post:
       operationId: "api.runProgram"
       summary: "Execute the given program"
       tags:
         - Program management
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
             type: string
-      requestBody:
-        description: Program object
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Program'
       responses:
         200:
           description: "ok"
 
-  /programs/{name}/status:
+  /programs/{id}/status:
     get:
       operationId: "api.statusProgram"
       summary: "Get the status of the given program"
       tags:
         - Program management
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -256,14 +270,14 @@ paths:
         200:
           description: "ok"
 
-  /programs/{name}/stop:
+  /programs/{id}/stop:
     patch:
       operationId: "api.stopProgram"
       summary: "Stop the given program"
       tags:
         - Program management
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -281,6 +295,13 @@ paths:
       responses:
         200:
           description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+
     post:
       operationId: "api.saveAsNewActivity"
       summary: "Save a new activity"
@@ -296,14 +317,18 @@ paths:
       responses:
         200:
           description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
         400:
           description: "Failed to save the activity"
-  /activities/{name}:
+  /activities/{id}:
     get:
       operationId: "api.loadActivity"
       summary: "Get the activity with the specified name"
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -318,11 +343,16 @@ paths:
       responses:
         200:
           description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+
     put:
       operationId: "api.saveActivity"
-      summary: "Save the activity with the specified name"
+      summary: "Save the activity with the specified id"
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -339,13 +369,18 @@ paths:
       responses:
         200:
           description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+
     delete:
       operationId: "api.deleteActivity"
       summary: "Delete an activity"
       tags:
         - Activity management
       parameters:
-        - name: name
+        - name: id
           in: path
           required: true
           schema:
@@ -752,6 +787,11 @@ components:
     Program:
       type: object
       properties:
+        id:
+          type: string
+          #pattern: '^[[:xdigit:]]{8}(?:\-[[:xdigit:]]{4}){3}\-[[:xdigit:]]{12}$'
+          minLength: 36
+          maxLength: 36
         name:
           type: string
           pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
@@ -773,6 +813,11 @@ components:
     Activity:
       type: object
       properties:
+        id:
+          type: string
+          #pattern: '^[[:xdigit:]]{8}(?:\-[[:xdigit:]]{4}){3}\-[[:xdigit:]]{12}$/
+          minLength: 36
+          maxLength: 36
         name:
           type: string
           minLength: 1

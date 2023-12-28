@@ -52,9 +52,9 @@
   },
   "cloud":{
      "sync_modes":{
-        "activities":"b",
-        "programs":"b",
-        "settings":"b"
+        "activities":"n",
+        "programs":"n",
+        "settings":"n"
      },
      "sync_period":"10",
      "reg_otp":"AB1234CD"

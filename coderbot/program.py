@@ -20,6 +20,7 @@
 import os
 import threading
 import json
+import uuid
 import shutil
 import logging
 from datetime import datetime
@@ -92,7 +93,7 @@ class ProgramEngine:
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
-                    if self.load(program_name) is None:
+                    if self.load_by_name(program_name) is None:
                         logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
                         with open(os.path.join(dirname, filename), "r") as f:
                             program_dict = json.load(f)
@@ -122,19 +123,20 @@ class ProgramEngine:
             program._modified = datetime.now()
             self._program = program
             program_db_entry = self._program.as_dict()
-            if self._programs.search(query.name == program.name) != []:
-                self._programs.update(program_db_entry, query.name == program.name)
+            if self._programs.search(query.id == program._id) != []:
+                self._programs.update(program_db_entry, query.id == program._id)
             else:
                 self._programs.insert(program_db_entry)
+            return program_db_entry
 
-    def load(self, name, active_only=True):
+    def load(self, id, active_only=True):
         with self.lock: 
             query = Query()
             program_db_entries = None
             if active_only:
-                program_db_entries = self._programs.search((query.name == name) & (query.status == PROGRAM_STATUS_ACTIVE)) 
+                program_db_entries = self._programs.search((query.id == id) & (query.status == PROGRAM_STATUS_ACTIVE)) 
             else:
-                program_db_entries = self._programs.search(query.name == name)
+                program_db_entries = self._programs.search(query.id == id)
             if len(program_db_entries) > 0:
                 prog_db_entry = program_db_entries[0]
                 #logging.debug(prog_db_entry)
@@ -142,26 +144,31 @@ class ProgramEngine:
                 return self._program
             return None
 
-    def delete(self, name, logical = True):
+    def load_by_name(self, name):
+        with self.lock:
+            program = None
+            query = Query()
+            programs = self._programs.search((query.name == name) & (query.status == PROGRAM_STATUS_ACTIVE)) 
+            if len(programs) > 0:
+                program = Program.from_dict(programs[0])
+            return program
+
+    def delete(self, id, logical = True):
         with self.lock: 
             query = Query()
-            program_db_entries = self._programs.search(query.name == name)
+            program_db_entries = self._programs.search(query.id == id)
             if len(program_db_entries) > 0:
                 program_db_entry = program_db_entries[0]
                 if logical:
                     program_db_entry["status"] = PROGRAM_STATUS_DELETED
                     program_db_entry["modified"] = datetime.now().isoformat()
-                    self._programs.update(program_db_entry, query.name == name)
+                    self._programs.update(program_db_entry, query.id == id)
                 else:
-                    self._programs.remove(query.name == name)
+                    self._programs.remove(query.id == id)
         return None
 
-    def create(self, name, code):
-        self._program = Program(name, code, modified=datetime.now())
-        return self._program
-
-    def is_running(self, name):
-        return self._program.is_running() and self._program.name == name
+    def is_running(self, id):
+        return self._program.is_running() and self._program.id == id
 
     def check_end(self):
         return self._program.check_end()
@@ -185,14 +192,14 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, description=None, code=None, dom_code=None, kind=PROGRAM_KIND_USER, id=None, modified=None, status=None):
+    def __init__(self, name, id=str(uuid.uuid4()), description=None, code=None, dom_code=None, kind=PROGRAM_KIND_USER, modified=None, status=None):
         self._thread = None
+        self._id = id
         self._name = name
         self._description = description
         self._dom_code = dom_code
         self._code = code
         self._kind = kind
-        self._id = id
         self._modified = modified
         self._status = status
 

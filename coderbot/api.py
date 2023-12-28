@@ -277,41 +277,58 @@ def deleteMusicPackage(name):
 
 ## Programs
 
-def saveProgram(name, body):
+def saveNewProgram(body):
     overwrite = body.get("overwrite")
-    existing_program = prog_engine.load(name)
+    name = body["name"]
+    existing_program = prog_engine.load_by_name(name)
     logging.info("saving - name: %s, body: %s", name, str(existing_program))
     if existing_program is not None and not overwrite:
         return "askOverwrite"
     elif existing_program is not None and existing_program.is_stock() == True:
         return "defaultCannotOverwrite", 400
     program = Program(name=body.get("name"), code=body.get("code"), dom_code=body.get("dom_code"), modified=datetime.now(), status="active")
-    prog_engine.save(program)
-    return {}
+    program_db_entry = prog_engine.save(program)
+    return program_db_entry
 
-def loadProgram(name):
-    existing_program = prog_engine.load(name)
+def saveProgram(id, body):
+    overwrite = body.get("overwrite")
+    name = body["name"]
+    existing_program = prog_engine.load(id)
+    logging.info("saving - id: %s - name: %s - existing: %s", id, name, str(existing_program is not None))
+    if existing_program is not None and existing_program.is_stock() == True:
+        return "defaultCannotOverwrite", 400
+    program = Program(
+        id=existing_program._id,
+        name=existing_program._name, 
+        code=body.get("code"), 
+        dom_code=body.get("dom_code"), 
+        modified=datetime.now(),
+        status="active")
+    prog_engine.save(program)
+    return program.as_dict()
+
+def loadProgram(id):
+    existing_program = prog_engine.load(id)
     if existing_program:
         return existing_program.as_dict(), 200
     else:
         return None, 404
 
-def deleteProgram(name):
-    prog_engine.delete(name, logical=True)
+def deleteProgram(id):
+    prog_engine.delete(id, logical=True)
 
 def listPrograms():
     return prog_engine.prog_list(active_only=True)
 
-def runProgram(name, body):
+def runProgram(id):
     """
     Execute the given program
     """
     logging.debug("program_exec")
-    code = body.get('code')
-    prog = prog_engine.create(name, code)
+    prog = prog_engine.load(id)
     return prog.execute()
 
-def stopProgram(name):
+def stopProgram(id):
     """
     Stop the program execution
     """
@@ -321,7 +338,7 @@ def stopProgram(name):
         prog.stop()
     return "ok"
 
-def statusProgram(name):
+def statusProgram(id):
     """
     Expose the program status
     """
@@ -334,19 +351,20 @@ def statusProgram(name):
 
 ## Activities
 
-def saveActivity(name, body):
+def saveActivity(id, body):
     activity = body
-    activities.save(activity.get("name"), activity)
+    activity["id"] = id
+    return activities.save(activity)
 
 def saveAsNewActivity(body):
     activity = body
-    activities.save(activity.get("name"), activity)
+    return activities.save(activity)
 
-def loadActivity(name=None, default=None):
-    return activities.load(name, default)
+def loadActivity(id=None, default=None):
+    return activities.load(id, default)
 
-def deleteActivity(name):
-    activities.delete(name), 200
+def deleteActivity(id):
+    activities.delete(id), 200
 
 def listActivities():
     return activities.list()
@@ -411,7 +429,7 @@ def cloudRegistrationDelete():
     return {}
 
 def cloudRegistrationStatus():
-    registration = cloud_settings.get('registration', {})
+    registration = Config.read().get("cloud").get('registration', {})
     return {
         "registered": CloudManager.get_instance().registration_status(),
         "name": registration.get('name', ""),

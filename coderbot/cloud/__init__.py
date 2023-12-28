@@ -35,6 +35,7 @@ from cloud_api_robot_client.model.robot_credentials import RobotCredentials
 SYNC_UPSTREAM = 'u'
 SYNC_DOWNSTREAM = 'd'
 SYNC_BIDIRECTIONAL = 'b'
+SYNC_DISABLED = 'n'
 
 ENTITY_KIND_USER = "user"
 ENTITY_KIND_STOCK = "stock"
@@ -197,7 +198,7 @@ class CloudManager(threading.Thread):
             config = Config.read()
             local_setting = {
                 "settings": config.get("settings"),
-                "cloud": config.get("cloud")
+                #"cloud": config.get("cloud")
             }
             local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified")).timestamp() < Config.modified()
             cloud_kind_user = cloud_setting_object.get("kind") == ENTITY_KIND_USER
@@ -217,7 +218,7 @@ class CloudManager(threading.Thread):
                 logging.info("settings.upstream")
             elif cloud_setting != local_setting: # setting, down
                 config["settings"] = cloud_setting["settings"]
-                config["cloud"] = cloud_setting["cloud"]
+                #config["cloud"] = cloud_setting["cloud"]
                 Config.write(config) 
                 logging.info("settings.downstream")
             self._sync_status["settings"] = "synced"
@@ -280,8 +281,8 @@ class CloudManager(threading.Thread):
                     elif sync_mode == "d" or (not local_activity_more_recent and sync_mode == SYNC_BIDIRECTIONAL):
                         al["data"] = ac.get("data")
                         al["modified"] = ac.get("modified")
-                        Activities.get_instance().save(al.get("name"), al)
-                        logging.info("activities.update.downstream: " + al.get("name"))
+                        Activities.get_instance().save(al)
+                        logging.info("activities.update.downstream: " + al.get("id"))
                 elif ac is None and sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
                     body = Activity(
                         id="",
@@ -296,7 +297,7 @@ class CloudManager(threading.Thread):
                     api_response = api_instance.create_robot_activity(body=body)
                     al["id"] = api_response.body["id"]
                     al["org_id"] = api_response.body["org_id"]
-                    Activities.get_instance().save(al.get("name"), al)
+                    Activities.get_instance().save(al)
                     logging.info("activities.create.upstream: " + al.get("name"))
                 elif ac is None and sync_mode in [SYNC_DOWNSTREAM]:
                     Activities.get_instance().delete(al.get("name"))
@@ -312,7 +313,7 @@ class CloudManager(threading.Thread):
                     activity["description"] = ac.get("description")
                     activity["kind"] = ac.get("kind")
                     activity["status"] = ac.get("status")
-                    Activities.get_instance().save(ac.get("name"), activity)
+                    Activities.get_instance().save(activity)
 
             # manage local user activities to be deleted locally and upstream
             for al in activities_local_to_be_deleted:
@@ -320,7 +321,7 @@ class CloudManager(threading.Thread):
                     logging.info("activities.delete.upstream: " + al.get("name"))
                     api_response = api_instance.delete_robot_program(path_params={"activity_id":al.get("id")})
                 # delete locally permanently
-                Activities.get_instance().delete(al.get("name"), logical=False)
+                Activities.get_instance().delete(al.get("id"), logical=False)
 
             # manage local stock activities to be deleted locally
             for al in activities_local_stock:
@@ -328,7 +329,7 @@ class CloudManager(threading.Thread):
                 if al.get("id") is not None and activities_cloud_map.get(al.get("id")) is None:
                     logging.info("activities.delete.stock.locally: " + al.get("name"))
                     # delete locally permanently
-                    Activities.get_instance().delete(al.get("name"), logical=False)
+                    Activities.get_instance().delete(al.get("id"), logical=False)
 
             self._sync_status["activities"] = "synced"
         except cloud_api_robot_client.ApiException as e:
@@ -369,6 +370,7 @@ class CloudManager(threading.Thread):
             for pl in programs_local_user:
                 pc = programs_cloud_map.get(pl.get("id"))
                 pc_pl_equals = (pc is not None and 
+                                pc.get("id") == pl.get("id") and 
                                 pc.get("name") == pl.get("name") and 
                                 pc.get("code") == pl.get("code") and 
                                 pc.get("dom_code") == pl.get("dom_code") and
