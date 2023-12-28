@@ -50,7 +50,7 @@ class Activities():
             if activity.get("default", False) is True:
                 self.activities.update({'default': False})
             if self.activities.search(self.query.id == activity.get("id")) == []:
-                activity = self.activities.insert(activity)
+                self.activities.insert(activity)
             else:
                 self.activities.update(activity, self.query.id == activity.get("id"))
         activity = self.activities.search(self.query.id == activity.get("id"))[0]
