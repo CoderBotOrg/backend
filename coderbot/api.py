@@ -294,6 +294,8 @@ def saveProgram(id, body):
     overwrite = body.get("overwrite")
     name = body["name"]
     existing_program = prog_engine.load(id)
+    if existing_program is None:
+        return {}, 404
     logging.info("saving - id: %s - name: %s - existing: %s", id, name, str(existing_program is not None))
     if existing_program is not None and existing_program.is_stock() == True:
         return "defaultCannotOverwrite", 400
