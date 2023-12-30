@@ -152,7 +152,7 @@ class CloudManager(threading.Thread):
                     # Create an instance of the API class
                     api_instance = robot_sync_api.RobotSyncApi(api_client)
                     
-                    self.sync_settings(api_instance, sync_modes["settings"])
+                    #self.sync_settings(api_instance, sync_modes["settings"])
                     self.sync_activities(api_instance, sync_modes["activities"])
                     self.sync_programs(api_instance, sync_modes["programs"])
             except Exception as e:
@@ -223,7 +223,7 @@ class CloudManager(threading.Thread):
                 logging.info("settings.downstream")
             self._sync_status["settings"] = "synced"
         except cloud_api_robot_client.ApiException as e:
-            logging.warn("Exception when calling settings RobotSyncApi: %s\n" % e)
+            logging.warn("Exception when calling settings RobotSyncApi: %s\n", e)
             self._sync_status["registration"] = "failed"
 
     def sync_activities(self, api_instance, sync_mode):
@@ -251,14 +251,16 @@ class CloudManager(threading.Thread):
             # cloud activities
             activities_cloud_map = {}
             for a in cloud_activities:
-               if a.get("status") == ACTIVITY_STATUS_ACTIVE:
+                logging.info("cloud_activities %s, %s", str(a.get("status")), a.get("id"))
+                if a.get("status") == ACTIVITY_STATUS_ACTIVE:
                     activities_cloud_map[a.get("id")] = a
 
             # loop through local
             for al in activities_local_user:
                 logging.info("activities.syncing: " + str(al.get("id")) + " name: " + str(al.get("name")))
                 ac = activities_cloud_map.get(al.get("id"))
-                ac_al_equals = (ac is not None and ac.get("data") == al.get("data"))
+                ac_al_equals = (ac is not None and ac.get("id") == al.get("id"))
+                
                 if ac is not None and not ac_al_equals:
                     al["modified"] = al.get("modified", datetime.now(tz=timezone.utc).isoformat()) 
                     local_activity_more_recent = datetime.fromisoformat(ac.get("modified")).timestamp() < datetime.fromisoformat(al.get("modified")).timestamp()
@@ -285,7 +287,7 @@ class CloudManager(threading.Thread):
                         logging.info("activities.update.downstream: " + al.get("id"))
                 elif ac is None and sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
                     body = Activity(
-                        id="",
+                        id=al.get("id"),
                         org_id="",
                         name=al.get("name"),
                         description=al.get("description"),
@@ -294,13 +296,14 @@ class CloudManager(threading.Thread):
                         modified=al.get("modified", datetime.now(tz=timezone.utc).isoformat()),
                         status="active",
                     )
+                    logging.info("activities.create.upstream - id %s, name: %s", al.get("id"), al.get("name"))
                     api_response = api_instance.create_robot_activity(body=body)
                     al["id"] = api_response.body["id"]
                     al["org_id"] = api_response.body["org_id"]
                     Activities.get_instance().save(al)
-                    logging.info("activities.create.upstream: " + al.get("name"))
+                    #logging.info("activities.create.upstream: " + al.get("name"))
                 elif ac is None and sync_mode in [SYNC_DOWNSTREAM]:
-                    Activities.get_instance().delete(al.get("name"))
+                    Activities.get_instance().delete(al.get("id"))
                     logging.info("activities.delete.downstream: " + al.get("name"))
 
             for k, ac in activities_cloud_map.items():
@@ -319,17 +322,17 @@ class CloudManager(threading.Thread):
             for al in activities_local_to_be_deleted:
                 if al.get("id") is not None:
                     logging.info("activities.delete.upstream: " + al.get("name"))
-                    api_response = api_instance.delete_robot_program(path_params={"activity_id":al.get("id")})
+                    api_response = api_instance.delete_robot_activity(path_params={"activity_id":al.get("id")})
                 # delete locally permanently
                 Activities.get_instance().delete(al.get("id"), logical=False)
 
             # manage local stock activities to be deleted locally
-            for al in activities_local_stock:
-                # logging.info("activities.check.stock.locally: " + al.get("name") + " id: " + str(al.get("id")))
-                if al.get("id") is not None and activities_cloud_map.get(al.get("id")) is None:
-                    logging.info("activities.delete.stock.locally: " + al.get("name"))
-                    # delete locally permanently
-                    Activities.get_instance().delete(al.get("id"), logical=False)
+            # for al in activities_local_stock:
+            #     # logging.info("activities.check.stock.locally: " + al.get("name") + " id: " + str(al.get("id")))
+            #     if al.get("id") is not None and activities_cloud_map.get(al.get("id")) is None:
+            #         logging.info("activities.delete.stock.locally: " + al.get("name"))
+            #         # delete locally permanently
+            #         Activities.get_instance().delete(al.get("id"), logical=False)
 
             self._sync_status["activities"] = "synced"
         except cloud_api_robot_client.ApiException as e:
@@ -370,11 +373,7 @@ class CloudManager(threading.Thread):
             for pl in programs_local_user:
                 pc = programs_cloud_map.get(pl.get("id"))
                 pc_pl_equals = (pc is not None and 
-                                pc.get("id") == pl.get("id") and 
-                                pc.get("name") == pl.get("name") and 
-                                pc.get("code") == pl.get("code") and 
-                                pc.get("dom_code") == pl.get("dom_code") and
-                                pc.get("status") == pl.get("status"))
+                                pc.get("id") == pl.get("id"))
                 logging.info("programs.syncing: " + str(pl.get("id")) + " name: " + pl.get("name"))
 
                 if pc is not None and not pc_pl_equals:
@@ -408,7 +407,7 @@ class CloudManager(threading.Thread):
                 elif pc is None and sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
                     # cloud program does not exist
                     body = Program(
-                        id="",
+                        id=pl.get("id"),
                         org_id="",
                         name=pl.get("name"),
                         description=pl.get("description", ""),
@@ -425,7 +424,7 @@ class CloudManager(threading.Thread):
                     logging.info("programs.create.upstream: " + pl.get("name"))
                 elif pc is None and sync_mode in [SYNC_DOWNSTREAM]:
                     # cloud program does not exist, delete locally since sync_mode is downstream
-                    ProgramEngine.get_instance().delete(pl.get("name"))
+                    ProgramEngine.get_instance().delete(pl.get("id"))
                     logging.info("programs.delete.downstream: " + pl.get("name"))
 
             # manage cloud programs not present locally in "active" status
@@ -447,15 +446,15 @@ class CloudManager(threading.Thread):
                     logging.info("programs.delete.upstream: " + pl.get("name"))
                     api_response = api_instance.delete_robot_program(path_params={"program_id":pl.get("id")})
                 # delete locally permanently
-                ProgramEngine.get_instance().delete(pl.get("name"), logical=False)
+                ProgramEngine.get_instance().delete(pl.get("id"), logical=False)
 
             # manage local stock programs to be deleted locally
-            for pl in programs_local_stock:
-                # logging.info("programs.check.stock.locally: " + pl.get("name") + " id: " + str(pl.get("id")))
-                if pl.get("id") is not None and programs_cloud_map.get(pl.get("id")) is None:
-                    logging.info("programs.delete.stock.locally: " + pl.get("name"))
-                    # delete locally permanently
-                    ProgramEngine.get_instance().delete(pl.get("name"), logical=False)
+            # for pl in programs_local_stock:
+            #     # logging.info("programs.check.stock.locally: " + pl.get("name") + " id: " + str(pl.get("id")))
+            #     if pl.get("id") is not None and programs_cloud_map.get(pl.get("id")) is None:
+            #         logging.info("programs.delete.stock.locally: " + pl.get("name"))
+            #         # delete locally permanently
+            #         ProgramEngine.get_instance().delete(pl.get("name"), logical=False)
             self._sync_status["programs"] = "synced"
         except cloud_api_robot_client.ApiException as e:
             logging.warn("Exception when calling programs RobotSyncApi: %s\n" % e)

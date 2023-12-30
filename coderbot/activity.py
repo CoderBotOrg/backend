@@ -54,7 +54,7 @@ class Activities():
             else:
                 self.activities.update(activity, self.query.id == activity.get("id"))
         activity = self.activities.search(self.query.id == activity.get("id"))[0]
-        logging.info("updating/creating activity: %s", str(activity))
+        logging.info("updating/creating activity - id: %s, name: %s", str(activity.get("id")), str(activity.get("name")))
         return activity
 
     def delete(self, id, logical = True):
