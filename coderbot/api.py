@@ -292,7 +292,7 @@ def saveNewProgram(body):
 
 def saveProgram(id, body):
     overwrite = body.get("overwrite")
-    name = body["name"]
+    name = body.get("name", None)
     existing_program = prog_engine.load(id)
     if existing_program is None:
         return {}, 404
