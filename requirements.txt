@@ -23,7 +23,7 @@ numpy==1.24.3
 Pillow==10.1.0
 protobuf==4.25.1
 opencv-contrib-python==4.5.5.62
-tflite-runtime==2.12.0
+tflite-runtime==2.13.0
 pytesseract==0.3.10
 picamera==1.13
 pyzbar==0.1.9

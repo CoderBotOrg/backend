@@ -192,9 +192,9 @@ class Program:
     def dom_code(self):
         return self._dom_code
 
-    def __init__(self, name, id=str(uuid.uuid4()), description=None, code=None, dom_code=None, kind=PROGRAM_KIND_USER, modified=None, status=None):
+    def __init__(self, name, id=None, description=None, code=None, dom_code=None, kind=PROGRAM_KIND_USER, modified=None, status=None):
         self._thread = None
-        self._id = id
+        self._id = id if id is not None else str(uuid.uuid4())
         self._name = name
         self._description = description
         self._dom_code = dom_code

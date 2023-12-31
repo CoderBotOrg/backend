@@ -19,7 +19,7 @@ from config import Config
 from cnn.cnn_manager import CNNManager
 from event import EventManager
 from coderbot import CoderBot
-from cloud import CloudManager
+from cloud.sync import CloudManager
 
 # Logging configuration
 logger = logging.getLogger()
@@ -66,6 +66,10 @@ def run_server():
     try:
         try:
             settings = Config.read().get("settings")
+            # if settings.get("id") is None:
+            #     settings["id"] = str(uuid.uuid4()) # init uuid for local settings
+            #     Config.write()
+
             app.settings = settings
             network_settings = Config.read().get("network")
 

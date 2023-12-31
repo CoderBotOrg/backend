@@ -122,7 +122,7 @@ class CloudManager(threading.Thread):
 
     def run(self):
         while(True):
-            sync_period = int(Config.read().get("sync_period", "60"))
+            sync_period = int(Config.read().get("cloud").get("sync_period", "60"))
             self.sync()
             sleep(sync_period)
 
@@ -152,11 +152,12 @@ class CloudManager(threading.Thread):
                     # Create an instance of the API class
                     api_instance = robot_sync_api.RobotSyncApi(api_client)
                     
-                    #self.sync_settings(api_instance, sync_modes["settings"])
+                    self.sync_settings(api_instance, sync_modes["settings"])
                     self.sync_activities(api_instance, sync_modes["activities"])
                     self.sync_programs(api_instance, sync_modes["programs"])
             except Exception as e:
                 logging.warn("run.sync.api_not_available: " + str(e))
+                raise e
        
         logging.info("run.sync.end")
         self._syncing = False
@@ -193,32 +194,30 @@ class CloudManager(threading.Thread):
             api_response = api_instance.get_robot_setting()
             cloud_setting_object = api_response.body
             cloud_setting = json.loads(cloud_setting_object.get('data'))
-
             # sync only the "settings" and "cloud" sections, do not sync "network"
             config = Config.read()
             local_setting = {
-                "settings": config.get("settings"),
-                #"cloud": config.get("cloud")
+                "settings": config.get("settings")
             }
             local_most_recent = datetime.fromisoformat(cloud_setting_object.get("modified")).timestamp() < Config.modified()
             cloud_kind_user = cloud_setting_object.get("kind") == ENTITY_KIND_USER
+            # logging.info(f"cloud_kind_user: {cloud_kind_user}, cloud_setting != local_setting: {cloud_setting != local_setting}, local_most_recent: {local_most_recent}, sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]: {sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]}")
             # logging.info("settings.syncing: " + cloud_setting_object.get("id", "") + " name: " + cloud_setting_object.get("name", ""))
-            if cloud_kind_user and cloud_setting != local_setting and local_most_recent:
+            if cloud_kind_user and cloud_setting != local_setting and local_most_recent and sync_mode in [SYNC_UPSTREAM, SYNC_BIDIRECTIONAL]:
                 body = Setting(
                     id = cloud_setting_object.get('id'),
                     org_id = cloud_setting_object.get('org_id'),
                     name = cloud_setting_object.get('name'),
                     description = cloud_setting_object.get('description'),
                     data = json.dumps(local_setting),
-                    kind = local_setting.get("kind", ENTITY_KIND_STOCK),
+                    kind = cloud_setting_object.get("kind"),
                     modified = datetime.now().isoformat(),
                     status = cloud_setting_object.get('status'),
                 )
                 api_response = api_instance.set_robot_setting(body)
                 logging.info("settings.upstream")
-            elif cloud_setting != local_setting: # setting, down
+            elif cloud_setting != local_setting and sync_mode in [SYNC_DOWNSTREAM, SYNC_BIDIRECTIONAL]: # setting, down
                 config["settings"] = cloud_setting["settings"]
-                #config["cloud"] = cloud_setting["cloud"]
                 Config.write(config) 
                 logging.info("settings.downstream")
             self._sync_status["settings"] = "synced"

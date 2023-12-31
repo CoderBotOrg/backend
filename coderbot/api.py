@@ -23,7 +23,7 @@ from runtime_test import run_test
 from musicPackages import MusicPackageManager
 from program import Program, ProgramEngine
 from motion import Motion
-from cloud import CloudManager
+from cloud.sync import CloudManager
 
 from balena import Balena
 from coderbot import CoderBot
