@@ -39,8 +39,7 @@ class Image():
     _aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_ARUCO_ORIGINAL)
     _aruco_parameters = cv2.aruco.DetectorParameters_create()
 
-    #_face_cascade = cv2.CascadeClassifier('/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml')
-    _face_cascade = cv2.CascadeClassifier('/usr/share/opencv/lbpcascades/lbpcascade_frontalface.xml')
+    _face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
     def __init__(self, array):
         self._data = array
@@ -85,7 +84,8 @@ class Image():
         return tx
 
     def find_faces(self):
-        faces = self._face_cascade.detectMultiScale(self._data)
+        gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
+        faces = self._face_cascade.detectMultiScale(gray)
         return faces
 
     def filter_color(self, color):
