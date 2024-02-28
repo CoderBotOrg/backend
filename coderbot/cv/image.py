@@ -84,7 +84,8 @@ class Image():
         return tx
 
     def find_faces(self):
-        faces = self._face_cascade.detectMultiScale(self._data)
+        gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
+        faces = self._face_cascade.detectMultiScale(gray)
         return faces
 
     def filter_color(self, color):
