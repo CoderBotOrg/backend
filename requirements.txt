@@ -1,31 +1,31 @@
 # API framework
 connexion==2.14.2
-Flask==2.2.3
+Flask==2.3.3
 Flask-Cors==3.0.10
-tinydb==4.7.1
-Werkzeug==2.2.3
+tinydb==4.8.0
+Werkzeug==2.3.8
 
 # Misc utils
-setuptools==67.4.0
+setuptools==69.2.0
 event-channel==0.4.3
 
 # IO extensions
 pigpio==1.78
-smbus2==0.4.2
-spidev==3.5
+smbus2==0.4.3
+spidev==3.6
 
 # Audio
 sox==1.4.1
-PyAudio==0.2.12
-pyalsaaudio==0.9.2
+PyAudio==0.2.14
+pyalsaaudio==0.10.0
 
 # Computer Vision
-grpcio==1.48.1
-numpy==1.24.2
-Pillow==9.4.0
-protobuf==4.22.0
+grpcio==1.62.1
+numpy==1.26.4
+Pillow==10.2.0
+protobuf==4.25.2
 opencv-contrib-python==4.5.5.62
-tflite-runtime==2.11.0
+tflite-runtime==2.14.0
 pytesseract==0.3.10
 picamera==1.13
 pyzbar==0.1.9
