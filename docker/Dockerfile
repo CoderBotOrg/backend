@@ -33,7 +33,8 @@ RUN install_packages \
  zbar-tools \
  libzbar0 \
  sox \
- libsox-fmt-all
+ libsox-fmt-all \
+ libopenblas-dev
 RUN install_packages \
  avrdude \
  tesseract-ocr \
