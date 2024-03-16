@@ -29,6 +29,7 @@ RUN apt-get update -y && apt-get install -y \
  libzbar0 \
  sox \
  libsox-fmt-all \
+ libopenblas-dev \
  avrdude \
  tesseract-ocr \
  tesseract-ocr-eng \
