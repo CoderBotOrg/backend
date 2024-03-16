@@ -1,4 +1,4 @@
-FROM coderbot/rpi-debian:bullseye-20220923
+FROM coderbot/rpi-debian:bullseye-20240227
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
