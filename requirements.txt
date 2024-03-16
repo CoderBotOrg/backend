@@ -1,6 +1,6 @@
 # API framework
 connexion==2.14.2
-Flask==2.3.3
+Flask==2.2.5
 Flask-Cors==3.0.10
 tinydb==4.8.0
 Werkzeug==2.2.3
