@@ -36,8 +36,9 @@ class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
     r_dest = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
 
-    _aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
-    _aruco_parameters = cv2.aruco.DetectorParameters_create()
+    _aruco_detector = cv2.aruco.DetectorParameters(
+        cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL), 
+        cv2.aruco.DetectorParameters())
 
     _face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
@@ -254,7 +255,7 @@ class Image():
 
     def find_ar_code(self):
         gray = cv2.cvtColor(self._data, cv2.COLOR_BGR2GRAY)
-        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, self._aruco_dict, parameters=self._aruco_parameters)
+        corners, ids, rejectedImgPoints = self._aruco_detector.detectMarkers(gray)
         codes = []
         positions = []
         if ids is not None:
