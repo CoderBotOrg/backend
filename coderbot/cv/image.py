@@ -36,7 +36,7 @@ class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
     r_dest = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
 
-    _aruco_detector = cv2.aruco.DetectorParameters(
+    _aruco_detector = cv2.aruco.ArucoDetector(
         cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL), 
         cv2.aruco.DetectorParameters())
 
