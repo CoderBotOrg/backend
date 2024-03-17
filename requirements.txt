@@ -24,7 +24,7 @@ grpcio==1.62.1
 numpy==1.26.4
 Pillow==10.2.0
 protobuf==4.25.2
-opencv-contrib-python==4.5.5.62
+opencv-contrib-python==4.9.0.80
 tflite-runtime==2.11.0
 pytesseract==0.3.10
 picamera==1.13

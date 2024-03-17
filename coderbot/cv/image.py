@@ -36,7 +36,7 @@ class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
     r_dest = np.float32([[0, -120], [640, -120], [380, 480], [260, 480]])
 
-    _aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_ARUCO_ORIGINAL)
+    _aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_ARUCO_ORIGINAL)
     _aruco_parameters = cv2.aruco.DetectorParameters_create()
 
     _face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
