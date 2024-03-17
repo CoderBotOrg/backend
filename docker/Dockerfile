@@ -46,7 +46,8 @@ RUN install_packages \
 
 ENV READTHEDOCS=True
 ADD requirements.txt /tmp/.
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --upgrade pip && \
+  pip install --no-cache-dir -r /tmp/requirements.txt
 
 RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \

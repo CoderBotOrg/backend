@@ -39,7 +39,8 @@ RUN apt-get update -y && apt-get install -y \
  tesseract-ocr-deu
 
 ADD docker/stub/requirements.txt /tmp/.
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --upgrade pip && \
+ pip install --no-cache-dir -r /tmp/requirements.txt
 
 RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \
