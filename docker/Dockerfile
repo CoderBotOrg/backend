@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN install_packages \
  patch \
- gcc \
+ build-essential \
  libraspberrypi0 \
  procps \
  sudo \
