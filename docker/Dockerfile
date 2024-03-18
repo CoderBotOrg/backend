@@ -16,6 +16,7 @@ RUN install_packages \
  portaudio19-dev \
  python3 \
  python3-pip \
+ python3-dev \
  libopenjp2-7-dev \
  libtiff5 \
  libatlas-base-dev \
