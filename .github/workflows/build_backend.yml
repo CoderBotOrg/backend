@@ -56,15 +56,15 @@ jobs:
         # generate Docker tags based on the following events/attributes
         tags: |
           # always latest
-          type=raw,value=latest
+          type=raw,value=latest,suffix=-${{ matrix.architecture.tag }}
           # branch event
-          type=ref,event=branch
+          type=ref,event=branch,suffix=-${{ matrix.architecture.tag }}
           # tag event
-          type=ref,event=tag
+          type=ref,event=tag,suffix=-${{ matrix.architecture.tag }}
           # pull request event
-          type=ref,event=pr
+          type=ref,event=pr,suffix=-${{ matrix.architecture.tag }}
           # push event
-          type=sha,enable=true,prefix=git-,format=short
+          type=sha,enable=true,prefix=git-,format=short,suffix=-${{ matrix.architecture.tag }}
     - uses: actions/checkout@v3 # Checking out the repo
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -78,7 +78,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and push
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
           push: true
           build-args: CODERBOT_VERSION=${{github.ref_name}}-${{github.sha}}
