@@ -39,6 +39,13 @@ jobs:
   release-backend:
     needs: [test]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: 
+          - arch: linux/arm/v7
+            dockerfile: Dockerfile
+          - arch: linux/arm/v8
+            dockerfile: Dockerfile.arm64
     steps:
     - name: Docker meta
       id: meta
@@ -75,10 +82,10 @@ jobs:
       with:
           push: true
           build-args: CODERBOT_VERSION=${{github.ref_name}}-${{github.sha}}
-          platforms: linux/arm/v7
+          platforms: ${{ matrix.architecture.arch }}
           tags: ${{ steps.meta.outputs.tags }}
           context: .
-          file: docker/Dockerfile
+          file: docker/${{ matrix.architecture.dockerfile }}
           cache-from: type=registry,ref=ghcr.io/coderbotorg/backend:latest
           cache-to: type=inline
 
