@@ -29,7 +29,7 @@ logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
 
 # Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
 #  from the folder 'swagger-ui'. Clone the 'swagger-ui' repository inside the backend folder
-wagger_ui_options = SwaggerUIOptions(swagger_ui=True)
+swagger_ui_options = SwaggerUIOptions(swagger_ui=True)
 app = connexion.App(__name__, swagger_ui_options=swagger_ui_options)
 app.add_middleware(
     CORSMiddleware,
