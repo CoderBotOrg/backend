@@ -8,7 +8,9 @@ import logging.handlers
 import picamera
 import connexion
 
-from flask_cors import CORS
+from connexion.options import SwaggerUIOptions
+from connexion.middleware import MiddlewarePosition
+from starlette.middleware.cors import CORSMiddleware
 
 from camera import Camera
 from motion import Motion
@@ -22,29 +24,27 @@ from coderbot import CoderBot
 # Logging configuration
 logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOGLEVEL", "INFO"))
-# sh = logging.StreamHandler()
-# formatter = logging.Formatter('%(message)s')
-# sh.setFormatter(formatter)
-# logger.addHandler(sh)
 
 ## (Connexion) Flask app configuration
 
 # Serve a custom version of the swagger ui (Jinja2 templates) based on the default one
 #  from the folder 'swagger-ui'. Clone the 'swagger-ui' repository inside the backend folder
-options = {"swagger_ui": False}
-connexionApp = connexion.App(__name__, options=options)
-
-# Connexion wraps FlaskApp, so app becomes connexionApp.app
-app = connexionApp.app
-# Access-Control-Allow-Origin
-CORS(app)
-app.debug = False
+wagger_ui_options = SwaggerUIOptions(swagger_ui=True)
+app = connexion.App(__name__, swagger_ui_options=swagger_ui_options)
+app.add_middleware(
+    CORSMiddleware,
+    position=MiddlewarePosition.BEFORE_EXCEPTION,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.prog_engine = ProgramEngine.get_instance()
 
 ## New API and web application
 
 # API v1 is defined in v1.yml and its methods are in api.py
-connexionApp.add_api('v1.yml')
+app.add_api('v1.yml')
 
 def button_pushed():
     if app.bot_config.get('button_func') == "startstop":
@@ -97,7 +97,7 @@ def run_server():
 
         remove_doreset_file()
 
-        app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False, threaded=True)
+        app.run(host="0.0.0.0", port=5000)
     finally:
         if cam:
             cam.exit()
