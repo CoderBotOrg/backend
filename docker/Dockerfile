@@ -1,10 +1,9 @@
-FROM coderbot/rpi-debian:bullseye-20240227
+FROM balenalib/raspberrypi3:bullseye-20240304
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN install_packages \
- patch \
  build-essential \
  libraspberrypi0 \
  procps \
