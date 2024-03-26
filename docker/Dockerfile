@@ -1,4 +1,4 @@
-FROM balenalib/raspberrypi3:bullseye-20240304
+FROM balenalib/raspberrypi3:bullseye-20240227
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
