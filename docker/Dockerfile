@@ -5,7 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN install_packages \
  build-essential \
- libraspberrypi0 \
  procps \
  sudo \
  wget \
@@ -17,7 +16,7 @@ RUN install_packages \
  python3-pip \
  python3-dev \
  libopenjp2-7-dev \
- libtiff5 \
+ libtiff5-dev \
  libatlas-base-dev \
  libhdf5-dev \
  alsa-utils \
