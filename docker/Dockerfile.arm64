@@ -1,4 +1,4 @@
-FROM balenalib/raspberrypi3-64:bullseye-20240304
+FROM coderbot/raspberrypi3-64:bullseye-20240304
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
