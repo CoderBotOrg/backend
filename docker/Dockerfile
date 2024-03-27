@@ -4,7 +4,6 @@ ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN install_packages \
- build-essential \
  libraspberrypi0 \
  procps \
  sudo \
