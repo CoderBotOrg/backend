@@ -21,8 +21,7 @@ grpcio==1.62.1
 numpy==1.26.4
 Pillow==10.2.0
 protobuf==4.25.2
-cmake==3.28.4
-opencv-contrib-python-headless==4.9.0.80
+opencv-contrib-python-headless==4.8.1.78
 tflite-runtime
 pytesseract==0.3.10
 picamera==1.13
