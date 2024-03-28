@@ -23,11 +23,11 @@ RUN install_packages \
  espeak
 RUN install_packages \
  libharfbuzz-bin \
- libwebp6 \
- libilmbase25 \
+ webp6 \
+ libilmbase-dev \
  libgstreamer1.0-0 \
- libavcodec-extra58 \
- libavformat58
+ libavcodec-extra59 \
+ libavformat59
 RUN install_packages \
  libopencv-dev \
  zbar-tools \
