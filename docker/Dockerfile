@@ -22,7 +22,7 @@ RUN install_packages \
  espeak
 RUN install_packages \
  libharfbuzz-bin \
- lwebp \
+ webp \
  libilmbase-dev \
  libgstreamer1.0-0 \
  libavcodec-extra59 \
