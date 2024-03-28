@@ -45,7 +45,7 @@ RUN install_packages \
 
 ENV READTHEDOCS=True
 ADD requirements.txt /tmp/.
-RUN pip install --upgrade pip && \
+RUN pip install --break-system-packages --upgrade pip && \
   pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 RUN mkdir -p /coderbot && \
