@@ -4,7 +4,7 @@ ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN install_packages \
- cmake \
+ cmake ninja-build \
  procps \
  sudo \
  wget \
