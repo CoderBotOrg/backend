@@ -24,5 +24,4 @@ protobuf==4.25.2
 opencv-contrib-python-headless==4.8.1.78
 tflite-runtime
 pytesseract==0.3.10
-picamera==1.13
 pyzbar==0.1.9

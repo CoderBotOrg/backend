@@ -60,22 +60,23 @@ class Camera(object):
 
     def __init__(self):
         logging.info("starting camera")
+        cfg = config.Config.get()
         cam_props = {"width":640, "height":512,
-                     "cv_image_factor": config.Config.get().get("cv_image_factor"),
-                     "exposure_mode": config.Config.get().get("camera_exposure_mode"),
-                     "framerate": config.Config.get().get("camera_framerate"),
-                     "bitrate": config.Config.get().get("camera_jpeg_bitrate"),
-                     "jpeg_quality": int(config.Config.get().get("camera_jpeg_quality"))}
+                     "cv_image_factor": cfg.get("cv_image_factor"),
+                     "exposure_mode": cfg.get("camera_exposure_mode"),
+                     "framerate": cfg.get("camera_framerate"),
+                     "bitrate": cfg.get("camera_jpeg_bitrate"),
+                     "jpeg_quality": int(cfg.get("camera_jpeg_quality"))}
         self._camera = camera.Camera(props=cam_props)
         self.recording = False
         self.video_start_time = time.time() + 8640000
         self._image_time = 0
-        self._cv_image_factor = int(config.Config.get().get("cv_image_factor", 4))
-        self._image_refresh_timeout = float(config.Config.get().get("camera_refresh_timeout", 0.1))
-        self._color_object_size_min = int(config.Config.get().get("camera_color_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
-        self._color_object_size_max = int(config.Config.get().get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
-        self._path_object_size_min = int(config.Config.get().get("camera_path_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
-        self._path_object_size_max = int(config.Config.get().get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
+        self._cv_image_factor = int(cfg.get("cv_image_factor", 4))
+        self._image_refresh_timeout = float(cfg.get("camera_refresh_timeout", 0.1))
+        self._color_object_size_min = int(cfg.get("camera_color_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
+        self._color_object_size_max = int(cfg.get("camera_color_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
+        self._path_object_size_min = int(cfg.get("camera_path_object_size_min", 80)) / (self._cv_image_factor * self._cv_image_factor)
+        self._path_object_size_max = int(cfg.get("camera_path_object_size_max", 32000)) / (self._cv_image_factor * self._cv_image_factor)
         self.load_photo_metadata()
         if not self._photos:
             self._photos = []
@@ -86,7 +87,7 @@ class Camera(object):
             self.save_photo_metadata()
 
         self._cnn_classifiers = {}
-        cnn_model = config.Config.get().get("cnn_default_model", "")
+        cnn_model = cfg.get("cnn_default_model", "")
         if cnn_model != "":
             try:
                 self._cnn_classifiers[cnn_model] = CNNManager.get_instance().load_model(cnn_model)

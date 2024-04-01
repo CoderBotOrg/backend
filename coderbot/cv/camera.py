@@ -25,7 +25,9 @@ import os
 import logging
 from threading import Condition
 import numpy as np
-import picamera
+from picamera2 import Picamera2
+from picamera2.encoders import Encoder, MJPEGEncoder, H264Encoder
+from picamera2.outputs import FileOutput, FfmpegOutput
 
 class Camera(object):
 
@@ -34,29 +36,21 @@ class Camera(object):
     VIDEO_FILE_EXT = ".mp4"
     VIDEO_FILE_EXT_H264 = '.h264'
 
-    class StreamingOutputMJPEG(object):
+    class StreamingOutputMJPEG(io.BufferedIOBase):
         def __init__(self):
             self.frame = None
-            self.buffer = io.BytesIO()
             self.condition = Condition()
 
         def write(self, buf):
-            if buf.startswith(b'\xff\xd8'):
-                # New frame, copy the existing buffer's content and notify all
-                # clients it's available
-                self.buffer.truncate()
-                with self.condition:
-                    self.frame = self.buffer.getvalue()
-                    self.condition.notify_all()
-                self.buffer.seek(0)
-            return self.buffer.write(buf)
+            with self.condition:
+                self.frame = buf
+                self.condition.notify_all()
 
-    class StreamingOutputBGR(object):
+    class StreamingOutputBGR(io.BufferedIOBase):
         def __init__(self, resolution):
             self.frame = None
             self.condition = Condition()
             self.resolution = resolution
-            self.count = 0
 
         def write(self, buf):
             with self.condition:
@@ -64,18 +58,21 @@ class Camera(object):
                 self.frame = frame.reshape(self.resolution[1], self.resolution[0], 4)
                 self.frame = np.delete(self.frame, 3, 2)
                 self.condition.notify_all()
-            return len(buf)
 
     def __init__(self, props):
         logging.info("camera init")
-        self.camera = picamera.PiCamera()
+        self.camera = Picamera2()
+        self.camera.configure(self.camera.create_video_configuration(main={"size": (props.get('width', 640), props.get('height', 512))}))
         self.camera.resolution = (props.get('width', 640), props.get('height', 512))
-        self.out_rgb_resolution = (int(self.camera.resolution[0] / int(props.get('cv_image_factor', 4))), int(self.camera.resolution[1] / int(props.get('cv_image_factor', 4))))
+        self.out_rgb_resolution = (int(props.get('width', 640) / int(props.get('cv_image_factor', 4))), int(props.get('height', 512) / int(props.get('cv_image_factor', 4))))
         self.camera.framerate = float(props.get('framerate', 20))
         self.camera.exposure_mode = props.get('exposure_mode', "auto")
         self.output_mjpeg = self.StreamingOutputMJPEG()
-        self.output_bgr = self.StreamingOutputBGR(self.out_rgb_resolution)
-        self.h264_encoder = None
+        self.encoder_streaming = MJPEGEncoder(10000000)
+        self.encoder_streaming.output = [FileOutput(self.output_mjpeg)]
+        self.encoder_h264 = H264Encoder()
+        #self.output_bgr = self.StreamingOutputBGR(self.out_rgb_resolution)
+        #self.h264_encoder = None
         self.recording = None
         self.video_filename = None
         self._jpeg_quality = props.get('jpeg_quality', 20)
@@ -83,31 +80,27 @@ class Camera(object):
 
     def video_rec(self, filename):
         self.video_filename = filename[:filename.rfind(".")]
-        self.camera.start_recording(self.video_filename + self.VIDEO_FILE_EXT_H264, format="h264", quality=23, splitter_port=2)
+        output = FfmpegOutput(output_filename=filename)
+        self.encoder_h264.output = [output]
+        self.camera.start_encoder(self.encoder_h264, output)
+        #self.camera.start_recording(self.encoder_h264, FfmpegOutput(output_filename=filename))
+        #self.camera.start_recording(self.video_filename + self.VIDEO_FILE_EXT_H264, format="h264", quality=23, splitter_port=2)
 
     def video_stop(self):
-        logging.debug("video_stop")
-        self.camera.stop_recording(2)
-
-        # pack in mp4 container
-        params = " -loglevel quiet -stats -framerate " + str(self.camera.framerate) + \
-                 " -i "  + self.video_filename + self.VIDEO_FILE_EXT_H264 + \
-                 " -c copy " + self.video_filename + self.VIDEO_FILE_EXT
-
-        os.system(self.FFMPEG_CMD + params)
-        # remove h264 file
-        os.remove(self.video_filename + self.VIDEO_FILE_EXT_H264)
+        logging.info("video_stop")
+        self.camera.stop_encoder(encoders=[self.encoder_h264])
+        #self.camera.stop_recording()
 
     def grab_start(self):
-        logging.debug("grab_start")
-        self.camera.start_recording(self.output_mjpeg, format="mjpeg", splitter_port=0, bitrate=self._jpeg_bitrate)
-        self.camera.start_recording(self.output_bgr, format="bgra", splitter_port=1, resize=self.out_rgb_resolution)
+        logging.info("grab_start")
+        self.camera.start()
+        self.camera.start_encoder(self.encoder_streaming)
+        #self.camera.start_recording(self.output_mjpeg, format="mjpeg", splitter_port=0, bitrate=self._jpeg_bitrate)
+        #self.camera.start_recording(self.output_bgr, format="bgra", splitter_port=1, resize=self.out_rgb_resolution)
 
     def grab_stop(self):
-        logging.debug("grab_stop")
-
-        self.camera.stop_recording(0)
-        self.camera.stop_recording(1)
+        logging.info("grab_stop")
+        self.camera.stop_encoder(encoders=[self.encoder_streaming])
 
     def get_image_jpeg(self):
         with self.output_mjpeg.condition:
@@ -115,9 +108,11 @@ class Camera(object):
             return self.output_mjpeg.frame
 
     def get_image_bgr(self):
-        with self.output_bgr.condition:
-            self.output_bgr.condition.wait()
-            return self.output_bgr.frame
+        buf = self.camera.capture_buffer()
+        frame_from_buf = np.frombuffer(buf, dtype=np.uint8)
+        frame = frame_from_buf.reshape(self.camera.resolution[1], self.camera.resolution[0], 4)
+        frame = np.delete(frame, 3, 2)
+        return frame
 
     def set_overlay_text(self, text):
         try:
