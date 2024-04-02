@@ -9,7 +9,7 @@ import numpy
 
 logger = logging.getLogger()
 
-class PiCameraMock(object):
+class Picamera2Mock(object):
     """Implements PiCamera mock class
     PiCamera is the library used to access the integrated Camera, this mock class emulates the capture functions in order to test the streamer loop.
     """
@@ -27,6 +27,11 @@ class PiCameraMock(object):
         self.images["mjpeg"] = image_jpeg 
         self.images["bgra"] = cv2.cvtColor(numpy.array(PILImage.open(io.BytesIO(image_jpeg))), cv2.COLOR_RGB2BGRA)
         
+    def configure(self, configuration):
+        pass
+
+    def create_video_configuration(self, main):
+        return {}
 
     class ImageRecorder(threading.Thread):
         def __init__(self, buffer, image):
@@ -44,6 +49,9 @@ class PiCameraMock(object):
         def __init__(self, buffer, video):
             self.buffer = buffer
             self.video = video
+
+    def start(self):
+        pass
 
     def start_recording(self, buffer, format, splitter_port, quality=None, bitrate=None, resize=None):
         """mock start_recording"""
@@ -68,6 +76,15 @@ class PiCameraMock(object):
             f = open(recorder.buffer, "wb")
             f.write(recorder.video)
             f.close()
+
+    def start_encoder(self, encoder):
+        pass
+
+    def stop_encoder(self, encoders):
+        pass
+
+    def capture_buffer(self):
+        return self.images["bgra"]
 
     def close():
         """mock close"""

@@ -1,0 +1,7 @@
+WARNING:root:tensorflow not available (for training)
+WARNING:root:tensorflow not available (for inference)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.610s
+
+OK
