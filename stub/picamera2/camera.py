@@ -1,4 +1,4 @@
-from picamera_mock import PiCameraMock as PiCamera
+from picamera2_mock import Picamera2Mock as Picamera2
 
 class array(object):
     def __init(self):

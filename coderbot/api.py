@@ -9,7 +9,6 @@ import subprocess
 import urllib
 
 import connexion
-import picamera
 from flask import Response, request, send_file
 from werkzeug.datastructures import Headers
 
@@ -213,7 +212,7 @@ def getPhoto(name):
     try:
         media_file = cam.get_photo_file(name)
         return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), max_age=0)
-    except picamera.exc.PiCameraError as e:
+    except Exception as e:
         logging.error("Error: %s", str(e))
         return 503
     except FileNotFoundError:

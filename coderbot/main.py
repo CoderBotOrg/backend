@@ -5,7 +5,6 @@ CoderBot REST API and static resources
 import os
 import logging
 import logging.handlers
-import picamera
 import connexion
 
 from connexion.options import SwaggerUIOptions
@@ -78,10 +77,11 @@ def run_server():
                 logging.warning("Audio not present")
 
             try:
+                logging.info("starting camera")
                 cam = Camera.get_instance()
                 Motion.get_instance()
-            except picamera.exc.PiCameraError:
-                logging.warning("Camera not present")
+            except Exception as e:
+                logging.warning("Camera not present", str(e))
 
             CNNManager.get_instance()
             EventManager.get_instance("coderbot")
