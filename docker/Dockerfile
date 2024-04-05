@@ -26,6 +26,7 @@ RUN install_packages \
  libhdf5-dev \
  alsa-utils \
  espeak \
+ python3-libcamera \
  python3-picamera2
 RUN install_packages \
  libharfbuzz-bin \
