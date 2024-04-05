@@ -26,7 +26,7 @@ RUN install_packages \
  libhdf5-dev \
  alsa-utils \
  espeak \
- python-picamera2
+ python3-picamera2
 RUN install_packages \
  libharfbuzz-bin \
  webp \
