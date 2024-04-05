@@ -25,7 +25,8 @@ RUN install_packages \
  libatlas-base-dev \
  libhdf5-dev \
  alsa-utils \
- espeak
+ espeak \
+ python-picamera2
 RUN install_packages \
  libharfbuzz-bin \
  webp \
