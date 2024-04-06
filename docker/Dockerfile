@@ -3,6 +3,11 @@ FROM coderbot/raspberrypi3:bullseye-20240227
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN install_packages gnupg
+
+RUN echo "deb http://archive.raspberrypi.org/debian/ bullseye main" > /etc/apt/sources.list.d/raspi.list \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
+
 RUN install_packages \
  libraspberrypi0 \
  procps \
@@ -20,7 +25,8 @@ RUN install_packages \
  libatlas-base-dev \
  libhdf5-dev \
  alsa-utils \
- espeak
+ espeak \
+ python3-picamera2
 RUN install_packages \
  libharfbuzz-bin \
  libwebp6 \
