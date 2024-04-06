@@ -1,4 +1,4 @@
-FROM coderbot/raspberrypi3:bullseye-20240227
+FROM balenalib/raspberrypi3:bookworm-20240227
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,7 +9,7 @@ RUN echo "deb http://archive.raspberrypi.org/debian/ bullseye main" > /etc/apt/s
   && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 RUN install_packages \
- libraspberrypi0 \
+ build-essential \
  procps \
  sudo \
  wget \
@@ -21,7 +21,7 @@ RUN install_packages \
  python3-pip \
  python3-dev \
  libopenjp2-7-dev \
- libtiff5 \
+ libtiff5-dev \
  libatlas-base-dev \
  libhdf5-dev \
  alsa-utils \
@@ -29,11 +29,11 @@ RUN install_packages \
  python3-picamera2
 RUN install_packages \
  libharfbuzz-bin \
- libwebp6 \
- libilmbase25 \
+ webp \
+ libilmbase-dev \
  libgstreamer1.0-0 \
- libavcodec-extra58 \
- libavformat58
+ libavcodec-extra59 \
+ libavformat59
 RUN install_packages \
  libopencv-dev \
  zbar-tools \
@@ -52,8 +52,8 @@ RUN install_packages \
 
 ENV READTHEDOCS=True
 ADD requirements.txt /tmp/.
-RUN pip install --upgrade pip && \
-  pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --break-system-packages --upgrade pip && \
+  pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \

@@ -170,9 +170,10 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
+
       tags:
         - Program management
       responses:
@@ -187,9 +188,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       responses:
         200:
           description: "ok"
@@ -206,9 +207,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       requestBody:
         description: Program object
         required: true
@@ -234,9 +235,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       requestBody:
         description: Program object
         required: true
@@ -260,9 +261,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       responses:
         200:
           description: "ok"
@@ -279,9 +280,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       responses:
         200:
           description: "ok"
@@ -322,9 +323,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
         - name: default
           in: query
           schema:
@@ -344,9 +345,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       requestBody:
         description: Update Activity
         required: true
@@ -370,9 +371,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       responses:
         200:
           description: "ok"
@@ -413,9 +414,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       tags:
         - Music extensions
       responses:
@@ -617,9 +618,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
             minLength: 1
             maxLength: 128
+            pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       tags:
         - CNN Models
       responses:
@@ -634,6 +635,8 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 128
             pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
       tags:
         - CNN Models
@@ -722,9 +725,9 @@ components:
       properties:
         name:
           type: string
-          pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
           minLength: 1
           maxLength: 128
+          pattern: '^[a-zA-ZA-zÀ-ú0-9-_ ]+$'
         code:
           type: string
           minLength: 1

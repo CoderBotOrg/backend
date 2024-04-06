@@ -27,7 +27,7 @@ jobs:
         mkdir -p schemathesis
         python3 -m venv schemathesis
         . schemathesis/bin/activate
-        pip install schemathesis==3.24.3
+        pip install schemathesis==3.24.3 
         st run --endpoint 'activities' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         #st run --endpoint 'media' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
         st run --endpoint 'control/speak' --hypothesis-max-examples=10 --request-timeout=20 http://localhost:5000/api/v1/openapi.json
