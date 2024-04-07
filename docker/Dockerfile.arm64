@@ -29,11 +29,11 @@ RUN install_packages \
  python3-picamera2
 RUN install_packages \
  libharfbuzz-bin \
- webp \
- libilmbase-dev \
+ libwebp6 \
+ libilmbase25 \
  libgstreamer1.0-0 \
- libavcodec-extra59 \
- libavformat59
+ libavcodec-extra58 \
+ libavformat58
 RUN install_packages \
  libopencv-dev \
  zbar-tools \
