@@ -9,6 +9,7 @@ RUN echo "deb http://archive.raspberrypi.org/debian/ bullseye main" > /etc/apt/s
   && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 RUN install_packages \
+ libraspberrypi0 \
  build-essential \
  procps \
  sudo \
