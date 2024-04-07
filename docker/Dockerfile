@@ -27,7 +27,7 @@ RUN install_packages \
  webp \
  libilmbase-dev \
  libgstreamer1.0-0 \
- libavcodec-extra59 \
+ libavcodec-extra58 \
  libavformat59
 RUN install_packages \
  libopencv-dev \
