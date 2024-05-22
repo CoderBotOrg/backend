@@ -29,3 +29,4 @@ tflite-runtime==2.11.0
 pytesseract==0.3.10
 picamera==1.13
 pyzbar==0.1.9
+requests>=2.32.0 # not directly required, pinned by Snyk to avoid a vulnerability
