@@ -157,8 +157,10 @@ class CoderBot(object):
             s.cancel()
 
     @classmethod
-    def get_instance(cls, motor_trim_factor=1.0, motor_max_power=100, motor_min_power=0, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
+    def get_instance(cls, motor_trim_factor=1.0, motor_max_power=100, motor_min_power=0, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01), from_defaults=True):
         if not cls.the_bot:
+            if from_defaults:
+                raise ValueError("incorrect CoderBot initialisation")
             cls.the_bot = CoderBot(motor_trim_factor=motor_trim_factor,  motor_max_power= motor_max_power, motor_min_power=motor_min_power, hw_version=hw_version, pid_params=pid_params)
         return cls.the_bot
 
