@@ -87,12 +87,13 @@ class ProgramEngine:
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
-                    logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
-                    with open(os.path.join(dirname, filename), "r") as f:
-                        program_dict = json.load(f)
-                        program_dict["default"] = "default" in dirname
-                        program = Program.from_dict(program_dict)
-                        self.save(program)
+                    if self._programs.search(query.name == program_name) == []:
+                        logging.info("adding program %s in path %s as default %r", program_name, dirname, ("default" in dirname))
+                        with open(os.path.join(dirname, filename), "r") as f:
+                            program_dict = json.load(f)
+                            program_dict["default"] = "default" in dirname
+                            program = Program.from_dict(program_dict)
+                            self.save(program)
 
     @classmethod
     def get_instance(cls):

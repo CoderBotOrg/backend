@@ -9,7 +9,6 @@ import subprocess
 import urllib
 
 import connexion
-import picamera
 from flask import Response, request, send_file
 from werkzeug.datastructures import Headers
 
@@ -27,16 +26,7 @@ from coderbot import CoderBot
 
 BUTTON_PIN = 16
 
-config = Config.read()
-bot = CoderBot.get_instance(motor_trim_factor=float(config.get('move_motor_trim', 1.0)),
-                            motor_max_power=int(config.get('motor_max_power', 100)),
-                            motor_min_power=int(config.get('motor_min_power', 0)),
-                            hw_version=config.get('hardware_version'),
-                            pid_params=(float(config.get('pid_kp', 1.0)),
-                                        float(config.get('pid_kd', 0.1)),
-                                        float(config.get('pid_ki', 0.01)),
-                                        float(config.get('pid_max_speed', 200)),
-                                        float(config.get('pid_sample_time', 0.01))))
+bot = CoderBot.get_instance()
 audio_device = Audio.get_instance()
 cam = Camera.get_instance()
 
@@ -213,7 +203,7 @@ def getPhoto(name):
     try:
         media_file = cam.get_photo_file(name)
         return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), max_age=0)
-    except picamera.exc.PiCameraError as e:
+    except Exception as e:
         logging.error("Error: %s", str(e))
         return 503
     except FileNotFoundError:
