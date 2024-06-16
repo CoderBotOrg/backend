@@ -26,7 +26,7 @@ import audioop
 import pyaudio
 import alsaaudio
 
-from six.moves import queue
+import queue
 # [END import_libraries]
 
 # Audio recording parameters

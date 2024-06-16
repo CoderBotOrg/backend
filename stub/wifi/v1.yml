@@ -1,0 +1,64 @@
+openapi: "3.0.0"
+info:
+  version: "1.0"
+  title: OpenAPI 3.0 definition of WiFi API
+
+servers:
+  - url: http://coderbot.local/v1
+
+# Paths supported by the server application
+paths:
+  /list_access_points:
+    get:
+      operationId: "api.list_access_points"
+      summary: "list Access Points"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Wifi
+  /connection_status:
+    get:
+      operationId: "api.connection_status"
+      summary: "connection Status"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Wifi
+  /connect:
+    post:
+      operationId: "api.connect"
+      summary: "connect"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Wifi
+  /forget:
+    post:
+      operationId: "api.forget"
+      summary: "forget"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Wifi
+  /sset_hotspot_ssid:
+    post:
+      operationId: "api.sset_hotspot_ssid"
+      summary: "sset_hotspot_ssid"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Wifi
+  /set_hotspot_password:
+    post:
+      operationId: "api.set_hotspot_password"
+      summary: "set_hotspot_password"
+      responses:
+        200:
+          description: "ok"
+      tags:
+        - Wifi
