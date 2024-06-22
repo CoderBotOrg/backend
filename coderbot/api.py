@@ -27,6 +27,7 @@ from coderbot import CoderBot
 
 BUTTON_PIN = 16
 
+config = Config.get()
 bot = CoderBot.get_instance()
 audio_device = Audio.get_instance()
 cam = Camera.get_instance()
