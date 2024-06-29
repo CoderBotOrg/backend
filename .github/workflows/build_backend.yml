@@ -42,9 +42,9 @@ jobs:
     strategy:
       matrix:
         architecture: 
-          - arch: linux/arm/v7
-            dockerfile: Dockerfile
-            tag: armv7
+          # - arch: linux/arm/v7
+          #   dockerfile: Dockerfile
+          #   tag: armv7
           - arch: linux/arm64
             dockerfile: Dockerfile.arm64
             tag: arm64
