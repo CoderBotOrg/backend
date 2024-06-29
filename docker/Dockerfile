@@ -1,4 +1,4 @@
-FROM balenalib/raspberrypi3:bookworm-20240227
+FROM balenalib/raspberrypi3:bookworm-20240229
 
 ENV QEMU_CPU=max
 ENV DEBIAN_FRONTEND=noninteractive
