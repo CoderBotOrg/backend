@@ -26,16 +26,8 @@ from coderbot import CoderBot
 
 BUTTON_PIN = 16
 
-config = Config.read()
-bot = CoderBot.get_instance(motor_trim_factor=float(config.get('move_motor_trim', 1.0)),
-                            motor_max_power=int(config.get('motor_max_power', 100)),
-                            motor_min_power=int(config.get('motor_min_power', 0)),
-                            hw_version=config.get('hardware_version'),
-                            pid_params=(float(config.get('pid_kp', 1.0)),
-                                        float(config.get('pid_kd', 0.1)),
-                                        float(config.get('pid_ki', 0.01)),
-                                        float(config.get('pid_max_speed', 200)),
-                                        float(config.get('pid_sample_time', 0.01))))
+config = Config.get()
+bot = CoderBot.get_instance()
 audio_device = Audio.get_instance()
 cam = Camera.get_instance()
 
