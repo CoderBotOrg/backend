@@ -7,6 +7,8 @@ import logging
 import os
 import subprocess
 import urllib
+import uptime
+from gpiozero import CPUTemperature, Device
 
 import connexion
 from flask import Response, request, send_file
@@ -54,17 +56,8 @@ def get_status():
     (Cached method)
     """
 
-    temp = "undefined"
-    try:
-        temp = os.popen("vcgencmd measure_temp").readline().replace("temp=", "")
-    except Exception:
-        pass
-
-    uptime = 0
-    try:
-        uptime = subprocess.check_output(["uptime"]).decode('utf-8').replace('\n', '')
-    except Exception:
-        pass
+    temp = str(CPUTemperature().temperature)
+    uptime = uptime.uptime()
 
     internet_status = False
     try:
@@ -84,10 +77,26 @@ def get_info():
     """
     device = {}
     serial = get_serial()
-
+    board_info_dict = {}
     try:
         device = Balena.get_instance().device()
-        logging.info("device: %s", str(device))
+        logging.debug("device: %s", str(device))
+        board_info = Device.pin_factory.board_info
+        board_info_dict["model"] = board_info.model
+        board_info_dict["revision"] = board_info.revision
+        board_info_dict["released"] = board_info.released
+        board_info_dict["manufacturer"] = board_info.manufacturer
+        board_info_dict["soc"] = board_info.soc
+        board_info_dict["pcb_revision"] = board_info.pcb_revision
+        board_info_dict["memory"] = board_info.memory
+        board_info_dict["storage"] = board_info.storage
+        board_info_dict["usb"] = board_info.usb
+        board_info_dict["usb3"] = board_info.usb3
+        board_info_dict["ethernet"] = board_info.ethernet
+        board_info_dict["eth_speed"] = board_info.eth_speed
+        board_info_dict["wifi"] = board_info.wifi
+        board_info_dict["bluetooth"] = board_info.bluetooth
+
     except Exception:
         pass
 
@@ -95,7 +104,8 @@ def get_info():
              'coderbot_version': os.getenv("CODERBOT_VERSION"),
              'update_status': device.get("status"),
              'kernel': device.get("os_version"),
-             'serial': serial }
+             'serial': serial,
+             'board_info': board_info_dict }
 
 prog = None
 prog_engine = ProgramEngine.get_instance()

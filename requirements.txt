@@ -5,6 +5,8 @@ tinydb==4.8.0
 # Misc utils
 setuptools==69.2.0
 event-channel==0.4.3
+gpiozero==2.0.1
+uptime==3.0.1
 
 # IO extensions
 pigpio==1.78
