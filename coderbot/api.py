@@ -56,8 +56,8 @@ def get_status():
     (Cached method)
     """
 
-    temp = str(CPUTemperature().temperature)
-    uptime = uptime.uptime()
+    a_temp = str(CPUTemperature().temperature)
+    a_uptime = uptime.uptime()
 
     internet_status = False
     try:
@@ -67,8 +67,8 @@ def get_status():
         pass
 
     return {'internet_status': internet_status,
-            'temp': temp,
-            'uptime': uptime}
+            'temp': a_temp,
+            'uptime': a_uptime}
 
 def get_info():
     """

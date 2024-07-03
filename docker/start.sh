@@ -6,6 +6,7 @@
 # enable i2c driver
 modprobe i2c-dev
 # detect camerq
+/usr/bin/entry.sh
 udevadm control --reload
 # set home
 cd /coderbot
