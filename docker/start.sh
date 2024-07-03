@@ -5,6 +5,8 @@
 /usr/bin/tvservice -o
 # enable i2c driver
 modprobe i2c-dev
+# detect camerq
+udevadm control --reload
 # set home
 cd /coderbot
 # start coderbot
