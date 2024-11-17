@@ -5,8 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN install_packages gnupg
 
-#RUN echo "deb http://archive.raspberrypi.org/debian/ bookworm main" > /etc/apt/sources.list.d/raspi.list \
-#  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
+RUN echo "deb http://archive.raspberrypi.org/debian/ bookworm main" > /etc/apt/sources.list.d/raspi.list \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 RUN install_packages \
  build-essential \
