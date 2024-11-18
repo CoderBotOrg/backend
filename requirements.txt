@@ -19,8 +19,8 @@ PyAudio==0.2.14
 pyalsaaudio==0.10.0
 
 # Computer Vision
-grpcio==1.62.1
-numpy==1.26.4
+grpcio==1.68.0
+numpy==2.1.3
 Pillow==10.2.0
 protobuf==4.25.2
 opencv-contrib-python-headless==4.9.0.80
