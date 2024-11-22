@@ -10,6 +10,7 @@ RUN echo "deb http://archive.raspberrypi.org/debian/ bookworm main" > /etc/apt/s
 
 RUN install_packages \
  build-essential \
+ cmake \
  procps \
  sudo \
  wget \
