@@ -39,6 +39,7 @@ jobs:
   release-backend:
     needs: [test]
     runs-on: ubuntu-latest
+    timeout-minutes: 1440
     strategy:
       matrix:
         architecture: 
@@ -81,7 +82,6 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and push
       uses: docker/build-push-action@v5
-      timeout-minutes: 1440
       with:
           push: true
           build-args: CODERBOT_VERSION=${{github.ref_name}}-${{github.sha}}
