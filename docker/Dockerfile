@@ -38,6 +38,7 @@ RUN install_packages \
  libavformat59
 RUN install_packages \
  libopencv-dev \
+ python3-opencv \
  zbar-tools \
  libzbar0 \
  sox \
@@ -53,9 +54,9 @@ RUN install_packages \
  tesseract-ocr-deu
 
 ENV READTHEDOCS=True
-ADD requirements.txt /tmp/.
+ADD requirements_32.txt /tmp/.
 RUN pip install --break-system-packages --upgrade pip && \
-  pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
+  pip install --no-cache-dir --break-system-packages -r /tmp/requirements_32.txt
 
 RUN mkdir -p /coderbot && \
 mkdir -p /coderbot/data && \
