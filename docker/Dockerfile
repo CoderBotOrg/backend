@@ -38,7 +38,6 @@ RUN install_packages \
  libavformat59
 RUN install_packages \
  libopencv-dev \
- python3-opencv \
  zbar-tools \
  libzbar0 \
  sox \
