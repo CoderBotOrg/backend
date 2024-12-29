@@ -26,7 +26,7 @@ import logging
 from threading import Condition
 import numpy as np
 from picamera2 import Picamera2
-from picamera2.encoders import Encoder, MJPEGEncoder, H264Encoder
+from picamera2.encoders import MJPEGEncoder, H264Encoder
 from picamera2.outputs import FileOutput, FfmpegOutput
 
 class Camera(object):

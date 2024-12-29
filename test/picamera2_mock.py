@@ -9,6 +9,33 @@ import numpy
 
 logger = logging.getLogger()
 
+class Picamera2EoncoderMock(threading.Thread):
+    def __init__(self, output):
+        self.output = output
+        self.image_jpeg = open('test/test_image.jpeg', 'rb').read()
+        self.exit = False
+        super().__init__()
+
+    def close(self):
+        self.output[0].close()
+
+    def stop(self):
+        self.exit = True
+
+    def run(self):
+        while(not self.exit):
+            self.output[0].outputframe(self.image_jpeg)
+            time.sleep(0.03)
+
+class Picamera2MJPEGEncoderMock(Picamera2EoncoderMock):
+    def __init__(self, output=None, quality=20):
+        super().__init__(output)
+        self.quality = quality
+
+class Picamera2H264EncoderMock(Picamera2EoncoderMock):
+    def __init__(self, output=None):
+        super().__init__(output)
+
 class Picamera2Mock(object):
     """Implements PiCamera mock class
     PiCamera is the library used to access the integrated Camera, this mock class emulates the capture functions in order to test the streamer loop.
@@ -53,35 +80,13 @@ class Picamera2Mock(object):
     def start(self):
         pass
 
-    def start_recording(self, buffer, format, splitter_port, quality=None, bitrate=None, resize=None):
-        """mock start_recording"""
-        print(format)
-        if format == "bgra" and resize:
-            self.images[format] = cv2.resize(self.images[format], resize)
-        if format == "h264":
-            f = open("test/test.h264", "rb")
-            video = f.read()
-            f.close()
-            self.splitter_recorders[splitter_port] = self.VideoRecorder(buffer, video)
-        else:
-            self.splitter_recorders[splitter_port] = self.ImageRecorder(buffer, self.images[format])
-            self.splitter_recorders[splitter_port].start() 
-
-    def stop_recording(self, splitter_port):
-        if splitter_port < 2:
-            self.splitter_recorders[splitter_port].go = False
-            self.splitter_recorders[splitter_port].join()
-        else:
-            recorder = self.splitter_recorders[splitter_port]
-            f = open(recorder.buffer, "wb")
-            f.write(recorder.video)
-            f.close()
-
-    def start_encoder(self, encoder):
-        pass
+    def start_encoder(self, encoder, output=None):
+        encoder.start()
+        output
 
     def stop_encoder(self, encoders):
-        pass
+        for encoder in encoders:
+            encoder.stop()
 
     def capture_buffer(self):
         return self.images["bgra"]

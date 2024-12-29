@@ -64,4 +64,4 @@ ADD docker/stub/start.sh /coderbot/.
 ARG CODERBOT_VERSION
 ENV CODERBOT_VERSION=${CODERBOT_VERSION}
 
-ENTRYPOINT /coderbot/start.sh
+ENTRYPOINT ["coderbot/start.sh"]

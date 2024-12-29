@@ -1,10 +1,2 @@
-class Encoder():
-    pass
-
-class MJPEGEncoder(Encoder):
-    def __init__(self, bitrate):
-        pass
-
-class H264Encoder(Encoder):
-    def __init__(self, bitrate=100000):
-        pass
+from picamera2_mock import Picamera2MJPEGEncoderMock as MJPEGEncoder
+from picamera2_mock import Picamera2H264EncoderMock as H264Encoder
