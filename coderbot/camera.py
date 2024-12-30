@@ -213,8 +213,11 @@ class Camera(object):
 
     def delete_photo(self, filename):
         logging.info("delete photo: %s", filename)
-        os.remove(PHOTO_PATH + "/" + filename)
-        os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
+        try:
+            os.remove(PHOTO_PATH + "/" + filename)
+            os.remove(PHOTO_PATH + "/" + filename[:filename.rfind(".")] + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT)
+        except FileNotFoundError:
+            logging.warning("photo not found: %s", filename)
         for photo in self._photos:
             if photo["name"] == filename:
                 self._photos.remove(photo)
