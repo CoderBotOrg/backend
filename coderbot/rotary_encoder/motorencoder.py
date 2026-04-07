@@ -1,5 +1,7 @@
 import pigpio
 import threading
+import logging
+from collections import deque
 from time import sleep, time
 
 from rotary_encoder.rotarydecoder import RotaryDecoder
@@ -14,6 +16,19 @@ class MotorEncoder:
         Every movement method must acquire lock in order not to have
         concurrency problems on GPIO READ/WRITE """
 
+    # Encoder geometry constants
+    # Gearbox ratio: 120:1 (1 wheel revolution = 120 motor revolutions)
+    # Encoder ratio: 16 ticks per motor revolution
+    # 1 wheel revolution = 120 * 16 = 1920 ticks (single channel)
+    # Both channels, EITHER_EDGE: 1920 * 2 = 3840 callbacks per revolution
+    # R = 32.5mm → circumference = 2πR = 204.2mm
+    # 3840 ticks = 204.2mm → 1 tick = 0.053mm
+    DISTANCE_PER_TICK = 0.053  # mm per encoder callback
+
+    # Speed calculation: sliding window size (ticks)
+    # Smaller = more responsive but noisier; larger = smoother but laggier
+    SPEED_WINDOW_SIZE = 20
+
     # default constructor
     def __init__(self, pi, enable_pin, forward_pin, backward_pin, feedback_pin_A, feedback_pin_B):
         # setting pin variables
@@ -25,18 +40,16 @@ class MotorEncoder:
         self._feedback_pin_B = feedback_pin_B
 
         # setting movement variables
-        self._direction = 0
-        self._distance_per_tick = 0.06 #(mm)
-        self._ticks = 0
+        self._direction = 0           # commanded direction: 1=forward, -1=backward, 0=stopped
+        self._encoder_direction = 0   # direction detected by quadrature encoder
+        self._ticks = 0               # total ticks (unsigned, for speed/distance magnitude)
+        self._signed_ticks = 0        # signed ticks (for directional distance)
         self._power = 0
-        self._encoder_speed = 0
+        self._encoder_speed = 0.0
         self._is_moving = False
 
-        # quadrature encoder variables
-        self._start_timer = 0
-        self._current_timer = 0
-        self._ticks_threshold = 100
-        self._ticks_counter = 0
+        # sliding window for speed calculation
+        self._tick_history = deque(maxlen=self.SPEED_WINDOW_SIZE + 1)
 
         # other
         self._encoder_lock = threading.RLock()
@@ -47,16 +60,19 @@ class MotorEncoder:
     def ticks(self):
         return self._ticks
 
-    # distance
+    # distance (unsigned magnitude)
     def distance(self):
-        #return self._distance
-        return self._ticks * self._distance_per_tick
+        return self._ticks * self.DISTANCE_PER_TICK
 
-    # direction
+    # signed distance (positive=forward, negative=backward)
+    def signed_distance(self):
+        return self._signed_ticks * self.DISTANCE_PER_TICK
+
+    # direction from encoder feedback
     def direction(self):
-        return self._direction
+        return self._encoder_direction
 
-    # speed
+    # speed (always positive, magnitude only)
     def speed(self):
         return self._encoder_speed
 
@@ -65,29 +81,27 @@ class MotorEncoder:
         return self._is_moving
 
     # MOVEMENT
-    """ The stop function acquires the lock to operate on motor
-        then writes a 0 on movement pins to stop the motor
-        and releases the lock afterwards 
+    """ The control function sets PWM to drive the motor at the given power.
         Motor speed on range 0 - 100 already set on PWM_set_range(100)
         if a time_elapse parameter value is provided, motion is locked
         for a certain amount of time """
 
     def control(self, power=100.0, time_elapse=0):
-        # resetting distance and ticks before new movement
-        self._distance = 0  # resetting distance travelled
-        self._ticks = 0  # resetting ticks
+        # resetting ticks before new movement
+        self._ticks = 0
+        self._signed_ticks = 0
 
         self._direction = 1 if power > 0 else -1  # setting direction according to speed
-        self._power = abs(power) # setting current power
+        self._power = abs(power)  # setting current power
 
         if self._enable_pin is not None:
             self._pi.write(self._enable_pin, True)  # enabling motors
 
         # going forward
-        if (self._direction == 1):
+        if self._direction == 1:
             self._pi.write(self._backward_pin, 0)
             self._pi.set_PWM_dutycycle(self._forward_pin, self._power)
-        # going bacakward
+        # going backward
         else:
             self._pi.write(self._forward_pin, 0)
             self._pi.set_PWM_dutycycle(self._backward_pin, self._power)
@@ -95,13 +109,11 @@ class MotorEncoder:
         self._is_moving = True
 
         # movement time elapse
-        if (time_elapse > 0):
+        if time_elapse > 0:
             sleep(time_elapse)
             self.stop()
 
-    """ The stop function acquires the lock to operate on motor
-        then writes a 0 on movement pins to stop the motor
-        and releases the lock afterwards """
+    """ The stop function writes a 0 on movement pins to stop the motor """
 
     def stop(self):
         # stopping motor
@@ -114,69 +126,58 @@ class MotorEncoder:
     # stop auxiliary function, resets wheel state
     def reset_state(self):
         # returning state variables to consistent state
-        # after stopping, values of distance and ticks remains until
+        # after stopping, values of distance and ticks remain until
         # next movement
-        self._ticks = 0  # resetting ticks
-        self._power = 0  # resetting PWM power
-        self._encoder_speed = 0  # resetting encoder speed
-        self._direction = 0  # resetting direction
-        self._start_timer = 0
-        self._current_timer = 0
-        self._ticks_counter = 0
-        self._is_moving = False  # resetting moving flag
+        self._ticks = 0
+        self._signed_ticks = 0
+        self._power = 0
+        self._encoder_speed = 0.0
+        self._direction = 0
+        self._encoder_direction = 0
+        self._tick_history.clear()
+        self._is_moving = False
 
     # adjust power for velocity control loop
     def adjust_power(self, power):
-        self._power = power  # setting current power
+        self._power = abs(power)  # setting current power
 
         # adjusting power forward
-        if (self._direction == 1):
-            self._pi.set_PWM_dutycycle(self._forward_pin, abs(power))
-        # adjusting power bacakward
+        if self._direction == 1:
+            self._pi.set_PWM_dutycycle(self._forward_pin, self._power)
+        # adjusting power backward
         else:
-            self._pi.set_PWM_dutycycle(self._backward_pin, abs(power))
+            self._pi.set_PWM_dutycycle(self._backward_pin, self._power)
 
     # CALLBACK
     """ The callback function rotary_callback is called on EITHER_EDGE by the
-            rotary_decoder with a parameter value of 1 (1 new tick)
-            - Gearbox ratio: 120:1 (1 wheel revolution = 120 motor revolution)
-            - Encoder ratio: 16:1 encoder ticks for 1 motor revolution
-            - 1 wheel revolution = 120 * 16 = 1920 ticks
-            - R = 32.5mm        
-            - 1 wheel revolution = 2πR = 2 * π * 32.5mm = 204.2mm
-            - 3840 ticks = 204.2mm
-            - 1 tick = 0.053mm
-            - 1 tick : 0.053mm = x : 1000mm -> x = 18867 ticks approximately 
-            So 0.053 is the ticks->distance(mm) conversion coefficient
-            The callback function calculates current velocity by taking groups of 
-            ticks_threshold ticks"""
-    # callback function
-    def rotary_callback(self, tick):
-        self._encoder_lock.acquire()
+            rotary_decoder with direction (+1/-1) and tick (pigpio timestamp).
 
-        # taking groups of n ticks each
-        if (self._ticks_counter == 0):
-            self._start_timer = tick  # clock started
-        elif (abs(self._ticks_counter) == self._ticks_threshold):
-            self._current_timer = tick
-            elapse = (self._current_timer - self._start_timer) / 1000000.0 # calculating time elapse
-            # calculating current speed
-            self._encoder_speed = self._ticks_threshold * self._distance_per_tick / elapse  # (mm/s)
+            Speed is calculated using a sliding window of recent ticks for
+            responsive, continuous updates. Uses pigpio.tickDiff() to handle
+            the 32-bit microsecond counter wraparound (~72 min). """
 
-        self._ticks += 1  # updating ticks
+    def rotary_callback(self, direction, tick):
+        with self._encoder_lock:
+            # update direction from quadrature decoder
+            self._encoder_direction = direction
 
-        if(abs(self._ticks_counter) < self._ticks_threshold):
-            self._ticks_counter += 1
-        else:
-            self._start_timer = tick  # clock started
-            self._ticks_counter = 0
+            # update tick counts
+            self._ticks += 1
+            self._signed_ticks += direction
 
-        # updating ticks counter using module
-        # 0, 1, 2, ... 8, 9, 10, 0, 1, 2, ...
-        # not ideal, module on ticks counter not precise, may miss an interrupt
-        #self._ticks_counter += 1 % (self._ticks_threshold + 1)
+            # sliding window speed calculation
+            self._tick_history.append(tick)
 
-        self._encoder_lock.release() # releasing lock
+            if len(self._tick_history) >= self.SPEED_WINDOW_SIZE + 1:
+                # we have enough ticks for a speed measurement
+                oldest_tick = self._tick_history[0]
+                elapsed_us = pigpio.tickDiff(oldest_tick, tick)
+                if elapsed_us > 0:
+                    self._encoder_speed = (
+                        self.SPEED_WINDOW_SIZE * self.DISTANCE_PER_TICK
+                        / (elapsed_us / 1000000.0)
+                    )  # mm/s
+            # else: not enough ticks yet, keep speed at last known value
 
     # callback cancelling
     def cancel_callback(self):

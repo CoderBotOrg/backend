@@ -127,9 +127,8 @@ class Camera(object):
             self.save_photo_metadata()
 
     def save_photo_metadata(self):
-        f = open(PHOTO_METADATA_FILE, "wt")
-        json.dump(self._photos, f)
-        f.close()
+        with open(PHOTO_METADATA_FILE, "wt") as f:
+            json.dump(self._photos, f)
 
     def update_photo(self, photo):
         for p in self._photos:
@@ -152,17 +151,14 @@ class Camera(object):
         photo_index = self.get_next_photo_index()
         filename = PHOTO_PREFIX + str(photo_index) + self._camera.PHOTO_FILE_EXT
         filename_thumb = PHOTO_PREFIX + str(photo_index) + PHOTO_THUMB_SUFFIX + self._camera.PHOTO_FILE_EXT
-        of = open(PHOTO_PATH + "/" + filename, "wb+")
-        oft = open(PHOTO_PATH + "/" + filename_thumb, "wb+")
         im_str = self.get_image_jpeg()
-        of.write(im_str)
-        # thumb
-        im_pil = PILImage.open(BytesIO(im_str))
-        im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
+        with open(PHOTO_PATH + "/" + filename, "wb+") as of:
+            of.write(im_str)
+        with open(PHOTO_PATH + "/" + filename_thumb, "wb+") as oft:
+            im_pil = PILImage.open(BytesIO(im_str))
+            im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
         self._photos.append({"name":filename})
         self.save_photo_metadata()
-        of.close()
-        oft.close()
 
     def is_recording(self):
         return self.recording
@@ -186,15 +182,14 @@ class Camera(object):
             except Exception:
                 pass
 
-        oft = open(PHOTO_PATH +  "/" + filename_thumb, "wb")
-        im_str = self._camera.get_image_jpeg()
-        im_pil = PILImage.open(BytesIO(im_str))
-        im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
+        with open(PHOTO_PATH +  "/" + filename_thumb, "wb") as oft:
+            im_str = self._camera.get_image_jpeg()
+            im_pil = PILImage.open(BytesIO(im_str))
+            im_pil.resize(PHOTO_THUMB_SIZE).save(oft)
         self._photos.append({"name":filename})
         self.save_photo_metadata()
         self._camera.video_rec(PHOTO_PATH + "/" + filename)
         self.video_start_time = time.time()
-        oft.close()
 
     def video_stop(self):
         if self.recording:

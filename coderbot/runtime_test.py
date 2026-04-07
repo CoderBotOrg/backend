@@ -91,7 +91,7 @@ def __test_encoder():
         assert (c.speed() == 0)
 
         return 1
-    except:
+    except Exception:
         return -1
 
 # sonar

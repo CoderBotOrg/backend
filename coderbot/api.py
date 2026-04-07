@@ -114,6 +114,7 @@ def move(body):
     distance=body.get("distance")
     if (speed is None or speed == 0) or (elapse is not None and distance is not None):
         return 400
+    speed = max(-100, min(100, speed))
     bot.move(speed=speed, elapse=elapse, distance=distance)
     return 200
 
@@ -123,6 +124,7 @@ def turn(body):
     distance=body.get("distance")
     if (speed is None or speed == 0) or (elapse is not None and distance is not None):
         return 400
+    speed = max(-100, min(100, speed))
     bot.turn(speed=speed, elapse=elapse, distance=distance)
     return 200
 
@@ -201,9 +203,10 @@ def listPhotos():
 
 def getPhoto(name):
     mimetype = {'jpg': 'image/jpeg', 'mp4': 'video/mp4'}
+    name = os.path.basename(name)
     try:
         media_file = cam.get_photo_file(name)
-        return send_file(media_file, mimetype=mimetype.get(name[:-3], 'image/jpeg'), max_age=0)
+        return send_file(media_file, mimetype=mimetype.get(name[-3:], 'image/jpeg'), max_age=0)
     except picamera.exc.PiCameraError as e:
         logging.error("Error: %s", str(e))
         return 503
@@ -211,6 +214,7 @@ def getPhoto(name):
         return 404
 
 def savePhoto(name, body):
+    name = os.path.basename(name)
     try:
         cam.update_photo({"name": name, "tag": body.get("tag")})
     except FileNotFoundError:
@@ -218,6 +222,7 @@ def savePhoto(name, body):
 
 def deletePhoto(name):
     logging.debug("photo delete")
+    name = os.path.basename(name)
     try:
         cam.delete_photo(name)
     except FileNotFoundError:
@@ -235,10 +240,10 @@ def saveSettings(body):
     return 200
 
 def updateFromPackage():
-    os.system('sudo bash /home/pi/clean-update.sh')
+    subprocess.run(['sudo', 'bash', '/home/pi/clean-update.sh'], check=False)
     file_to_upload = connexion.request.files['file_to_upload']
     file_to_upload.save(os.path.join('/home/pi/', 'update.tar'))
-    os.system('sudo reboot')
+    subprocess.run(['sudo', 'reboot'], check=False)
     return 200
 
 def listMusicPackages():

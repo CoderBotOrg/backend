@@ -170,10 +170,9 @@ class Motion:
         #print "initial tp: ", len(self.tracks), " current tp: ", len(new_tracks)
         #print len(new_tracks), len(tracks)
         tracks[:] = new_tracks[:]
-        if tracks is False:
+        if not tracks:
             logging.warning("lost ALL tp!")
             self.bot.stop()
-            #exit(0)
         #cv2.polylines(self.vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
 
     def calc_motion(self):

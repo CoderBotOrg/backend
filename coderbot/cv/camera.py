@@ -122,8 +122,8 @@ class Camera(object):
     def set_overlay_text(self, text):
         try:
             self.camera.annotate_text = text
-        except picamera.PiCameraValueError:
-            logging.info("PiCameraValueError")
+        except Exception:
+            logging.info("Unable to set overlay text")
 
     def close(self):
         self.camera.close()

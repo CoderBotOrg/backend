@@ -39,8 +39,8 @@ class Sonar:
         pi.set_mode(self._trig, pigpio.OUTPUT)
         pi.set_mode(self._echo, pigpio.INPUT)
 
-        self._cb = pi.callback(self._trig, pigpio.EITHER_EDGE, self._cbf)
-        self._cb = pi.callback(self._echo, pigpio.EITHER_EDGE, self._cbf)
+        self._cb_trig = pi.callback(self._trig, pigpio.EITHER_EDGE, self._cbf)
+        self._cb_echo = pi.callback(self._echo, pigpio.EITHER_EDGE, self._cbf)
 
         self._inited = True
 
@@ -79,7 +79,6 @@ class Sonar:
             return None
 
     def get_distance(self):
-        time.sleep(0.05)
         return round(self.read() / self.MICROSECONDS * self.SOUND_SPEED / 2, 1) # seconds / microseconds * sound speed / 2 (half trip)
 
     def cancel(self):
@@ -89,6 +88,7 @@ class Sonar:
         """
         if self._inited:
             self._inited = False
-            self._cb.cancel()
+            self._cb_trig.cancel()
+            self._cb_echo.cancel()
             self.pi.set_mode(self._trig, self._trig_mode)
             self.pi.set_mode(self._echo, self._echo_mode)

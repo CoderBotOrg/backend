@@ -30,6 +30,8 @@ import json
 import os
 import logging
 import copy
+import shutil
+import subprocess
 
 class MusicPackage:
 
@@ -150,7 +152,7 @@ class MusicPackageManager:
             return 2
 
         if os.path.exists('./sounds/notes/' + packageName):
-            os.system('rm -rf ./sounds/notes/' + packageName)
+            shutil.rmtree('./sounds/notes/' + packageName)
             return 1
 
 
@@ -189,9 +191,9 @@ class MusicPackageManager:
                 logging.info("errore, il pacchetto " + pkgname + " ha versione precendente a quello attualmente installato")
                 raise ValueError()
         else:
-            os.system('unzip -o ' + '/tmp/' + filename + " -d /tmp")
-            os.system('mkdir ' + pkgpath)
-            os.system('mv /tmp/' + pkgname + "/" + 'audio.wav ' + pkgpath + '/')
+            subprocess.run(['unzip', '-o', '/tmp/' + filename, '-d', '/tmp'], check=True)
+            os.makedirs(pkgpath, exist_ok=True)
+            shutil.move('/tmp/' + pkgname + '/audio.wav', pkgpath + '/audio.wav')
 
             with open('/tmp/' + pkgname + '/' + pkgname + '.json') as json_file:
                 logging.info("adding " + pkgname + " package")
@@ -208,7 +210,7 @@ class MusicPackageManager:
 
             self.updatePackages()
 
-            os.system('rm -rf /tmp/' + pkgname)
+            shutil.rmtree('/tmp/' + pkgname, ignore_errors=True)
 
 
     def isPackageAvailable(self,namePackage):

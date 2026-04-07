@@ -82,8 +82,7 @@ class ProgramEngine:
         # initialise DB from default programs
         query = Query()
         self.lock = Lock()
-        for dirname, dirnames, filenames, in os.walk(PROGRAMS_PATH_DEFAULTS):
-            dirnames
+        for dirname, _dirnames, filenames in os.walk(PROGRAMS_PATH_DEFAULTS):
             for filename in filenames:
                 if PROGRAM_PREFIX in filename:
                     program_name = filename[len(PROGRAM_PREFIX):-len(PROGRAM_SUFFIX)]
@@ -154,7 +153,6 @@ class ProgramEngine:
         return self._program
 
 class Program:
-    _running = False
 
     @property
     def dom_code(self):
@@ -162,6 +160,7 @@ class Program:
 
     def __init__(self, name, code=None, dom_code=None, default=False):
         self._thread = None
+        self._running = False
         self.name = name
         self._dom_code = dom_code
         self._code = code
@@ -213,9 +212,37 @@ class Program:
             self._log = "" #clear log
             imports = "import json\n"
             code = imports + self._code
-            env = globals()
+            # Restricted namespace: only expose robot control functions,
+            # not the full global scope (prevents access to os, sys, etc.)
+            safe_env = {
+                '__builtins__': {
+                    'range': range, 'len': len, 'int': int, 'float': float,
+                    'str': str, 'bool': bool, 'list': list, 'dict': dict,
+                    'tuple': tuple, 'set': set, 'abs': abs, 'min': min,
+                    'max': max, 'round': round, 'print': print,
+                    'True': True, 'False': False, 'None': None,
+                    'isinstance': isinstance, 'type': type,
+                    'enumerate': enumerate, 'zip': zip, 'map': map,
+                    'filter': filter, 'sorted': sorted, 'reversed': reversed,
+                    'sum': sum, 'any': any, 'all': all,
+                    'ValueError': ValueError, 'TypeError': TypeError,
+                    'RuntimeError': RuntimeError, 'Exception': Exception,
+                    'KeyError': KeyError, 'IndexError': IndexError,
+                    '__import__': lambda name, *args, **kwargs:
+                        __import__(name) if name in ('json', 'math', 'time', 'random') else
+                        (_ for _ in ()).throw(ImportError(f"import of '{name}' is not allowed")),
+                },
+                'get_cam': get_cam,
+                'get_bot': get_bot,
+                'get_motion': get_motion,
+                'get_audio': get_audio,
+                'get_prog_eng': get_prog_eng,
+                'get_event': get_event,
+                'get_music': get_music,
+                'get_atmega': get_atmega,
+            }
             logging.debug("** start code **\n"+str(code)+ "\n** end code **")
-            exec(code, env, env)
+            exec(code, safe_env, safe_env)
         except RuntimeError as re:
             logging.info("quit: %s", str(re))
             get_prog_eng().log(str(re))

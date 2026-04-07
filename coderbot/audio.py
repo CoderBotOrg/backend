@@ -21,6 +21,7 @@ import os
 from array import array
 import time
 import logging
+import subprocess
 import wave
 import audioop
 import pyaudio
@@ -64,8 +65,16 @@ class Audio:
     def say(self, what, locale='en'):
         if what and "$" in what:
             self.play(what[1:] + SOUNDEXT)
-        elif what and what:
-            os.system('espeak --stdout -v' + locale + ' -p 90 -a 200 -s 150 -g 10 "' + what + '" 2>>/dev/null | aplay -q')
+        elif what:
+            try:
+                espeak = subprocess.Popen(
+                    ['espeak', '--stdout', '-v', locale, '-p', '90', '-a', '200', '-s', '150', '-g', '10', what],
+                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
+                )
+                subprocess.run(['aplay', '-q'], stdin=espeak.stdout, stderr=subprocess.DEVNULL)
+                espeak.wait()
+            except FileNotFoundError:
+                logging.warning("espeak or aplay not found")
 
     def normalize(self, snd_data):
         "Average the volume out"

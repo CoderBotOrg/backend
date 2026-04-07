@@ -37,14 +37,13 @@ class Config(object):
             cls.restore()
         with open(CONFIG_FILE, 'r') as f:
           cls._config = json.load(f)
-          f.close()
           return cls._config
 
     @classmethod
     def write(cls, config):
         cls._config = config
-        f = open(CONFIG_FILE, 'w')
-        json.dump(cls._config, f)
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(cls._config, f)
         return cls._config
 
     @classmethod

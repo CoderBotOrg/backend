@@ -17,8 +17,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ############################################################################
 
-import os
-import sys
 import time
 from math import copysign
 import logging
@@ -102,11 +100,12 @@ class CoderBot(object):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, motor_trim_factor=1.0, motor_min_power=0, motor_max_power=100, hw_version="5", pid_params=(0.8, 0.1, 0.01, 200, 0.01)):
+        self._mpu = None
         try:
             self._mpu = mpu.AccelGyroMag()
             logging.info("MPU available")
-        except:
-            logging.info("MPU not available")
+        except Exception:
+            logging.warning("MPU not available")
 
         self.GPIOS = HW_VERSIONS.get(hw_version, GPIO_CODERBOT_V_5())
         self._pin_out = [self.GPIOS.PIN_LEFT_FORWARD, self.GPIOS.PIN_RIGHT_FORWARD, self.GPIOS.PIN_LEFT_BACKWARD, self.GPIOS.PIN_RIGHT_BACKWARD, self.GPIOS.PIN_SERVO_1, self.GPIOS.PIN_SERVO_2]
@@ -178,11 +177,20 @@ class CoderBot(object):
         self.motor_control(speed_left=speed_left, speed_right=speed_right, time_elapse=elapse, target_distance=distance)
 
     def turn_angle(self, speed=100, angle=0):
-        z = self._mpu.get_gyro()[2]
+        if self._mpu is None:
+            logging.warning("MPU not available, cannot turn by angle")
+            return
+        accumulated = 0.0
         self.turn(speed, elapse=0)
-        while abs(z - self._mpu.get_gyro()[2]) < angle:
+        t = time.time()
+        while abs(accumulated) < angle:
+            now = time.time()
+            dt = now - t
+            t = now
+            gyro_z = self._mpu.get_gyro()[2]
+            accumulated += gyro_z * dt
+            logging.info("turn_angle: accumulated=%.2f target=%s", accumulated, angle)
             time.sleep(0.05)
-            logging.info(self._mpu.get_gyro()[2])
         self.stop()
 
     def forward(self, speed=100, elapse=None, distance=None):
@@ -204,6 +212,8 @@ class CoderBot(object):
         return self.sonar[sonar_id].get_distance()
 
     def get_mpu_accel(self, axis=None):
+        if self._mpu is None:
+            return None
         acc = self._mpu.get_acc()
         if axis is None:
             return acc
@@ -211,17 +221,23 @@ class CoderBot(object):
             return int(acc[axis]*100.0)/100.0
 
     def get_mpu_gyro(self, axis=None):
+        if self._mpu is None:
+            return None
         gyro = self._mpu.get_gyro()
         if axis is None:
             return gyro
         else:
-            return int(gyro[axis]*100.0)/200.0
+            return int(gyro[axis]*100.0)/100.0
 
     def get_mpu_heading(self):
+        if self._mpu is None:
+            return None
         hdg = self._mpu.get_hdg()
         return int(hdg)
 
     def get_mpu_temp(self):
+        if self._mpu is None:
+            return None
         temp = self._mpu.get_temp()
         return int(temp*100.0)/100.0
 
@@ -242,7 +258,7 @@ class CoderBot(object):
         self._twin_motors_enc.stop()
 
     def is_moving(self):
-        return self._twin_motors_enc._is_moving
+        return self._twin_motors_enc.is_moving()
 
     # Distance travelled getter
     def distance(self):
@@ -254,7 +270,7 @@ class CoderBot(object):
 
     # CoderBot direction getter
     def direction(self):
-        return self._twin_motors_enc.speed()
+        return self._twin_motors_enc.direction()
 
     def set_callback(self, gpio, callback, elapse):
         self._cb_elapse[gpio] = elapse * 1000

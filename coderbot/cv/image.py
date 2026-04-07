@@ -29,8 +29,8 @@ MIN_MATCH_COUNT = 10
 
 try:
     from pyzbar.pyzbar import decode
-except:
-    logging.info("zbar not availabe")
+except Exception:
+    logging.info("zbar not available")
 
 class Image():
     r_from = np.float32([[0, 0], [640, 0], [640, 480], [0, 480]])
@@ -123,7 +123,7 @@ class Image():
         return Image(data)
 
     def blackwhite(self):
-        data = cv2.threshold(self._data, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        _, data = cv2.threshold(self._data, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         return Image(data)
 
     def invert(self):

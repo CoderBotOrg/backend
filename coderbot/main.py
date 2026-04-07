@@ -95,14 +95,15 @@ def run_server():
             CNNManager.get_instance()
             EventManager.get_instance("coderbot")
 
-            if app.bot_config.get('load_at_start') and app.bot_config.get('load_at_start'):
+            if app.bot_config.get('load_at_start'):
                 prog = app.prog_engine.load(app.bot_config.get('load_at_start'))
                 prog.execute()
+
+            bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)
+
         except ValueError as e:
             app.bot_config = {}
             logging.error(e)
-
-        bot.set_callback(bot.GPIOS.PIN_PUSHBUTTON, button_pushed, 100)
 
         remove_doreset_file()
 
